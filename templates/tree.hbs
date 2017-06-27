@@ -1,0 +1,21 @@
+<section class="enp-tree">
+    <div class="enp-tree__intro">
+        <h2>{{title}}</h2>
+        <a class="enp-tree__start" href="#enp-tree__question--1">{{startButton}}</a>
+    </div>
+
+    {{#if questions}}
+        {{#each questions}}
+            <section id="enp-tree__question--{{id}}">
+                <h3 class="enp-tree__question">{{content}}</h3>
+                {{#if options}}
+                    <ul class="enp-tree__options">
+                        {{#each options}}
+                            <li id="enp-tree__option--{{id}}" class="enp-tree__option"><a href="#enp-tree__question--{{destinationID}}">{{content}}</a></li>
+                        {{/each}}
+                    </ul>
+                {{/if}}
+            </section>
+        {{/each}}
+    {{/if}}
+</section>

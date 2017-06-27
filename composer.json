@@ -1,0 +1,13 @@
+{
+    "require": {
+        "zordius/lightncandy": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Enp\\":"src"
+        },
+        "files": [
+            "src/utilities.php"
+        ]
+    }
+}
