@@ -30,6 +30,6 @@
 
 <script src="dist/js/handlebars.runtime.js"></script>
 <script src="dist/js/templates.js"></script>
-<script src="dist/js/scripts.min.js"></script>
+<script src="dist/js/scripts.js"></script>
 </body>
 </html>

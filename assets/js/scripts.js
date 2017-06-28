@@ -64,23 +64,28 @@ function getTreeData(name) {
     });
 }
 
-
 function createTree(name) {
-    getTreeData(name).then(function(response) {
-        // The first runs when the promise resolves, with the request.reponse
-        // specified within the resolve() method.
-        let treeData = JSON.parse(response);
-        let newTree = new Tree(treeData)
-        // add it to our array of Tree objects
-        Trees.push(newTree)
-        // Render it
-        let treeBlock = document.getElementById('enp-tree__'+newTree.id);
-        treeBlock.innerHTML = newTree.html
-        // The second runs when the promise
-        // is rejected, and logs the Error specified with the reject() method.
-    }, function(Error) {
-        console.log(Error)
-    });
+    getTreeData(name).then(buildTree).catch(handleTreeDataError);
+}
+
+function buildTree(response) {
+    // The first runs when the promise resolves, with the request.reponse
+    // specified within the resolve() method.
+    let treeData = JSON.parse(response);
+    let newTree = new Tree(treeData)
+    // add it to our array of Tree objects
+    Trees.push(newTree)
+    // Render it
+    renderTree(newTree)
+}
+
+function handleTreeDataError(err) {
+    console.log(err)
+}
+
+function renderTree(Tree) {
+    let treeBlock = document.getElementById('enp-tree__'+Tree.id);
+    treeBlock.innerHTML = Tree.html
 }
 
 createTree('citizen');
