@@ -9,7 +9,7 @@ $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
 
 $app = new \Slim\App(["settings" => $config]);
-$app->get('/data/{name}', function (Request $request, Response $response) {
+$app->get('/tree/{name}', function (Request $request, Response $response) {
     $name = $request->getAttribute('name');
     $response->getBody()->write(file_get_contents("../../data/$name.json"));
 

@@ -34,7 +34,7 @@ class Render extends Template {
         return $renderer($this->get_data());
     }
 
-    protected function set_data($data_slug) {
+    protected function set_data($tree_slug) {
         $data = false;
 
         $client = new HTTP\Client([
@@ -44,7 +44,7 @@ class Render extends Template {
             'timeout'  => 2.0,
         ]);
 
-        $response = $client->request('GET', "data/$data_slug");
+        $response = $client->request('GET', "tree/$tree_slug");
         // Explicity cast the body to a string so we get the content string and not the body object
         $body = (string) $response->getBody();
 

@@ -2,6 +2,10 @@
 
 function Tree(data) {
     this.data = data;
+    this.id = data.id;
+    this.title = data.title;
+    this.startButton = data.startButton;
+    this.questions = data.questions;
     this.template = TreeTemplates.tree;
     this.html = this.template(this.data);
 }
@@ -33,7 +37,7 @@ function getTreeData(name) {
 
         var request = new XMLHttpRequest();
         request.overrideMimeType("application/json");
-        request.open('GET', 'http://dev/decision-tree/data/' + name, true);
+        request.open('GET', 'http://dev/decision-tree/api/v1/tree/' + name, true);
         //request.responseType = 'json';
         // When the request loads, check whether it was successful
         request.onload = function () {
@@ -60,12 +64,12 @@ var Trees = [];
 getTreeData('citizen').then(function (response) {
     // The first runs when the promise resolves, with the request.reponse
     // specified within the resolve() method.
-    console.log(response);
-    var newTree = new Tree(response);
+    var treeData = JSON.parse(response);
+    var newTree = new Tree(treeData);
     // add it to our array of Tree objects
     Trees.push(newTree);
     // Render it
-    var treeBlock = document.getElementById('enp-tree__' + newTree.data.id);
+    var treeBlock = document.getElementById('enp-tree__' + newTree.id);
     treeBlock.innerHTML = newTree.html;
     // The second runs when the promise
     // is rejected, and logs the Error specified with the reject() method.
