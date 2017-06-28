@@ -6,3 +6,4 @@
 .sass-cache
 /gulp/*
 /node_modules/*
+vendor/*

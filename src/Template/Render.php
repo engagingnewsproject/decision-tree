@@ -7,6 +7,7 @@
 namespace Enp\Template;
 require_once('./vendor/autoload.php');
 use Enp\Utility as Utility;
+use GuzzleHttp as HTTP;
 
 class Render extends Template {
     public $data,
@@ -22,7 +23,6 @@ class Render extends Template {
         $this->set_template_path($template_name);
         // set the data
         $this->set_data($data_slug);
-        return $this->data;
     }
 
     /**
@@ -30,34 +30,35 @@ class Render extends Template {
     */
     public function render() {
         $renderer = include $this->get_template_path();
+        $data = $this->get_data();
         return $renderer($this->get_data());
     }
 
     protected function set_data($data_slug) {
         $data = false;
-        if(!Utility\is_slug($data_slug)) {
-            $this->data = $data;
-            return $this->data;
+
+        $client = new HTTP\Client([
+            // Base URI is used with relative requests
+            'base_uri' => Utility\get_api_base_url(),
+            // You can set any number of default request options.
+            'timeout'  => 2.0,
+        ]);
+
+        $response = $client->request('GET', "data/$data_slug");
+        // Explicity cast the body to a string so we get the content string and not the body object
+        $body = (string) $response->getBody();
+
+        // decode it if it's not empty
+        if(!empty($body)) {
+            $data = json_decode($body, true);
         }
 
-        $url = Utility\get_data_url($data_slug);
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $JSON = curl_exec($ch);
-        curl_close($ch);
-
-        if(is_string($JSON)) {
-            $data = json_decode($JSON, true);
+        // check to make sure it's a valid array
+        if(!is_array($data)) {
+            $data = false;
         }
 
-        if(is_array($data)) {
-            $this->data = $data;
-        } else {
-            $this->data = false;
-        }
-        return $this->data;
+        $this->data = $data;
     }
 
     protected function set_template_path() {
@@ -76,8 +77,5 @@ class Render extends Template {
     public function get_template_path() {
         return $this->template_path;
     }
-
-
-
 
 }

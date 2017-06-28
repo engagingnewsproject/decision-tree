@@ -34,13 +34,23 @@ function get_server_url() {
 
     if($url === false) {
         if(is_dev() === true) {
-            $url = 'http://dev/decision-tree';
+            $url = 'http://dev/decision-tree/';
         } else {
-            $url = $_SERVER['HTTP_HOST'].'/decision-tree';
+            $url = $_SERVER['HTTP_HOST'].'/decision-tree/';
         }
     }
 
     return $url;
+}
+
+function get_api_base_url() {
+    static $base_url = false;
+
+    if($base_url === false) {
+        $base_url = get_server_url().'api/v1/';
+    }
+
+    return $base_url;
 }
 
 /**

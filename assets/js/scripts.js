@@ -1,3 +1,9 @@
+function Tree(data) {
+    this.data = data
+    this.template = TreeTemplates.tree
+    this.html = this.template(this.data)
+}
+
 var treeJSON = {
     id: '1',
     title: 'Are You Eligible to be a US Citizen',
@@ -22,15 +28,50 @@ var treeJSON = {
     ]
 };
 
-// var template = Handlebars.templates['decision-tree.hbs'];
-// var html = template(dtJSON);
+// create the tree
+function getTreeData(name) {
+    let DecisionTree;
 
-// var DTtemplate = Handlebars.templates['DecisionTree']
-// console.log(html)
-var template = TreeTemplates.tree;
-var html = template(treeJSON);
-console.log(html);
+    return new Promise(function(resolve, reject) {
 
-console.log(treeJSON.id)
-var treeBlock = document.getElementById('enp-tree__'+treeJSON.id);
-treeBlock.innerHTML = html
+      var request = new XMLHttpRequest();
+      request.overrideMimeType("application/json");
+      request.open('GET', 'http://dev/decision-tree/data/'+name, true);
+      //request.responseType = 'json';
+      // When the request loads, check whether it was successful
+      request.onload = function() {
+        if (request.status === 200) {
+        // If successful, resolve the promise by passing back the request response
+          resolve(request.response);
+        } else {
+        // If it fails, reject the promise with a error message
+          reject(Error('Image didn\'t load successfully; error code:' + request.statusText));
+        }
+      };
+      request.onerror = function() {
+      // Also deal with the case when the entire request fails to begin with
+      // This is probably a network error, so reject the promise with an appropriate message
+          reject(Error('There was a network error.'));
+      };
+      // Send the request
+      request.send();
+    });
+}
+
+const Trees = []
+
+getTreeData('citizen').then(function(response) {
+    // The first runs when the promise resolves, with the request.reponse
+    // specified within the resolve() method.
+    console.log(response)
+    let newTree = new Tree(response)
+    // add it to our array of Tree objects
+    Trees.push(newTree)
+    // Render it
+    let treeBlock = document.getElementById('enp-tree__'+newTree.data.id);
+    treeBlock.innerHTML = newTree.html
+    // The second runs when the promise
+    // is rejected, and logs the Error specified with the reject() method.
+}, function(Error) {
+    console.log(Error)
+});
