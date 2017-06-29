@@ -2,14 +2,16 @@
     "require": {
         "zordius/lightncandy": "dev-master",
         "guzzlehttp/guzzle": "^6.3",
-        "slim/slim": "^3.0"
+        "slim/slim": "^3.0",
+        "slim/php-view": "^2.2"
     },
     "autoload": {
         "psr-4": {
             "Enp\\":"src"
         },
         "files": [
-            "src/utilities.php"
+            "src/utilities.php",
+            "tree-config.php"
         ]
     }
 }

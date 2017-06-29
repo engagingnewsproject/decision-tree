@@ -1,35 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <title>Gulp Starter</title>
-    <link rel='stylesheet' href='dist/css/styles.min.css'/>
+<?php
+// allow all sites to access this file
+header('Access-Control-Allow-Origin: *');
+require 'vendor/autoload.php';
 
-</head>
-<body>
-<?php include('views/header.php');?>
-<main>
-    <h2>Main content block</h2>
-    <?php
-    require_once('./vendor/autoload.php');
-    // render the template
-    new Enp\Template\Compile('tree');
-    $template = new Enp\Template\Render('tree', 'citizen');
-    echo $template->render();
-    /*$renderer = include 'views/tree.php';
-    // Render by different data
+use \Psr\Http\Message\ServerRequestInterface as Request;
+use \Psr\Http\Message\ResponseInterface as Response;
 
-    echo $renderer($treeData);
-    */?>
-    <div id="enp-tree__1"></div>
-</main>
-<footer>
-    <h2>Footer</h2>
-</footer>
 
-<script src="dist/js/handlebars.runtime.js"></script>
-<script src="dist/js/templates.js"></script>
-<script src="dist/js/scripts.js"></script>
-</body>
-</html>
+$config = [];
+$config['displayErrorDetails'] = true;
+$config['addContentLengthHeader'] = false;
+
+$app = new \Slim\App(["settings" => $config]);
+
+// register views
+$container = $app->getContainer();
+$container['view'] = new \Slim\Views\PhpRenderer("views/");
+$app->group('/api', function() {
+    $this->group('/v1', function() {
+        $this->get('/tree/{name}', function (Request $request, Response $response) {
+            $name = $request->getAttribute('name');
+            $response->getBody()->write(file_get_contents("data/$name.json"));
+
+            return $response;
+        });
+    });
+});
+
+$app->group('/iframe', function() {
+    $this->group('/v1', function() {
+        $this->get('/tree/{name}', function (Request $request, Response $response) {
+            $name = $request->getAttribute('name');
+            $this->view->render($response, "iframe.php", [
+                "name" => $name,
+                "url"=>TREE_URL
+            ]);
+        });
+    });
+});
+
+$app->run();

@@ -3,7 +3,6 @@
  *
  */
 namespace Enp\Template;
-require_once('./vendor/autoload.php');
 use Enp\Utility as Utility;
 
 class Template
@@ -18,7 +17,7 @@ class Template
     protected function set_template() {
         $template = false;
         if($this->template_name !== false) {
-            $template_file = file_get_contents("templates/$this->template_name.hbs");
+            $template_file = file_get_contents(TREE_PATH."/templates/$this->template_name.hbs");
 
             if(is_string($template_file)) {
                 $template = $template_file;

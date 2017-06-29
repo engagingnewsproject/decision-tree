@@ -5,7 +5,6 @@
 * @author jones.jeremydavid@gmail.com
 */
 namespace Enp\Template;
-require_once('./vendor/autoload.php');
 use Enp\Utility as Utility;
 
 class Compile extends Template {
@@ -20,7 +19,7 @@ class Compile extends Template {
         $template = $this->get_template();
 
         if($template && $template_name) {
-            return $this->compile($template, "views/$template_name.php");
+            return $this->compile($template, TREE_PATH."/views/$template_name.php");
         } else {
             return false;
         }

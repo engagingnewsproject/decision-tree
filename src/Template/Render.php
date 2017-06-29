@@ -5,9 +5,7 @@
 * @author jones.jeremydavid@gmail.com
 */
 namespace Enp\Template;
-require_once('./vendor/autoload.php');
 use Enp\Utility as Utility;
-use GuzzleHttp as HTTP;
 
 class Render extends Template {
     public $data,
@@ -37,17 +35,7 @@ class Render extends Template {
     protected function set_data($tree_slug) {
         $data = false;
 
-        $client = new HTTP\Client([
-            // Base URI is used with relative requests
-            'base_uri' => Utility\get_api_base_url(),
-            // You can set any number of default request options.
-            'timeout'  => 2.0,
-        ]);
-
-        $response = $client->request('GET', "tree/$tree_slug");
-        // Explicity cast the body to a string so we get the content string and not the body object
-        $body = (string) $response->getBody();
-
+        $body = file_get_contents(TREE_URL."/data/$tree_slug.json");
         // decode it if it's not empty
         if(!empty($body)) {
             $data = json_decode($body, true);
