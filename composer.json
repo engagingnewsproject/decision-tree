@@ -1,7 +1,6 @@
 {
     "require": {
         "zordius/lightncandy": "dev-master",
-        "guzzlehttp/guzzle": "^6.3",
         "slim/slim": "^3.0",
         "slim/php-view": "^2.2"
     },
