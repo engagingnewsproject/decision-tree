@@ -4,7 +4,7 @@
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <title>Decision Tree - <?php echo $name;?></title>
-    <link rel='stylesheet' href="<?php echo $url;?>/dist/css/styles.min.css"/>
+    <link rel='stylesheet' href="<?php echo $url;?>/dist/css/base.min.css"/>
 
 </head>
 <body>

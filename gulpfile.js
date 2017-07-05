@@ -75,7 +75,7 @@ gulp.task('svgstore', function () {
 
 
 gulp.task('sass', function () {
-    processSASS('styles');
+    processSASS('base');
 });
 
 gulp.task('js', function() {
@@ -117,7 +117,7 @@ gulp.task('compressImg', function() {
 
 
 function processSASS(filename) {
-    return gulp.src('assets/sass/'+filename+'.{scss,sass}')
+    return gulp.src('assets/sass/output/'+filename+'.{scss,sass}')
       // Converts Sass into CSS with Gulp Sass
       .pipe(plumber())
       .pipe(sass({

@@ -24,12 +24,8 @@ $app->group('/api', function() {
 
             return $response;
         });
-    });
-});
 
-$app->group('/iframe', function() {
-    $this->group('/v1', function() {
-        $this->get('/tree/{name}', function (Request $request, Response $response) {
+        $this->get('/tree/{name}/iframe', function (Request $request, Response $response) {
             $name = $request->getAttribute('name');
             $this->view->render($response, "iframe.php", [
                 "name" => $name,
@@ -38,5 +34,6 @@ $app->group('/iframe', function() {
         });
     });
 });
+
 
 $app->run();

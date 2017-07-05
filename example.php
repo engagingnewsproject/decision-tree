@@ -4,13 +4,14 @@
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <title>Example Decision Tree</title>
+    <link rel='stylesheet' href="dist/css/base.min.css"/>
 </head>
 <body>
 <main>
     <h2>Main content block</h2>
     <div id="enp-tree__1"></div>
     <noscript>
-        <iframe src="iframe/v1/tree/citizen"></iframe>
+        <iframe src="api/v1/tree/citizen/iframe"></iframe>
     </noscript>
 </main>
 <footer>

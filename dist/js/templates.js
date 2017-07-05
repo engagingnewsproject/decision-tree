@@ -32,7 +32,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
-  return "<section class=\"enp-tree\">\n    <div class=\"enp-tree__intro\">\n        <h2>"
+  return "<section id=\"enp-tree\" class=\"enp-tree\">\n    <div class=\"enp-tree__intro\">\n        <h2>"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + "</h2>\n        <a class=\"enp-tree__start\" href=\"#enp-tree__question--1\">"
     + alias4(((helper = (helper = helpers.startButton || (depth0 != null ? depth0.startButton : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"startButton","hash":{},"data":data}) : helper)))
