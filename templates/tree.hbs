@@ -6,12 +6,12 @@
 
     {{#if questions}}
         {{#each questions}}
-            <section id="enp-tree__question--{{id}}">
-                <h3 class="enp-tree__question">{{content}}</h3>
+            <section id="enp-tree__question--{{id}}" class="enp-tree__question">
+                <h3 class="enp-tree__question-title">{{content}}</h3>
                 {{#if options}}
                     <ul class="enp-tree__options">
                         {{#each options}}
-                            <li id="enp-tree__option--{{id}}" class="enp-tree__option"><a href="#enp-tree__question--{{destinationID}}">{{content}}</a></li>
+                            <li id="enp-tree__option--{{id}}" class="enp-tree__option"><a class="enp-tree__option-link"  href="#enp-tree__question--{{destinationID}}">{{content}}</a></li>
                         {{/each}}
                     </ul>
                 {{/if}}

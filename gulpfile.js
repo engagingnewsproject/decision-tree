@@ -36,7 +36,7 @@ gulp.task('serve', ['sass', 'js', 'compressImg', 'svgstore', 'templates'], funct
         proxy: localhost
     });
     // Watch SCSS file for change to pass on to sass compiler,
-    gulp.watch('assets/sass/*.{scss,sass}', ['sass']);
+    gulp.watch(['assets/sass/*.{scss,sass}','assets/sass/*/*.{scss,sass}'], ['sass']);
     // Watch SCSS file for change to pass on to sass compiler,
     gulp.watch('assets/js/*.js', ['js']);
     // run img compression when images added to directory

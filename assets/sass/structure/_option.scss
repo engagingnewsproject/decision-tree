@@ -1,0 +1,18 @@
+.enp-tree__options {
+    @include no-list;
+}
+
+.enp-tree__option {
+    line-height: 1.2;
+
+    margin-bottom: $spacing__base/2;
+
+}
+
+.enp-tree__option-link {
+    display: block;
+    width: 100%;
+    padding: $spacing__base/2;
+    text-decoration: none;
+    transition: all .2s;
+}

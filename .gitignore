@@ -7,3 +7,5 @@
 /gulp/*
 /node_modules/*
 vendor/*
+tree-config.php
+tree-db.php
