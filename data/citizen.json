@@ -2,43 +2,31 @@
     "id": "1",
     "title": "Are You Eligible to be a US Citizen",
     "startButton": "Start",
-    "questions": [{
-        "main": [{
-            "id": 2,
-            "content": "Are you at least 18 years old?",
-            "options": [
-                {
-                    "id": 3,
-                    "content": "Yes",
-                    "destinationID": 2
-                },
-                {
-                    "id": 3,
-                    "content": "No",
-                    "destinationID": 4
-                }
-            ]
-        },
-        {
-            "id": 2,
-            "content": "Are you at least 18 years old?",
-            "options": [
-                {
-                    "id": 3,
-                    "content": "Yes",
-                    "destinationID": 2
-                },
-                {
-                    "id": 3,
-                    "content": "No",
-                    "destinationID": 4
-                }
-            ]
-        }]
+    "columns": [{
+        "id": 8,
+        "title": "Main",
+        "order": 0,
+        "questions": [{
+                "id": 2,
+                "content": "Are you at least 18 years old?",
+                "options": [
+                    {
+                        "id": 3,
+                        "content": "Yes",
+                        "destinationID": 2
+                    },
+                    {
+                        "id": 3,
+                        "content": "No",
+                        "destinationID": 4
+                    }
+                ]
+            }
+        ]
     }],
     "end": [{
             "id": 9,
-            "content": "You are elegible."
+            "content": "You are elegible.",
             "options": [{
                 "id": 8,
                 "content": "Start Over",
@@ -49,10 +37,20 @@
                 "content": "Go back to ",
                 "destinationID": 4
             }]
-        }],
-        "fail": [{
+        },
+        {
             "id": 10,
-            "content": "You are not elegible."
-        }]
-    }]
+            "content": "You are not elegible.",
+            "options": [{
+                "id": 8,
+                "content": "Start Over",
+                "destinationID": 2
+            },
+            {
+                "id": 3,
+                "content": "Go back to ",
+                "destinationID": 4
+            }]
+        }
+    ]
 }

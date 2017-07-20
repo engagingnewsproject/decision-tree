@@ -35,14 +35,14 @@ var treeJSON = {
 const Trees = []
 
 // create the tree
-function getTreeData(name) {
+function getTreeData(slug) {
     let DecisionTree;
 
     return new Promise(function(resolve, reject) {
 
       var request = new XMLHttpRequest();
       request.overrideMimeType("application/json");
-      request.open('GET', 'http://dev/decision-tree/api/v1/tree/'+name, true);
+      request.open('GET', 'http://dev/decision-tree/api/v1/trees/'+slug+'/compiled', true);
       //request.responseType = 'json';
       // When the request loads, check whether it was successful
       request.onload = function() {
@@ -51,7 +51,7 @@ function getTreeData(name) {
           resolve(request.response);
         } else {
         // If it fails, reject the promise with a error message
-          reject(Error('Image didn\'t load successfully; error code:' + request.statusText));
+          reject(Error('Tree could not be loaded:' + request.statusText));
         }
       };
       request.onerror = function() {
@@ -64,8 +64,8 @@ function getTreeData(name) {
     });
 }
 
-function createTree(name) {
-    getTreeData(name).then(buildTree).catch(handleTreeDataError);
+function createTree(slug) {
+    getTreeData(slug).then(buildTree).catch(handleTreeDataError);
 }
 
 function buildTree(response) {

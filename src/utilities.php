@@ -109,6 +109,5 @@ function is_id($string) {
         }
     }
 
-
     return $is_id;
 }

@@ -10,7 +10,9 @@
         },
         "files": [
             "src/utilities.php",
-            "tree-config.php"
+            "src/Database/DB.php",
+            "tree-config.php",
+            "tree-db.php"
         ]
     }
 }
