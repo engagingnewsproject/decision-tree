@@ -1,8 +1,8 @@
-<?php  function lcr597139871f529ifvar($cx, $v, $zero) {
+<?php  function lcr5972743936a09ifvar($cx, $v, $zero) {
   return ($v !== null) && ($v !== false) && ($zero || ($v !== 0) && ($v !== 0.0)) && ($v !== '') && (is_array($v) ? (count($v) > 0) : true);
  }
 
- function lcr597139871f529sec($cx, $v, $bp, $in, $each, $cb, $else = null) {
+ function lcr5972743936a09sec($cx, $v, $bp, $in, $each, $cb, $else = null) {
   $push = ($in !== $v) || $each;
 
   $isAry = is_array($v) || ($v instanceof \ArrayObject);
@@ -55,10 +55,10 @@
      $i++;
     }
     if (isset($bp[0])) {
-     $raw = lcr597139871f529m($cx, $raw, array($bp[0] => $raw));
+     $raw = lcr5972743936a09m($cx, $raw, array($bp[0] => $raw));
     }
     if (isset($bp[1])) {
-     $raw = lcr597139871f529m($cx, $raw, array($bp[1] => $cx['sp_vars']['index']));
+     $raw = lcr5972743936a09m($cx, $raw, array($bp[1] => $cx['sp_vars']['index']));
     }
     $ret[] = $cb($cx, $raw);
    }
@@ -111,7 +111,7 @@
   return '';
  }
 
- function lcr597139871f529m($cx, $a, $b) {
+ function lcr5972743936a09m($cx, $a, $b) {
   if (is_array($b)) {
    if ($a === null) {
     return $b;
@@ -229,17 +229,16 @@ return function ($in = null, $options = null) {
     ob_start();echo '<section id="enp-tree" class="enp-tree">
     <div class="enp-tree__intro">
         <h2>',htmlspecialchars((string)(($inary && isset($in['title'])) ? $in['title'] : null), ENT_QUOTES, 'UTF-8'),'</h2>
-        <a class="enp-tree__start" href="#enp-tree__question--1">',htmlspecialchars((string)(($inary && isset($in['startButton'])) ? $in['startButton'] : null), ENT_QUOTES, 'UTF-8'),'</a>
+        <!--<a class="enp-tree__start" href="#enp-tree__destination--1">',htmlspecialchars((string)(($inary && isset($in['startButton'])) ? $in['startButton'] : null), ENT_QUOTES, 'UTF-8'),'</a>-->
     </div>
-';if (lcr597139871f529ifvar($cx, (($inary && isset($in['columns'])) ? $in['columns'] : null), false)){echo '',lcr597139871f529sec($cx, (($inary && isset($in['columns'])) ? $in['columns'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);echo '            <section id="enp-tree__column--',htmlspecialchars((string)(($inary && isset($in['id'])) ? $in['id'] : null), ENT_QUOTES, 'UTF-8'),'" class="enp-tree__column">
-                <h3 class="enp-tree__column-title">',htmlspecialchars((string)(($inary && isset($in['title'])) ? $in['title'] : null), ENT_QUOTES, 'UTF-8'),'</h3>
-';if (lcr597139871f529ifvar($cx, (($inary && isset($in['questions'])) ? $in['questions'] : null), false)){echo '',lcr597139871f529sec($cx, (($inary && isset($in['questions'])) ? $in['questions'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);echo '                        <section id="enp-tree__question--',htmlspecialchars((string)(($inary && isset($in['id'])) ? $in['id'] : null), ENT_QUOTES, 'UTF-8'),'" class="enp-tree__question">
-                            <h4 class="enp-tree__question-title">',htmlspecialchars((string)(($inary && isset($in['content'])) ? $in['content'] : null), ENT_QUOTES, 'UTF-8'),'</h4>
-';if (lcr597139871f529ifvar($cx, (($inary && isset($in['options'])) ? $in['options'] : null), false)){echo '                                <ul class="enp-tree__options">
-',lcr597139871f529sec($cx, (($inary && isset($in['options'])) ? $in['options'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);echo '                                        <li id="enp-tree__option--',htmlspecialchars((string)(($inary && isset($in['id'])) ? $in['id'] : null), ENT_QUOTES, 'UTF-8'),'" class="enp-tree__option"><a class="enp-tree__option-link"  href="#enp-tree__question--',htmlspecialchars((string)(($inary && isset($in['destinationID'])) ? $in['destinationID'] : null), ENT_QUOTES, 'UTF-8'),'">',htmlspecialchars((string)(($inary && isset($in['content'])) ? $in['content'] : null), ENT_QUOTES, 'UTF-8'),'</a></li>
-';}),'                                </ul>
-';}else{echo '';}echo '                        </section>
-';}),'';}else{echo '';}echo '            </section>
-';}),'';}else{echo '';}echo '</section>
+
+';if (lcr5972743936a09ifvar($cx, (($inary && isset($in['questions'])) ? $in['questions'] : null), false)){echo '',lcr5972743936a09sec($cx, (($inary && isset($in['questions'])) ? $in['questions'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);echo '            <section id="enp-tree__destination--',htmlspecialchars((string)(($inary && isset($in['question_id'])) ? $in['question_id'] : null), ENT_QUOTES, 'UTF-8'),'" class="enp-tree__question">
+                <h4 class="enp-tree__question-title">',htmlspecialchars((string)(($inary && isset($in['title'])) ? $in['title'] : null), ENT_QUOTES, 'UTF-8'),'</h4>
+';if (lcr5972743936a09ifvar($cx, (($inary && isset($in['options'])) ? $in['options'] : null), false)){echo '                    <ul class="enp-tree__options">
+',lcr5972743936a09sec($cx, (($inary && isset($in['options'])) ? $in['options'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);echo '                            <li id="enp-tree__option--',htmlspecialchars((string)(($inary && isset($in['option_id'])) ? $in['option_id'] : null), ENT_QUOTES, 'UTF-8'),'" class="enp-tree__option"><a class="enp-tree__option-link"  href="#enp-tree__destination--',htmlspecialchars((string)(($inary && isset($in['destination_id'])) ? $in['destination_id'] : null), ENT_QUOTES, 'UTF-8'),'">',htmlspecialchars((string)(($inary && isset($in['title'])) ? $in['title'] : null), ENT_QUOTES, 'UTF-8'),'</a></li>
+';}),'                    </ul>
+';}else{echo '';}echo '            </section>
+';}),'';}else{echo '';}echo '
+</section>
 ';return ob_get_clean();
 };?>

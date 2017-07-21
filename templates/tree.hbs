@@ -1,27 +1,22 @@
 <section id="enp-tree" class="enp-tree">
     <div class="enp-tree__intro">
         <h2>{{title}}</h2>
-        <a class="enp-tree__start" href="#enp-tree__question--1">{{startButton}}</a>
+        <!--<a class="enp-tree__start" href="#enp-tree__destination--1">{{startButton}}</a>-->
     </div>
-    {{#if groups}}
-        {{#each groups}}
-            <section id="enp-tree__group--{{id}}" class="enp-tree__group">
-                <h3 class="enp-tree__group-title">{{title}}</h3>
-                {{#if questions}}
-                    {{#each questions}}
-                        <section id="enp-tree__question--{{id}}" class="enp-tree__question">
-                            <h4 class="enp-tree__question-title">{{content}}</h4>
-                            {{#if options}}
-                                <ul class="enp-tree__options">
-                                    {{#each options}}
-                                        <li id="enp-tree__option--{{id}}" class="enp-tree__option"><a class="enp-tree__option-link"  href="#enp-tree__question--{{destinationID}}">{{content}}</a></li>
-                                    {{/each}}
-                                </ul>
-                            {{/if}}
-                        </section>
-                    {{/each}}
+
+    {{#if questions}}
+        {{#each questions}}
+            <section id="enp-tree__destination--{{question_id}}" class="enp-tree__question">
+                <h4 class="enp-tree__question-title">{{title}}</h4>
+                {{#if options}}
+                    <ul class="enp-tree__options">
+                        {{#each options}}
+                            <li id="enp-tree__option--{{option_id}}" class="enp-tree__option"><a class="enp-tree__option-link"  href="#enp-tree__destination--{{destination_id}}">{{title}}</a></li>
+                        {{/each}}
+                    </ul>
                 {{/if}}
             </section>
         {{/each}}
     {{/if}}
+
 </section>

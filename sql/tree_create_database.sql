@@ -172,6 +172,11 @@ USE `tree` ;
 -- -----------------------------------------------------
 -- Placeholder table for view `tree`.`tree_question`
 -- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tree`.`tree_api` (`el_id` INT, `tree_id` INT, `el_title` INT, `el_content` INT);
+
+-- -----------------------------------------------------
+-- Placeholder table for view `tree`.`tree_question`
+-- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tree`.`tree_question` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT, `el_order` INT);
 
 -- -----------------------------------------------------
@@ -190,13 +195,23 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree_option` (`el_id` INT, `tree_id` INT, `el
 CREATE TABLE IF NOT EXISTS `tree`.`tree_end` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT);
 
 -- -----------------------------------------------------
+-- View `tree`.`tree_api`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_api`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_api` (tree_id, tree_slug, title, content, created_at, updated_at, owner) AS
+    SELECT
+        tree_id, tree_slug, tree_title, tree_content, tree_created_at, tree_updated_at, tree_owner
+    FROM
+        tree.tree;
+-- -----------------------------------------------------
 -- View `tree`.`tree_question`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`tree_question`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_question` (question_id, tree_id, group_id, el_title, el_content, el_order) AS
+CREATE  OR REPLACE VIEW `tree_question` (question_id, tree_id, group_id, title, content, `order`) AS
     SELECT
-        el.el_id, el.tree_id, group.el_id, el.el_title, el.el_content, el_order.el_order
+        el.el_id, el.tree_id, el_group.el_id, el.el_title, el.el_content, el_order.el_order
     FROM
         tree.tree_element el
             INNER JOIN
@@ -204,7 +219,7 @@ CREATE  OR REPLACE VIEW `tree_question` (question_id, tree_id, group_id, el_titl
             INNER JOIN
         tree.tree_element_order el_order ON el.el_id = el_order.el_id
             INNER JOIN
-        tree.tree_element_container group ON el.el_id = group.el_id_child
+        tree.tree_element_container el_group ON el.el_id = el_group.el_id_child
     WHERE
         el_type.el_type = 'question';
 
@@ -213,7 +228,7 @@ CREATE  OR REPLACE VIEW `tree_question` (question_id, tree_id, group_id, el_titl
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`tree_end`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_end` (end_id, tree_id, el_title, el_content) AS
+CREATE  OR REPLACE VIEW `tree_end` (end_id, tree_id, title, content) AS
     SELECT
         el.el_id, el.tree_id, el.el_title, el.el_content
     FROM
@@ -228,7 +243,7 @@ CREATE  OR REPLACE VIEW `tree_end` (end_id, tree_id, el_title, el_content) AS
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`tree_option`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_option` (option_id, tree_id, question_id, el_title, el_content, el_order, destination_id) AS
+CREATE  OR REPLACE VIEW `tree_option` (option_id, tree_id, question_id, title, content, `order`, destination_id) AS
     SELECT
         el.el_id, el.tree_id, question.el_id, el.el_title, el.el_content, el_order.el_order, destination.el_id_destination
     FROM
@@ -249,7 +264,7 @@ CREATE  OR REPLACE VIEW `tree_option` (option_id, tree_id, question_id, el_title
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`tree_group`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_group` (group_id, tree_id, el_title, el_content, el_order) AS
+CREATE  OR REPLACE VIEW `tree_group` (group_id, tree_id, title, content, `order`) AS
     SELECT
         el.el_id, el.tree_id, el.el_title, el.el_content, el_order.el_order
     FROM

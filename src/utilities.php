@@ -119,3 +119,28 @@ function get_tree_slug_by_id($tree_id) {
     // return the tree slug
     return $tree['tree_slug'];
 }
+
+function get_tree_id_by_slug($tree_slug) {
+    // use the id to get the slug. Switch to $tree_id bc that's what it is
+    $DB = new \ENP\Database\DB();
+    $tree = $DB->get_tree_by_slug($tree_slug);
+    // return the tree slug
+    return $tree['tree_id'];
+}
+
+// really bare curl implementation to consume our own api
+function get_endpoint($path) {
+    // Get cURL resource
+    $curl = curl_init();
+    // Set options
+    curl_setopt_array($curl, array(
+        CURLOPT_RETURNTRANSFER => 1, // get response as string
+        CURLOPT_URL => TREE_URL.'/api/v1/'.$path
+    ));
+    // Send the request
+    $response = curl_exec($curl);
+    // Close request to clear up some resources
+    curl_close($curl);
+
+    return $response;
+}

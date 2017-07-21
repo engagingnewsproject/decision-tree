@@ -11,6 +11,7 @@
         "files": [
             "src/utilities.php",
             "src/Database/DB.php",
+            "src/Database/CompileTree.php",
             "tree-config.php",
             "tree-db.php"
         ]

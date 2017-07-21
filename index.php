@@ -23,14 +23,19 @@ $app->group('/api', function() {
             if(\Enp\Utility\is_id($tree_slug)) {
                 $tree_slug = \Enp\Utility\get_tree_slug_by_id($tree_slug);
             }
-            $response->getBody()->write(file_get_contents("data/$tree_slug.json"));
+            $compiled = new \Enp\Database\CompileTree($tree_slug);
 
+            $response->getBody()->write(file_get_contents("data/$tree_slug.json"));
             return $response;
         });
 
         $this->get('/trees/{tree_slug}/iframe', function (Request $request, Response $response) {
 
             $tree_slug = $request->getAttribute('tree_slug');
+            // check if we have a slug or an id
+            if(\Enp\Utility\is_id($tree_slug)) {
+                $tree_slug = \Enp\Utility\get_tree_slug_by_id($tree_slug);
+            }
 
             $this->view->render($response, "iframe.php", [
                 "tree_slug" => $tree_slug,
@@ -39,97 +44,108 @@ $app->group('/api', function() {
         });
 
         $this->get('/trees/', function (Request $request, Response $response) {
-            header('Content-type: text/javascript');
-            $DB = new \ENP\Database\DB();
+            $DB = new \Enp\Database\DB();
             $trees = $DB->get_trees();
 
-            return json_encode($trees, JSON_PRETTY_PRINT);
+            $response->getBody()->write(json_encode($trees));
+            return $response;
         });
 
         $this->get('/trees/{tree_id}', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
-            $DB = new \ENP\Database\DB();
+            $DB = new \Enp\Database\DB();
             $tree = $DB->get_tree($tree_id);
 
             // format into JSON
-            return json_encode($tree, JSON_PRETTY_PRINT);
+            $response->getBody()->write(json_encode($tree));
+            return $response;
         });
 
 
         $this->get('/trees/{tree_id}/groups/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
             // get all groups from that tree id
-            $DB = new \ENP\Database\DB();
+            $DB = new \Enp\Database\DB();
             $groups = $DB->get_groups($tree_id);
             // return the JSON
-            return json_encode($groups, JSON_PRETTY_PRINT);
+            $response->getBody()->write(json_encode($groups));
+            return $response;
         });
 
         $this->get('/trees/{tree_id}/groups/{group_id}', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
             $group_id = $request->getAttribute('group_id');
 
-            $DB = new \ENP\Database\DB();
+            $DB = new \Enp\Database\DB();
             $group = $DB->get_group($group_id, $tree_id);
             // return the JSON
-            return json_encode($group, JSON_PRETTY_PRINT);
+            $response->getBody()->write(json_encode($group));
+            return $response;
         });
 
         $this->get('/trees/{tree_id}/questions/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
 
-            $DB = new \ENP\Database\DB();
+            $DB = new \Enp\Database\DB();
             $questions = $DB->get_questions($tree_id);
             // return the JSON
-            return json_encode($questions, JSON_PRETTY_PRINT);
+            $response->getBody()->write(json_encode($questions));
+            return $response;
         });
 
         $this->get('/trees/{tree_id}/questions/{question_id}', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
             $question_id = $request->getAttribute('question_id');
 
-            $DB = new \ENP\Database\DB();
+            $DB = new \Enp\Database\DB();
             $question = $DB->get_question($question_id, $tree_id);
             // return the JSON
-            return json_encode($question, JSON_PRETTY_PRINT);
+            $response->getBody()->write(json_encode($question));
+            return $response;
         });
 
-        $this->get('/trees/{tree_id}/options/', function (Request $request, Response $response) {
+        $this->get('/trees/{tree_id}/questions/{question_id}/options/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
+            $question_id = $request->getAttribute('question_id');
 
-            $DB = new \ENP\Database\DB();
-            $options = $DB->get_options($tree_id);
+            $DB = new \Enp\Database\DB();
+            $options = $DB->get_options($question_id, $tree_id);
             // return the JSON
-            return json_encode($options, JSON_PRETTY_PRINT);
+            $response->getBody()->write(json_encode($options));
+            return $response;
         });
 
-        $this->get('/trees/{tree_id}/options/{option_id}', function (Request $request, Response $response) {
+        $this->get('/trees/{tree_id}/questions/{question_id}/options/{option_id}', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
+            $question_id = $request->getAttribute('question_id');
             $option_id = $request->getAttribute('option_id');
 
-            $DB = new \ENP\Database\DB();
-            $option = $DB->get_option($option_id, $tree_id);
+            $DB = new \Enp\Database\DB();
+            $option = $DB->get_option($option_id, $question_id, $tree_id);
             // return the JSON
-            return json_encode($option, JSON_PRETTY_PRINT);
+            $response->getBody()->write(json_encode($option));
+            return $response;
         });
 
         $this->get('/trees/{tree_id}/ends/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
 
-            $DB = new \ENP\Database\DB();
+            $DB = new \Enp\Database\DB();
             $ends = $DB->get_ends($tree_id);
             // return the JSON
-            return json_encode($ends, JSON_PRETTY_PRINT);
+            $response->getBody()->write(json_encode($ends));
+            return $response;
         });
 
         $this->get('/trees/{tree_id}/ends/{end_id}', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
             $end_id = $request->getAttribute('end_id');
 
-            $DB = new \ENP\Database\DB();
+            $DB = new \Enp\Database\DB();
             $end = $DB->get_end($end_id, $tree_id);
             // return the JSON
-            return json_encode($end, JSON_PRETTY_PRINT);
+            $response->getBody()->write(json_encode($end));
+            return $response;
         });
 
     });
