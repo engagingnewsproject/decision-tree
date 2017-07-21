@@ -3,10 +3,10 @@
         <h2>{{title}}</h2>
         <a class="enp-tree__start" href="#enp-tree__question--1">{{startButton}}</a>
     </div>
-    {{#if columns}}
-        {{#each columns}}
-            <section id="enp-tree__column--{{id}}" class="enp-tree__column">
-                <h3 class="enp-tree__column-title">{{title}}</h3>
+    {{#if groups}}
+        {{#each groups}}
+            <section id="enp-tree__group--{{id}}" class="enp-tree__group">
+                <h3 class="enp-tree__group-title">{{title}}</h3>
                 {{#if questions}}
                     {{#each questions}}
                         <section id="enp-tree__question--{{id}}" class="enp-tree__question">

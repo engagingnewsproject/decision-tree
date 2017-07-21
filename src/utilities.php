@@ -111,3 +111,11 @@ function is_id($string) {
 
     return $is_id;
 }
+
+function get_tree_slug_by_id($tree_id) {
+    // use the id to get the slug. Switch to $tree_id bc that's what it is
+    $DB = new \ENP\Database\DB();
+    $tree = $DB->get_tree($tree_id);
+    // return the tree slug
+    return $tree['tree_slug'];
+}

@@ -175,9 +175,9 @@ USE `tree` ;
 CREATE TABLE IF NOT EXISTS `tree`.`tree_question` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT, `el_order` INT);
 
 -- -----------------------------------------------------
--- Placeholder table for view `tree`.`tree_column`
+-- Placeholder table for view `tree`.`tree_group`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_column` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT, `el_order` INT);
+CREATE TABLE IF NOT EXISTS `tree`.`tree_group` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT, `el_order` INT);
 
 -- -----------------------------------------------------
 -- Placeholder table for view `tree`.`tree_option`
@@ -194,9 +194,9 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree_end` (`el_id` INT, `tree_id` INT, `el_ty
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`tree_question`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_question` (question_id, tree_id, column_id, el_title, el_content, el_order) AS
+CREATE  OR REPLACE VIEW `tree_question` (question_id, tree_id, group_id, el_title, el_content, el_order) AS
     SELECT
-        el.el_id, el.tree_id, column.el_id, el.el_title, el.el_content, el_order.el_order
+        el.el_id, el.tree_id, group.el_id, el.el_title, el.el_content, el_order.el_order
     FROM
         tree.tree_element el
             INNER JOIN
@@ -204,7 +204,7 @@ CREATE  OR REPLACE VIEW `tree_question` (question_id, tree_id, column_id, el_tit
             INNER JOIN
         tree.tree_element_order el_order ON el.el_id = el_order.el_id
             INNER JOIN
-        tree.tree_element_container column ON el.el_id = column.el_id_child
+        tree.tree_element_container group ON el.el_id = group.el_id_child
     WHERE
         el_type.el_type = 'question';
 
@@ -245,11 +245,11 @@ CREATE  OR REPLACE VIEW `tree_option` (option_id, tree_id, question_id, el_title
         el_type.el_type = 'option';
 
 -- -----------------------------------------------------
--- View `tree`.`tree_column`
+-- View `tree`.`tree_group`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_column`;
+DROP TABLE IF EXISTS `tree`.`tree_group`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_column` (column_id, tree_id, el_title, el_content, el_order) AS
+CREATE  OR REPLACE VIEW `tree_group` (group_id, tree_id, el_title, el_content, el_order) AS
     SELECT
         el.el_id, el.tree_id, el.el_title, el.el_content, el_order.el_order
     FROM
@@ -259,7 +259,7 @@ CREATE  OR REPLACE VIEW `tree_column` (column_id, tree_id, el_title, el_content,
             INNER JOIN
         tree.tree_element_order el_order ON el.el_id = el_order.el_id
     WHERE
-        el_type.el_type = 'column';
+        el_type.el_type = 'group';
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

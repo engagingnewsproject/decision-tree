@@ -2,7 +2,7 @@
     "id": "1",
     "title": "Are You Eligible to be a US Citizen",
     "startButton": "Start",
-    "columns": [{
+    "groups": [{
         "id": 8,
         "title": "Main",
         "order": 0,
