@@ -60,11 +60,15 @@ class DB extends PDO {
         return $stmt;
     }
 
-	public function fetch_all_by_tree($view, $tree_id) {
+	public function fetch_all_by_tree($view, $tree_id, $options = array()) {
+		$default_options = array('orderby'=>false);
+		$options = array_merge($default_options, $options);
 		// TODO: validate options
 		$params = [":tree_id" => $tree_id];
 		$sql = "SELECT * from ".$view." WHERE
 				tree_id = :tree_id";
+
+		$sql .= $this->get_orderby($options['orderby']);
 
 		return $this->fetch_all($sql, $params);
 	}
@@ -127,9 +131,10 @@ class DB extends PDO {
 		return $this->fetch_one_by_view('group', $group_id, $tree_id);
 	}
 
-	public function get_questions($tree_id, $orderby = false) {
-		return $this->fetch_all_by_tree($this->views['tree_question'], $tree_id);
-		$sql .= $this->get_orderby($orderby);
+	public function get_questions($tree_id, $options = array()) {
+		$default_options = array('orderby'=>'order');
+		$options = array_merge($default_options, $options);
+		return $this->fetch_all_by_tree($this->views['tree_question'], $tree_id, $options);
 	}
 
 	public function get_question($question_id, $tree_id = false) {
@@ -153,7 +158,7 @@ class DB extends PDO {
 		return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 	}
 
-	public function get_options($question_id, $options) {
+	public function get_options($question_id, $options = array()) {
 		$default_options = array('tree_id'=>false, 'orderby'=>'order');
 		$options = array_merge($default_options, $options);
 
@@ -162,31 +167,32 @@ class DB extends PDO {
 				question_id = :question_id";
 
 		// if a tree_id was passed, append it to the params and sql statement
-		if(array_key_exists('tree_id', $options) && $options['tree_id'] !== false) {
+		if(\Enp\Utility\is_id($options['tree_id'])) {
 			$params[":tree_id"] = $tree_id;
 			$sql .= " AND tree_id = :tree_id";
 		}
 
-		if(array_key_exists('orderby', $options) && $options['orderby'] !== false) {
-			$sql .= $this->get_orderby($orderby);
-		}
+		$sql .= $this->get_orderby($options['orderby']);
 
 		return $this->fetch_all($sql, $params);
 	}
 
-	public function get_option($option_id, $question_id = false, $tree_id = false) {
+	public function get_option($option_id, $options = array()) {
+		$default_options = array('tree_id'=>false, 'question_id'=>false);
+		$options = array_merge($default_options, $options);
+
 		$params = [":option_id" => $option_id];
 
 		$sql = "SELECT * from ".$this->views["tree_option"]." WHERE
 				option_id = :option_id";
 
 		// if a tree_id was passed, append it to the params and sql statement
-		if($tree_id !== false) {
+		if( \Enp\Utility\is_id($options['tree_id']) ) {
 			$params[":tree_id"] = $tree_id;
 			$sql .= " AND tree_id = :tree_id";
 		}
 
-		if($question_id !== false) {
+		if( \Enp\Utility\is_id($options['question_id']) ) {
 			$params[":question_id"] = $question_id;
 			$sql .= " AND question_id = :question_id";
 		}

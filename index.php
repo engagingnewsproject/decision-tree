@@ -87,8 +87,7 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
 
             $DB = new \Enp\Database\DB();
-            $orderby = 'order';
-            $questions = $DB->get_questions($tree_id, $orderby);
+            $questions = $DB->get_questions($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($questions));
             return $response;
@@ -99,7 +98,7 @@ $app->group('/api', function() {
             $question_id = $request->getAttribute('question_id');
 
             $DB = new \Enp\Database\DB();
-            $question = $DB->get_question($question_id, $tree_id);
+            $question = $DB->get_question($question_id, ['tree_id' => $tree_id]);
             // return the JSON
             $response->getBody()->write(json_encode($question));
             return $response;
@@ -110,8 +109,7 @@ $app->group('/api', function() {
             $question_id = $request->getAttribute('question_id');
 
             $DB = new \Enp\Database\DB();
-            $options = ['tree_id'=>$tree_id, 'orderby'=>'order'];
-            $options = $DB->get_options($question_id, $options);
+            $options = $DB->get_options($question_id, ['tree_id' => $tree_id]);
             // return the JSON
             $response->getBody()->write(json_encode($options));
             return $response;
@@ -123,7 +121,7 @@ $app->group('/api', function() {
             $option_id = $request->getAttribute('option_id');
 
             $DB = new \Enp\Database\DB();
-            $option = $DB->get_option($option_id, $question_id, $tree_id);
+            $option = $DB->get_option($option_id, ['tree_id' => $tree_id, 'question_id' => $question_id]);
             // return the JSON
             $response->getBody()->write(json_encode($option));
             return $response;

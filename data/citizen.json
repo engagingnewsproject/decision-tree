@@ -31,15 +31,6 @@
             "order": "0",
             "options": [
                 {
-                    "option_id": "3",
-                    "tree_id": "1",
-                    "question_id": "2",
-                    "title": "Yes",
-                    "content": "",
-                    "order": "1",
-                    "destination_id": "5"
-                },
-                {
                     "option_id": "4",
                     "tree_id": "1",
                     "question_id": "2",
@@ -47,6 +38,15 @@
                     "content": "",
                     "order": "0",
                     "destination_id": "6"
+                },
+                {
+                    "option_id": "3",
+                    "tree_id": "1",
+                    "question_id": "2",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "5"
                 }
             ]
         },
@@ -59,15 +59,6 @@
             "order": "1",
             "options": [
                 {
-                    "option_id": "9",
-                    "tree_id": "1",
-                    "question_id": "8",
-                    "title": "Yes",
-                    "content": "",
-                    "order": "1",
-                    "destination_id": "11"
-                },
-                {
                     "option_id": "10",
                     "tree_id": "1",
                     "question_id": "8",
@@ -75,6 +66,15 @@
                     "content": "",
                     "order": "0",
                     "destination_id": "6"
+                },
+                {
+                    "option_id": "9",
+                    "tree_id": "1",
+                    "question_id": "8",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "11"
                 }
             ]
         },
@@ -87,15 +87,6 @@
             "order": "2",
             "options": [
                 {
-                    "option_id": "12",
-                    "tree_id": "1",
-                    "question_id": "11",
-                    "title": "Yes",
-                    "content": "",
-                    "order": "1",
-                    "destination_id": "14"
-                },
-                {
                     "option_id": "13",
                     "tree_id": "1",
                     "question_id": "11",
@@ -103,6 +94,15 @@
                     "content": "",
                     "order": "0",
                     "destination_id": "6"
+                },
+                {
+                    "option_id": "12",
+                    "tree_id": "1",
+                    "question_id": "11",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "14"
                 }
             ]
         },
@@ -152,15 +152,6 @@
             "order": "4",
             "options": [
                 {
-                    "option_id": "19",
-                    "tree_id": "1",
-                    "question_id": "18",
-                    "title": "Yes",
-                    "content": "",
-                    "order": "1",
-                    "destination_id": "21"
-                },
-                {
                     "option_id": "20",
                     "tree_id": "1",
                     "question_id": "18",
@@ -168,6 +159,15 @@
                     "content": "",
                     "order": "0",
                     "destination_id": "6"
+                },
+                {
+                    "option_id": "19",
+                    "tree_id": "1",
+                    "question_id": "18",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "21"
                 }
             ]
         },
@@ -180,15 +180,6 @@
             "order": "5",
             "options": [
                 {
-                    "option_id": "22",
-                    "tree_id": "1",
-                    "question_id": "21",
-                    "title": "Yes",
-                    "content": "",
-                    "order": "1",
-                    "destination_id": "23"
-                },
-                {
                     "option_id": "23",
                     "tree_id": "1",
                     "question_id": "21",
@@ -196,62 +187,15 @@
                     "content": "",
                     "order": "0",
                     "destination_id": "6"
-                }
-            ]
-        },
-        {
-            "question_id": "26",
-            "tree_id": "1",
-            "group_id": "1",
-            "title": "During the past three years, I have not been out of the country for 18 months or more.",
-            "content": "",
-            "order": "7",
-            "options": [
+                },
                 {
-                    "option_id": "27",
+                    "option_id": "22",
                     "tree_id": "1",
-                    "question_id": "26",
+                    "question_id": "21",
                     "title": "Yes",
                     "content": "",
                     "order": "1",
-                    "destination_id": "29"
-                },
-                {
-                    "option_id": "28",
-                    "tree_id": "1",
-                    "question_id": "26",
-                    "title": "No",
-                    "content": "",
-                    "order": "0",
-                    "destination_id": "6"
-                }
-            ]
-        },
-        {
-            "question_id": "29",
-            "tree_id": "1",
-            "group_id": null,
-            "title": "During the last five years, I have not been out of the US for 30 months or more.",
-            "content": "",
-            "order": "8",
-            "options": [
-                {
-                    "option_id": "30",
-                    "tree_id": "1",
-                    "question_id": "29",
-                    "title": "Yes",
-                    "content": "",
-                    "order": "1",
-                    "destination_id": "5"
-                },
-                {
-                    "option_id": "31",
-                    "tree_id": "1",
-                    "question_id": "29",
-                    "title": "No",
-                    "content": "",
-                    "order": "0",
-                    "destination_id": "6"
+                    "destination_id": "23"
                 }
             ]
         },
@@ -264,15 +208,6 @@
             "order": "6",
             "options": [
                 {
-                    "option_id": "34",
-                    "tree_id": "1",
-                    "question_id": "33",
-                    "title": "Yes",
-                    "content": "",
-                    "order": "1",
-                    "destination_id": "26"
-                },
-                {
                     "option_id": "35",
                     "tree_id": "1",
                     "question_id": "33",
@@ -280,6 +215,71 @@
                     "content": "",
                     "order": "0",
                     "destination_id": "6"
+                },
+                {
+                    "option_id": "34",
+                    "tree_id": "1",
+                    "question_id": "33",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "26"
+                }
+            ]
+        },
+        {
+            "question_id": "26",
+            "tree_id": "1",
+            "group_id": "1",
+            "title": "During the past three years, I have not been out of the country for 18 months or more.",
+            "content": "",
+            "order": "7",
+            "options": [
+                {
+                    "option_id": "28",
+                    "tree_id": "1",
+                    "question_id": "26",
+                    "title": "No",
+                    "content": "",
+                    "order": "0",
+                    "destination_id": "6"
+                },
+                {
+                    "option_id": "27",
+                    "tree_id": "1",
+                    "question_id": "26",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "29"
+                }
+            ]
+        },
+        {
+            "question_id": "29",
+            "tree_id": "1",
+            "group_id": null,
+            "title": "During the last five years, I have not been out of the US for 30 months or more.",
+            "content": "",
+            "order": "8",
+            "options": [
+                {
+                    "option_id": "31",
+                    "tree_id": "1",
+                    "question_id": "29",
+                    "title": "No",
+                    "content": "",
+                    "order": "0",
+                    "destination_id": "6"
+                },
+                {
+                    "option_id": "30",
+                    "tree_id": "1",
+                    "question_id": "29",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "5"
                 }
             ]
         }
