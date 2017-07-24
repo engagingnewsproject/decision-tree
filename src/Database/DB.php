@@ -127,8 +127,9 @@ class DB extends PDO {
 		return $this->fetch_one_by_view('group', $group_id, $tree_id);
 	}
 
-	public function get_questions($tree_id) {
+	public function get_questions($tree_id, $orderby = false) {
 		return $this->fetch_all_by_tree($this->views['tree_question'], $tree_id);
+		$sql .= $this->get_orderby($orderby);
 	}
 
 	public function get_question($question_id, $tree_id = false) {
@@ -152,7 +153,7 @@ class DB extends PDO {
 		return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 	}
 
-	public function get_options($question_id, $tree_id = false) {
+	public function get_options($question_id, $tree_id = false, $orderby = false) {
 		$params = [":question_id" => $question_id];
 		$sql = "SELECT * from ".$this->views['tree_option']." WHERE
 				question_id = :question_id";
@@ -162,6 +163,9 @@ class DB extends PDO {
 			$params[":tree_id"] = $tree_id;
 			$sql .= " AND tree_id = :tree_id";
 		}
+
+
+		$sql .= $this->get_orderby($orderby);
 
 		return $this->fetch_all($sql, $params);
 	}
@@ -192,6 +196,19 @@ class DB extends PDO {
 
 	public function get_end($end_id, $tree_id = false) {
 		return $this->fetch_one_by_view('end', $end_id, $tree_id);
+	}
+
+	protected function get_orderby($orderby) {
+		if($orderby === 'order') {
+			// order by order
+			$sql = " ORDER BY `order`";
+		} else if(is_string($orderby)) {
+			$sql = " ".$orderby;
+		} else {
+			// do nothing
+			$sql = '';
+		}
+		return $sql;
 	}
 
 

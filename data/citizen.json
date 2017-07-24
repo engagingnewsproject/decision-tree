@@ -14,7 +14,11 @@
             "content": "",
             "order": "0",
             "questions": [
-                "2"
+                "2",
+                "18",
+                "21",
+                "33",
+                "26"
             ]
         }
     ],
@@ -40,6 +44,239 @@
                     "option_id": "4",
                     "tree_id": "1",
                     "question_id": "2",
+                    "title": "No",
+                    "content": "",
+                    "order": "0",
+                    "destination_id": "6"
+                }
+            ]
+        },
+        {
+            "question_id": "8",
+            "tree_id": "1",
+            "group_id": null,
+            "title": "Are you a permanent resident of the US?",
+            "content": "",
+            "order": "1",
+            "options": [
+                {
+                    "option_id": "9",
+                    "tree_id": "1",
+                    "question_id": "8",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "11"
+                },
+                {
+                    "option_id": "10",
+                    "tree_id": "1",
+                    "question_id": "8",
+                    "title": "No",
+                    "content": "",
+                    "order": "0",
+                    "destination_id": "6"
+                }
+            ]
+        },
+        {
+            "question_id": "11",
+            "tree_id": "1",
+            "group_id": null,
+            "title": "Have you been issued a Permanent Resident Card?",
+            "content": "",
+            "order": "2",
+            "options": [
+                {
+                    "option_id": "12",
+                    "tree_id": "1",
+                    "question_id": "11",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "14"
+                },
+                {
+                    "option_id": "13",
+                    "tree_id": "1",
+                    "question_id": "11",
+                    "title": "No",
+                    "content": "",
+                    "order": "0",
+                    "destination_id": "6"
+                }
+            ]
+        },
+        {
+            "question_id": "14",
+            "tree_id": "1",
+            "group_id": null,
+            "title": "I have been a permanent resident for.",
+            "content": "",
+            "order": "3",
+            "options": [
+                {
+                    "option_id": "15",
+                    "tree_id": "1",
+                    "question_id": "14",
+                    "title": "Less than three years",
+                    "content": "",
+                    "order": "0",
+                    "destination_id": "6"
+                },
+                {
+                    "option_id": "16",
+                    "tree_id": "1",
+                    "question_id": "14",
+                    "title": "Three or more years",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "18"
+                },
+                {
+                    "option_id": "17",
+                    "tree_id": "1",
+                    "question_id": "14",
+                    "title": "Five or more years",
+                    "content": "",
+                    "order": "2",
+                    "destination_id": "1"
+                }
+            ]
+        },
+        {
+            "question_id": "18",
+            "tree_id": "1",
+            "group_id": "1",
+            "title": "I am married to and living with a US Citizen.",
+            "content": "",
+            "order": "4",
+            "options": [
+                {
+                    "option_id": "19",
+                    "tree_id": "1",
+                    "question_id": "18",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "21"
+                },
+                {
+                    "option_id": "20",
+                    "tree_id": "1",
+                    "question_id": "18",
+                    "title": "No",
+                    "content": "",
+                    "order": "0",
+                    "destination_id": "6"
+                }
+            ]
+        },
+        {
+            "question_id": "21",
+            "tree_id": "1",
+            "group_id": "1",
+            "title": "I have been married to that US Citizen for at least the past three years.",
+            "content": "",
+            "order": "5",
+            "options": [
+                {
+                    "option_id": "22",
+                    "tree_id": "1",
+                    "question_id": "21",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "23"
+                },
+                {
+                    "option_id": "23",
+                    "tree_id": "1",
+                    "question_id": "21",
+                    "title": "No",
+                    "content": "",
+                    "order": "0",
+                    "destination_id": "6"
+                }
+            ]
+        },
+        {
+            "question_id": "26",
+            "tree_id": "1",
+            "group_id": "1",
+            "title": "During the past three years, I have not been out of the country for 18 months or more.",
+            "content": "",
+            "order": "7",
+            "options": [
+                {
+                    "option_id": "27",
+                    "tree_id": "1",
+                    "question_id": "26",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "29"
+                },
+                {
+                    "option_id": "28",
+                    "tree_id": "1",
+                    "question_id": "26",
+                    "title": "No",
+                    "content": "",
+                    "order": "0",
+                    "destination_id": "6"
+                }
+            ]
+        },
+        {
+            "question_id": "29",
+            "tree_id": "1",
+            "group_id": null,
+            "title": "During the last five years, I have not been out of the US for 30 months or more.",
+            "content": "",
+            "order": "8",
+            "options": [
+                {
+                    "option_id": "30",
+                    "tree_id": "1",
+                    "question_id": "29",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "5"
+                },
+                {
+                    "option_id": "31",
+                    "tree_id": "1",
+                    "question_id": "29",
+                    "title": "No",
+                    "content": "",
+                    "order": "0",
+                    "destination_id": "6"
+                }
+            ]
+        },
+        {
+            "question_id": "33",
+            "tree_id": "1",
+            "group_id": "1",
+            "title": "My spouse has been a US Citizen for at least the past three years.",
+            "content": "",
+            "order": "6",
+            "options": [
+                {
+                    "option_id": "34",
+                    "tree_id": "1",
+                    "question_id": "33",
+                    "title": "Yes",
+                    "content": "",
+                    "order": "1",
+                    "destination_id": "26"
+                },
+                {
+                    "option_id": "35",
+                    "tree_id": "1",
+                    "question_id": "33",
                     "title": "No",
                     "content": "",
                     "order": "0",

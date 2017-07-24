@@ -124,7 +124,7 @@ ENGINE = InnoDB;
 -- Table `tree`.`tree_element_order`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tree`.`tree_element_order` (
-  `el_order_id` INT NOT NULL,
+  `el_order_id` INT NOT NULL AUTO_INCREMENT,
   `el_id` INT NULL,
   `el_order` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`el_order_id`),
@@ -218,7 +218,7 @@ CREATE  OR REPLACE VIEW `tree_question` (question_id, tree_id, group_id, title, 
         tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
             INNER JOIN
         tree.tree_element_order el_order ON el.el_id = el_order.el_id
-            INNER JOIN
+            LEFT JOIN
         tree.tree_element_container el_group ON el.el_id = el_group.el_id_child
     WHERE
         el_type.el_type = 'question';

@@ -87,7 +87,8 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
 
             $DB = new \Enp\Database\DB();
-            $questions = $DB->get_questions($tree_id);
+            $orderby = 'order';
+            $questions = $DB->get_questions($tree_id, $orderby);
             // return the JSON
             $response->getBody()->write(json_encode($questions));
             return $response;
@@ -109,7 +110,8 @@ $app->group('/api', function() {
             $question_id = $request->getAttribute('question_id');
 
             $DB = new \Enp\Database\DB();
-            $options = $DB->get_options($question_id, $tree_id);
+            $orderby = 'order';
+            $options = $DB->get_options($question_id, $tree_id, $orderby);
             // return the JSON
             $response->getBody()->write(json_encode($options));
             return $response;
