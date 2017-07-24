@@ -6,7 +6,13 @@
 
     {{#if questions}}
         {{#each questions}}
-            <section id="enp-tree__destination--{{question_id}}" class="enp-tree__question" {{#ifIn question_id ../groups.0.questions}} style="background: red;"{{/ifIn}}>
+            {{#if group_id}}
+                {{#starts_group question_id group_id ../groups}}
+                    <div class="enp-tree__group">
+                        <h3 class="enp-tree__group-title">{{group_id}}</h3>
+                {{/starts_group}}
+            {{/if}}
+            <section id="enp-tree__destination--{{question_id}}" class="enp-tree__question" >
                 <h4 class="enp-tree__question-title">{{upper title}}</h4>
                 {{#if options}}
                     <ul class="enp-tree__options">
@@ -16,6 +22,12 @@
                     </ul>
                 {{/if}}
             </section>
+
+            {{#if group_id}}
+                {{#ends_group question_id group_id ../groups}}
+                    </div>
+                {{/ends_group}}
+            {{/if}}
         {{/each}}
     {{/if}}
 

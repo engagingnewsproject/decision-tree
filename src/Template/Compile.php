@@ -34,7 +34,8 @@ class Compile extends Template {
             'flags' => \LightnCandy\LightnCandy::FLAG_HANDLEBARS,
             'helpers' => array(
                 'upper' => '\Enp\Template\Helpers::upper',
-                'ifIn'  => '\Enp\Template\Helpers::ifIn',
+                'starts_group'  => '\Enp\Template\Helpers::starts_group',
+                'ends_group'  => '\Enp\Template\Helpers::ends_group',
             )
         );
 
