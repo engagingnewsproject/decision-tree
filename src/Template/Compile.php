@@ -26,13 +26,21 @@ class Compile extends Template {
     }
 
 
-
-
     protected function compile($template, $destination) {
         if(empty($template)) {
             return false;
         }
-        $phpStr = \LightnCandy\LightnCandy::compile($template);
+        $options = array(
+            'flags' => \LightnCandy\LightnCandy::FLAG_HANDLEBARS,
+            'helpers' => array(
+                'upper' => '\Enp\Template\Helpers::upper',
+                'ifIn'  => '\Enp\Template\Helpers::ifIn',
+            )
+        );
+
+
+
+        $phpStr = \LightnCandy\LightnCandy::compile($template, $options);
         // Save the compiled PHP code into a php file
         file_put_contents($destination, '<?php ' . $phpStr . '?>');
         // get the file and return it

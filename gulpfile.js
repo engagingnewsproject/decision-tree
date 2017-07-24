@@ -30,7 +30,7 @@ const declare = require('gulp-declare');
 
 
 // Static Server + watching scss/html files
-gulp.task('serve', ['sass', 'js', 'compressImg', 'svgstore', 'templates'], function() {
+gulp.task('serve', ['sass', 'js', 'compressImg', 'svgstore',  'handlebars'], function() {
 
     browserSync({
         proxy: localhost
@@ -44,7 +44,7 @@ gulp.task('serve', ['sass', 'js', 'compressImg', 'svgstore', 'templates'], funct
     // run SVG when svg files added
     gulp.watch('assets/svg/*.svg', ['svgstore']);
     // compile templates
-    gulp.watch('templates/*.hbs', ['templates']);
+    gulp.watch('templates/*.hbs', ['handlebars']);
     // Watch our CSS file and reload when it's done compiling
     gulp.watch("dist/css/*.css").on('change', reload);
     // Watch php file
@@ -137,7 +137,21 @@ function processSASS(filename) {
       .pipe(gulp.dest('dist/css/'));
 }
 
-gulp.task('templates', function(){
+gulp.task('handlebars', function(){
+  gulp.src('templates/*.hbs')
+      .pipe(handlebars({
+        handlebars: require('handlebars')
+      }))
+      .pipe(wrap('Handlebars.template(<%= contents %>)'))
+      .pipe(declare({
+        namespace: 'TreeTemplates',
+        noRedeclare: true, // Avoid duplicate declarations
+      }))
+      .pipe(concat('templates.js'))
+      .pipe(gulp.dest('dist/js/'));
+});
+
+/*gulp.task('templates', function(){
   gulp.src('templates/*.hbs')
     .pipe(handlebars({
       handlebars: require('handlebars')
@@ -149,7 +163,7 @@ gulp.task('templates', function(){
     }))
     .pipe(concat('templates.js'))
     .pipe(gulp.dest('dist/js/'));
-});
+});*/
 
 // Creating a default task
 gulp.task('default', ['serve']);

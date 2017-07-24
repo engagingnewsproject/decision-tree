@@ -46,7 +46,6 @@ function createTree(slug) {
 }
 
 function buildTree(response) {
-    console.log(response);
     // The first runs when the promise resolves, with the request.reponse
     // specified within the resolve() method.
     let treeData = JSON.parse(response);

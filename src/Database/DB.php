@@ -153,19 +153,23 @@ class DB extends PDO {
 		return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 	}
 
-	public function get_options($question_id, $tree_id = false, $orderby = false) {
+	public function get_options($question_id, $options) {
+		$default_options = array('tree_id'=>false, 'orderby'=>'order');
+		$options = array_merge($default_options, $options);
+
 		$params = [":question_id" => $question_id];
 		$sql = "SELECT * from ".$this->views['tree_option']." WHERE
 				question_id = :question_id";
 
 		// if a tree_id was passed, append it to the params and sql statement
-		if($tree_id !== false) {
+		if(array_key_exists('tree_id', $options) && $options['tree_id'] !== false) {
 			$params[":tree_id"] = $tree_id;
 			$sql .= " AND tree_id = :tree_id";
 		}
 
-
-		$sql .= $this->get_orderby($orderby);
+		if(array_key_exists('orderby', $options) && $options['orderby'] !== false) {
+			$sql .= $this->get_orderby($orderby);
+		}
 
 		return $this->fetch_all($sql, $params);
 	}

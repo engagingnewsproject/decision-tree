@@ -110,8 +110,8 @@ $app->group('/api', function() {
             $question_id = $request->getAttribute('question_id');
 
             $DB = new \Enp\Database\DB();
-            $orderby = 'order';
-            $options = $DB->get_options($question_id, $tree_id, $orderby);
+            $options = ['tree_id'=>$tree_id, 'orderby'=>'order'];
+            $options = $DB->get_options($question_id, $options);
             // return the JSON
             $response->getBody()->write(json_encode($options));
             return $response;

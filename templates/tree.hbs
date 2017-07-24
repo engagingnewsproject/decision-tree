@@ -6,8 +6,8 @@
 
     {{#if questions}}
         {{#each questions}}
-            <section id="enp-tree__destination--{{question_id}}" class="enp-tree__question">
-                <h4 class="enp-tree__question-title">{{title}}</h4>
+            <section id="enp-tree__destination--{{question_id}}" class="enp-tree__question" {{#ifIn question_id ../groups.0.questions}} style="background: red;"{{/ifIn}}>
+                <h4 class="enp-tree__question-title">{{upper title}}</h4>
                 {{#if options}}
                     <ul class="enp-tree__options">
                         {{#each options}}
@@ -18,5 +18,6 @@
             </section>
         {{/each}}
     {{/if}}
+
 
 </section>

@@ -1,5 +1,17 @@
 'use strict';
 
+Handlebars.registerHelper('upper', function (str) {
+  return str.toUpperCase();
+});
+
+Handlebars.registerHelper('ifIn', function (elem, list, options) {
+  if (list.indexOf(elem) > -1) {
+    return options.fn(this);
+  }
+  return options.inverse(this);
+});
+'use strict';
+
 function Tree(data) {
     this.data = data;
     this.tree_id = data.tree_id;
@@ -47,7 +59,6 @@ function createTree(slug) {
 }
 
 function buildTree(response) {
-    console.log(response);
     // The first runs when the promise resolves, with the request.reponse
     // specified within the resolve() method.
     var treeData = JSON.parse(response);

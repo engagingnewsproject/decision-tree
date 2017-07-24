@@ -57,8 +57,10 @@ class CompileTree extends DB {
 
 
     protected function compile_questions($tree_id) {
-        $questions = $this->DB->get_questions($tree_id);
+        $orderby = 'order';
+        $questions = $this->DB->get_questions($tree_id, $orderby);
         $i = 0;
+
         foreach($questions as $question) {
 
             $questions[$i]['options'] = $this->compile_options($question['question_id']);
@@ -71,7 +73,8 @@ class CompileTree extends DB {
     }
 
     protected function compile_options($question_id) {
-        return $this->DB->get_options($question_id);
+        $options['orderby'] = 'order';
+        return $this->DB->get_options($question_id, $options);
     }
 
     protected function compile_ends($tree_id) {
