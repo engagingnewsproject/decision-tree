@@ -55,7 +55,7 @@
     );
     
     $inary=is_array($in);
-    return '<section id="enp-tree--'.LR::raw($cx, (($inary && isset($in['tree_id'])) ? $in['tree_id'] : null)).'" class="enp-tree">
+    return '<section id="enp-tree--'.LR::raw($cx, (($inary && isset($in['tree_id'])) ? $in['tree_id'] : null)).'" class="enp-tree enp-tree--no-js">
     <div class="enp-tree__intro">
         <h2 class="enp-tree__title enp-tree__title--tree">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</h2>
 '.((LR::ifvar($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), false)) ? ''.LR::sec($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '                <div class="enp-tree__start-container">
