@@ -31,6 +31,7 @@ class DB extends PDO {
 
 		$this->views = [
 						'tree' 			=> 'tree_api',
+						'tree_start'	=> 'tree_start',
 						'tree_group'	=> 'tree_group',
 						'tree_question'	=> 'tree_question',
 						'tree_option'	=> 'tree_option',
@@ -121,6 +122,14 @@ class DB extends PDO {
 				tree_slug = :tree_slug";
 		// return the found tree row
 		return $this->fetch_one($sql, $params);
+	}
+
+	public function get_starts($tree_id) {
+		return $this->fetch_all_by_tree($this->views['tree_start'], $tree_id);
+	}
+
+	public function get_start($start_id, $tree_id = false) {
+		return $this->fetch_one_by_view('start', $start_id, $tree_id);
 	}
 
 	public function get_groups($tree_id) {

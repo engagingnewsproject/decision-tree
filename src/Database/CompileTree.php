@@ -25,6 +25,7 @@ class CompileTree extends DB {
         }
 
         $this->compiled = $tree;
+        $this->compiled['starts'] = $this->compile_starts($tree_id);
         $this->compiled['groups'] = $this->compile_groups($tree_id);
         $this->compiled['questions'] = $this->compile_questions($tree_id);
         $this->compiled['ends'] = $this->compile_ends($tree_id);
@@ -38,6 +39,10 @@ class CompileTree extends DB {
 
     protected function write_file($tree, $compiled_json) {
         file_put_contents(TREE_PATH.'/data/'.$tree['tree_slug'].'.json', $compiled_json);
+    }
+
+    protected function compile_starts($tree_id) {
+        return $this->DB->get_starts($tree_id);
     }
 
     protected function compile_groups($tree_id) {

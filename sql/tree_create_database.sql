@@ -195,6 +195,11 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree_option` (`el_id` INT, `tree_id` INT, `el
 CREATE TABLE IF NOT EXISTS `tree`.`tree_end` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT);
 
 -- -----------------------------------------------------
+-- Placeholder table for view `tree`.`tree_start`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tree`.`tree_start` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT);
+
+-- -----------------------------------------------------
 -- View `tree`.`tree_api`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`tree_api`;
@@ -275,6 +280,23 @@ CREATE  OR REPLACE VIEW `tree_group` (group_id, tree_id, title, content, `order`
         tree.tree_element_order el_order ON el.el_id = el_order.el_id
     WHERE
         el_type.el_type = 'group';
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_start`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_start`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_start` (start_id, tree_id, title, content, destination_id) AS
+    SELECT
+        el.el_id, el.tree_id, el.el_title, el.el_content, destination.el_id_destination
+    FROM
+        tree.tree_element el
+    INNER JOIN
+        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+    INNER JOIN
+        tree.tree_element_destination destination ON el.el_id = destination.el_id
+    WHERE
+        el_type.el_type = 'start';
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

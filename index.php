@@ -61,6 +61,26 @@ $app->group('/api', function() {
             return $response;
         });
 
+        $this->get('/trees/{tree_id}/starts/', function (Request $request, Response $response) {
+            $tree_id = $request->getAttribute('tree_id');
+            // get all starts from that tree id
+            $DB = new \Enp\Database\DB();
+            $starts = $DB->get_starts($tree_id);
+            // return the JSON
+            $response->getBody()->write(json_encode($starts));
+            return $response;
+        });
+
+        $this->get('/trees/{tree_id}/starts/{start_id}', function (Request $request, Response $response) {
+            $tree_id = $request->getAttribute('tree_id');
+            $start_id = $request->getAttribute('start_id');
+
+            $DB = new \Enp\Database\DB();
+            $start = $DB->get_start($start_id, $tree_id);
+            // return the JSON
+            $response->getBody()->write(json_encode($start));
+            return $response;
+        });
 
         $this->get('/trees/{tree_id}/groups/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
