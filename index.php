@@ -20,12 +20,16 @@ $app->group('/api', function() {
     $this->group('/v1', function() {
         $this->get('/trees/{tree_slug}/compiled', function (Request $request, Response $response) {
             $tree_slug = $request->getAttribute('tree_slug');
+            $minified = $request->getQueryParam('minified', $default = false);
+            $ext = ($minified === 'true' ? '.min' : '');
+
             if(\Enp\Utility\is_id($tree_slug)) {
                 $tree_slug = \Enp\Utility\get_tree_slug_by_id($tree_slug);
             }
+            // this will get moved to a "compile on save" for trees
             $compiled = new \Enp\Database\CompileTree($tree_slug);
 
-            $response->getBody()->write(file_get_contents("data/$tree_slug.json"));
+            $response->getBody()->write(file_get_contents("data/".$tree_slug.$ext.".json"));
             return $response;
         });
 

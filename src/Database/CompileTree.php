@@ -30,15 +30,17 @@ class CompileTree extends DB {
         $this->compiled['questions'] = $this->compile_questions($tree_id);
         $this->compiled['ends'] = $this->compile_ends($tree_id);
         // encode to JSON
-        $compiled_json = json_encode($this->compiled, JSON_PRETTY_PRINT);
+        $pretty_json = json_encode($this->compiled, JSON_PRETTY_PRINT);
+        $minified_json = json_encode($this->compiled);
         // write to file
-        $this->write_file($tree, $compiled_json);
+        $this->write_file($tree['tree_slug'], $pretty_json);
+        $this->write_file($tree['tree_slug'].'.min', $minified_json);
         // return the json, if they need it
         return $compiled_json;
     }
 
-    protected function write_file($tree, $compiled_json) {
-        file_put_contents(TREE_PATH.'/data/'.$tree['tree_slug'].'.json', $compiled_json);
+    protected function write_file($filename, $contents) {
+        file_put_contents(TREE_PATH.'/data/'.$filename.'.json', $contents);
     }
 
     protected function compile_starts($tree_id) {
