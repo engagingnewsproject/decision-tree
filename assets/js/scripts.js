@@ -65,12 +65,6 @@ function Tree(slug) {
         treeRendered.classList.add('enp-tree--has-js');
     }
 
-    var renderTree = function(data) {
-        console.log('render');
-
-    }
-
-
     // getters
     this.getTreeID = function() { return _treeID }
     this.getStarts = function() { return _starts }
