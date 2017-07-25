@@ -1,33 +1,46 @@
 <section id="enp-tree" class="enp-tree">
     <div class="enp-tree__intro">
-        <h2>{{title}}</h2>
+        <h2 class="enp-tree__title enp-tree__title--tree">{{{title}}}</h2>
         <!--<a class="enp-tree__start" href="#enp-tree__destination--1">{{startButton}}</a>-->
     </div>
 
     {{#if questions}}
         {{#each questions}}
             {{#if group_id}}
-                {{#starts_group question_id group_id ../groups}}
+                {{#group_start question_id group_id ../groups}}
                     <div class="enp-tree__group">
-                        <h3 class="enp-tree__group-title">{{group_id}}</h3>
-                {{/starts_group}}
+                        <h3 class="enp-tree__title enp-tree__title--group">{{.}}</h3>
+                {{/group_start}}
             {{/if}}
-            <section id="enp-tree__destination--{{question_id}}" class="enp-tree__question" >
-                <h4 class="enp-tree__question-title">{{upper title}}</h4>
+            <section id="enp-tree__destination--{{{question_id}}}" class="enp-tree__question" >
+                <h4 class="enp-tree__title enp-tree__title--question">{{title}}</h4>
                 {{#if options}}
                     <ul class="enp-tree__options">
                         {{#each options}}
-                            <li id="enp-tree__option--{{option_id}}" class="enp-tree__option"><a class="enp-tree__option-link"  href="#enp-tree__destination--{{destination_id}}">{{title}}</a></li>
+                            <li id="enp-tree__option--{{{option_id}}}" class="enp-tree__option"><a class="enp-tree__option-link"  href="#enp-tree__destination--{{{destination_id}}}">{{title}}</a></li>
                         {{/each}}
                     </ul>
                 {{/if}}
             </section>
 
             {{#if group_id}}
-                {{#ends_group question_id group_id ../groups}}
+                {{#group_end question_id group_id ../groups}}
                     </div>
-                {{/ends_group}}
+                {{/group_end}}
             {{/if}}
+        {{/each}}
+    {{/if}}
+
+    {{#if ends}}
+        {{#each ends}}
+            <section id="enp-tree__destination--{{{end_id}}}" class="enp-tree__end">
+                <p>End</p>
+                <h3 class="enp-tree__title enp-tree__title--end">{{{title}}}</h3>
+                {{#if description}}
+                    <div class="enp-tree__description enp-tree__description--end">{{description}}</div>
+                {{/if}}
+                <a class="enp-tree__btn enp-tree__btn--retry" href="#enp-tree__destination--{{../questions.0.question_id}}">Start Again</a>
+            </section>
         {{/each}}
     {{/if}}
 

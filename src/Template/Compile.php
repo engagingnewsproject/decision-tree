@@ -33,9 +33,9 @@ class Compile extends Template {
         $options = array(
             'flags' => \LightnCandy\LightnCandy::FLAG_HANDLEBARS,
             'helpers' => array(
-                'upper' => '\Enp\Template\Helpers::upper',
-                'starts_group'  => '\Enp\Template\Helpers::starts_group',
-                'ends_group'  => '\Enp\Template\Helpers::ends_group',
+                'group_start'  => '\Enp\Template\Helpers::group_start',
+                'group_end'  => '\Enp\Template\Helpers::group_end',
+                'group_title'  => '\Enp\Template\Helpers::group_title'
             )
         );
 

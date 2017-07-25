@@ -1,26 +1,19 @@
-Handlebars.registerHelper('upper', function(str){
-   return str.toUpperCase();
-});
-
-Handlebars.registerHelper('starts_group', function(question_id, group_id, groups, options) {
+Handlebars.registerHelper('group_start', function(question_id, group_id, groups, options) {
     // find the group
     for(let i = 0; i < groups.length; i++) {
         if(groups[i].group_id === group_id) {
             // check if it's the first in the question order
             if(groups[i].questions[0] === question_id) {
-                return options.fn(this);
+                return options.fn(groups[i].title);
             } else {
                 return '';
             }
         }
     }
-  /*if(list.indexOf(elem) > -1) {
-    return options.fn(this);
-  }
-  return options.inverse(this);*/
+    return '';
 });
 
-Handlebars.registerHelper('ends_group', function(question_id, group_id, groups, options) {
+Handlebars.registerHelper('group_end', function(question_id, group_id, groups, options) {
     // find the group
     for(let i = 0; i < groups.length; i++) {
         if(groups[i].group_id === group_id) {
@@ -33,8 +26,15 @@ Handlebars.registerHelper('ends_group', function(question_id, group_id, groups, 
             }
         }
     }
-  /*if(list.indexOf(elem) > -1) {
-    return options.fn(this);
-  }
-  return options.inverse(this);*/
+    return '';
+});
+
+Handlebars.registerHelper('group_title', function(group_id, groups, options) {
+    // find the group
+    for(let i = 0; i < groups.length; i++) {
+        if(groups[i].group_id === group_id) {
+            return groups[i].title;
+        }
+    }
+    return '';
 });

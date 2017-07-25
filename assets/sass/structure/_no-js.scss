@@ -1,0 +1,12 @@
+.no-js {
+    .enp-tree__end,
+    .enp-tree__question {
+        margin-top: 20px;
+        margin-bottom: 500px;
+    }
+
+    & {
+        // let's let them explore by scrolling
+        // overflow: hidden;
+    }
+}
