@@ -1,3 +1,7 @@
+Handlebars.registerHelper('environment', function(options) {
+    return 'js';
+});
+
 Handlebars.registerHelper('group_start', function(question_id, group_id, groups, options) {
     // find the group
     for(let i = 0; i < groups.length; i++) {

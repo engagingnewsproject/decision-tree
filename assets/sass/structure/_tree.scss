@@ -9,10 +9,16 @@ html {
 
 .enp-tree {
     width: 100%;
-    max-width: 800px;
+    padding: $spacing__base/4;
+}
+
+.enp-tree__intro {
+    width: 100%;
+    max-width: $column_max_width;
 }
 
 .enp-tree__start {
-    padding: $spacing__base*0.8 $spacing__base;
+    padding: $spacing__base*0.6 $spacing__base;
     text-decoration: none;
+    text-align: center;
 }

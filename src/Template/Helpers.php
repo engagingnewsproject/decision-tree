@@ -12,6 +12,13 @@ class Helpers {
     }
 
     /**
+    * Get a group title by ID
+    */
+    public static function environment($options) {
+        return 'php';
+    }
+
+    /**
     * Find out if this question starts a group
     */
     public static function group_start($question_id, $group_id, $groups, $options) {

@@ -1,14 +1,30 @@
-.enp-tree__start {
-    background: $btn_background;
-    color: $btn_color
+.enp-tree {
+    background: $tree_background;
 }
 
-.enp-tree__option-link {
-    background: #ddd;
-    background: rgba(0,0,0,.1);
+.enp-tree__start {
+    background: $btn_background;
+    color: $btn_color;
 
     &:hover,
     &:focus {
-        background: rgba(0,0,0,.2);
+        background: $btn_background--hover;
+        color: $btn_color;
+    }
+}
+
+.enp-tree__question {
+    background: $question_background;
+}
+
+.enp-tree__option-link,
+.enp-tree__option-link:visited {
+    background: $option_background;
+    color: $text_color;
+
+    &:hover,
+    &:focus {
+        background: $option_background--hover;
+        color: $text_color;
     }
 }

@@ -1,5 +1,7 @@
 .enp-tree__question {
     width: 100%;
-    border: 1px solid #ddd;
     padding: $spacing__base;
+    border: 1px solid $question_border;
+    max-width: $column_max_width;
+    margin-bottom: $spacing__base*2;
 }
