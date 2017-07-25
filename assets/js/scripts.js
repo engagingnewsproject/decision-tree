@@ -9,7 +9,7 @@ function Tree(slug) {
 
     // Request our Tree Data
 
-    this.getTreeData = function(slug) {
+    var getTreeData = function(slug) {
         console.log(slug);
         let DecisionTree;
 
@@ -39,11 +39,11 @@ function Tree(slug) {
         });
     }
 
-    this.handleTreeDataError = function(err) {
+    var handleTreeDataError = function(err) {
         console.log(err)
     }
 
-    this.createTree = function(response) {
+    var createTree = function(response) {
         let data = JSON.parse(response);
 
         _treeID = data.tree_id
@@ -85,7 +85,7 @@ function Tree(slug) {
     }
 
     // create the tree
-    this.getTreeData(slug).then(this.createTree).catch(this.handleTreeDataError);
+    getTreeData(slug).then(createTree).catch(handleTreeDataError);
 
 }
 
