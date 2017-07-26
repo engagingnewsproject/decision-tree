@@ -11,7 +11,7 @@
     <h2>Main content block</h2>
     <div id="enp-tree__citizen">
         <noscript>
-            <iframe width="100%" height="600px" src="api/v1/trees/citizen/iframe"></iframe>
+            <iframe width="100%" height="500px" src="api/v1/trees/citizen/iframe?js=false"></iframe>
         </noscript>
     </div>
 

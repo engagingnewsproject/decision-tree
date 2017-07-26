@@ -61,8 +61,13 @@ function Tree(options) {
     }
 
     // constructor
-    function createTree(response) {
-        var data = JSON.parse(response);
+    function createTree(request) {
+        // check our response URL to make sure it's from a trusted source
+        if (!/https?:\/\/(?:dev\/decision-tree|tree\.engagingnewsproject\.org|enptree\.staging\.wpengine\.com)\/api\//.test(request.responseURL)) {
+            throw new Error('resopnseURL from an invalidated source.');
+        }
+
+        var data = JSON.parse(request.response);
 
         _data = data;
         _state = 'start';
@@ -226,7 +231,7 @@ function getTreeData(slug, url) {
         request.onload = function () {
             if (request.status === 200) {
                 // If successful, resolve the promise by passing back the request response
-                resolve(request.response);
+                resolve(request);
             } else {
                 // If it fails, reject the promise with a error message
                 reject(Error('Tree could not be loaded:' + request.statusText));

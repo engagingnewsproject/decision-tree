@@ -4,54 +4,7 @@
  */
 namespace Enp\Utility;
 
-/**
-* Check if we're in the dev environment or on a live site
-*
-* @return Boolean (static)
-*/
-function is_dev() {
-    static $is_dev = false;
 
-    // Regex check to see if starts with http:// or https://
-    $url = $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-    $matches = null;
-    preg_match('/^https?:\/\/(dev|localhost:[0-9]+)\//', $url, $matches);
-    // if there's a match, then we're in dev
-    if(!empty($matches)) {
-        $is_dev = true;
-    }
-
-    return $is_dev;
-}
-
-/**
-* Get the URL of the current environment
-*
-* @return String (static)
-*/
-function get_server_url() {
-    static $url = false;
-
-    if($url === false) {
-        if(is_dev() === true) {
-            $url = 'http://dev/decision-tree/';
-        } else {
-            $url = $_SERVER['HTTP_HOST'].'/decision-tree/';
-        }
-    }
-
-    return $url;
-}
-
-function get_api_base_url() {
-    static $base_url = false;
-
-    if($base_url === false) {
-        $base_url = get_server_url().'api/v1/';
-    }
-
-    return $base_url;
-}
 
 /**
 * Build the data URL to get the JSON data
@@ -113,6 +66,10 @@ function is_id($string) {
 }
 
 function get_tree_slug_by_id($tree_id) {
+    // test if it's a valid ID or not
+    if(!is_id($tree_id)) {
+        return false;
+    }
     // use the id to get the slug. Switch to $tree_id bc that's what it is
     $DB = new \ENP\Database\DB();
     $tree = $DB->get_tree($tree_id);
@@ -121,6 +78,10 @@ function get_tree_slug_by_id($tree_id) {
 }
 
 function get_tree_id_by_slug($tree_slug) {
+    // test if it's a valid ID or not
+    if(!is_slug($tree_slug)) {
+        return false;
+    }
     // use the id to get the slug. Switch to $tree_id bc that's what it is
     $DB = new \ENP\Database\DB();
     $tree = $DB->get_tree_by_slug($tree_slug);
