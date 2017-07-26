@@ -1,5 +1,8 @@
 <?php use \LightnCandy\SafeString as SafeString;use \LightnCandy\Runtime as LR;return function ($in = null, $options = null) {
-    $helpers = array(            'group_start' => function($question_id, $group_id, $groups, $options) {
+    $helpers = array(            'environment' => function($options) {
+        return 'no-js';
+    },
+            'group_start' => function($question_id, $group_id, $groups, $options) {
         foreach($groups as $group) {
             if($group['group_id'] === $group_id) {
                 // check if it's the first in the question order
@@ -55,7 +58,7 @@
     );
     
     $inary=is_array($in);
-    return '<section id="enp-tree--'.LR::raw($cx, (($inary && isset($in['tree_id'])) ? $in['tree_id'] : null)).'" class="enp-tree enp-tree--no-js">
+    return '<section id="enp-tree--'.LR::raw($cx, (($inary && isset($in['tree_id'])) ? $in['tree_id'] : null)).'" class="enp-tree enp-tree--'.LR::raw($cx, LR::hbch($cx, 'environment', array(array(),array()), 'raw', $in)).'">
     <div class="enp-tree__intro">
         <h2 class="enp-tree__title enp-tree__title--tree">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</h2>
 '.((LR::ifvar($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), false)) ? ''.LR::sec($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '                <div class="enp-tree__start-container">

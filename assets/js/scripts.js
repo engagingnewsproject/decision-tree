@@ -1,55 +1,23 @@
-function Tree(slug) {
-    var _treeID,
-        _starts,
-        _questions,
-        _ends,
+function Tree(options) {
+    var _data,
         _state,
-        _stateID,
-        _template;
+        _stateID;
 
-    // Request our Tree Data
-
-    var getTreeData = function(slug) {
-        console.log(slug);
-        let DecisionTree;
-
-        return new Promise(function(resolve, reject) {
-
-          var request = new XMLHttpRequest();
-          request.overrideMimeType("application/json");
-          request.open('GET', 'http://dev/decision-tree/api/v1/trees/'+slug+'/compiled?minfied=true', true);
-          //request.responseType = 'json';
-          // When the request loads, check whether it was successful
-          request.onload = function() {
-            if (request.status === 200) {
-            // If successful, resolve the promise by passing back the request response
-              resolve(request.response);
-            } else {
-            // If it fails, reject the promise with a error message
-              reject(Error('Tree could not be loaded:' + request.statusText));
-            }
-          };
-          request.onerror = function() {
-          // Also deal with the case when the entire request fails to begin with
-          // This is probably a network error, so reject the promise with an appropriate message
-              reject(Error('There was a network error.'));
-          };
-          // Send the request
-          request.send();
-        });
+    // required options
+    if(typeof options.slug !== 'string') {
+        throw new Error('Tree slug is required must be a string.')
     }
 
-    var handleTreeDataError = function(err) {
-        console.log(err)
+    if(typeof options.container !== 'object') {
+        throw new Error('Tree container must be an object. Try `container: document.getElementById(your-id)`.')
     }
 
-    var createTree = function(response) {
+
+    // constructor
+    function createTree(response) {
         let data = JSON.parse(response);
 
-        _treeID = data.tree_id
-        _starts = data.starts
-        _questions = data.questions
-        _ends = data.ends
+        _data = data
         _state = 'start'
         _stateID = data.starts[0].start_id
 
@@ -57,22 +25,14 @@ function Tree(slug) {
         var template = window.TreeTemplates.tree;
         var treeHTML = template(data)
 
-        let treeBlock = document.getElementById('enp-tree__'+_treeID);
-        treeBlock.innerHTML = treeHTML
-        let treeRendered = document.getElementById('enp-tree--'+_treeID);
-        // remove the no-js class
-        treeRendered.classList.remove('enp-tree--no-js');
-        treeRendered.classList.add('enp-tree--has-js');
+        // set the HTML into the passed container
+        options.container.innerHTML = treeHTML
     }
 
     // getters
-    this.getTreeID = function() { return _treeID }
-    this.getStarts = function() { return _starts }
-    this.getQuestions = function() { return _questions }
-    this.getEnds = function() { return _ends }
-    this.getState = function() { return _ends }
-    this.getTemplate = function() { return _template }
-    this.getHTML = function() { return _html }
+    this.getData = function() { return _data }
+    this.getState = function() { return _state }
+    this.getStateID = function() { return _stateID }
 
     // setters
     this.setState = function(state) {
@@ -84,70 +44,93 @@ function Tree(slug) {
         _stateID = stateID;
     }
 
+    // INIT
+    // Request our Tree Data
     // create the tree
-    getTreeData(slug).then(createTree).catch(handleTreeDataError);
+    getTreeData(options.slug, 'http://dev/decision-tree/api/v1/trees/'+options.slug+'/compiled?minfied=true')
+        .then(createTree)
+        .catch(handleTreeDataError);
 
 }
 
-Tree.prototype.getOtherTreeID = function(){
-    return this._treeID
+
+Tree.prototype.getQuestion = function(id){
+    // get the individual item
+    questionIndex = this.getIndexBy(this.getData(), 'question_id', id)
+    question = this.data.questions[questionIndex]
+
+    return question;
 };
 
-// getters and setters
-/*Tree.prototype.getState = function(){
-    return this.state
-};
+/**
+* Allowed types, 'question', 'group', 'end', 'start'
+*/
+Tree.prototype.getDataByType = function(type, id) {
+    let typeIndex,
+        whitelist,
+        data;
+    // check allowed types
+    whitelist = ['question','group','end','start']
 
+    if(!whitelist.includes(type)) {
+        throw new Error("Allowed getDataByType types are "+whitelist.toString());
+    }
+    // get the data of this type
+    data = this.getData();
+    // append 's' to get the right array
+    // 'question' becomes 'questions'
+    data = data[type+'s'];
 
-
-Tree.prototype.getQuestions = function(id){
-    let question,
-        questionIndex;
+    // if there's an ID, let's get the specific one they're after
     if(id !== undefined) {
         // get the individual item
-        questionIndex = this.getIndexBy(this.data.questions, 'question_id', id)
-        question = this.data.questions[questionIndex]
+        typeIndex = this.getIndexBy(data, type+'_id', id)
+        data = data[typeIndex]
+    }
+
+    return data;
+}
+
+Tree.prototype.getQuestions = function(id){
+    let question;
+    if(id !== undefined) {
+        // get the individual item
+        question = this.getDataByType('question', id)
     } else {
-        question = this.data.questions
+        question = this.getDataByType('question')
     }
     return question;
 };
 
 Tree.prototype.getStarts = function(id){
-    let start,
-        startIndex;
+    let start;
     if(id !== undefined) {
         // get the individual item
-        startIndex = this.getIndexBy(this.data.starts, 'start_id', id)
-        start = this.data.starts[startIndex]
+        start = this.getDataByType('start', id)
     } else {
-        start = this.data.starts
+        start = this.getDataByType('start')
     }
     return start;
 };
 
 Tree.prototype.getEnds = function(id){
-    let end,
-        endIndex;
+    let end;
     if(id !== undefined) {
         // get the individual item
-        endIndex = this.getIndexBy(this.data.ends, 'end_id', id)
-        end = this.data.ends[endIndex]
+        end = this.getDataByType('end', id)
     } else {
-        end = this.data.ends
+        end = this.getDataByType('end')
     }
     return end;
 };
 
 Tree.prototype.getGroups = function(id){
-    let group,
-        groupIndex;
+    let group;
     if(id !== undefined) {
         // get the individual item
-        groupIndex = this.getIndexBy(this.data.groups, 'group_id', id)
-        group = this.data.groups[groupIndex]
+        group = this.getDataByType('group', id)
     } else {
-        group = this.data.groups
+        group = this.getDataByType('group')
     }
     return group;
 };
@@ -179,29 +162,17 @@ Tree.prototype.getIndexBy = function(objArray, name, value){
     return -1;
 };
 
-Tree.prototype.setState(id) {
-    if(id === undefined) {
-        this.state = 0;
-        this.state = 'start';
-    } else if (){
-
-    }
-}
-*/
-
 
 const Trees = []
 
-/*
-// create the tree
-function getTreeData(slug) {
+function getTreeData(slug, url) {
     let DecisionTree;
 
     return new Promise(function(resolve, reject) {
 
       var request = new XMLHttpRequest();
       request.overrideMimeType("application/json");
-      request.open('GET', 'http://dev/decision-tree/api/v1/trees/'+slug+'/compiled?minfied=true', true);
+      request.open('GET', url, true);
       //request.responseType = 'json';
       // When the request loads, check whether it was successful
       request.onload = function() {
@@ -223,37 +194,7 @@ function getTreeData(slug) {
     });
 }
 
-function createTree(slug) {
-    getTreeData(slug).then(buildTree).catch(handleTreeDataError);
-}
-
-function buildTree(response) {
-    // The first runs when the promise resolves, with the request.reponse
-    // specified within the resolve() method.
-    let treeData = JSON.parse(response);
-    let newTree = new Tree(treeData)
-    // add it to our array of Tree objects
-    Trees.push(newTree)
-    // Render it
-    renderTree(newTree)
-}
-
 function handleTreeDataError(err) {
     console.log(err)
+    throw new Error('Tree data could not be loaded.')
 }
-
-function renderTree(Tree) {
-    let treeBlock = document.getElementById('enp-tree__'+Tree.data.tree_id);
-    treeBlock.innerHTML = Tree.html
-    let treeRendered = document.getElementById('enp-tree--'+Tree.data.tree_id);
-    // remove the no-js class
-    treeRendered.classList.remove('enp-tree--no-js');
-    treeRendered.classList.add('enp-tree--has-js');
-
-    // hide
-}
-
-createTree('citizen');
-*/
-
-var tree = new Tree('citizen');

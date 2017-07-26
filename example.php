@@ -9,10 +9,12 @@
 <body>
 <main>
     <h2>Main content block</h2>
-    <div id="enp-tree__1"></div>
-    <noscript>
-        <iframe width="100%" height="600px" src="api/v1/trees/citizen/iframe"></iframe>
-    </noscript>
+    <div id="enp-tree__citizen">
+        <noscript>
+            <iframe width="100%" height="600px" src="api/v1/trees/citizen/iframe"></iframe>
+        </noscript>
+    </div>
+
 </main>
 <footer>
     <h2>Footer</h2>
@@ -20,5 +22,14 @@
 <script src="dist/js/handlebars.runtime.js"></script>
 <script src="dist/js/templates.js"></script>
 <script src="dist/js/scripts.js"></script>
+<script>
+
+    treeOptions = {
+            slug: 'citizen',
+            container: document.getElementById('enp-tree__citizen')
+    };
+
+    var tree = new Tree(treeOptions);
+</script>
 </body>
 </html>

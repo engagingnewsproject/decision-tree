@@ -1,5 +1,5 @@
 Handlebars.registerHelper('environment', function(options) {
-    return 'js';
+    return 'has-js';
 });
 
 Handlebars.registerHelper('group_start', function(question_id, group_id, groups, options) {

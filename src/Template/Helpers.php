@@ -15,7 +15,7 @@ class Helpers {
     * Get a group title by ID
     */
     public static function environment($options) {
-        return 'php';
+        return 'no-js';
     }
 
     /**

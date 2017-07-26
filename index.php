@@ -36,12 +36,18 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_slug}/iframe', function (Request $request, Response $response) {
 
             $tree_slug = $request->getAttribute('tree_slug');
+            $js = $request->getQueryParam('js', $default = 'true');
+
             // check if we have a slug or an id
             if(\Enp\Utility\is_id($tree_slug)) {
                 $tree_slug = \Enp\Utility\get_tree_slug_by_id($tree_slug);
             }
-
-            $this->view->render($response, "iframe.php", [
+            if($js === 'false') {
+                $view_path = 'no-js';
+            } else {
+                $view_path = 'has-js';
+            }
+            $this->view->render($response, "iframe/$view_path/index.php", [
                 "tree_slug" => $tree_slug,
                 "url"=>TREE_URL
             ]);
