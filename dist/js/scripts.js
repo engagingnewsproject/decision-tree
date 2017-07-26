@@ -53,18 +53,21 @@ function Tree(options) {
 
     // required options
     if (typeof options.slug !== 'string') {
-        throw new Error('Tree slug is required must be a string.');
+        console.error('Tree slug is must be a string.');
+        return false;
     }
 
     if (_typeof(options.container) !== 'object') {
-        throw new Error('Tree container must be an object. Try `container: document.getElementById(your-id)`.');
+        console.error('Tree container must be a valid object. Try `container: document.getElementById(your-id)`.');
+        return false;
     }
 
     // constructor
     function createTree(request) {
         // check our response URL to make sure it's from a trusted source
         if (!/https?:\/\/(?:dev\/decision-tree|tree\.engagingnewsproject\.org|enptree\.staging\.wpengine\.com)\/api\//.test(request.responseURL)) {
-            throw new Error('resopnseURL from an invalidated source.');
+            console.error('responseURL from an invalidated source.');
+            return false;
         }
 
         var data = JSON.parse(request.response);
@@ -108,14 +111,6 @@ function Tree(options) {
     getTreeData(options.slug, 'http://dev/decision-tree/api/v1/trees/' + options.slug + '/compiled?minfied=true').then(createTree).catch(handleTreeDataError);
 }
 
-Tree.prototype.getQuestion = function (id) {
-    // get the individual item
-    questionIndex = this.getIndexBy(this.getData(), 'question_id', id);
-    question = this.data.questions[questionIndex];
-
-    return question;
-};
-
 /**
 * Allowed types, 'question', 'group', 'end', 'start'
 */
@@ -127,7 +122,8 @@ Tree.prototype.getDataByType = function (type, id) {
     whitelist = ['question', 'group', 'end', 'start'];
 
     if (!whitelist.includes(type)) {
-        throw new Error("Allowed getDataByType types are " + whitelist.toString());
+        console.error("Allowed getDataByType types are " + whitelist.toString());
+        return false;
     }
     // get the data of this type
     data = this.getData();
@@ -139,7 +135,12 @@ Tree.prototype.getDataByType = function (type, id) {
     if (id !== undefined) {
         // get the individual item
         typeIndex = this.getIndexBy(data, type + '_id', id);
-        data = data[typeIndex];
+        if (typeIndex !== undefined) {
+            // found one!
+            data = data[typeIndex];
+        } else {
+            data = undefined;
+        }
     }
 
     return data;
@@ -207,19 +208,25 @@ Tree.prototype.getOptions = function (question_id, option_id) {
     return option;
 };
 
+/**
+* Powers most all of the retrieval of data from the tree
+* Searches an array for a key that equals a certain value
+*
+* @param objArray (ARRAY of OBJECTS)
+* @param name (STRING) of the key you're wanting to find the matching value of
+* @param value (MIXED) the value you want to find a match for
+* @return INT of the index that matches or UNDEFINED if not found
+*/
 Tree.prototype.getIndexBy = function (objArray, name, value) {
     for (var i = 0; i < objArray.length; i++) {
         if (objArray[i][name] == value) {
             return i;
         }
     }
-    return -1;
+    return undefined;
 };
 
-var Trees = [];
-
 function getTreeData(slug, url) {
-    var DecisionTree = void 0;
 
     return new Promise(function (resolve, reject) {
 
@@ -248,6 +255,5 @@ function getTreeData(slug, url) {
 }
 
 function handleTreeDataError(err) {
-    console.log(err);
-    throw new Error('Tree data could not be loaded.');
+    console.error(err);
 }
