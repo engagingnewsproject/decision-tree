@@ -14,7 +14,7 @@ describe('Tree', function() {
         setTimeout(function(){
               // complete the async before
               return done();
-        }, 300);
+        }, 100);
     });
 
     after(function() {
@@ -85,6 +85,84 @@ describe('Tree', function() {
             .equal(false);
         });
 
+    });
+
+    describe('setState', function() {
+
+        it('should initialize as the state of "start"', function() {
+            expect('start').to.equal(tree.getState());
+        });
+
+        it('should initialize as the stateID of the first start_id', function() {
+            var starts = tree.getDataByType('start');
+            expect(tree.getStateID()).to.equal(starts[0].start_id);
+        });
+
+        it('should set the question_id to first question\'s question_id', function() {
+            var questions = tree.getDataByType('question');
+            var question_id = questions[0].question_id;
+            tree.setState('question', question_id);
+
+            expect(question_id).to.equal(tree.getStateID());
+        });
+
+        it('should set the state to "question"', function() {
+            var questions = tree.getDataByType('question');
+            var question_id = questions[0].question_id;
+            tree.setState('question', question_id);
+
+            expect('question').to.equal(tree.getState());
+        });
+
+        it('should set the question_id to first question\'s question_id', function() {
+            var questions = tree.getDataByType('question');
+            var question_id = questions[0].question_id;
+            tree.setState('question', question_id);
+
+            expect(question_id).to.equal(tree.getStateID());
+        });
+
+        it('should set the state to "end"', function() {
+            var ends = tree.getDataByType('end');
+            var end_id = ends[0].end_id;
+            tree.setState('end', end_id);
+
+            expect('end').to.equal(tree.getState());
+        });
+
+        it('should set the end_id to first end\'s end_id', function() {
+            var ends = tree.getDataByType('end');
+            var end_id = ends[0].end_id;
+            tree.setState('end', end_id);
+
+            expect(end_id).to.equal(tree.getStateID());
+        });
+
+        it('should set the state to "start"', function() {
+            var starts = tree.getDataByType('start');
+            var start_id = starts[0].start_id;
+            tree.setState('start', start_id);
+
+            expect('start').to.equal(tree.getState());
+        });
+
+        it('should set the start_id to first start\'s start_id', function() {
+            var starts = tree.getDataByType('start');
+            var start_id = starts[0].start_id;
+            tree.setState('start', start_id);
+
+            expect(start_id).to.equal(tree.getStateID());
+        });
+
+        it('should not set the state to "foo"', function() {
+            state = tree.setState('foo', 1);
+            expect(state).to.equal(false);
+        });
+
+        it('should not set the state to an invalid question_id', function() {
+            state = tree.setState('question', '12398019283102983102983102938102938');
+            expect(state).to.equal(false);
+        });
     });
 
     describe('getQuestions', function() {

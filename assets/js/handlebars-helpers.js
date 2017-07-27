@@ -8,7 +8,8 @@ Handlebars.registerHelper('group_start', function(question_id, group_id, groups,
         if(groups[i].group_id === group_id) {
             // check if it's the first in the question order
             if(groups[i].questions[0] === question_id) {
-                return options.fn(groups[i].title);
+                // pass the values we'll need in the template
+                return options.fn({group_id: groups[i].group_id, group_title: groups[i].title});
             } else {
                 return '';
             }
@@ -28,16 +29,6 @@ Handlebars.registerHelper('group_end', function(question_id, group_id, groups, o
             } else {
                 return '';
             }
-        }
-    }
-    return '';
-});
-
-Handlebars.registerHelper('group_title', function(group_id, groups, options) {
-    // find the group
-    for(let i = 0; i < groups.length; i++) {
-        if(groups[i].group_id === group_id) {
-            return groups[i].title;
         }
     }
     return '';

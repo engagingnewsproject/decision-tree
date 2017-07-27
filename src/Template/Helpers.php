@@ -26,7 +26,8 @@ class Helpers {
             if($group['group_id'] === $group_id) {
                 // check if it's the first in the question order
                 if($group['questions'][0] === $question_id) {
-                    return $options['fn']($group['title']);
+                    // set the context of the values we'll need
+                    return $options['fn'](["group_id"=>$group['group_id'], "group_title"=>$group['title']]);
                 } else {
                     return '';
                 }
@@ -48,19 +49,6 @@ class Helpers {
                 } else {
                     return '';
                 }
-            }
-        }
-        return '';
-    }
-
-    /**
-    * Get a group title by ID
-    */
-    public static function group_title($group_id, $groups, $options) {
-
-        foreach($groups as $group) {
-            if($group['group_id'] === $group_id) {
-                return $options['fn']($group['group_title']);
             }
         }
         return '';

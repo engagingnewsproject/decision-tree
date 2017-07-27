@@ -10,7 +10,8 @@ Handlebars.registerHelper('group_start', function (question_id, group_id, groups
         if (groups[i].group_id === group_id) {
             // check if it's the first in the question order
             if (groups[i].questions[0] === question_id) {
-                return options.fn(groups[i].title);
+                // pass the values we'll need in the template
+                return options.fn({ group_id: groups[i].group_id, group_title: groups[i].title });
             } else {
                 return '';
             }
@@ -30,16 +31,6 @@ Handlebars.registerHelper('group_end', function (question_id, group_id, groups, 
             } else {
                 return '';
             }
-        }
-    }
-    return '';
-});
-
-Handlebars.registerHelper('group_title', function (group_id, groups, options) {
-    // find the group
-    for (var i = 0; i < groups.length; i++) {
-        if (groups[i].group_id === group_id) {
-            return groups[i].title;
         }
     }
     return '';
@@ -64,6 +55,7 @@ function Tree(options) {
 
     // constructor
     function createTree(request) {
+
         // check our response URL to make sure it's from a trusted source
         if (!/https?:\/\/(?:dev\/decision-tree|tree\.engagingnewsproject\.org|enptree\.staging\.wpengine\.com)\/api\//.test(request.responseURL)) {
             console.error('responseURL from an invalidated source.');
@@ -82,6 +74,16 @@ function Tree(options) {
 
         // set the HTML into the passed container
         options.container.innerHTML = treeHTML;
+        var treeEl = options.container.firstElementChild;
+        // assign the value to our inserted element
+        treeEl.value = data;
+        // assign the element to the data
+        _data.el = treeEl;
+
+        // bind question data
+        bindAllData(this);
+        // attach event listeners to all <a> elements
+        options.container.addEventListener("click", this.handleClick);
     }
 
     // getters
@@ -96,19 +98,230 @@ function Tree(options) {
     };
 
     // setters
-    this.setState = function (state) {
-        // protect this function!
+    function bindAllData(context) {
+        console.time("bind");
+        var elTypes = ['question', 'start', 'end', 'group'];
+        // loop through the data and find the corresponding elements
+        for (var i = 0; i < elTypes.length; i++) {
+            // get the data: ex {question_id: 2, order: 2, etc}
+            var elData = context.getDataByType(elTypes[i]);
+            for (var j = 0; j < elData.length; j++) {
+                // get the id, ex. the id value '2'
+                // this is like saying: getDataByType('question').question_id
+                var id = elData[j][elTypes[i] + '_id'];
+                // find the element in the DOM
+                var el = document.getElementById('enp-tree__el--' + id);
+                // find the spot in the data tree to assign the el to
+                // this is like saying: _data[questions]
+                var dataEl = _data[elTypes[i] + 's'][j];
+                // bind the data
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+                bindDOMData(dataEl, el, elTypes[i]);
+
+                // see if we're working with a question
+                if (elTypes[i] === 'question') {
+                    var _options = dataEl.options;
+                    // loop through the options
+                    for (var k = 0; k < _options.length; k++) {
+                        // get the spot in the data tree to bind the data to
+                        var optionDataEl = _options[k];
+                        // get option el
+                        var optionEl = document.getElementById('enp-tree__el--' + optionDataEl.option_id);
+                        // bind the data
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                        bindDOMData(optionDataEl, optionEl, 'option');
+                    }
+                }
+            }
+        }
+        console.timeEnd("bind");
+    }
+
+    /**
+    * Bind data to an element and bind that element to the _data
+    * ex. bindDOMData(_data.questions[0], document.getElementById('enp-tree__el--2'))
+    * would bind the data from questions[0] to the el--2 (DOM element), and set
+    * _data.questions[0].el = el--2 (DOM el)
+    */
+    function bindDOMData(_dataObj, element, type) {
+        // we can only add this once, not overwrite existing ones
+        if (_dataObj.el === undefined) {
+            // clone the data so we're not giving direct access to the _data attribute
+            var clonedObj = void 0;
+            // building the cloned data manually so:
+            // 1. it's soooo much faster. Like, exponentionally as the tree grows
+            // 2. we're not recording a bunch of data we don't need
+            //    (like "content", "title", etc)
+            // 3. We can add data that we do need (like "type")
+            switch (type) {
+                case 'start':
+                    clonedObj = {
+                        start_id: _dataObj.start_id,
+                        type: 'start'
+                    };
+                    break;
+
+                case 'group':
+                    clonedObj = {
+                        group_id: _dataObj.group_id,
+                        type: 'group'
+                    };
+                    break;
+
+                case 'question':
+                    clonedObj = {
+                        question_id: _dataObj.question_id,
+                        type: 'question',
+                        destination_id: _dataObj.destination_id
+                    };
+                    clonedObj.options = [];
+                    // add options
+                    for (var i = 0; i < _dataObj.options.length; i++) {
+                        clonedObj.options.push(_dataObj.options[i].option_id);
+                    }
+                    break;
+
+                case 'option':
+                    clonedObj = {
+                        option_id: _dataObj.option_id,
+                        type: 'option',
+                        question_id: _dataObj.question_id,
+                        destination_id: _dataObj.destination_id
+                    };
+                    break;
+
+                case 'end':
+                    clonedObj = {
+                        end_id: _dataObj.end_id,
+                        type: 'end'
+                    };
+                    break;
+            }
+            // dynamically building the structure was quite slow, so we're manually doing it for speed on this kinda expensive operation
+            // bind the data to the DOM
+            element.data = clonedObj;
+            // bind the element to the _data
+            _dataObj.el = element;
+
+            return _dataObj.el;
+        } else {
+            // can't overwrite data, so return false
+            return false;
+        }
+    }
+
+    this.setState = function (state, stateID) {
+        var whitelist = ['start', 'question', 'end'];
+
+        // TODO: Check that start can't go straight to end?
+        // TODO: Check that the next state is valid from the question's options?
+
+        // check allowed states
+        if (!whitelist.includes(state)) {
+            console.error(state + " is not an allowed state. Allowed states are " + whitelist.toString());
+            return false;
+        }
+
+        // check if the stateID is a valid ID for this state
+        var validateState = this.getDataByType(state, stateID);
+        if (validateState === false || validateState === undefined || (typeof validateState === 'undefined' ? 'undefined' : _typeof(validateState)) !== 'object') {
+            console.error(stateID + " is invalid for the current state of '" + state + "'");
+            return false;
+        }
+
+        // looks valid! Set the states
         _state = state;
-    };
-    this.setStateID = function (stateID) {
-        // protect this function!
         _stateID = stateID;
     };
 
     // INIT
     // Request our Tree Data
     // create the tree
-    getTreeData(options.slug, 'http://dev/decision-tree/api/v1/trees/' + options.slug + '/compiled?minfied=true').then(createTree).catch(handleTreeDataError);
+    getTreeData(options.slug, 'http://dev/decision-tree/api/v1/trees/' + options.slug + '/compiled?minfied=true').then(createTree.bind(this)).catch(handleTreeDataError);
 }
 
 /**
@@ -208,6 +421,17 @@ Tree.prototype.getOptions = function (question_id, option_id) {
     return option;
 };
 
+Tree.prototype.toDestinationClick = function (el) {};
+
+Tree.prototype.setActive = function (el) {};
+
+Tree.prototype.handleClick = function (event) {
+    var el = event.target;
+    if (el.nodeName === 'A') {
+        event.preventDefault();
+        this.toDestinationClick(el);
+    }
+};
 /**
 * Powers most all of the retrieval of data from the tree
 * Searches an array for a key that equals a certain value

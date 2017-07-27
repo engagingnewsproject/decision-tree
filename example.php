@@ -28,7 +28,7 @@
             slug: 'citizen',
             container: document.getElementById('enp-tree__citizen')
     };
-
+    
     var tree = new Tree(treeOptions);
 </script>
 </body>

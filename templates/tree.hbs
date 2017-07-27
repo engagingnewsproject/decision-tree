@@ -3,8 +3,8 @@
         <h2 class="enp-tree__title enp-tree__title--tree">{{{title}}}</h2>
         {{#if starts}}
             {{#each starts}}
-                <div class="enp-tree__start-container">
-                    <p><a class="enp-tree__start" href="#enp-tree__destination--{{{destination_id}}}" data-enp-tree-destination-id="{{{destination_id}}}">{{{title}}}</a></p>
+                <div id="enp-tree__el--{{start_id}}" class="enp-tree__start-container">
+                    <p><a class="enp-tree__start" href="#enp-tree__el--{{{destination_id}}}">{{{title}}}</a></p>
                     {{#if content}}
                         <div class="enp-tree__description enp-tree__description--start">
                             {{content}}
@@ -19,11 +19,11 @@
         {{#each questions}}
             {{#if group_id}}
                 {{#group_start question_id group_id ../groups}}
-                    <div class="enp-tree__group">
-                        <h3 class="enp-tree__title enp-tree__title--group">{{.}}</h3>
+                    <div id="enp-tree__el--{{{group_id}}}" class="enp-tree__group">
+                        <h3 class="enp-tree__title enp-tree__title--group">{{group_title}}</h3>
                 {{/group_start}}
             {{/if}}
-            <section id="enp-tree__destination--{{{question_id}}}" class="enp-tree__question" >
+            <section id="enp-tree__el--{{{question_id}}}" class="enp-tree__question" >
                 <h4 class="enp-tree__title enp-tree__title--question">{{title}}</h4>
                 {{#if content}}
                     <div class="enp-tree__description enp-tree__description--question">{{content}}</div>
@@ -31,7 +31,7 @@
                 {{#if options}}
                     <ul class="enp-tree__options">
                         {{#each options}}
-                            <li id="enp-tree__option--{{{option_id}}}" class="enp-tree__option"><a class="enp-tree__option-link"  href="#enp-tree__destination--{{{destination_id}}}" data-enp-tree-destination-id="{{{destination_id}}}">{{title}}</a></li>
+                            <li id="enp-tree__el--{{{option_id}}}" class="enp-tree__option"><a class="enp-tree__option-link"  href="#enp-tree__el--{{{destination_id}}}">{{title}}</a></li>
                         {{/each}}
                     </ul>
                 {{/if}}
@@ -47,7 +47,7 @@
 
     {{#if ends}}
         {{#each ends}}
-            <section id="enp-tree__destination--{{{end_id}}}" class="enp-tree__end">
+            <section id="enp-tree__el--{{{end_id}}}" class="enp-tree__end">
                 <p>End</p>
                 <h3 class="enp-tree__title enp-tree__title--end">{{{title}}}</h3>
                 {{#if content}}

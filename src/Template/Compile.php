@@ -36,7 +36,6 @@ class Compile extends Template {
                 'environment'  => '\Enp\Template\Helpers::environment',
                 'group_start'  => '\Enp\Template\Helpers::group_start',
                 'group_end'  => '\Enp\Template\Helpers::group_end',
-                'group_title'  => '\Enp\Template\Helpers::group_title'
             )
         );
 
