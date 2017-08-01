@@ -4,4 +4,16 @@
     border: 1px solid $question_border;
     max-width: $column_max_width;
     margin-bottom: $spacing__base*2;
+    transition: all .4s;
+}
+
+.enp-tree--has-js {
+    .enp-tree__question {
+        &:not(.active) {
+            opacity: 0.2;
+        }
+        .active {
+            opacity: 1;
+        }
+    }
 }
