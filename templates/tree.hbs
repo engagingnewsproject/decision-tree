@@ -2,16 +2,16 @@
     <div class="enp-tree__intro">
         <h2 class="enp-tree__title enp-tree__title--tree">{{{title}}}</h2>
         {{#if starts}}
-            {{#each starts}}
-                <div id="enp-tree__el--{{start_id}}" class="enp-tree__start-container">
-                    <p><a class="enp-tree__start" href="#enp-tree__el--{{{destination_id}}}">{{{title}}}</a></p>
+            <div class="enp-tree__start-container">
+                {{#each starts}}
+                    <p><a id="enp-tree__el--{{start_id}}" class="enp-tree__start" href="#enp-tree__el--{{{destination_id}}}">{{{title}}}</a></p>
                     {{#if content}}
                         <div class="enp-tree__description enp-tree__description--start">
                             {{content}}
                         </div>
                     {{/if}}
-                </div>
-            {{/each}}
+                {{/each}}
+            </div>
         {{/if}}
     </div>
 
@@ -31,7 +31,7 @@
                 {{#if options}}
                     <ul class="enp-tree__options">
                         {{#each options}}
-                            <li id="enp-tree__el--{{{option_id}}}" class="enp-tree__option"><a class="enp-tree__option-link"  href="#enp-tree__el--{{{destination_id}}}">{{title}}</a></li>
+                            <li class="enp-tree__option"><a class="enp-tree__option-link" id="enp-tree__el--{{{option_id}}}" href="#enp-tree__el--{{{destination_id}}}">{{title}}</a></li>
                         {{/each}}
                     </ul>
                 {{/if}}

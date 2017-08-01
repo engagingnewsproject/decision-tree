@@ -248,9 +248,9 @@ CREATE  OR REPLACE VIEW `tree_end` (end_id, tree_id, title, content) AS
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`tree_option`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_option` (option_id, tree_id, question_id, title, content, `order`, destination_id) AS
+CREATE  OR REPLACE VIEW `tree_option` (option_id, tree_id, question_id, title, content, `order`, destination_id, destination_type) AS
     SELECT
-        el.el_id, el.tree_id, question.el_id, el.el_title, el.el_content, el_order.el_order, destination.el_id_destination
+        el.el_id, el.tree_id, question.el_id, el.el_title, el.el_content, el_order.el_order, destination.el_id_destination, destination_type.el_type
     FROM
         tree.tree_element el
             INNER JOIN
@@ -261,6 +261,10 @@ CREATE  OR REPLACE VIEW `tree_option` (option_id, tree_id, question_id, title, c
         tree.tree_element_container question ON el.el_id = question.el_id_child
             INNER JOIN
         tree.tree_element_destination destination ON el.el_id = destination.el_id
+            INNER JOIN
+        tree.tree_element destination_el ON destination_el.el_id = destination.el_id_destination
+            INNER JOIN
+        tree.tree_element_type destination_type ON destination_type.el_type_id = destination_el.el_type_id
     WHERE
         el_type.el_type = 'option';
 

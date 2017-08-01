@@ -46,7 +46,8 @@
                     "title": "No",
                     "content": "",
                     "order": "0",
-                    "destination_id": "6"
+                    "destination_id": "6",
+                    "destination_type": "end"
                 },
                 {
                     "option_id": "3",
@@ -55,7 +56,8 @@
                     "title": "Yes",
                     "content": "",
                     "order": "1",
-                    "destination_id": "8"
+                    "destination_id": "8",
+                    "destination_type": "question"
                 }
             ]
         },
@@ -74,7 +76,8 @@
                     "title": "No",
                     "content": "",
                     "order": "0",
-                    "destination_id": "6"
+                    "destination_id": "6",
+                    "destination_type": "end"
                 },
                 {
                     "option_id": "9",
@@ -83,7 +86,8 @@
                     "title": "Yes",
                     "content": "",
                     "order": "1",
-                    "destination_id": "11"
+                    "destination_id": "11",
+                    "destination_type": "question"
                 }
             ]
         },
@@ -102,7 +106,8 @@
                     "title": "No",
                     "content": "",
                     "order": "0",
-                    "destination_id": "6"
+                    "destination_id": "6",
+                    "destination_type": "end"
                 },
                 {
                     "option_id": "12",
@@ -111,7 +116,8 @@
                     "title": "Yes",
                     "content": "",
                     "order": "1",
-                    "destination_id": "14"
+                    "destination_id": "14",
+                    "destination_type": "question"
                 }
             ]
         },
@@ -130,7 +136,8 @@
                     "title": "Less than three years",
                     "content": "",
                     "order": "0",
-                    "destination_id": "6"
+                    "destination_id": "6",
+                    "destination_type": "end"
                 },
                 {
                     "option_id": "16",
@@ -139,7 +146,8 @@
                     "title": "Three or more years",
                     "content": "",
                     "order": "1",
-                    "destination_id": "18"
+                    "destination_id": "18",
+                    "destination_type": "question"
                 },
                 {
                     "option_id": "17",
@@ -148,7 +156,8 @@
                     "title": "Five or more years",
                     "content": "",
                     "order": "2",
-                    "destination_id": "1"
+                    "destination_id": "29",
+                    "destination_type": "question"
                 }
             ]
         },
@@ -167,7 +176,8 @@
                     "title": "No",
                     "content": "",
                     "order": "0",
-                    "destination_id": "6"
+                    "destination_id": "6",
+                    "destination_type": "end"
                 },
                 {
                     "option_id": "19",
@@ -176,7 +186,8 @@
                     "title": "Yes",
                     "content": "",
                     "order": "1",
-                    "destination_id": "21"
+                    "destination_id": "21",
+                    "destination_type": "question"
                 }
             ]
         },
@@ -195,7 +206,8 @@
                     "title": "No",
                     "content": "",
                     "order": "0",
-                    "destination_id": "6"
+                    "destination_id": "6",
+                    "destination_type": "end"
                 },
                 {
                     "option_id": "22",
@@ -204,7 +216,8 @@
                     "title": "Yes",
                     "content": "",
                     "order": "1",
-                    "destination_id": "33"
+                    "destination_id": "33",
+                    "destination_type": "question"
                 }
             ]
         },
@@ -223,7 +236,8 @@
                     "title": "No",
                     "content": "",
                     "order": "0",
-                    "destination_id": "6"
+                    "destination_id": "6",
+                    "destination_type": "end"
                 },
                 {
                     "option_id": "34",
@@ -232,7 +246,8 @@
                     "title": "Yes",
                     "content": "",
                     "order": "1",
-                    "destination_id": "26"
+                    "destination_id": "26",
+                    "destination_type": "question"
                 }
             ]
         },
@@ -251,7 +266,8 @@
                     "title": "No",
                     "content": "",
                     "order": "0",
-                    "destination_id": "6"
+                    "destination_id": "6",
+                    "destination_type": "end"
                 },
                 {
                     "option_id": "27",
@@ -260,7 +276,8 @@
                     "title": "Yes",
                     "content": "",
                     "order": "1",
-                    "destination_id": "29"
+                    "destination_id": "29",
+                    "destination_type": "question"
                 }
             ]
         },
@@ -279,7 +296,8 @@
                     "title": "No",
                     "content": "",
                     "order": "0",
-                    "destination_id": "6"
+                    "destination_id": "6",
+                    "destination_type": "end"
                 },
                 {
                     "option_id": "30",
@@ -288,7 +306,8 @@
                     "title": "Yes",
                     "content": "",
                     "order": "1",
-                    "destination_id": "5"
+                    "destination_id": "5",
+                    "destination_type": "end"
                 }
             ]
         }

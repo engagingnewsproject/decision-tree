@@ -28,8 +28,8 @@
             slug: 'citizen',
             container: document.getElementById('enp-tree__citizen')
     };
-    
-    var tree = new Tree(treeOptions);
+
+    var tree = createTree(treeOptions);
 </script>
 </body>
 </html>
