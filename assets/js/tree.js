@@ -3,19 +3,25 @@
 */
 (function () {
 
-function Tree(data, view) {
+function Tree(data, observers) {
     var _data,
-        _state,
-        views;
+        _state;
 
+    // keep an array of observers
+    this.observers = []
 
-    function validateData(data) {
+    /**
+    * Private functions
+    */
+    var _validateData = function(data) {
         // TODO: make sure the data is valid
-        return data;
+        return true;
     }
 
-    // constructor
-    function setData(data) {
+    /*
+    * Private function to set Data and State on Init
+    */
+    var _setData = function(data) {
         _data = data
         _state = {
             id: data.starts[0].start_id,
@@ -24,21 +30,14 @@ function Tree(data, view) {
     }
 
 
-
     /**
     ** Public functinos
-    **
     **/
-    var emit = function(action, data) {
-        console.log('emitting '+action)
-        for(let i = 0; i < views.length; i++) {
-            views[i].on(action, data)
-        }
-    }
+
     // getters
     this.getData = function() { return _data }
     this.getState = function() { return _state }
-    this.getViews = function() { return views }
+
     // setters
     this.setState = function(stateType, stateID) {
         let whitelist = ['start','question','end']
@@ -49,6 +48,10 @@ function Tree(data, view) {
         // check allowed states
         if(!whitelist.includes(stateType)) {
             console.error(stateType + " is not an allowed state. Allowed states are "+whitelist.toString())
+            this.emitError('setState', {
+                stateType: stateType,
+                stateID: stateID
+            })
             return false
         }
 
@@ -63,157 +66,220 @@ function Tree(data, view) {
         _state.type = stateType
         _state.id = stateID
         // emit that we've changed it
-        emit('update', _state)
+        this.emit('update', _state)
     }
 
     /***********************
     ******** INIT  *********
     ***********************/
-    // start with one view
-    views = [view]
     // set the data
-    setData(data);
-    // emit that we're ready for other code to utilize this tree
-    emit('ready', this);
+    if(_validateData(data)) {
+        // start with one observer so we can
+        // alert them on ready
+        this.setObservers(observers)
+        // set the data
+        _setData(data)
+        // emit that we're ready for other code to utilize this tree
+        this.emit('ready', this);
+    } else {
+        console.error('Tree data is invalid.')
+        return false;
+    }
+
 }
 
-Tree.prototype.update = function(action, data) {
-    console.log(action);
-    switch(action) {
-        // data will be the element clicked
-        case 'update':
-            if(data.type === 'start') {
+Tree.prototype = {
+    constructor: Tree,
+
+    /**
+    * Let Observers know about different actions
+    * 'ready', 'update', 'error'
+    */
+    emit: function(action, data) {
+        console.log('emitting '+action)
+        for(let i = 0; i < this.observers.length; i++) {
+            this.observers[i].on(action, data)
+        }
+    },
+
+    /**
+    * Let our observers know about the error
+    */
+    emitError: function(action, data) {
+        this.emit('error', {
+            action: action,
+            data: data,
+        });
+    },
+
+    /**
+    * Request to update the tree
+    */
+    update: function(action, data) {
+        console.log('Request update with this data:');
+        console.log(data);
+        switch(action) {
+            // data will be the element clicked
+            case 'state':
+                this.updateState(data);
+                break
+        }
+    },
+
+    /**
+    * Attempt to update a sate
+    * Validation and emitting happens with setState
+    */
+    updateState: function(data) {
+        switch(data.type) {
+            case 'start':
                 // go to first question
                 let question = this.getQuestions()[0];
                 this.setState('question', question.question_id);
+                break
+
+            case 'option':
+                // find the destination
+                this.setState(data.destination_type, data.destination_id);
+                break
+        }
+    },
+
+    /**
+    * Allowed types, 'question', 'group', 'end', 'start'
+    */
+    getDataByType: function(type, id) {
+        let typeIndex,
+            whitelist,
+            data;
+        // check allowed types
+        whitelist = ['question','group','end','start']
+
+        if(!whitelist.includes(type)) {
+            console.error("Allowed getDataByType types are "+whitelist.toString());
+            return false;
+        }
+        // get the data of this type
+        data = this.getData();
+        // append 's' to get the right array
+        // 'question' becomes 'questions'
+        data = data[type+'s'];
+
+        // if there's an ID, let's get the specific one they're after
+        if(id !== undefined) {
+            // get the individual item
+            typeIndex = this.getIndexBy(data, type+'_id', id)
+            if(typeIndex !== undefined) {
+                // found one!
+                data = data[typeIndex]
+            } else {
+                data = undefined
             }
 
-            if(data.type === 'option') {
-                // go to question/end
-                // find the option_id
-            }
-            break
-    }
-};
-/**
-* Allowed types, 'question', 'group', 'end', 'start'
-*/
-Tree.prototype.getDataByType = function(type, id) {
-    let typeIndex,
-        whitelist,
-        data;
-    // check allowed types
-    whitelist = ['question','group','end','start']
+        }
 
-    if(!whitelist.includes(type)) {
-        console.error("Allowed getDataByType types are "+whitelist.toString());
-        return false;
-    }
-    // get the data of this type
-    data = this.getData();
-    // append 's' to get the right array
-    // 'question' becomes 'questions'
-    data = data[type+'s'];
+        return data;
+    },
 
-    // if there's an ID, let's get the specific one they're after
-    if(id !== undefined) {
-        // get the individual item
-        typeIndex = this.getIndexBy(data, type+'_id', id)
-        if(typeIndex !== undefined) {
-            // found one!
-            data = data[typeIndex]
+    getQuestions: function(id){
+        let question;
+        if(id !== undefined) {
+            // get the individual item
+            question = this.getDataByType('question', id)
         } else {
-            data = undefined
+            question = this.getDataByType('question')
+        }
+        return question;
+    },
+
+    getStarts: function(id){
+        let start;
+        if(id !== undefined) {
+            // get the individual item
+            start = this.getDataByType('start', id)
+        } else {
+            start = this.getDataByType('start')
+        }
+        return start;
+    },
+
+    getEnds: function(id){
+        let end;
+        if(id !== undefined) {
+            // get the individual item
+            end = this.getDataByType('end', id)
+        } else {
+            end = this.getDataByType('end')
+        }
+        return end;
+    },
+
+    getGroups: function(id){
+        let group;
+        if(id !== undefined) {
+            // get the individual item
+            group = this.getDataByType('group', id)
+        } else {
+            group = this.getDataByType('group')
+        }
+        return group;
+    },
+
+    getOptions: function(question_id, option_id){
+        let option,
+            optionIndex,
+            question;
+
+        // get the individual item
+        question = this.getQuestions(question_id);
+
+        if(option_id !== undefined) {
+            optionIndex = this.getIndexBy(question.options, 'option_id', option_id)
+            option = question.options[optionIndex]
+        } else {
+            option = question.options;
         }
 
-    }
+        return option;
+    },
 
-    return data;
-}
-
-Tree.prototype.getQuestions = function(id){
-    let question;
-    if(id !== undefined) {
-        // get the individual item
-        question = this.getDataByType('question', id)
-    } else {
-        question = this.getDataByType('question')
-    }
-    return question;
-};
-
-Tree.prototype.getStarts = function(id){
-    let start;
-    if(id !== undefined) {
-        // get the individual item
-        start = this.getDataByType('start', id)
-    } else {
-        start = this.getDataByType('start')
-    }
-    return start;
-};
-
-Tree.prototype.getEnds = function(id){
-    let end;
-    if(id !== undefined) {
-        // get the individual item
-        end = this.getDataByType('end', id)
-    } else {
-        end = this.getDataByType('end')
-    }
-    return end;
-};
-
-Tree.prototype.getGroups = function(id){
-    let group;
-    if(id !== undefined) {
-        // get the individual item
-        group = this.getDataByType('group', id)
-    } else {
-        group = this.getDataByType('group')
-    }
-    return group;
-};
-
-Tree.prototype.getOptions = function(question_id, option_id){
-    let option,
-        optionIndex,
-        question;
-
-    // get the individual item
-    question = this.getQuestions(question_id);
-
-    if(option_id !== undefined) {
-        optionIndex = this.getIndexBy(question.options, 'option_id', option_id)
-        option = question.options[optionIndex]
-    } else {
-        option = question.options;
-    }
-
-    return option;
-};
-
-Tree.prototype.addView = function(TreeView) {
-
-}
-
-/**
-* Powers most all of the retrieval of data from the tree
-* Searches an array for a key that equals a certain value
-*
-* @param objArray (ARRAY of OBJECTS)
-* @param name (STRING) of the key you're wanting to find the matching value of
-* @param value (MIXED) the value you want to find a match for
-* @return INT of the index that matches or UNDEFINED if not found
-*/
-Tree.prototype.getIndexBy = function(objArray, name, value){
-    for (let i = 0; i < objArray.length; i++) {
-        if (objArray[i][name] == value) {
-            return i;
+    setObservers: function(observers) {
+        for(let i = 0; i < observers.length; i++) {
+            this.addObserver(observers[i])
         }
+        return this.observers
+    },
+
+    addObserver: function(observer) {
+        // no need to validate. anyone can listen
+        // we do need to check to make sure the observer hasn't already
+        // been added
+        this.observers.push(observer)
+    },
+
+    getObservers: function() {
+        return this.observers
+    },
+
+    /**
+    * Powers most all of the retrieval of data from the tree
+    * Searches an array for a key that equals a certain value
+    *
+    * @param objArray (ARRAY of OBJECTS)
+    * @param name (STRING) of the key you're wanting to find the matching value of
+    * @param value (MIXED) the value you want to find a match for
+    * @return INT of the index that matches or UNDEFINED if not found
+    */
+    getIndexBy: function(objArray, name, value){
+        for (let i = 0; i < objArray.length; i++) {
+            if (objArray[i][name] == value) {
+                return i;
+            }
+        }
+        return undefined;
     }
-    return undefined;
-};
+}
+
 
 
 
@@ -274,8 +340,9 @@ function buildTree(request) {
     let treeView = new TreeView({
         container: this.container,
     });
+    let observers = [treeView]
 
-    let tree = new Tree(data, treeView);
+    let tree = new Tree(data, observers);
 
     trees.push(tree);
 

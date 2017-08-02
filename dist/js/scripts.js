@@ -47,186 +47,205 @@ function TreeView(options) {
         return false;
     }
 
-    // if a Tree was passed, add it
-    if (options.Tree) {
-        _Tree = options.Tree;
-    }
-
-    // set the el
-    _el = options.container;
-    // attach event listeners to the tree element
-    _el.addEventListener("click", this.click.bind(this));
-
     // getters
     this.getEl = function () {
         return _el;
     };
-
     this.getId = function () {
         return _id;
     };
-
     this.getTree = function () {
         return _Tree;
     };
 
+    // setters
     this.setTree = function (Tree) {
-        _Tree = Tree;
+        // only let it be set once
+        if (_Tree === undefined) {
+            _Tree = Tree;
+        }
+        return _Tree;
     };
+
+    /***********************
+    ******** INIT  *********
+    ***********************/
+    // if a Tree was passed, add it
+    if (options.Tree) {
+        this.setTree(options.Tree);
+    }
+
+    // set the el
+    _el = options.container;
+    // attach event listeners to the tree element with
+    // bound `this` so we get our reference to this element
+    _el.addEventListener("click", this.click.bind(this));
 }
 
-TreeView.prototype.on = function (action, data) {
-    console.log(action);
-    switch (action) {
-        case 'ready':
-            // data will be the tree itself
-            Tree = data;
-            this.setTree(Tree);
-            this.render(Tree.getData());
-            break;
-        case 'update':
-            this.update(data);
-            break;
-    }
-};
+TreeView.prototype = {
+    constructor: TreeView,
 
-TreeView.prototype.render = function (data) {
-    // render the tree
-    var template = window.TreeTemplates.tree;
-    var treeHTML = template(data);
-    // set the HTML into the passed container
-    this.getEl().innerHTML = treeHTML;
-
-    // bind question data
-    this.bindAllData();
-};
-
-TreeView.prototype.update = function (state) {
-    // render the tree
-    // remove is-active
-    console.log(state);
-    // Do stuff based on the new state change...
-
-    /*document.querySelector('.is-active').classList.remove('is-active')
-    document.getElementById('enp-tree__el--'+state.id).classList.add('is-active')*/
-};
-
-TreeView.prototype.click = function (event) {
-    var el = event.target;
-    // check if it's a click on the parent tree (which we don't care about)
-    if (el !== event.currentTarget) {
-        if (el.nodeName === 'A') {
-            event.preventDefault();
-            console.log(el.data);
-            this.emit('update', el.data);
+    /**
+    * Listen to parent Tree's emitted actions and handle accordingly
+    */
+    on: function on(action, data) {
+        console.log(action);
+        switch (action) {
+            case 'ready':
+                // data will be the tree itself
+                Tree = data;
+                this.setTree(Tree);
+                this.render(Tree.getData());
+                break;
+            case 'update':
+                this.update(data);
+                break;
         }
-    }
-    event.stopPropagation();
-};
+    },
 
-/**
-* Let our Tree know about the click
-*/
-TreeView.prototype.emit = function (action, data) {
-    var Tree = this.getTree();
-    Tree.update(action, data);
-};
+    render: function render(data) {
+        // render the tree
+        var template = window.TreeTemplates.tree;
+        var treeHTML = template(data);
+        // set the HTML into the passed container
+        this.getEl().innerHTML = treeHTML;
 
-/**
-* Bind tree data to the element for easy access to data when we need it
-*/
-TreeView.prototype.bindAllData = function () {
-    Tree = this.getTree();
-    var elTypes = ['question', 'start', 'end', 'group'];
-    // loop through the data and find the corresponding elements
-    for (var i = 0; i < elTypes.length; i++) {
-        // get the data: ex {question_id: 2, order: 2, etc}
-        var elData = Tree.getDataByType(elTypes[i]);
-        for (var j = 0; j < elData.length; j++) {
-            // get the id, ex. the id value '2'
-            // this is like saying: getDataByType('question').question_id
-            var id = elData[j][elTypes[i] + '_id'];
-            // find the element in the DOM
-            var el = document.getElementById('enp-tree__el--' + id);
-            // bind the data
-            this.bindDOMData(elData[j], el, elTypes[i]);
+        // bind question data
+        this.bindAllData();
+    },
 
-            // see if we're working with a question
-            if (elTypes[i] === 'question') {
-                var options = elData[j].options;
-                // loop through the options
-                for (var k = 0; k < options.length; k++) {
-                    // get option el
-                    var optionEl = document.getElementById('enp-tree__el--' + options[k].option_id);
-                    // bind the data
-                    this.bindDOMData(options[k], optionEl, 'option');
+    update: function update(state) {
+        // render the tree
+        // remove is-active
+        console.log(state);
+        // Do stuff based on the new state change...
+
+        /*document.querySelector('.is-active').classList.remove('is-active')
+        document.getElementById('enp-tree__el--'+state.id).classList.add('is-active')*/
+    },
+
+    click: function click(event) {
+        var el = event.target;
+        // check if it's a click on the parent tree (which we don't care about)
+        if (el !== event.currentTarget) {
+            if (el.nodeName === 'A') {
+                event.preventDefault();
+                console.log(el.data);
+                this.emit('update', 'state', el.data);
+            }
+        }
+        event.stopPropagation();
+    },
+
+    /**
+    * Let our Tree know about the click.
+    */
+    emit: function emit(action, item, data) {
+        var Tree = this.getTree();
+        switch (action) {
+            case 'update':
+                // this is usually Tree.update('state', dataAboutNewState)
+                Tree.update(item, data);
+                break;
+        }
+    },
+
+    /**
+    * Bind tree data to the element for easy access to data when we need it
+    */
+    bindAllData: function bindAllData() {
+        Tree = this.getTree();
+        var elTypes = ['question', 'start', 'end', 'group'];
+        // loop through the data and find the corresponding elements
+        for (var i = 0; i < elTypes.length; i++) {
+            // get the data: ex {question_id: 2, order: 2, etc}
+            var elData = Tree.getDataByType(elTypes[i]);
+            for (var j = 0; j < elData.length; j++) {
+                // get the id, ex. the id value '2'
+                // this is like saying: getDataByType('question').question_id
+                var id = elData[j][elTypes[i] + '_id'];
+                // find the element in the DOM
+                var el = document.getElementById('enp-tree__el--' + id);
+                // bind the data
+                this.bindDOMData(elData[j], el, elTypes[i]);
+
+                // see if we're working with a question
+                if (elTypes[i] === 'question') {
+                    var options = elData[j].options;
+                    // loop through the options
+                    for (var k = 0; k < options.length; k++) {
+                        // get option el
+                        var optionEl = document.getElementById('enp-tree__el--' + options[k].option_id);
+                        // bind the data
+                        this.bindDOMData(options[k], optionEl, 'option');
+                    }
                 }
             }
         }
-    }
-};
+    },
 
-TreeView.prototype.bindDOMData = function (data, element, type) {
-    // we can only add this once, not overwrite existing ones
-    if (element.data === undefined) {
-        // clone the data so we're not giving direct access to the _data attribute
-        var clonedObj = void 0;
-        // building the cloned data manually so:
-        // 1. it's soooo much faster. Like, exponentionally as the tree grows
-        // 2. we're not recording a bunch of data we don't need
-        //    (like "content", "title", etc)
-        // 3. We can add data that we do need (like "type")
-        switch (type) {
-            case 'start':
-                clonedObj = {
-                    start_id: data.start_id,
-                    type: 'start'
-                };
-                break;
+    bindDOMData: function bindDOMData(data, element, type) {
+        // we can only add this once, not overwrite existing ones
+        if (element.data === undefined) {
+            // clone the data so we're not giving direct access to the _data attribute
+            var clonedObj = void 0;
+            // building the cloned data manually so:
+            // 1. it's soooo much faster. Like, exponentionally as the tree grows
+            // 2. we're not recording a bunch of data we don't need
+            //    (like "content", "title", etc)
+            // 3. We can add data that we do need (like "type")
+            switch (type) {
+                case 'start':
+                    clonedObj = {
+                        start_id: data.start_id,
+                        type: 'start'
+                    };
+                    break;
 
-            case 'group':
-                clonedObj = {
-                    group_id: data.group_id,
-                    type: 'group'
-                };
-                break;
+                case 'group':
+                    clonedObj = {
+                        group_id: data.group_id,
+                        type: 'group'
+                    };
+                    break;
 
-            case 'question':
-                clonedObj = {
-                    question_id: data.question_id,
-                    type: 'question'
-                };
-                clonedObj.options = [];
-                // add options
-                for (var i = 0; i < data.options.length; i++) {
-                    clonedObj.options.push(data.options[i].option_id);
-                }
-                break;
+                case 'question':
+                    clonedObj = {
+                        question_id: data.question_id,
+                        type: 'question'
+                    };
+                    clonedObj.options = [];
+                    // add options
+                    for (var i = 0; i < data.options.length; i++) {
+                        clonedObj.options.push(data.options[i].option_id);
+                    }
+                    break;
 
-            case 'option':
-                clonedObj = {
-                    option_id: data.option_id,
-                    type: 'option',
-                    question_id: data.question_id,
-                    destination_id: data.destination_id,
-                    destination_type: data.destination_type
-                };
-                break;
+                case 'option':
+                    clonedObj = {
+                        option_id: data.option_id,
+                        type: 'option',
+                        question_id: data.question_id,
+                        destination_id: data.destination_id,
+                        destination_type: data.destination_type
+                    };
+                    break;
 
-            case 'end':
-                clonedObj = {
-                    end_id: data.end_id,
-                    type: 'end'
-                };
-                break;
+                case 'end':
+                    clonedObj = {
+                        end_id: data.end_id,
+                        type: 'end'
+                    };
+                    break;
+            }
+            // dynamically building the structure was quite slow, so we're manually doing it for speed on this kinda expensive operation
+            // bind the data to the DOM
+            element.data = clonedObj;
+            return element.data;
+        } else {
+            // can't overwrite data, so return false
+            return false;
         }
-        // dynamically building the structure was quite slow, so we're manually doing it for speed on this kinda expensive operation
-        // bind the data to the DOM
-        element.data = clonedObj;
-        return element.data;
-    } else {
-        // can't overwrite data, so return false
-        return false;
     }
 };
 'use strict';
@@ -238,33 +257,35 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 */
 (function () {
 
-    function Tree(data, view) {
-        var _data, _state, views;
+    function Tree(data, observers) {
+        var _data, _state;
 
-        function validateData(data) {
+        // keep an array of observers
+        this.observers = [];
+
+        /**
+        * Private functions
+        */
+        var _validateData = function _validateData(data) {
             // TODO: make sure the data is valid
-            return data;
-        }
+            return true;
+        };
 
-        // constructor
-        function setData(data) {
+        /*
+        * Private function to set Data and State on Init
+        */
+        var _setData = function _setData(data) {
             _data = data;
             _state = {
                 id: data.starts[0].start_id,
                 type: 'start'
             };
-        }
+        };
 
         /**
         ** Public functinos
-        **
         **/
-        var emit = function emit(action, data) {
-            console.log('emitting ' + action);
-            for (var i = 0; i < views.length; i++) {
-                views[i].on(action, data);
-            }
-        };
+
         // getters
         this.getData = function () {
             return _data;
@@ -272,9 +293,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         this.getState = function () {
             return _state;
         };
-        this.getViews = function () {
-            return views;
-        };
+
         // setters
         this.setState = function (stateType, stateID) {
             var whitelist = ['start', 'question', 'end'];
@@ -285,6 +304,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             // check allowed states
             if (!whitelist.includes(stateType)) {
                 console.error(stateType + " is not an allowed state. Allowed states are " + whitelist.toString());
+                this.emitError('setState', {
+                    stateType: stateType,
+                    stateID: stateID
+                });
                 return false;
             }
 
@@ -299,153 +322,216 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             _state.type = stateType;
             _state.id = stateID;
             // emit that we've changed it
-            emit('update', _state);
+            this.emit('update', _state);
         };
 
         /***********************
         ******** INIT  *********
         ***********************/
-        // start with one view
-        views = [view];
         // set the data
-        setData(data);
-        // emit that we're ready for other code to utilize this tree
-        emit('ready', this);
+        if (_validateData(data)) {
+            // start with one observer so we can
+            // alert them on ready
+            this.setObservers(observers);
+            // set the data
+            _setData(data);
+            // emit that we're ready for other code to utilize this tree
+            this.emit('ready', this);
+        } else {
+            console.error('Tree data is invalid.');
+            return false;
+        }
     }
 
-    Tree.prototype.update = function (action, data) {
-        console.log(action);
-        switch (action) {
-            // data will be the element clicked
-            case 'update':
-                if (data.type === 'start') {
+    Tree.prototype = {
+        constructor: Tree,
+
+        /**
+        * Let Observers know about different actions
+        * 'ready', 'update', 'error'
+        */
+        emit: function emit(action, data) {
+            console.log('emitting ' + action);
+            for (var i = 0; i < this.observers.length; i++) {
+                this.observers[i].on(action, data);
+            }
+        },
+
+        /**
+        * Let our observers know about the error
+        */
+        emitError: function emitError(action, data) {
+            this.emit('error', {
+                action: action,
+                data: data
+            });
+        },
+
+        /**
+        * Request to update the tree
+        */
+        update: function update(action, data) {
+            console.log('Request update with this data:');
+            console.log(data);
+            switch (action) {
+                // data will be the element clicked
+                case 'state':
+                    this.updateState(data);
+                    break;
+            }
+        },
+
+        /**
+        * Attempt to update a sate
+        * Validation and emitting happens with setState
+        */
+        updateState: function updateState(data) {
+            switch (data.type) {
+                case 'start':
                     // go to first question
                     var question = this.getQuestions()[0];
                     this.setState('question', question.question_id);
+                    break;
+
+                case 'option':
+                    // find the destination
+                    this.setState(data.destination_type, data.destination_id);
+                    break;
+            }
+        },
+
+        /**
+        * Allowed types, 'question', 'group', 'end', 'start'
+        */
+        getDataByType: function getDataByType(type, id) {
+            var typeIndex = void 0,
+                whitelist = void 0,
+                data = void 0;
+            // check allowed types
+            whitelist = ['question', 'group', 'end', 'start'];
+
+            if (!whitelist.includes(type)) {
+                console.error("Allowed getDataByType types are " + whitelist.toString());
+                return false;
+            }
+            // get the data of this type
+            data = this.getData();
+            // append 's' to get the right array
+            // 'question' becomes 'questions'
+            data = data[type + 's'];
+
+            // if there's an ID, let's get the specific one they're after
+            if (id !== undefined) {
+                // get the individual item
+                typeIndex = this.getIndexBy(data, type + '_id', id);
+                if (typeIndex !== undefined) {
+                    // found one!
+                    data = data[typeIndex];
+                } else {
+                    data = undefined;
                 }
+            }
 
-                if (data.type === 'option') {
-                    // go to question/end
-                    // find the option_id
-                }
-                break;
-        }
-    };
-    /**
-    * Allowed types, 'question', 'group', 'end', 'start'
-    */
-    Tree.prototype.getDataByType = function (type, id) {
-        var typeIndex = void 0,
-            whitelist = void 0,
-            data = void 0;
-        // check allowed types
-        whitelist = ['question', 'group', 'end', 'start'];
+            return data;
+        },
 
-        if (!whitelist.includes(type)) {
-            console.error("Allowed getDataByType types are " + whitelist.toString());
-            return false;
-        }
-        // get the data of this type
-        data = this.getData();
-        // append 's' to get the right array
-        // 'question' becomes 'questions'
-        data = data[type + 's'];
-
-        // if there's an ID, let's get the specific one they're after
-        if (id !== undefined) {
-            // get the individual item
-            typeIndex = this.getIndexBy(data, type + '_id', id);
-            if (typeIndex !== undefined) {
-                // found one!
-                data = data[typeIndex];
+        getQuestions: function getQuestions(id) {
+            var question = void 0;
+            if (id !== undefined) {
+                // get the individual item
+                question = this.getDataByType('question', id);
             } else {
-                data = undefined;
+                question = this.getDataByType('question');
             }
-        }
+            return question;
+        },
 
-        return data;
-    };
-
-    Tree.prototype.getQuestions = function (id) {
-        var question = void 0;
-        if (id !== undefined) {
-            // get the individual item
-            question = this.getDataByType('question', id);
-        } else {
-            question = this.getDataByType('question');
-        }
-        return question;
-    };
-
-    Tree.prototype.getStarts = function (id) {
-        var start = void 0;
-        if (id !== undefined) {
-            // get the individual item
-            start = this.getDataByType('start', id);
-        } else {
-            start = this.getDataByType('start');
-        }
-        return start;
-    };
-
-    Tree.prototype.getEnds = function (id) {
-        var end = void 0;
-        if (id !== undefined) {
-            // get the individual item
-            end = this.getDataByType('end', id);
-        } else {
-            end = this.getDataByType('end');
-        }
-        return end;
-    };
-
-    Tree.prototype.getGroups = function (id) {
-        var group = void 0;
-        if (id !== undefined) {
-            // get the individual item
-            group = this.getDataByType('group', id);
-        } else {
-            group = this.getDataByType('group');
-        }
-        return group;
-    };
-
-    Tree.prototype.getOptions = function (question_id, option_id) {
-        var option = void 0,
-            optionIndex = void 0,
-            question = void 0;
-
-        // get the individual item
-        question = this.getQuestions(question_id);
-
-        if (option_id !== undefined) {
-            optionIndex = this.getIndexBy(question.options, 'option_id', option_id);
-            option = question.options[optionIndex];
-        } else {
-            option = question.options;
-        }
-
-        return option;
-    };
-
-    Tree.prototype.addView = function (TreeView) {};
-
-    /**
-    * Powers most all of the retrieval of data from the tree
-    * Searches an array for a key that equals a certain value
-    *
-    * @param objArray (ARRAY of OBJECTS)
-    * @param name (STRING) of the key you're wanting to find the matching value of
-    * @param value (MIXED) the value you want to find a match for
-    * @return INT of the index that matches or UNDEFINED if not found
-    */
-    Tree.prototype.getIndexBy = function (objArray, name, value) {
-        for (var i = 0; i < objArray.length; i++) {
-            if (objArray[i][name] == value) {
-                return i;
+        getStarts: function getStarts(id) {
+            var start = void 0;
+            if (id !== undefined) {
+                // get the individual item
+                start = this.getDataByType('start', id);
+            } else {
+                start = this.getDataByType('start');
             }
+            return start;
+        },
+
+        getEnds: function getEnds(id) {
+            var end = void 0;
+            if (id !== undefined) {
+                // get the individual item
+                end = this.getDataByType('end', id);
+            } else {
+                end = this.getDataByType('end');
+            }
+            return end;
+        },
+
+        getGroups: function getGroups(id) {
+            var group = void 0;
+            if (id !== undefined) {
+                // get the individual item
+                group = this.getDataByType('group', id);
+            } else {
+                group = this.getDataByType('group');
+            }
+            return group;
+        },
+
+        getOptions: function getOptions(question_id, option_id) {
+            var option = void 0,
+                optionIndex = void 0,
+                question = void 0;
+
+            // get the individual item
+            question = this.getQuestions(question_id);
+
+            if (option_id !== undefined) {
+                optionIndex = this.getIndexBy(question.options, 'option_id', option_id);
+                option = question.options[optionIndex];
+            } else {
+                option = question.options;
+            }
+
+            return option;
+        },
+
+        setObservers: function setObservers(observers) {
+            for (var i = 0; i < observers.length; i++) {
+                this.addObserver(observers[i]);
+            }
+            return this.observers;
+        },
+
+        addObserver: function addObserver(observer) {
+            // no need to validate. anyone can listen
+            // we do need to check to make sure the observer hasn't already
+            // been added
+            this.observers.push(observer);
+        },
+
+        getObservers: function getObservers() {
+            return this.observers;
+        },
+
+        /**
+        * Powers most all of the retrieval of data from the tree
+        * Searches an array for a key that equals a certain value
+        *
+        * @param objArray (ARRAY of OBJECTS)
+        * @param name (STRING) of the key you're wanting to find the matching value of
+        * @param value (MIXED) the value you want to find a match for
+        * @return INT of the index that matches or UNDEFINED if not found
+        */
+        getIndexBy: function getIndexBy(objArray, name, value) {
+            for (var i = 0; i < objArray.length; i++) {
+                if (objArray[i][name] == value) {
+                    return i;
+                }
+            }
+            return undefined;
         }
-        return undefined;
     };
 
     function createTree(options) {
@@ -500,8 +586,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         var treeView = new TreeView({
             container: this.container
         });
+        var observers = [treeView];
 
-        var tree = new Tree(data, treeView);
+        var tree = new Tree(data, observers);
 
         trees.push(tree);
     }
