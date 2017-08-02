@@ -40,7 +40,12 @@ function Tree(data, observers) {
 
     // setters
     this.setState = function(stateType, stateID) {
-        let whitelist = ['start','question','end']
+        let whitelist,
+            validateState,
+            oldState,
+            newState;
+
+        whitelist = ['start','question','end']
 
         // TODO: Check that start can't go straight to end?
         // TODO: Check that the next state is valid from the question's options?
@@ -48,7 +53,7 @@ function Tree(data, observers) {
         // check allowed states
         if(!whitelist.includes(stateType)) {
             console.error(stateType + " is not an allowed state. Allowed states are "+whitelist.toString())
-            this.emitError('setState', {
+            this.emitError('invalidStateType', {
                 stateType: stateType,
                 stateID: stateID
             })
@@ -56,17 +61,34 @@ function Tree(data, observers) {
         }
 
         // check if the stateID is a valid ID for this state
-        let validateState = this.getDataByType(stateType, stateID);
+        validateState = this.getDataByType(stateType, stateID);
         if(validateState === false || validateState === undefined || typeof validateState !== 'object') {
             console.error(stateID + " is invalid for the current state of '"+ stateType+"'")
+            this.emitError('invalidState', {
+                stateType: stateType,
+                stateID: stateID
+            })
             return false
         }
 
         // looks valid! Set the state
+        // store the old state
+        oldState = {
+            type: _state.type,
+            id: _state.id,
+        }
+
+        // set the state
         _state.type = stateType
         _state.id = stateID
+
+        // build a new state
+        newState = {
+            type: _state.type,
+            id: _state.id,
+        }
         // emit that we've changed it
-        this.emit('update', _state)
+        this.emit('update', {newState, oldState})
     }
 
     /***********************

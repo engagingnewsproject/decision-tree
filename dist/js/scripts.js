@@ -40,7 +40,7 @@ Handlebars.registerHelper('group_end', function (question_id, group_id, groups, 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function TreeView(options) {
-    var _id, _el, _Tree;
+    var _id, _container, _Tree, _activeEl;
 
     if (_typeof(options.container) !== 'object') {
         console.error('Tree container must be a valid object. Try `container: document.getElementById(your-id)`.');
@@ -48,14 +48,17 @@ function TreeView(options) {
     }
 
     // getters
-    this.getEl = function () {
-        return _el;
+    this.getContainer = function () {
+        return _container;
     };
     this.getId = function () {
         return _id;
     };
     this.getTree = function () {
         return _Tree;
+    };
+    this.getActiveEl = function () {
+        return _activeEl;
     };
 
     // setters
@@ -67,19 +70,46 @@ function TreeView(options) {
         return _Tree;
     };
 
+    // Pass a state for it to set to be active
+    this.setActiveEl = function (state) {
+        var el = void 0;
+        // check if classname matches, if we're even going to change anything
+        if (_activeEl !== undefined && _activeEl.id === 'enp-tree__el--' + state.id) {
+            // do nothing
+            return _activeEl;
+        }
+        // they're trying to set a new state, so let's see if we can
+        el = document.getElementById('enp-tree__el--' + state.id);
+        if ((typeof el === 'undefined' ? 'undefined' : _typeof(el)) !== 'object') {
+            console.error('Could not set active element for state type ' + state.type + ' with state id ' + state.id);
+            return false;
+        }
+
+        // valid (could be more checks, but this is good enough)
+        // set it
+        _activeEl = el;
+        return _activeEl;
+    };
+
     /***********************
     ******** INIT  *********
     ***********************/
-    // if a Tree was passed, add it
-    if (options.Tree) {
-        this.setTree(options.Tree);
+    // set an active className
+    if (options.activeClass) {
+        this.activeClassName = options.activeClass;
+    } else {
+        this.activeClassName = 'is-active';
     }
-
     // set the el
-    _el = options.container;
+    _container = options.container;
     // attach event listeners to the tree element with
     // bound `this` so we get our reference to this element
-    _el.addEventListener("click", this.click.bind(this));
+    _container.addEventListener("click", this.click.bind(this));
+
+    // if a Tree was passed, build the view now
+    if (options.Tree) {
+        this.build(options.Tree);
+    }
 }
 
 TreeView.prototype = {
@@ -89,18 +119,23 @@ TreeView.prototype = {
     * Listen to parent Tree's emitted actions and handle accordingly
     */
     on: function on(action, data) {
-        console.log(action);
+        console.log('TreeView "on" ' + action);
         switch (action) {
             case 'ready':
                 // data will be the tree itself
-                Tree = data;
-                this.setTree(Tree);
-                this.render(Tree.getData());
+                this.build(data);
                 break;
             case 'update':
-                this.update(data);
+                this.updateState(data);
                 break;
         }
+    },
+
+    build: function build(Tree) {
+        this.setTree(Tree);
+        this.render(Tree.getData());
+        // set the current state in the view
+        this.setState(Tree.getState());
     },
 
     render: function render(data) {
@@ -108,21 +143,90 @@ TreeView.prototype = {
         var template = window.TreeTemplates.tree;
         var treeHTML = template(data);
         // set the HTML into the passed container
-        this.getEl().innerHTML = treeHTML;
+        this.getContainer().innerHTML = treeHTML;
 
         // bind question data
         this.bindAllData();
     },
 
-    update: function update(state) {
-        // render the tree
-        // remove is-active
-        console.log(state);
-        // Do stuff based on the new state change...
+    /**
+    * Used when a state is already set and we need to change it
+    */
+    updateState: function updateState(data) {
+        var oldState = void 0,
+            newState = void 0,
+            oldActiveEl = void 0;
 
-        /*document.querySelector('.is-active').classList.remove('is-active')
-        document.getElementById('enp-tree__el--'+state.id).classList.add('is-active')*/
+        oldState = data.oldState;
+        newState = data.newState;
+        oldActiveEl = this.getActiveEl();
+
+        // removes container state class
+        if (oldState.type !== newState.type) {
+            this.removeContainerState(oldState);
+        }
+        if (oldState.id !== newState.id) {
+            // get active element
+            oldActiveEl.classList.remove(this.activeClassName);
+        }
+
+        // activate new state
+        // data.newState.id
+        newState = this.setState(data.newState);
+
+        // revert back to old state
+        if (newState === false) {
+            this.setState(data.oldState);
+        }
     },
+
+    setState: function setState(state) {
+        var activeEl = void 0;
+
+        this.addContainerState(state);
+
+        // set active element
+        activeEl = this.setActiveEl(state);
+
+        // if set active fails, let setState know
+        if (activeEl === false) {
+            return false;
+        }
+        console.log('TreeView state view is:');
+        console.log(state);
+        // validated, so set the new class!
+        activeEl.classList.add(this.activeClassName);
+        return true;
+    },
+
+    addContainerState: function addContainerState(state) {
+        // set the state type on the container
+        var container = this.getContainer();
+        var classes = container.classList;
+        // if the class isn't already there, add it
+        if (!classes.contains('enp-tree__state--' + state.type)) {
+            classes.add('enp-tree__state--' + state.type);
+        }
+    },
+
+    removeContainerState: function removeContainerState(state) {
+        // set the state type on the container
+        var container = this.getContainer();
+        container.classList.remove('enp-tree__state--' + state.type);
+    },
+
+    /*updateContainerState: function(data) {
+        let oldState,
+            newState,
+            container;
+         container = this.getContainer()
+        oldState = data.oldState
+        newState = data.newState
+         if(oldState.type !== newState.type) {
+            this.removeContainerState()
+            this.addContainerState();
+        }
+    },*/
 
     click: function click(event) {
         var el = event.target;
@@ -130,7 +234,6 @@ TreeView.prototype = {
         if (el !== event.currentTarget) {
             if (el.nodeName === 'A') {
                 event.preventDefault();
-                console.log(el.data);
                 this.emit('update', 'state', el.data);
             }
         }
@@ -141,6 +244,8 @@ TreeView.prototype = {
     * Let our Tree know about the click.
     */
     emit: function emit(action, item, data) {
+        console.log('Tree View Emit: ' + action);
+        console.log(data);
         var Tree = this.getTree();
         switch (action) {
             case 'update':
@@ -296,7 +401,12 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
         // setters
         this.setState = function (stateType, stateID) {
-            var whitelist = ['start', 'question', 'end'];
+            var whitelist = void 0,
+                validateState = void 0,
+                oldState = void 0,
+                newState = void 0;
+
+            whitelist = ['start', 'question', 'end'];
 
             // TODO: Check that start can't go straight to end?
             // TODO: Check that the next state is valid from the question's options?
@@ -304,7 +414,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             // check allowed states
             if (!whitelist.includes(stateType)) {
                 console.error(stateType + " is not an allowed state. Allowed states are " + whitelist.toString());
-                this.emitError('setState', {
+                this.emitError('invalidStateType', {
                     stateType: stateType,
                     stateID: stateID
                 });
@@ -312,17 +422,32 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
 
             // check if the stateID is a valid ID for this state
-            var validateState = this.getDataByType(stateType, stateID);
+            validateState = this.getDataByType(stateType, stateID);
             if (validateState === false || validateState === undefined || (typeof validateState === 'undefined' ? 'undefined' : _typeof(validateState)) !== 'object') {
                 console.error(stateID + " is invalid for the current state of '" + stateType + "'");
+                this.emitError('invalidState', {
+                    stateType: stateType,
+                    stateID: stateID
+                });
                 return false;
             }
 
             // looks valid! Set the state
-            _state.type = stateType;
+            // store the old state
+            oldState = {
+                type: _state.type,
+                id: _state.id
+
+                // set the state
+            };_state.type = stateType;
             _state.id = stateID;
-            // emit that we've changed it
-            this.emit('update', _state);
+
+            // build a new state
+            newState = {
+                type: _state.type,
+                id: _state.id
+                // emit that we've changed it
+            };this.emit('update', { newState: newState, oldState: oldState });
         };
 
         /***********************
