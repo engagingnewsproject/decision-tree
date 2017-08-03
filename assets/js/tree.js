@@ -24,8 +24,8 @@ function Tree(data, observers) {
     var _setData = function(data) {
         _data = data
         _state = {
-            id: data.starts[0].start_id,
-            type: 'start'
+            id: data.tree_id,
+            type: 'tree'
         }
     }
 
@@ -45,7 +45,7 @@ function Tree(data, observers) {
             oldState,
             newState;
 
-        whitelist = ['start','question','end']
+        whitelist = ['tree', 'start','question','end']
 
         // TODO: Check that start can't go straight to end?
         // TODO: Check that the next state is valid from the question's options?
@@ -61,8 +61,17 @@ function Tree(data, observers) {
         }
 
         // check if the stateID is a valid ID for this state
-        validateState = this.getDataByType(stateType, stateID);
-        if(validateState === false || validateState === undefined || typeof validateState !== 'object') {
+        if(stateType === 'tree') {
+            if(stateID === this.getTreeID()) {
+                validateState = true
+            } else {
+                validateState = false
+            }
+        } else {
+            validateState = this.getDataByType(stateType, stateID);
+        }
+
+        if(validateState === false || validateState === undefined) {
             console.error(stateID + " is invalid for the current state of '"+ stateType+"'")
             this.emitError('invalidState', {
                 stateType: stateType,
@@ -164,6 +173,16 @@ Tree.prototype = {
                 // find the destination
                 this.setState(data.destination_type, data.destination_id);
                 break
+
+            case 'end':
+                // find the destination
+                this.setState(data.destination_type, data.destination_id);
+                break
+
+            case 'restart':
+                // find the destination
+                this.setState('tree', this.getTreeID());
+                break
         }
     },
 
@@ -201,6 +220,10 @@ Tree.prototype = {
         }
 
         return data;
+    },
+
+    getTreeID: function() {
+        return this.getData().tree_id;
     },
 
     getQuestions: function(id){

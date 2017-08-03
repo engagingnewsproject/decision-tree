@@ -72,14 +72,21 @@ function TreeView(options) {
 
     // Pass a state for it to set to be active
     this.setActiveEl = function (state) {
-        var el = void 0;
+        var el = void 0,
+            elId = void 0;
+
+        if (state.type === 'tree') {
+            elId = 'enp-tree--' + state.id;
+        } else {
+            elId = 'enp-tree__el--' + state.id;
+        }
         // check if classname matches, if we're even going to change anything
-        if (_activeEl !== undefined && _activeEl.id === 'enp-tree__el--' + state.id) {
+        if (_activeEl !== undefined && _activeEl.id === elId) {
             // do nothing
             return _activeEl;
         }
         // they're trying to set a new state, so let's see if we can
-        el = document.getElementById('enp-tree__el--' + state.id);
+        el = document.getElementById(elId);
         if ((typeof el === 'undefined' ? 'undefined' : _typeof(el)) !== 'object') {
             console.error('Could not set active element for state type ' + state.type + ' with state id ' + state.id);
             return false;
@@ -95,11 +102,8 @@ function TreeView(options) {
     ******** INIT  *********
     ***********************/
     // set an active className
-    if (options.activeClass) {
-        this.activeClassName = options.activeClass;
-    } else {
-        this.activeClassName = 'is-active';
-    }
+    this.activeClassName = 'is-active';
+    this.animationLength = 600;
     // set the el
     _container = options.container;
     // attach event listeners to the tree element with
@@ -168,6 +172,11 @@ TreeView.prototype = {
         if (oldState.id !== newState.id) {
             // get active element
             oldActiveEl.classList.remove(this.activeClassName);
+            // animate out
+            oldActiveEl.classList.add('enp-tree__' + oldState.type + '--animate-out');
+            window.setTimeout(function () {
+                oldActiveEl.classList.remove('enp-tree__' + oldState.type + '--animate-out');
+            }, this.animationLength);
         }
 
         // activate new state
@@ -213,20 +222,13 @@ TreeView.prototype = {
         // set the state type on the container
         var container = this.getContainer();
         container.classList.remove('enp-tree__state--' + state.type);
-    },
 
-    /*updateContainerState: function(data) {
-        let oldState,
-            newState,
-            container;
-         container = this.getContainer()
-        oldState = data.oldState
-        newState = data.newState
-         if(oldState.type !== newState.type) {
-            this.removeContainerState()
-            this.addContainerState();
-        }
-    },*/
+        // add animation classes
+        container.classList.add('enp-tree__state--animate-out--' + state.type);
+        window.setTimeout(function () {
+            container.classList.remove('enp-tree__state--animate-out--' + state.type);
+        }, this.animationLength);
+    },
 
     click: function click(event) {
         var el = event.target;
@@ -274,16 +276,25 @@ TreeView.prototype = {
                 // bind the data
                 this.bindDOMData(elData[j], el, elTypes[i]);
 
-                // see if we're working with a question
-                if (elTypes[i] === 'question') {
-                    var options = elData[j].options;
-                    // loop through the options
-                    for (var k = 0; k < options.length; k++) {
-                        // get option el
-                        var optionEl = document.getElementById('enp-tree__el--' + options[k].option_id);
-                        // bind the data
-                        this.bindDOMData(options[k], optionEl, 'option');
-                    }
+                // see if we're working with a question or end
+                switch (elTypes[i]) {
+                    case 'question':
+                        var options = elData[j].options;
+                        // loop through the options
+                        for (var k = 0; k < options.length; k++) {
+                            // get option el
+                            var optionEl = document.getElementById('enp-tree__el--' + options[k].option_id);
+                            // bind the data
+                            this.bindDOMData(options[k], optionEl, 'option');
+                        }
+                        break;
+
+                    case 'end':
+                        // assign data to restart button
+                        // restart button
+                        var restartEl = document.getElementById('enp-tree__restart--' + id);
+                        this.bindDOMData(elData[j], restartEl, 'restart');
+                        break;
                 }
             }
         }
@@ -342,6 +353,13 @@ TreeView.prototype = {
                         type: 'end'
                     };
                     break;
+
+                case 'restart':
+                    clonedObj = {
+                        restart_id: data.end_id,
+                        type: 'restart'
+                    };
+                    break;
             }
             // dynamically building the structure was quite slow, so we're manually doing it for speed on this kinda expensive operation
             // bind the data to the DOM
@@ -354,8 +372,6 @@ TreeView.prototype = {
     }
 };
 'use strict';
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 /**
 * Must have one view to initialize
@@ -382,8 +398,8 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
         var _setData = function _setData(data) {
             _data = data;
             _state = {
-                id: data.starts[0].start_id,
-                type: 'start'
+                id: data.tree_id,
+                type: 'tree'
             };
         };
 
@@ -406,7 +422,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 oldState = void 0,
                 newState = void 0;
 
-            whitelist = ['start', 'question', 'end'];
+            whitelist = ['tree', 'start', 'question', 'end'];
 
             // TODO: Check that start can't go straight to end?
             // TODO: Check that the next state is valid from the question's options?
@@ -422,8 +438,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
 
             // check if the stateID is a valid ID for this state
-            validateState = this.getDataByType(stateType, stateID);
-            if (validateState === false || validateState === undefined || (typeof validateState === 'undefined' ? 'undefined' : _typeof(validateState)) !== 'object') {
+            if (stateType === 'tree') {
+                if (stateID === this.getTreeID()) {
+                    validateState = true;
+                } else {
+                    validateState = false;
+                }
+            } else {
+                validateState = this.getDataByType(stateType, stateID);
+            }
+
+            if (validateState === false || validateState === undefined) {
                 console.error(stateID + " is invalid for the current state of '" + stateType + "'");
                 this.emitError('invalidState', {
                     stateType: stateType,
@@ -522,6 +547,16 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     // find the destination
                     this.setState(data.destination_type, data.destination_id);
                     break;
+
+                case 'end':
+                    // find the destination
+                    this.setState(data.destination_type, data.destination_id);
+                    break;
+
+                case 'restart':
+                    // find the destination
+                    this.setState('tree', this.getTreeID());
+                    break;
             }
         },
 
@@ -558,6 +593,10 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             }
 
             return data;
+        },
+
+        getTreeID: function getTreeID() {
+            return this.getData().tree_id;
         },
 
         getQuestions: function getQuestions(id) {

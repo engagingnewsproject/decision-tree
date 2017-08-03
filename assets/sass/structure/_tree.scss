@@ -10,6 +10,7 @@ html {
 .enp-tree {
     width: 100%;
     padding: $spacing__base/4;
+    position: relative;
 }
 
 .enp-tree__intro {
@@ -21,4 +22,37 @@ html {
     padding: $spacing__base*0.6 $spacing__base;
     text-decoration: none;
     text-align: center;
+}
+
+// overview of whole tree
+.enp-tree__state--tree {
+    .enp-tree__questions {
+        position: relative;
+    }
+    .enp-tree__questions {
+        max-width: 280px;
+    }
+
+    .enp-tree__question {
+        font-size: 0.6rem;
+    }
+
+    .enp-tree__title--question {
+        font-size: $question__font-size * 0.7;
+    }
+
+    .enp-tree__title--question {
+        font-size: $question__font-size * 0.7;
+    }
+
+    .enp-tree__title--end {
+        font-size: $end__font-size * 0.7;
+    }
+
+    .enp-tree__group {
+        position: absolute;
+        top: 0;
+        left: 100%;
+        margin-left: 30px;
+    }
 }

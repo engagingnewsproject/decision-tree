@@ -29,7 +29,8 @@
             container: document.getElementById('enp-tree__citizen')
     };
 
-    var tree = createTree(treeOptions);
+    // you can access all your trees with var trees
+    createTree(treeOptions);
 </script>
 </body>
 </html>
