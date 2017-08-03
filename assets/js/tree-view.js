@@ -2,6 +2,8 @@ function TreeView(options) {
     var _id,
         _container,
         _treeEl,
+        _contentWrap,
+        _questionsWrap,
         _Tree,
         _activeEl;
 
@@ -16,6 +18,8 @@ function TreeView(options) {
     this.getTree = function() { return _Tree}
     this.getTreeEl = function() { return _treeEl}
     this.getActiveEl = function() { return _activeEl}
+    this.getContentWrap = function() { return _contentWrap}
+    this.getQuestionsWrap = function() { return _questionsWrap}
 
     // setters
     this.setTree = function(Tree) {
@@ -33,7 +37,23 @@ function TreeView(options) {
             // this will be the tree rendered by handlebars
             _treeEl = _container.firstElementChild
         }
-        return _Tree
+        return _treeEl
+    }
+
+    this.setContentWrap = function() {
+        // only let it be set once
+        if(_contentWrap === undefined) {
+            _contentWrap = document.getElementById('enp-tree__wrapper--'+_Tree.getTreeID())
+        }
+        return _contentWrap
+    }
+
+    this.setQuestionsWrap = function() {
+        // only let it be set once
+        if(_questionsWrap === undefined) {
+            _questionsWrap =  _contentWrap.firstElementChild
+        }
+        return _questionsWrap
     }
 
     // Pass a state for it to set to be active
@@ -69,7 +89,10 @@ function TreeView(options) {
     ***********************/
     // set an active className
     this.activeClassName = 'is-active'
+    // how long animation classes are applied for until removed
     this.animationLength = 600
+    // what scale the tree view is set to (same # you apply to scaling in your CSS)
+    this.treeScale = 0.5
     // set the el
     _container = options.container;
     // attach event listeners to the tree element with
@@ -107,6 +130,10 @@ TreeView.prototype = {
         this.render(Tree.getData())
         // set the Tree El
         this.setTreeEl()
+        // set the tree wrap
+        this.setContentWrap()
+        // set the questions wrap
+        this.setQuestionsWrap()
         // set the current state in the view
         this.setState(Tree.getState())
     },
@@ -164,7 +191,7 @@ TreeView.prototype = {
         // set active element
         activeEl = this.setActiveEl(state)
 
-        // if set active fails, let setState know
+        // if set active fails... what to do?
         if(activeEl === false) {
             return false;
         }
@@ -172,6 +199,25 @@ TreeView.prototype = {
         console.log(state)
         // validated, so set the new class!
         activeEl.classList.add(this.activeClassName)
+
+        // if we're on a question, set the transform origin on the wrapper
+        let qWrap = this.getQuestionsWrap()
+        let cWrap = this.getContentWrap()
+        if(state.type === 'question') {
+
+            // this works well if we don't scale it
+            // this.getAbsoluteBoundingRect(activeEl).top - this.getAbsoluteBoundingRect(qWrap).top
+            // if we change the margins based on a state change here, it'll mess up
+            // the calculation on offsetTop. If we're going to do that, we need to
+            // delay the margin change until after the animation has completed
+            // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (qWrap) must be set position relative
+            this.setTransform(qWrap, 'translate3d(0,'+ - (activeEl.offsetTop - 50)+'px,0)')
+
+            // set a maxHeight
+            cWrap.style.maxHeight = activeEl.offsetHeight + 150+'px'
+        } else {
+            this.setTransform(qWrap, '')
+        }
         return true;
     },
 
@@ -183,6 +229,19 @@ TreeView.prototype = {
         if(!classes.contains('enp-tree__state--'+state.type)) {
             classes.add('enp-tree__state--'+state.type)
         }
+        if(state.type === 'tree') {
+            // if the state type is tree, set a max-height on the window.
+            let wrap = document.getElementById('enp-tree__wrapper--'+state.id)
+            wrap.style.maxHeight = wrap.getBoundingClientRect().height+'px';
+        }
+    },
+
+    setTransform: function(el, prop) {
+        el.style.webkitTransform = prop;
+        el.style.MozTransform = prop;
+        el.style.msTransform = prop;
+        el.style.OTransform = prop;
+        el.style.transform = prop;
     },
 
     removeContainerState: function(state) {
@@ -241,7 +300,6 @@ TreeView.prototype = {
         }
 
     },
-
 
     /**
     * Bind tree data to the element for easy access to data when we need it
@@ -309,6 +367,7 @@ TreeView.prototype = {
                     clonedObj = {
                         group_id: data.group_id,
                         type: 'group',
+                        order: data.order
                     }
                     break
 
@@ -316,6 +375,7 @@ TreeView.prototype = {
                     clonedObj = {
                         question_id: data.question_id,
                         type: 'question',
+                        order: data.order
                     }
                     clonedObj.options = []
                     // add options
@@ -328,6 +388,7 @@ TreeView.prototype = {
                     clonedObj = {
                         option_id: data.option_id,
                         type: 'option',
+                        order: data.order,
                         question_id: data.question_id,
                         destination_id: data.destination_id,
                         destination_type: data.destination_type,
@@ -338,6 +399,7 @@ TreeView.prototype = {
                     clonedObj = {
                         end_id: data.end_id,
                         type: 'end',
+                        order: data.order
                     }
                     break
 
@@ -356,5 +418,47 @@ TreeView.prototype = {
             // can't overwrite data, so return false
             return false
         }
+    },
+
+    /*
+    @method getAbsoluteBoundingRect
+    @param {HTMLElement} el HTML element.
+    @return {Object} Absolute bounding rect for _el_.
+    */
+
+    getAbsoluteBoundingRect: function(el) {
+        var doc  = document,
+            win  = window,
+            body = doc.body,
+
+            // pageXOffset and pageYOffset work everywhere except IE <9.
+            offsetX = win.pageXOffset !== undefined ? win.pageXOffset :
+                (doc.documentElement || body.parentNode || body).scrollLeft,
+            offsetY = win.pageYOffset !== undefined ? win.pageYOffset :
+                (doc.documentElement || body.parentNode || body).scrollTop,
+
+            rect = el.getBoundingClientRect();
+
+        if (el !== body) {
+            var parent = el.parentNode;
+
+            // The element's rect will be affected by the scroll positions of
+            // *all* of its scrollable parents, not just the window, so we have
+            // to walk up the tree and collect every scroll offset. Good times.
+            while (parent !== body) {
+                offsetX += parent.scrollLeft;
+                offsetY += parent.scrollTop;
+                parent   = parent.parentNode;
+            }
+        }
+
+        return {
+            bottom: rect.bottom + offsetY,
+            height: rect.height,
+            left  : rect.left + offsetX,
+            right : rect.right + offsetX,
+            top   : rect.top + offsetY,
+            width : rect.width
+        };
     }
 }

@@ -2,3 +2,12 @@
     max-width: $column_max_width;
     width: 100%;
 }
+
+.enp-tree__state--tree {
+    .enp-tree__group {
+        position: absolute;
+        top: 0;
+        left: 100%;
+        margin-left: 30px;
+    }
+}

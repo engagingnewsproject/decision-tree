@@ -9,7 +9,7 @@ html {
 
 .enp-tree {
     width: 100%;
-    padding: $spacing__base/4;
+    padding: $spacing__base;
     position: relative;
 }
 
@@ -24,36 +24,54 @@ html {
     text-align: center;
 }
 
+.enp-tree__content-wrap {
+    padding-top: $spacing__base;
+    // so our focus glow doesn't get cut off from overflow hidden
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-bottom: $spacing__base;
+    position: relative; // !important!!!! need this to make offsetTop in JS calculate correctly
+    transition: all .4s;
+}
+
+.enp-tree__state--question {
+    .enp-tree__content-wrap {
+        overflow: hidden;
+    }
+}
+
+.enp-tree__questions {
+    position: relative;
+}
+
 // overview of whole tree
 .enp-tree__state--tree {
-    .enp-tree__questions {
-        position: relative;
-    }
-    .enp-tree__questions {
-        max-width: 280px;
+
+    .enp-tree__content-wrap {
+        transform: scale(0.5);
+        transform-origin: top left;
     }
 
     .enp-tree__question {
-        font-size: 0.6rem;
-    }
+        // !!!! DO NOT CHANGE ANY MARGINS OR PADDING HERE
+        position: relative;
+        transition: all .15s;
 
-    .enp-tree__title--question {
-        font-size: $question__font-size * 0.7;
-    }
-
-    .enp-tree__title--question {
-        font-size: $question__font-size * 0.7;
-    }
-
-    .enp-tree__title--end {
-        font-size: $end__font-size * 0.7;
-    }
-
-    .enp-tree__group {
-        position: absolute;
-        top: 0;
-        left: 100%;
-        margin-left: 30px;
+        &:focus,
+        &:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 5px rgba(0,0,0,.15);
+        }
+        // click layer so clicks on a question get sent to our
+        // JS as a question instead of something inside it, like a heading
+        &:before {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            content: '';
+        }
     }
 }
 
