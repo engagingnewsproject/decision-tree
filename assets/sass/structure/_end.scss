@@ -5,6 +5,10 @@
     padding: $spacing__base;
 }
 
+.enp-tree__end-options {
+    @include no-list;
+}
+
 .enp-tree__state--end {
     .enp-tree__end {
         &:not(.is-active) {

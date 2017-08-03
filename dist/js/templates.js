@@ -10,7 +10,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
 
   return "                    <p><a id=\"enp-tree__el--"
     + container.escapeExpression(((helper = (helper = helpers.start_id || (depth0 != null ? depth0.start_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"start_id","hash":{},"data":data}) : helper)))
-    + "\" class=\"enp-tree__start\" href=\"#enp-tree__el--"
+    + "\" class=\"enp-tree__btn enp-tree__start\" href=\"#enp-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.destination_id || (depth0 != null ? depth0.destination_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"destination_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\">"
     + ((stack1 = ((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper))) != null ? stack1 : "")

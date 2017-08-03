@@ -40,7 +40,7 @@ Handlebars.registerHelper('group_end', function (question_id, group_id, groups, 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function TreeView(options) {
-    var _id, _container, _Tree, _activeEl;
+    var _id, _container, _treeEl, _Tree, _activeEl;
 
     if (_typeof(options.container) !== 'object') {
         console.error('Tree container must be a valid object. Try `container: document.getElementById(your-id)`.');
@@ -57,6 +57,9 @@ function TreeView(options) {
     this.getTree = function () {
         return _Tree;
     };
+    this.getTreeEl = function () {
+        return _treeEl;
+    };
     this.getActiveEl = function () {
         return _activeEl;
     };
@@ -66,6 +69,16 @@ function TreeView(options) {
         // only let it be set once
         if (_Tree === undefined) {
             _Tree = Tree;
+        }
+        return _Tree;
+    };
+
+    // setters
+    this.setTreeEl = function () {
+        // only let it be set once
+        if (_treeEl === undefined) {
+            // this will be the tree rendered by handlebars
+            _treeEl = _container.firstElementChild;
         }
         return _Tree;
     };
@@ -138,6 +151,8 @@ TreeView.prototype = {
     build: function build(Tree) {
         this.setTree(Tree);
         this.render(Tree.getData());
+        // set the Tree El
+        this.setTreeEl();
         // set the current state in the view
         this.setState(Tree.getState());
     },
@@ -210,8 +225,8 @@ TreeView.prototype = {
 
     addContainerState: function addContainerState(state) {
         // set the state type on the container
-        var container = this.getContainer();
-        var classes = container.classList;
+        var treeEl = this.getTreeEl();
+        var classes = treeEl.classList;
         // if the class isn't already there, add it
         if (!classes.contains('enp-tree__state--' + state.type)) {
             classes.add('enp-tree__state--' + state.type);
@@ -220,13 +235,13 @@ TreeView.prototype = {
 
     removeContainerState: function removeContainerState(state) {
         // set the state type on the container
-        var container = this.getContainer();
-        container.classList.remove('enp-tree__state--' + state.type);
+        var treeEl = this.getTreeEl();
+        treeEl.classList.remove('enp-tree__state--' + state.type);
 
         // add animation classes
-        container.classList.add('enp-tree__state--animate-out--' + state.type);
+        treeEl.classList.add('enp-tree__state--animate-out--' + state.type);
         window.setTimeout(function () {
-            container.classList.remove('enp-tree__state--animate-out--' + state.type);
+            treeEl.classList.remove('enp-tree__state--animate-out--' + state.type);
         }, this.animationLength);
     },
 

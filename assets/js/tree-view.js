@@ -1,6 +1,7 @@
 function TreeView(options) {
     var _id,
         _container,
+        _treeEl,
         _Tree,
         _activeEl;
 
@@ -13,6 +14,7 @@ function TreeView(options) {
     this.getContainer = function() { return _container}
     this.getId = function() { return _id}
     this.getTree = function() { return _Tree}
+    this.getTreeEl = function() { return _treeEl}
     this.getActiveEl = function() { return _activeEl}
 
     // setters
@@ -20,6 +22,16 @@ function TreeView(options) {
         // only let it be set once
         if(_Tree === undefined) {
             _Tree = Tree
+        }
+        return _Tree
+    }
+
+    // setters
+    this.setTreeEl = function() {
+        // only let it be set once
+        if(_treeEl === undefined) {
+            // this will be the tree rendered by handlebars
+            _treeEl = _container.firstElementChild
         }
         return _Tree
     }
@@ -93,6 +105,8 @@ TreeView.prototype = {
     build: function(Tree) {
         this.setTree(Tree)
         this.render(Tree.getData())
+        // set the Tree El
+        this.setTreeEl()
         // set the current state in the view
         this.setState(Tree.getState())
     },
@@ -163,8 +177,8 @@ TreeView.prototype = {
 
     addContainerState: function(state) {
         // set the state type on the container
-        let container = this.getContainer()
-        let classes = container.classList;
+        let treeEl = this.getTreeEl()
+        let classes = treeEl.classList;
         // if the class isn't already there, add it
         if(!classes.contains('enp-tree__state--'+state.type)) {
             classes.add('enp-tree__state--'+state.type)
@@ -173,12 +187,12 @@ TreeView.prototype = {
 
     removeContainerState: function(state) {
         // set the state type on the container
-        let container = this.getContainer()
-        container.classList.remove('enp-tree__state--'+state.type)
+        let treeEl = this.getTreeEl()
+        treeEl.classList.remove('enp-tree__state--'+state.type)
 
         // add animation classes
-        container.classList.add('enp-tree__state--animate-out--'+state.type)
-        window.setTimeout(()=>{ container.classList.remove('enp-tree__state--animate-out--'+state.type) }, this.animationLength)
+        treeEl.classList.add('enp-tree__state--animate-out--'+state.type)
+        window.setTimeout(()=>{ treeEl.classList.remove('enp-tree__state--animate-out--'+state.type) }, this.animationLength)
     },
 
     click: function(event) {
