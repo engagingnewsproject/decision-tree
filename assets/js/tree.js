@@ -169,6 +169,11 @@ Tree.prototype = {
                 this.setState('question', question.question_id);
                 break
 
+            case 'question':
+                // find the destination
+                this.setState(data.type, data.question_id);
+                break
+
             case 'option':
                 // find the destination
                 this.setState(data.destination_type, data.destination_id);

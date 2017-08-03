@@ -56,3 +56,10 @@ html {
         margin-left: 30px;
     }
 }
+
+.enp-tree__state--question,
+.enp-tree__state--end {
+    .enp-tree__start-container {
+        display: none;
+    }
+}

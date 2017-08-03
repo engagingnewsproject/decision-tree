@@ -246,12 +246,30 @@ TreeView.prototype = {
     },
 
     click: function click(event) {
-        var el = event.target;
+        var el = void 0,
+            Tree = void 0,
+            state = void 0;
+
+        el = event.target;
+
         // check if it's a click on the parent tree (which we don't care about)
         if (el !== event.currentTarget) {
             if (el.nodeName === 'A') {
                 event.preventDefault();
                 this.emit('update', 'state', el.data);
+            }
+
+            // Let people click questions (that isn't the current question)
+            // to get to the question
+            if (el.nodeName === 'SECTION') {
+                event.preventDefault();
+                Tree = this.getTree();
+                state = Tree.getState();
+                // make sure we're not curently on this question
+                console.log(el.data);
+                if (el.data.type === 'question' && state.id !== el.data.question_id || state.type !== 'question') {
+                    this.emit('update', 'state', el.data);
+                }
             }
         }
         event.stopPropagation();
@@ -556,6 +574,11 @@ TreeView.prototype = {
                     // go to first question
                     var question = this.getQuestions()[0];
                     this.setState('question', question.question_id);
+                    break;
+
+                case 'question':
+                    // find the destination
+                    this.setState(data.type, data.question_id);
                     break;
 
                 case 'option':

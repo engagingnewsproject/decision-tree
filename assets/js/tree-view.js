@@ -196,12 +196,31 @@ TreeView.prototype = {
     },
 
     click: function(event) {
-        let el = event.target;
+        let el,
+            Tree,
+            state;
+
+        el = event.target;
+
         // check if it's a click on the parent tree (which we don't care about)
         if (el !== event.currentTarget) {
             if(el.nodeName === 'A') {
                 event.preventDefault()
                 this.emit('update', 'state', el.data)
+            }
+
+            // Let people click questions (that isn't the current question)
+            // to get to the question
+            if(el.nodeName === 'SECTION') {
+                event.preventDefault()
+                Tree = this.getTree()
+                state = Tree.getState();
+                // make sure we're not curently on this question
+                console.log(el.data)
+                if((el.data.type === 'question' && state.id !== el.data.question_id)  || state.type !== 'question' ) {
+                    this.emit('update', 'state', el.data)
+                }
+
             }
         }
         event.stopPropagation()
