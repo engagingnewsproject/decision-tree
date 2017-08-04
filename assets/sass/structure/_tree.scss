@@ -13,6 +13,12 @@ html {
     overflow-y: hidden;
 }
 
+// remove 300ms delay
+.enp-tree a,
+.enp-tree__question {
+    touch-action: manipulation;
+}
+
 .enp-tree__title {
     margin-top: 0;
     margin-bottom: $spacing__base;
