@@ -27,7 +27,9 @@ $app->group('/api', function() {
                 $tree_slug = \Enp\Utility\get_tree_slug_by_id($tree_slug);
             }
             // this will get moved to a "compile on save" for trees
-            $compiled = new \Enp\Database\CompileTree($tree_slug);
+            if(TREE_URL === 'http://dev/decision-tree') {
+                $compiled = new \Enp\Database\CompileTree($tree_slug);
+            }
 
             $response->getBody()->write(file_get_contents("data/".$tree_slug.$ext.".json"));
             return $response;
