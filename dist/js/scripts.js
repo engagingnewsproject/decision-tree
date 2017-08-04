@@ -146,6 +146,7 @@ function TreeView(options) {
     // attach event listeners to the tree element with
     // bound `this` so we get our reference to this element
     _container.addEventListener("click", this.click.bind(this));
+    _container.addEventListener("keydown", this.keydown.bind(this));
 
     // if a Tree was passed, build the view now
     if (options.Tree) {
@@ -308,11 +309,21 @@ TreeView.prototype = {
         }, this.animationLength);
     },
 
+    keydown: function keydown(event) {
+        console.log(event);
+        // check to see if it's a spacebar or enter keypress
+        // 13 = 'Enter'
+        // 32 = 'Space'
+        if (event.keyCode === 13 || event.keyCode === 32) {
+            // call the click
+            this.click(event);
+        }
+    },
+
     click: function click(event) {
         var el = void 0,
             Tree = void 0,
             state = void 0;
-
         el = event.target;
 
         // check if it's a click on the parent tree (which we don't care about)
@@ -892,7 +903,7 @@ TreeView.prototype = {
     function buildTree(request) {
 
         // check our response URL to make sure it's from a trusted source
-        if (!/https?:\/\/(?:dev\/decision-tree|tree\.engagingnewsproject\.org|enptree?(\.staging)\.wpengine\.com)\/api\//.test(request.responseURL)) {
+        if (!/https?:\/\/(?:dev\/decision-tree|tree\.engagingnewsproject\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
             console.error('responseURL from an invalidated source.');
             return false;
         }

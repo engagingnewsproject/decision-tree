@@ -97,6 +97,7 @@ function TreeView(options) {
     // attach event listeners to the tree element with
     // bound `this` so we get our reference to this element
     _container.addEventListener("click", this.click.bind(this));
+    _container.addEventListener("keydown", this.keydown.bind(this));
 
     // if a Tree was passed, build the view now
     if(options.Tree) {
@@ -256,11 +257,21 @@ TreeView.prototype = {
         window.setTimeout(()=>{ treeEl.classList.remove('enp-tree__state--animate-out--'+state.type) }, this.animationLength)
     },
 
+    keydown: function(event) {
+        console.log(event)
+        // check to see if it's a spacebar or enter keypress
+        // 13 = 'Enter'
+        // 32 = 'Space'
+        if(event.keyCode === 13 || event.keyCode === 32) {
+            // call the click
+            this.click(event)
+        }
+    },
+
     click: function(event) {
         let el,
             Tree,
             state;
-
         el = event.target;
 
         // check if it's a click on the parent tree (which we don't care about)
