@@ -249,7 +249,9 @@ TreeView.prototype = {
         console.log(state);
         // validated, so set the new class!
         activeEl.classList.add(this.activeClassName);
-
+        console.log(activeEl);
+        activeEl.focus();
+        console.log(document.activeElement);
         // if we're on a question, set the transform origin on the wrapper
         var cPanel = this.getContentPanel();
         var cWindow = this.getContentWindow();
@@ -269,6 +271,7 @@ TreeView.prototype = {
         } else {
             this.setTransform(cPanel, '');
         }
+        // focus the activeEl
         return true;
     },
 
@@ -318,6 +321,9 @@ TreeView.prototype = {
             // call the click
             this.click(event);
         }
+
+        // TODO: trap focus on question if question view
+
     },
 
     click: function click(event) {
