@@ -9,13 +9,30 @@ html {
 
 .enp-tree {
     width: 100%;
-    padding: $spacing__base;
     position: relative;
+    overflow-y: hidden;
+}
+
+.enp-tree__title {
+    margin-top: 0;
+    margin-bottom: $spacing__base;
 }
 
 .enp-tree__intro {
     width: 100%;
-    max-width: $column_max_width;
+    padding: $spacing__base;
+    position: relative;
+    z-index: 99;
+}
+
+.enp-tree__state--end,
+.enp-tree__state--question {
+    .enp-tree__title--tree {
+        margin-bottom: 0;
+    }
+    .enp-tree__start-container {
+        display: none;
+    }
 }
 
 .enp-tree__btn {
@@ -24,16 +41,24 @@ html {
     text-align: center;
 }
 
-.enp-tree__content-wrap {
+.enp-tree__content-window {
     box-sizing: content-box;
-
-    padding-top: $spacing__base * 3;
-    // so our focus glow doesn't get cut off from overflow hidden
-    padding-left: 3px;
-    padding-right: 3px;
-    padding-bottom: $spacing__base * 3;
+    padding: 15px;
     position: relative; // !important!!!! need this to make offsetTop in JS calculate correctly
     transition: all .4s;
+    transform-origin: top center;
+
+    @include breakpoint($mobile-large) {
+        padding: $spacing__base;
+        transform-origin: top left;
+    }
+}
+
+.enp-tree__state--explore {
+    .enp-tree__content-window {
+        padding-top: $spacing__base*5;
+        padding-bottom: $spacing__base*8;
+    }
 }
 
 .enp-tree__ends,
@@ -41,50 +66,70 @@ html {
     box-sizing: border-box;
 }
 
-.enp-tree__state--question {
-    .enp-tree__content-wrap {
-        overflow: hidden;
-    }
-}
-
-.enp-tree__questions {
+.enp-tree__content-panel {
     position: relative;
+    transition: all .5s;
 }
 
 // overview of whole tree
 .enp-tree__state--tree {
+    .enp-tree__content-window {
+        transform: scale(0.75);
+        transform-origin: top center;
 
-    .enp-tree__content-wrap {
-        transform: scale(0.5);
-        transform-origin: top left;
-    }
-
-    .enp-tree__question {
-        // !!!! DO NOT CHANGE ANY MARGINS OR PADDING HERE
-        position: relative;
-        transition: all .15s;
-
-        &:focus,
-        &:hover {
-            transform: scale(1.02);
-            box-shadow: 0 5px 5px rgba(0,0,0,.15);
-        }
-        // click layer so clicks on a question get sent to our
-        // JS as a question instead of something inside it, like a heading
-        &:before {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            left: 0;
-            content: '';
+        @include breakpoint($mobile-large) {
+            padding-top: $spacing__base * 3;
+            transform: scale(0.5);
+            transform-origin: top left;
         }
     }
 }
 
-.enp-tree__state--question,
 .enp-tree__state--end {
     .enp-tree__start-container {
         display: none;
+    }
+    .enp-tree__content-window {
+        padding-top: $spacing__base;
+    }
+}
+
+.enp-tree__state--tree.enp-tree__state--animate-out--end {
+    .enp-tree__content-window {
+        animation: animateToTreeMobile 0.5s;
+
+        @include breakpoint($mobile-large) {
+            animation: animateToTree 0.5s;
+        }
+
+    }
+     .enp-tree__content-panel {
+        transition: none;
+    }
+}
+
+@keyframes animateToTree {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) translate3d(0,-50px,0);
+        transform-origin: top left;
+    },
+    100% {
+        opacity: 1;
+        transform: scale(0.5) translate3d(0, 0,0);
+        transform-origin: top left;
+    }
+}
+
+@keyframes animateToTreeMobile {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) translate3d(0,-50px,0);
+        transform-origin: top center;
+    },
+    100% {
+        opacity: 1;
+        transform: scale(0.5) translate3d(0, 0,0);
+        transform-origin: top center;
     }
 }

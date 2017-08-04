@@ -14,7 +14,8 @@
             </div>
         {{/if}}
     </div>
-    <div id="enp-tree__wrapper--{{{tree_id}}}" class="enp-tree__content-wrap">
+    <div id="enp-tree__content-window--{{{tree_id}}}" class="enp-tree__content-window">
+        <div id="enp-tree__content-panel--{{{tree_id}}}" class="enp-tree__content-panel">
         {{#if questions}}
             <div class="enp-tree__questions">
                 {{#each questions}}
@@ -50,8 +51,8 @@
         {{#if ends}}
             <div class="enp-tree__ends">
                 {{#each ends}}
+
                     <section id="enp-tree__el--{{{end_id}}}" class="enp-tree__end">
-                        <p>End</p>
                         <h3 class="enp-tree__title enp-tree__title--end">{{{title}}}</h3>
                         {{#if content}}
                             <div class="enp-tree__description enp-tree__description--end">{{content}}</div>

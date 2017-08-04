@@ -3,7 +3,7 @@ function TreeView(options) {
         _container,
         _treeEl,
         _contentWrap,
-        _questionsWrap,
+        _contentPanel,
         _Tree,
         _activeEl;
 
@@ -18,8 +18,8 @@ function TreeView(options) {
     this.getTree = function() { return _Tree}
     this.getTreeEl = function() { return _treeEl}
     this.getActiveEl = function() { return _activeEl}
-    this.getContentWrap = function() { return _contentWrap}
-    this.getQuestionsWrap = function() { return _questionsWrap}
+    this.getContentWindow = function() { return _contentWrap}
+    this.getContentPanel = function() { return _contentPanel}
 
     // setters
     this.setTree = function(Tree) {
@@ -40,20 +40,20 @@ function TreeView(options) {
         return _treeEl
     }
 
-    this.setContentWrap = function() {
+    this.setContentWindow = function() {
         // only let it be set once
         if(_contentWrap === undefined) {
-            _contentWrap = document.getElementById('enp-tree__wrapper--'+_Tree.getTreeID())
+            _contentWrap = document.getElementById('enp-tree__content-window--'+_Tree.getTreeID())
         }
         return _contentWrap
     }
 
-    this.setQuestionsWrap = function() {
+    this.setContentPanel = function() {
         // only let it be set once
-        if(_questionsWrap === undefined) {
-            _questionsWrap =  _contentWrap.firstElementChild
+        if(_contentPanel === undefined) {
+            _contentPanel =  _contentWrap.firstElementChild
         }
-        return _questionsWrap
+        return _contentPanel
     }
 
     // Pass a state for it to set to be active
@@ -130,9 +130,9 @@ TreeView.prototype = {
         // set the Tree El
         this.setTreeEl()
         // set the tree wrap
-        this.setContentWrap()
+        this.setContentWindow()
         // set the questions wrap
-        this.setQuestionsWrap()
+        this.setContentPanel()
         // set the current state in the view
         this.setState(Tree.getState())
     },
@@ -200,22 +200,22 @@ TreeView.prototype = {
         activeEl.classList.add(this.activeClassName)
 
         // if we're on a question, set the transform origin on the wrapper
-        let qWrap = this.getQuestionsWrap()
-        let cWrap = this.getContentWrap()
-        if(state.type === 'question') {
+        let cPanel = this.getContentPanel()
+        let cWindow = this.getContentWindow()
+        if(state.type === 'question' || state.type === 'end') {
 
             // this works well if we don't scale it
-            // this.getAbsoluteBoundingRect(activeEl).top - this.getAbsoluteBoundingRect(qWrap).top
+            // this.getAbsoluteBoundingRect(activeEl).top - this.getAbsoluteBoundingRect(cPanel).top
             // if we change the margins based on a state change here, it'll mess up
             // the calculation on offsetTop. If we're going to do that, we need to
             // delay the margin change until after the animation has completed
-            // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (qWrap) must be set position relative
-            this.setTransform(qWrap, 'translate3d(0,'+ - (activeEl.offsetTop)+'px,0)')
+            // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (cPanel) must be set position relative
+            this.setTransform(cPanel, 'translate3d(0,'+ - (activeEl.offsetTop)+'px,0)')
 
-            // set a maxHeight
-            cWrap.style.height = activeEl.offsetHeight+'px'
+            // set a height
+            cWindow.style.height = activeEl.offsetHeight+'px'
         } else {
-            this.setTransform(qWrap, '')
+            this.setTransform(cPanel, '')
         }
         return true;
     },
@@ -230,7 +230,7 @@ TreeView.prototype = {
         }
         if(state.type === 'tree') {
             // if the state type is tree, set a max-height on the window.
-            let wrap = document.getElementById('enp-tree__wrapper--'+state.id)
+            let wrap = document.getElementById('enp-tree__content-window--'+state.id)
             wrap.style.height = wrap.getBoundingClientRect().height+'px';
         }
     },

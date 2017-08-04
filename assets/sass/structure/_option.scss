@@ -1,5 +1,7 @@
 .enp-tree__options {
     @include no-list;
+    margin: 0;
+    padding: 0;
 }
 
 .enp-tree__option {

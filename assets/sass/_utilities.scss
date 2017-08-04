@@ -1,3 +1,15 @@
+$desktop: 1100px;
+$tablet: 768px;
+$tablet-mini: 600px;
+$mobile-large: 480px;
+$mobile: 320px;
+
+@mixin breakpoint($width) {
+    @media screen and (min-width: $width) {
+        @content;
+    }
+}
+
 @mixin no-list {
     list-style: none;
     margin-left: 0;

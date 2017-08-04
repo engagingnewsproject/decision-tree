@@ -1,29 +1,63 @@
+
 .enp-tree__end {
+    max-width: $column_max_width;
+    position: relative;
     width: 100%;
-    background: #f2f2f2;
-    border: 1px solid #ddd;
     padding: $spacing__base;
+    margin-bottom: $spacing__base;
+}
+
+.enp-tree__label--end {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+}
+
+.enp-tree__title--end {
+    margin-bottom: 1rem;
+}
+
+.enp-tree__description--end {
+    margin-bottom: $spacing__base * 2;
 }
 
 .enp-tree__end-options {
     @include no-list;
 }
 
+.enp-tree__state--tree {
+    .enp-tree__ends {
+        display: flex;
+    }
+
+    .enp-tree__end {
+        margin-right: $spacing__base;
+        margin-bottom: $spacing__base;
+    }
+
+    .enp-tree__end-options {
+        display: none;
+    }
+}
+
+.enp-tree__state--question {
+    .enp-tree__end {
+        opacity: 0;
+        display: block;
+    }
+}
+
 .enp-tree__state--end {
+    .enp-tree__start-container {
+        display: none;
+    }
+
     .enp-tree__end {
         &:not(.is-active) {
             opacity: 0;
-            position: absolute;
-            z-index: -1;
         }
         &.is-active {
             opacity: 1;
-            position: relative;
-            z-index: 9;
         }
-    }
-
-    .enp-tree__questions {
-        display: none;
     }
 }

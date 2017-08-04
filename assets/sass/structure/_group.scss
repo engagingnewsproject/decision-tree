@@ -4,10 +4,21 @@
 }
 
 .enp-tree__state--tree {
-    .enp-tree__group {
-        position: absolute;
-        top: 0;
-        left: 100%;
-        margin-left: 30px;
+    @include breakpoint($mobile-large) {
+        .enp-tree__group {
+            position: absolute;
+            top: 0;
+            left: 650px;
+            float: right;
+        }
+        .enp-tree__title--group {
+            position: absolute;
+            bottom: 100%;
+        }
+    }
+}
+.enp-tree__state--question {
+    .enp-tree__title--group {
+        display: none;
     }
 }

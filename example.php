@@ -11,7 +11,7 @@
             border: 1px solid #ddd;
         }
 
-        .enp-tree__content-wrap {
+        .enp-tree__content-window {
             position: relative;
         }
 
@@ -31,7 +31,7 @@
             top: 0;
         }
 
-        .enp-tree__state--tree .enp-tree__content-wrap {
+        .enp-tree__state--tree .enp-tree__content-window {
             transform: scale(0.5);
             transform-origin: top left;
         }

@@ -2,6 +2,10 @@
     background: $tree_background;
 }
 
+.enp-tree__intro {
+    background: $intro_background;
+}
+
 .enp-tree__btn {
     background: $btn_background;
     color: $btn_color;
@@ -15,6 +19,7 @@
 
 .enp-tree__question {
     background: $question_background;
+    border: 1px solid $question_border;
 }
 
 .enp-tree__option-link,
@@ -27,4 +32,12 @@
         background: $option_background--hover;
         color: $text_color;
     }
+}
+
+.enp-tree__state--end {
+    background: $state_background--end;
+}
+.enp-tree__end {
+    background: $end_background;
+    border: 1px solid $end_border;
 }
