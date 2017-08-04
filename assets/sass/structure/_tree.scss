@@ -25,13 +25,20 @@ html {
 }
 
 .enp-tree__content-wrap {
-    padding-top: $spacing__base;
+    box-sizing: content-box;
+
+    padding-top: $spacing__base * 3;
     // so our focus glow doesn't get cut off from overflow hidden
     padding-left: 3px;
     padding-right: 3px;
-    padding-bottom: $spacing__base;
+    padding-bottom: $spacing__base * 3;
     position: relative; // !important!!!! need this to make offsetTop in JS calculate correctly
     transition: all .4s;
+}
+
+.enp-tree__ends,
+.enp-tree__questions {
+    box-sizing: border-box;
 }
 
 .enp-tree__state--question {

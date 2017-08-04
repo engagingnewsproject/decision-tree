@@ -84,25 +84,27 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
 },"18":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
-  return ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.ends : depth0),{"name":"each","hash":{},"fn":container.program(19, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+  return "            <div class=\"enp-tree__ends\">\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : (container.nullContext || {}),(depth0 != null ? depth0.ends : depth0),{"name":"each","hash":{},"fn":container.program(19, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "            </div>\n";
 },"19":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function";
 
-  return "                <section id=\"enp-tree__el--"
+  return "                    <section id=\"enp-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.end_id || (depth0 != null ? depth0.end_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"end_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
-    + "\" class=\"enp-tree__end\">\n                    <p>End</p>\n                    <h3 class=\"enp-tree__title enp-tree__title--end\">"
+    + "\" class=\"enp-tree__end\">\n                        <p>End</p>\n                        <h3 class=\"enp-tree__title enp-tree__title--end\">"
     + ((stack1 = ((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "</h3>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.content : depth0),{"name":"if","hash":{},"fn":container.program(20, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "\n                    <ul class=\"enp-tree__end-options\">\n                        <li class=\"enp-tree__end-option\">\n                            <a id=\"enp-tree__restart--"
+    + "\n                        <ul class=\"enp-tree__end-options\">\n                            <li class=\"enp-tree__end-option\">\n                                <a id=\"enp-tree__restart--"
     + container.escapeExpression(((helper = (helper = helpers.end_id || (depth0 != null ? depth0.end_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"end_id","hash":{},"data":data}) : helper)))
     + "\" class=\"enp-tree__btn enp-tree__btn--retry\" href=\"#enp-tree--"
     + ((stack1 = container.lambda((depths[1] != null ? depths[1].tree_id : depths[1]), depth0)) != null ? stack1 : "")
-    + "\">Start Again</a>\n                        </li>\n                    </ul>\n                </section>\n";
+    + "\">Start Again</a>\n                            </li>\n                        </ul>\n                    </section>\n";
 },"20":function(container,depth0,helpers,partials,data) {
     var helper;
 
-  return "                        <div class=\"enp-tree__description enp-tree__description--end\">"
+  return "                            <div class=\"enp-tree__description enp-tree__description--end\">"
     + container.escapeExpression(((helper = (helper = helpers.content || (depth0 != null ? depth0.content : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"content","hash":{},"data":data}) : helper)))
     + "</div>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {

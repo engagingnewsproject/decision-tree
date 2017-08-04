@@ -48,21 +48,23 @@
         {{/if}}
 
         {{#if ends}}
-            {{#each ends}}
-                <section id="enp-tree__el--{{{end_id}}}" class="enp-tree__end">
-                    <p>End</p>
-                    <h3 class="enp-tree__title enp-tree__title--end">{{{title}}}</h3>
-                    {{#if content}}
-                        <div class="enp-tree__description enp-tree__description--end">{{content}}</div>
-                    {{/if}}
+            <div class="enp-tree__ends">
+                {{#each ends}}
+                    <section id="enp-tree__el--{{{end_id}}}" class="enp-tree__end">
+                        <p>End</p>
+                        <h3 class="enp-tree__title enp-tree__title--end">{{{title}}}</h3>
+                        {{#if content}}
+                            <div class="enp-tree__description enp-tree__description--end">{{content}}</div>
+                        {{/if}}
 
-                    <ul class="enp-tree__end-options">
-                        <li class="enp-tree__end-option">
-                            <a id="enp-tree__restart--{{end_id}}" class="enp-tree__btn enp-tree__btn--retry" href="#enp-tree--{{{../tree_id}}}">Start Again</a>
-                        </li>
-                    </ul>
-                </section>
-            {{/each}}
+                        <ul class="enp-tree__end-options">
+                            <li class="enp-tree__end-option">
+                                <a id="enp-tree__restart--{{end_id}}" class="enp-tree__btn enp-tree__btn--retry" href="#enp-tree--{{{../tree_id}}}">Start Again</a>
+                            </li>
+                        </ul>
+                    </section>
+                {{/each}}
+            </div>
         {{/if}}
     </div>
 

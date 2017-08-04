@@ -140,8 +140,7 @@ function TreeView(options) {
     this.activeClassName = 'is-active';
     // how long animation classes are applied for until removed
     this.animationLength = 600;
-    // what scale the tree view is set to (same # you apply to scaling in your CSS)
-    this.treeScale = 0.5;
+    this.questionPadding = 50;
     // set the el
     _container = options.container;
     // attach event listeners to the tree element with
@@ -261,10 +260,10 @@ TreeView.prototype = {
             // the calculation on offsetTop. If we're going to do that, we need to
             // delay the margin change until after the animation has completed
             // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (qWrap) must be set position relative
-            this.setTransform(qWrap, 'translate3d(0,' + -(activeEl.offsetTop - 50) + 'px,0)');
+            this.setTransform(qWrap, 'translate3d(0,' + -activeEl.offsetTop + 'px,0)');
 
             // set a maxHeight
-            cWrap.style.maxHeight = activeEl.offsetHeight + 150 + 'px';
+            cWrap.style.height = activeEl.offsetHeight + 'px';
         } else {
             this.setTransform(qWrap, '');
         }
@@ -282,7 +281,7 @@ TreeView.prototype = {
         if (state.type === 'tree') {
             // if the state type is tree, set a max-height on the window.
             var wrap = document.getElementById('enp-tree__wrapper--' + state.id);
-            wrap.style.maxHeight = wrap.getBoundingClientRect().height + 'px';
+            wrap.style.height = wrap.getBoundingClientRect().height + 'px';
         }
     },
 
