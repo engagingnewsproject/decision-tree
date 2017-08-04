@@ -353,10 +353,16 @@ function createTree(options) {
 function getTreeData(slug) {
 
     return new Promise(function(resolve, reject) {
+        let baseUrl;
+        if(/https?:\/\/(?:dev\/decision-tree|localhost:3000\/decision-tree)\//.test(window.location.href)) {
+            baseUrl = 'http://dev/decision-tree'
+        } else {
+            baseUrl = 'http://enptree.wpengine.com'
+        }
 
       var request = new XMLHttpRequest();
       request.overrideMimeType("application/json");
-      request.open('GET', 'http://dev/decision-tree/api/v1/trees/'+slug+'/compiled?minfied=true', true);
+      request.open('GET', baseUrl+'/api/v1/trees/'+slug+'/compiled?minfied=true', true);
       //request.responseType = 'json';
       // When the request loads, check whether it was successful
       request.onload = function() {
