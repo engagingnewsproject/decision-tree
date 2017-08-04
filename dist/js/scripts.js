@@ -261,7 +261,8 @@ TreeView.prototype = {
             // delay the margin change until after the animation has completed
             // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (cPanel) must be set position relative
             this.setTransform(cPanel, 'translate3d(0,' + -activeEl.offsetTop + 'px,0)');
-
+            // set window scroll position to 0 (helps on mobile to center the question correctly)
+            cWindow.scrollTop = 0;
             // set a height
             cWindow.style.height = activeEl.offsetHeight + 'px';
         } else {

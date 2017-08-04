@@ -47,14 +47,22 @@ html {
     position: relative; // !important!!!! need this to make offsetTop in JS calculate correctly
     transition: all .4s;
     transform-origin: top center;
-    max-height: 700px;
-    overflow: scroll;
 
     @include breakpoint($mobile-large) {
-        max-height: none;
-        overflow: visible;
         padding: $spacing__base;
         transform-origin: top left;
+    }
+}
+
+.enp-tree__state--tree {
+    .enp-tree__content-window {
+        max-height: 700px;
+        overflow: scroll;
+
+        @include breakpoint($mobile-large) {
+            max-height: none;
+            overflow: visible;
+        }
     }
 }
 
@@ -80,11 +88,23 @@ html {
     .enp-tree__content-window {
         transform: scale(0.8);
         transform-origin: top center;
+        max-height: 700px;
+        overflow: scroll;
         @include breakpoint($mobile-large) {
             padding-top: $spacing__base * 3;
+            max-height: none;
+            overflow: visible;
             transform: scale(0.5);
             transform-origin: top left;
         }
+    }
+}
+
+.enp-tree__state--end,
+.enp-tree__state--question {
+
+    .enp-tree__content-window {
+        overflow: hidden;
     }
 }
 
@@ -96,6 +116,8 @@ html {
         padding-top: $spacing__base;
     }
 }
+
+
 
 .enp-tree__state--tree.enp-tree__state--animate-out--end {
     .enp-tree__content-window {
