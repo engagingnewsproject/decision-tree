@@ -47,8 +47,12 @@ html {
     position: relative; // !important!!!! need this to make offsetTop in JS calculate correctly
     transition: all .4s;
     transform-origin: top center;
+    max-height: 700px;
+    overflow: scroll;
 
     @include breakpoint($mobile-large) {
+        max-height: none;
+        overflow: visible;
         padding: $spacing__base;
         transform-origin: top left;
     }
@@ -74,9 +78,8 @@ html {
 // overview of whole tree
 .enp-tree__state--tree {
     .enp-tree__content-window {
-        transform: scale(0.75);
+        transform: scale(0.8);
         transform-origin: top center;
-
         @include breakpoint($mobile-large) {
             padding-top: $spacing__base * 3;
             transform: scale(0.5);
@@ -124,12 +127,12 @@ html {
 @keyframes animateToTreeMobile {
     0% {
         opacity: 0;
-        transform: scale(0.5) translate3d(0,-50px,0);
+        transform: scale(0.7) translate3d(0,-50px,0);
         transform-origin: top center;
     },
     100% {
         opacity: 1;
-        transform: scale(0.5) translate3d(0, 0,0);
+        transform: scale(0.8) translate3d(0, 0,0);
         transform-origin: top center;
     }
 }

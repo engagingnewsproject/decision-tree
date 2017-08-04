@@ -280,8 +280,10 @@ TreeView.prototype = {
         }
         if (state.type === 'tree') {
             // if the state type is tree, set a max-height on the window.
-            var wrap = document.getElementById('enp-tree__content-window--' + state.id);
-            wrap.style.height = wrap.getBoundingClientRect().height + 'px';
+            var cPanel = this.getContentPanel();
+            var cWindow = this.getContentWindow();
+            // content window is what you can see and the pane is the full height element with transform origin applied on it. Think of a big piece of paper (the panel) and it's covered up except for a small window that you're looking through
+            cWindow.style.height = cPanel.getBoundingClientRect().height + 'px';
         }
     },
 

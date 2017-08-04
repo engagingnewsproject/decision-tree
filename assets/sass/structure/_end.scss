@@ -27,7 +27,9 @@
 
 .enp-tree__state--tree {
     .enp-tree__ends {
-        display: flex;
+        @include breakpoint($mobile-large) {
+            display: flex;
+        }
     }
 
     .enp-tree__end {

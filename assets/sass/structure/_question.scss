@@ -1,6 +1,7 @@
 .enp-tree__questions {
     max-width: $column_max_width;
     margin-bottom: $spacing__base * 2;
+    transition: all .4s;
 }
 
 .enp-tree__question {
@@ -35,7 +36,9 @@
 }
 // .enp-tree__state--#{state} classes are applied with JS,
 // so these are JS only styles
-.enp-tree__state--question.enp-tree__state--animate-out--tree {
-    .enp-tree__question {}
+.enp-tree__state--end.enp-tree__state--animate-out--question {
+    .enp-tree__questions {
+        opacity: 0;
+    }
 
 }
