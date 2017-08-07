@@ -135,7 +135,8 @@ TreeView.prototype = {
         // set the questions wrap
         this.setContentPanel()
         // set the current state in the view
-        this.setState(Tree.getState())
+        let init = true
+        this.setState(Tree.getState(), init)
     },
 
     render: function(data) {
@@ -181,9 +182,11 @@ TreeView.prototype = {
         if(newState === false) {
             this.setState(data.oldState)
         }
+
+        // focus new active elemnt
     },
 
-    setState: function(state) {
+    setState: function(state, init) {
         let activeEl;
 
         this.addContainerState(state)
@@ -199,8 +202,12 @@ TreeView.prototype = {
         console.log(state)
         // validated, so set the new class!
         activeEl.classList.add(this.activeClassName)
-        // focus it
-        activeEl.focus()
+        // we don't want to add focus on init
+        if(init !== true) {
+            // focus it
+            activeEl.focus()
+        }
+
         // if we're on a question, set the transform origin on the wrapper
         let cPanel = this.getContentPanel()
         let cWindow = this.getContentWindow()
@@ -221,7 +228,7 @@ TreeView.prototype = {
         } else {
             this.setTransform(cPanel, '')
         }
-        // focus the activeEl
+
         return true;
     },
 
