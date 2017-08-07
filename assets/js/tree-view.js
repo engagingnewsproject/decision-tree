@@ -199,9 +199,8 @@ TreeView.prototype = {
         console.log(state)
         // validated, so set the new class!
         activeEl.classList.add(this.activeClassName)
-        console.log(activeEl)
+        // focus it
         activeEl.focus()
-        console.log(document.activeElement)
         // if we're on a question, set the transform origin on the wrapper
         let cPanel = this.getContentPanel()
         let cWindow = this.getContentWindow()
@@ -271,7 +270,9 @@ TreeView.prototype = {
             this.click(event)
         }
 
-        // TODO: trap focus on question if question view
+        // TODO: don't allow focus on other questions if question view
+
+        // TODO: don't allow focus on options if in tree state view
 
 
     },
