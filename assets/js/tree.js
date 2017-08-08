@@ -184,9 +184,14 @@ Tree.prototype = {
                 this.setState(data.destination_type, data.destination_id);
                 break
 
-            case 'restart':
-                // find the destination
+            case 'overview':
+                // go to tree overview
                 this.setState('tree', this.getTreeID());
+                break
+
+            case 'restart':
+                // go to first question
+                this.setState('question', this.getQuestions()[0].question_id);
                 break
         }
     },

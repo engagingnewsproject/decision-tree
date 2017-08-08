@@ -1,4 +1,4 @@
-<section id="enp-tree--{{{tree_id}}}" class="enp-tree enp-tree--{{{environment}}}" tabindex="-1">
+<section id="enp-tree--{{{tree_id}}}" class="enp-tree enp-tree--{{{environment}}}">
     <div id="enp-tree__intro--{{{tree_id}}}" class="enp-tree__intro">
         <h2 class="enp-tree__title enp-tree__title--tree">{{{title}}}</h2>
         {{#if starts}}
@@ -60,7 +60,10 @@
 
                         <ul class="enp-tree__end-options">
                             <li class="enp-tree__end-option">
-                                <a id="enp-tree__restart--{{end_id}}" class="enp-tree__btn enp-tree__btn--retry" href="#enp-tree--{{{../tree_id}}}">Start Again</a>
+                                <a id="enp-tree__restart--{{end_id}}" class="enp-tree__btn enp-tree__btn--retry" href="#enp-tree__el--{{{../questions.0.question_id}}}">Start Again</a>
+                            </li>
+                            <li class="enp-tree__end-option">
+                                <a id="enp-tree__overview--{{end_id}}" class="enp-tree__btn enp-tree__btn--overview" href="#enp-tree--{{{../tree_id}}}">Go to Overview</a>
                             </li>
                         </ul>
                     </section>

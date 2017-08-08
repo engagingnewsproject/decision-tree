@@ -367,6 +367,9 @@ TreeView.prototype = {
                         // restart button
                         var restartEl = document.getElementById('enp-tree__restart--'+id)
                         this.bindDOMData(elData[j], restartEl, 'restart')
+                        // go to overview button
+                        var overviewEl = document.getElementById('enp-tree__overview--'+id)
+                        this.bindDOMData(elData[j], overviewEl, 'overview')
                         break
                 }
             }
@@ -436,6 +439,12 @@ TreeView.prototype = {
                     clonedObj = {
                         restart_id: data.end_id,
                         type: 'restart',
+                    }
+                    break
+                case 'overview':
+                    clonedObj = {
+                        overview_id: data.end_id,
+                        type: 'overview',
                     }
                     break
             }
