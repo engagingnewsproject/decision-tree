@@ -25,13 +25,11 @@ html {
 }
 
 .enp-tree__intro {
+    text-align: center;
     width: 100%;
     padding: $spacing__base;
     position: relative;
     z-index: 99;
-    @media (max-width: $mobile-large) {
-        text-align: center;
-    }
 }
 
 .enp-tree__state--end,

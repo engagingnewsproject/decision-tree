@@ -35,11 +35,17 @@
     }
 }
 
+.enp-tree__state--question,
+.enp-tree__state--end {
+    .enp-tree__questions {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
 // .enp-tree__state--#{state} classes are applied with JS,
 // so these are JS only styles
 .enp-tree__state--end.enp-tree__state--animate-out--question {
     .enp-tree__questions {
         opacity: 0;
     }
-
 }
