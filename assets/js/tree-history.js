@@ -5,25 +5,49 @@
 */
 function TreeHistory(options) {
     var _Tree,
-        _storageString,
-        _history; // where in the history we're at (current state)
+        _history,
+        _historyStorageName,
+        _currentIndex, // where in the history we're at (current state)
+        _currentIndexStorageName;
+
+    /**
+    * Private functions
+    */
+
+    // save the passed history to localStorage and set the global _history to make sure everything is in sync
+    var _saveHistory = function(history) {
+        _history = history;
+        localStorage.setItem(_historyStorageName, JSON.stringify(_history));
+        console.log(_history)
+    }
+
+    var _saveCurrentIndex = function(currentIndex) {
+        _currentIndex = currentIndex
+        localStorage.setItem(_currentIndexStorageName, JSON.stringify(_currentIndex))
+        console.log(_currentIndex)
+    }
 
     // getters
     this.getTree = function() { return _Tree}
     this.getHistory = function() { return _history}
+    this.getCurrentIndex = function() { return _currentIndex}
 
     // setters
-
+    /**
+    * Clears the history and currentIndex to an empty state
+    */
     this.clearHistory = function() {
         // create as an empty array
+        let history = [];
+        let currentIndex = null;
 
-        let history = {
-                    states: [{}],
-                    currentIndex: null
-                };
-        saveHistory(history)
+        _saveHistory(history)
+        _saveCurrentIndex(currentIndex)
     }
 
+    /**
+    * Sets the parent Tree
+    */
     this.setTree = function(Tree) {
         // only let it be set once
         if(_Tree === undefined) {
@@ -32,7 +56,10 @@ function TreeHistory(options) {
         return _Tree
     }
 
-    this.setHistory = function() {
+    /**
+    * Sets variables and decides what state we'll init to
+    */
+    this.init = function() {
         let history,
             treeID;
 
@@ -40,17 +67,30 @@ function TreeHistory(options) {
         treeID = this.getTree().getTreeID()
 
         // set global storage string
-        _storageString = 'treeHistory__'+treeID
+        _historyStorageName = 'treeHistory__'+treeID
+        _currentIndexStorageName = 'treeHistoryIndex__'+treeID
 
         // if localStorage is empty, create it
-        if(localStorage.getItem(_storageString) === null) {
-            // sets a blank history
+        if(localStorage.getItem(_historyStorageName) === null) {
+            // sets a blank history and index
             this.clearHistory();
         }
 
-        // set localStorage
-        _history = JSON.parse(localStorage.getItem(_storageString))
-        return _history
+        // set from localStorage
+        _history = JSON.parse(localStorage.getItem(_historyStorageName))
+
+        // set currentIndex from localStorage
+        _currentIndex = JSON.parse(localStorage.getItem(_currentIndexStorageName))
+
+        // check that it's a valid state
+        this.setCurrentIndex(_currentIndex)
+    }
+
+    this.setHistory = function(history) {
+        // TODO: different checks to make sure it's legit, like
+        // don't add the same state twice.
+
+        return _saveHistory(history)
     }
 
     this.addHistory = function(state) {
@@ -58,14 +98,12 @@ function TreeHistory(options) {
         console.log(state)
         // TODO: Validate state. Should be a function on the Tree
         // check whitelist for state?
-        let history = this.getHistory();
-        // check tree data for appropriate id?
-        let length = history.state.push(state)
-        // set the new current index
-        this.setCurrentIndex(length-1)
 
+        let history = this.getHistory();
+        // add the state to the history
+        history.push(state)
         // save it
-        saveHistory(history)
+        this.setHistory(history)
     }
 
     this.deleteHistoryAfter = function(index) {
@@ -85,28 +123,20 @@ function TreeHistory(options) {
         // delete all history after the passed index
         _history = _history.splice(index)
 
-        saveHistory(_history)
+        _saveHistory(_history)
     }
-
-    // save the passed history to localStorage and set the global _history to make sure everything is in sync
-    var saveHistory = function(history) {
-        _history = history;
-        localStorage.setItem(_storageString, JSON.stringify(_history));
-        console.log(_history)
-    }
-
 
     this.setCurrentIndex = function(index) {
+        let history = this.getHistory()
         // Check that the index exists
-        if(_history.state[index] === undefined) {
-            console.error('Index not found in _history.')
-            return false;
+        if(index !== null && history[index] === undefined) {
+            console.error('Index not found in History.')
+            // Should we set the current index to null here?
+            return false
         }
 
         // don't worry about matching that the state exists. Maybe someone wants to set the current index to the last one in the series. Who knows?
-        _history.currentIndex = index
-
-        this.saveHistory(_history)
+        return _saveCurrentIndex(index)
     }
 
     // if a Tree was passed, build the History now
@@ -121,25 +151,15 @@ TreeHistory.prototype = {
 
     build: function(Tree) {
         this.setTree(Tree)
-        this.setHistory()
+        this.init()
         // TODO: update the Tree state to match the History
-    },
-
-    getCurrentIndex: function() {
-        let history = this.getHistory()
-        return history.currentIndex
-    },
-
-    getHistoryStates: function() {
-        let history = this.getHistory()
-        return history.states
     },
 
     getCurrentState: function() {
         let stateHistory,
             currentIndex;
 
-        stateHistory = this.getHistoryStates()
+        stateHistory = this.getHistory()
         currentIndex = this.getCurrentIndex()
 
         return stateHistory[currentIndex]
@@ -189,7 +209,6 @@ TreeHistory.prototype = {
 
     // updates the history state
     update: function(states) {
-        // TODO: refactor out all the "addHistory(newState); return;"
         let newState,
             oldState,
             history,
@@ -220,6 +239,8 @@ TreeHistory.prototype = {
         if(newState.type === 'question') {
             Tree = this.getTree()
             questions = Tree.getQuestions()
+            // try to find this state in our history
+            findIndex = this.getIndexBy(history, 'id', newState.id)
 
             // if the old state is Tree and the current question is the first question, then they're just starting, so let's clear the history (if any) and set the first question
             if(oldState.type === 'tree' && newState.id === questions[0].question_id) {
@@ -230,8 +251,7 @@ TreeHistory.prototype = {
                 return;
             }
 
-            // try to find this state in our history
-            findIndex = getIndexBy(history.states, 'id', newState.id)
+
             if(findIndex !== undefined) {
                 // set the currentIndex accordingly
                 this.setCurrentIndex(findIndex);
@@ -243,8 +263,8 @@ TreeHistory.prototype = {
             // if not, delete any history after the previous state.
             // They've gone rogue by going back in history and
             // chosing a new path
-            findIndex = getIndexBy(history.states, 'id', oldState.id)
-            if(findIndex !== undefined && findIndex !== history.states.length - 1) {
+            findIndex = this.getIndexBy(history, 'id', oldState.id)
+            if(findIndex !== undefined && findIndex !== history.length - 1) {
                 // delete anything after this point, because they've changed their state history
                 // we don't want to delete one by one because:
                 // 1. we won't allow them to do that
@@ -253,6 +273,11 @@ TreeHistory.prototype = {
 
                 // add our new history
                 this.addHistory(newState)
+                // TODO: Move this out of this function. We don't need to set the index when adding history
+                // check tree data for appropriate id?
+                let length = history.push(state)
+                // set the new current index
+                this.setCurrentIndex(length-1)
                 return;
             }
 
