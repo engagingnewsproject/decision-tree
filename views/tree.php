@@ -60,35 +60,48 @@
     
     $inary=is_array($in);
     return '<section id="enp-tree--'.LR::raw($cx, (($inary && isset($in['tree_id'])) ? $in['tree_id'] : null)).'" class="enp-tree enp-tree--'.LR::raw($cx, LR::hbch($cx, 'environment', array(array(),array()), 'raw', $in)).'">
-    <div class="enp-tree__intro">
+    <div id="enp-tree__intro--'.LR::raw($cx, (($inary && isset($in['tree_id'])) ? $in['tree_id'] : null)).'" class="enp-tree__intro">
         <h2 class="enp-tree__title enp-tree__title--tree">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</h2>
-'.((LR::ifvar($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), false)) ? ''.LR::sec($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '                <div class="enp-tree__start-container">
-                    <p><a class="enp-tree__start" href="#enp-tree__el--'.LR::raw($cx, (($inary && isset($in['destination_id'])) ? $in['destination_id'] : null)).'">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</a></p>
+'.((LR::ifvar($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), false)) ? '            <div class="enp-tree__start-container">
+'.LR::sec($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '                    <p><a id="enp-tree__el--'.LR::encq($cx, (($inary && isset($in['start_id'])) ? $in['start_id'] : null)).'" class="enp-tree__btn enp-tree__start" href="#enp-tree__el--'.LR::raw($cx, (($inary && isset($in['destination_id'])) ? $in['destination_id'] : null)).'">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</a></p>
 '.((LR::ifvar($cx, (($inary && isset($in['content'])) ? $in['content'] : null), false)) ? '                        <div class="enp-tree__description enp-tree__description--start">
                             '.LR::encq($cx, (($inary && isset($in['content'])) ? $in['content'] : null)).'
                         </div>
-' : '').'                </div>
-';}).'' : '').'    </div>
+' : '').'';}).'            </div>
+' : '').'    </div>
+    <div id="enp-tree__content-window--'.LR::raw($cx, (($inary && isset($in['tree_id'])) ? $in['tree_id'] : null)).'" class="enp-tree__content-window">
+        <div id="enp-tree__content-panel--'.LR::raw($cx, (($inary && isset($in['tree_id'])) ? $in['tree_id'] : null)).'" class="enp-tree__content-panel">
+'.((LR::ifvar($cx, (($inary && isset($in['questions'])) ? $in['questions'] : null), false)) ? '            <div class="enp-tree__questions">
+'.LR::sec($cx, (($inary && isset($in['questions'])) ? $in['questions'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return ''.((LR::ifvar($cx, (($inary && isset($in['group_id'])) ? $in['group_id'] : null), false)) ? ''.LR::hbbch($cx, 'group_start', array(array((($inary && isset($in['question_id'])) ? $in['question_id'] : null),(($inary && isset($in['group_id'])) ? $in['group_id'] : null),((isset($cx['scopes'][count($cx['scopes'])-1]) && is_array($cx['scopes'][count($cx['scopes'])-1]) && isset($cx['scopes'][count($cx['scopes'])-1]['groups'])) ? $cx['scopes'][count($cx['scopes'])-1]['groups'] : null)),array()), $in, false, function($cx, $in) {$inary=is_array($in);return '                            <div id="enp-tree__el--'.LR::raw($cx, (($inary && isset($in['group_id'])) ? $in['group_id'] : null)).'" class="enp-tree__group">
+                                <h3 class="enp-tree__title enp-tree__title--group">'.LR::encq($cx, (($inary && isset($in['group_title'])) ? $in['group_title'] : null)).'</h3>
+';}).'' : '').'                    <section id="enp-tree__el--'.LR::raw($cx, (($inary && isset($in['question_id'])) ? $in['question_id'] : null)).'" class="enp-tree__question" tabindex="0">
+                        <h4 class="enp-tree__title enp-tree__title--question">'.LR::encq($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</h4>
+'.((LR::ifvar($cx, (($inary && isset($in['content'])) ? $in['content'] : null), false)) ? '                            <div class="enp-tree__description enp-tree__description--question">'.LR::encq($cx, (($inary && isset($in['content'])) ? $in['content'] : null)).'</div>
+' : '').''.((LR::ifvar($cx, (($inary && isset($in['options'])) ? $in['options'] : null), false)) ? '                            <ul class="enp-tree__options">
+'.LR::sec($cx, (($inary && isset($in['options'])) ? $in['options'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '                                    <li class="enp-tree__option"><a class="enp-tree__option-link" id="enp-tree__el--'.LR::raw($cx, (($inary && isset($in['option_id'])) ? $in['option_id'] : null)).'" href="#enp-tree__el--'.LR::raw($cx, (($inary && isset($in['destination_id'])) ? $in['destination_id'] : null)).'">'.LR::encq($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</a></li>
+';}).'                            </ul>
+' : '').'                    </section>
 
-'.((LR::ifvar($cx, (($inary && isset($in['questions'])) ? $in['questions'] : null), false)) ? ''.LR::sec($cx, (($inary && isset($in['questions'])) ? $in['questions'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return ''.((LR::ifvar($cx, (($inary && isset($in['group_id'])) ? $in['group_id'] : null), false)) ? ''.LR::hbbch($cx, 'group_start', array(array((($inary && isset($in['question_id'])) ? $in['question_id'] : null),(($inary && isset($in['group_id'])) ? $in['group_id'] : null),((isset($cx['scopes'][count($cx['scopes'])-1]) && is_array($cx['scopes'][count($cx['scopes'])-1]) && isset($cx['scopes'][count($cx['scopes'])-1]['groups'])) ? $cx['scopes'][count($cx['scopes'])-1]['groups'] : null)),array()), $in, false, function($cx, $in) {$inary=is_array($in);return '                    <div id="enp-tree__el--'.LR::raw($cx, (($inary && isset($in['group_id'])) ? $in['group_id'] : null)).'" class="enp-tree__group">
-                        <h3 class="enp-tree__title enp-tree__title--group">'.LR::encq($cx, (($inary && isset($in['group_title'])) ? $in['group_title'] : null)).'</h3>
-';}).'' : '').'            <section id="enp-tree__el--'.LR::raw($cx, (($inary && isset($in['question_id'])) ? $in['question_id'] : null)).'" class="enp-tree__question" >
-                <h4 class="enp-tree__title enp-tree__title--question">'.LR::encq($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</h4>
-'.((LR::ifvar($cx, (($inary && isset($in['content'])) ? $in['content'] : null), false)) ? '                    <div class="enp-tree__description enp-tree__description--question">'.LR::encq($cx, (($inary && isset($in['content'])) ? $in['content'] : null)).'</div>
-' : '').''.((LR::ifvar($cx, (($inary && isset($in['options'])) ? $in['options'] : null), false)) ? '                    <ul class="enp-tree__options">
-'.LR::sec($cx, (($inary && isset($in['options'])) ? $in['options'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '                            <li id="enp-tree__el--'.LR::raw($cx, (($inary && isset($in['option_id'])) ? $in['option_id'] : null)).'" class="enp-tree__option"><a class="enp-tree__option-link"  href="#enp-tree__el--'.LR::raw($cx, (($inary && isset($in['destination_id'])) ? $in['destination_id'] : null)).'">'.LR::encq($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</a></li>
-';}).'                    </ul>
-' : '').'            </section>
-
-'.((LR::ifvar($cx, (($inary && isset($in['group_id'])) ? $in['group_id'] : null), false)) ? ''.LR::hbbch($cx, 'group_end', array(array((($inary && isset($in['question_id'])) ? $in['question_id'] : null),(($inary && isset($in['group_id'])) ? $in['group_id'] : null),((isset($cx['scopes'][count($cx['scopes'])-1]) && is_array($cx['scopes'][count($cx['scopes'])-1]) && isset($cx['scopes'][count($cx['scopes'])-1]['groups'])) ? $cx['scopes'][count($cx['scopes'])-1]['groups'] : null)),array()), $in, false, function($cx, $in) {$inary=is_array($in);return '                    </div>
-';}).'' : '').'';}).'' : '').'
-'.((LR::ifvar($cx, (($inary && isset($in['ends'])) ? $in['ends'] : null), false)) ? ''.LR::sec($cx, (($inary && isset($in['ends'])) ? $in['ends'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '            <section id="enp-tree__el--'.LR::raw($cx, (($inary && isset($in['end_id'])) ? $in['end_id'] : null)).'" class="enp-tree__end">
-                <p>End</p>
-                <h3 class="enp-tree__title enp-tree__title--end">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</h3>
-'.((LR::ifvar($cx, (($inary && isset($in['content'])) ? $in['content'] : null), false)) ? '                    <div class="enp-tree__description enp-tree__description--end">'.LR::encq($cx, (($inary && isset($in['content'])) ? $in['content'] : null)).'</div>
-' : '').'                <a class="enp-tree__btn enp-tree__btn--retry" href="#enp-tree--'.LR::raw($cx, ((isset($cx['scopes'][count($cx['scopes'])-1]) && is_array($cx['scopes'][count($cx['scopes'])-1]) && isset($cx['scopes'][count($cx['scopes'])-1]['tree_id'])) ? $cx['scopes'][count($cx['scopes'])-1]['tree_id'] : null)).'">Start Again</a>
-            </section>
-';}).'' : '').'
+'.((LR::ifvar($cx, (($inary && isset($in['group_id'])) ? $in['group_id'] : null), false)) ? ''.LR::hbbch($cx, 'group_end', array(array((($inary && isset($in['question_id'])) ? $in['question_id'] : null),(($inary && isset($in['group_id'])) ? $in['group_id'] : null),((isset($cx['scopes'][count($cx['scopes'])-1]) && is_array($cx['scopes'][count($cx['scopes'])-1]) && isset($cx['scopes'][count($cx['scopes'])-1]['groups'])) ? $cx['scopes'][count($cx['scopes'])-1]['groups'] : null)),array()), $in, false, function($cx, $in) {$inary=is_array($in);return '                            </div>
+';}).'' : '').'';}).'            </div>
+' : '').'
+'.((LR::ifvar($cx, (($inary && isset($in['ends'])) ? $in['ends'] : null), false)) ? '            <div class="enp-tree__ends">
+'.LR::sec($cx, (($inary && isset($in['ends'])) ? $in['ends'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '
+                    <section id="enp-tree__el--'.LR::raw($cx, (($inary && isset($in['end_id'])) ? $in['end_id'] : null)).'" class="enp-tree__end" tabindex="0">
+                        <h3 class="enp-tree__title enp-tree__title--end">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</h3>
+'.((LR::ifvar($cx, (($inary && isset($in['content'])) ? $in['content'] : null), false)) ? '                            <div class="enp-tree__description enp-tree__description--end">'.LR::encq($cx, (($inary && isset($in['content'])) ? $in['content'] : null)).'</div>
+' : '').'
+                        <ul class="enp-tree__end-options">
+                            <li class="enp-tree__end-option">
+                                <a id="enp-tree__restart--'.LR::encq($cx, (($inary && isset($in['end_id'])) ? $in['end_id'] : null)).'" class="enp-tree__btn enp-tree__btn--retry" href="#enp-tree__el--'.LR::raw($cx, ((isset($cx['scopes'][count($cx['scopes'])-1]) && is_array($cx['scopes'][count($cx['scopes'])-1]['questions']['0']) && isset($cx['scopes'][count($cx['scopes'])-1]['questions']['0']['question_id'])) ? $cx['scopes'][count($cx['scopes'])-1]['questions']['0']['question_id'] : null)).'">Start Again</a>
+                            </li>
+                            <li class="enp-tree__end-option">
+                                <a id="enp-tree__overview--'.LR::encq($cx, (($inary && isset($in['end_id'])) ? $in['end_id'] : null)).'" class="enp-tree__btn enp-tree__btn--overview" href="#enp-tree--'.LR::raw($cx, ((isset($cx['scopes'][count($cx['scopes'])-1]) && is_array($cx['scopes'][count($cx['scopes'])-1]) && isset($cx['scopes'][count($cx['scopes'])-1]['tree_id'])) ? $cx['scopes'][count($cx['scopes'])-1]['tree_id'] : null)).'">Go to Overview</a>
+                            </li>
+                        </ul>
+                    </section>
+';}).'            </div>
+' : '').'    </div>
 
 </section>
 ';

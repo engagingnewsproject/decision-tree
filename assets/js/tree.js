@@ -150,17 +150,23 @@ Tree.prototype = {
     },
 
     /**
-    * Request to update the tree
+    * Request to update the tree o
     */
     update: function(action, data) {
-        console.log('Tree.js request update with this data:');
-        console.log(data);
+
         switch(action) {
             // data will be the element clicked
             case 'state':
                 this.updateState(data);
                 break
         }
+    },
+
+    /**
+    * How observers message the parent and each other
+    */
+    message: function(action, data) {
+        this.emit(action, data)
     },
 
     /**
@@ -408,6 +414,7 @@ function buildTree(request) {
         container: this.container,
     });
     let treeHistory = new TreeHistory({});
+    console.log(treeHistory)
     // add the observers
     let observers = [treeView, treeHistory]
     // build the tree

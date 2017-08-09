@@ -10,6 +10,9 @@ function TreeHistory(options) {
         _currentIndex, // where in the history we're at (current state)
         _currentIndexStorageName;
 
+        // keep an array of observers
+        this.observers = []
+
     /**
     * Private functions
     */
@@ -100,6 +103,10 @@ function TreeHistory(options) {
         return _saveCurrentIndex(index)
     }
 
+    this.setView = function(container) {
+
+    }
+
     // if a Tree was passed, build the History now
     if(options.Tree) {
         this.build(options.Tree)
@@ -175,7 +182,7 @@ TreeHistory.prototype = {
                 // tree needs it in format {type: 'question', question_id: id}
                 state = {type: data.type}
                 state[data.type+'_id'] = data.id
-                
+
                 Tree.update(item, state);
                 break
         }
@@ -209,12 +216,19 @@ TreeHistory.prototype = {
             case 'update':
                 this.update(data)
                 break
+            case 'viewReady':
+                // build the view
+                // this.setView(data)
+                // get the container
+                let treeView = data
+                let container = treeView.getContentWindow()
+                let historyView = new TreeHistoryView({TreeHistory: this, container: container})
+                // add this to the observers
+                this.addObserver(historyView)
         }
-    },
 
-    // sets the localStorage
-    save: function() {
-
+        // notify observers of these changes
+        this.notifyObservers(action, data)
     },
 
     // updates the history state
@@ -307,6 +321,102 @@ TreeHistory.prototype = {
         }
     },
 
+    /**
+    * A little module pattern to manage the view. This way people
+    * can overwrite it if they want, and it's all isolated here
+    */
+    view: function() {
+        this.view = undefined
+        this.viewHistory = undefined
+        this.viewPane = undefined
+        return {
+            render: function() {
+                let view,
+                    cPane;
+
+                this.view = this.getTreeView()
+
+                if(this.view === undefined) {
+                    console.error('Could not find a view. Trying again in 700ms')
+                }
+                this.viewPane = this.view.getContentPane();
+                console.log(this.viewPane)
+            },
+
+            getTreeView: function() {
+                let Tree,
+                    observers;
+
+                Tree = this.getTree();
+                observers = Tree.getObservers()
+                // find the view
+                for(let i = 0; i < observers.length; i++) {
+                    if(observers[i].constructor.name === 'TreeView') {
+                        return observers[i]
+                    }
+                }
+                return undefined
+            }
+        }
+    },
+
+    /**
+    * A little module pattern to manage the view. This way people
+    * can overwrite it if they want, and it's all isolated here
+    */
+    /*viewRender: function() {
+        let view,
+            cPane;
+
+        view = this.viewGetTreeView()
+
+        if(cPane === undefined) {
+            console.error('Could not find a view. Trying again in 700ms')
+        }
+        this.viewParent = view.getContentPane();
+
+    },
+
+    // Find the tree view so we can get the pane to attach it to.
+    viewGetTreeView() {
+        let Tree,
+            observers;
+
+        Tree = this.getTree();
+        observers = Tree.getObservers()
+        // find the view
+        for(let i = 0; i < observers.length; i++) {
+            if(observers[i].constructor.name === 'TreeView') {
+                return observers[i]
+            }
+        }
+        return undefined
+    },*/
+
+    setObservers: function(observers) {
+        for(let i = 0; i < observers.length; i++) {
+            this.addObserver(observers[i])
+        }
+        return this.observers
+    },
+
+    addObserver: function(observer) {
+        // no need to validate. anyone can listen
+        // we do need to check to make sure the observer hasn't already
+        // been added
+        this.observers.push(observer)
+    },
+
+    getObservers: function() {
+        return this.observers
+    },
+
+    notifyObservers: function(action, data) {
+        console.log('Tree History notifying observers '+action)
+        for(let i = 0; i < this.observers.length; i++) {
+            this.observers[i].on(action, data)
+        }
+    },
 
     /**
     * Powers most all of the retrieval of data from the tree

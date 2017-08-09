@@ -3,7 +3,7 @@ function TreeView(options) {
         _container,
         _treeEl,
         _contentWrap,
-        _contentPanel,
+        _contentPane,
         _activeEl;
 
     if(typeof options.container !== 'object') {
@@ -17,7 +17,7 @@ function TreeView(options) {
     this.getTreeEl = function() { return _treeEl}
     this.getActiveEl = function() { return _activeEl}
     this.getContentWindow = function() { return _contentWrap}
-    this.getContentPanel = function() { return _contentPanel}
+    this.getContentPane = function() { return _contentPane}
 
     // setters
     this.setTree = function(Tree) {
@@ -46,12 +46,13 @@ function TreeView(options) {
         return _contentWrap
     }
 
-    this.setContentPanel = function() {
+    this.setContentPane = function() {
         // only let it be set once
-        if(_contentPanel === undefined) {
-            _contentPanel =  _contentWrap.firstElementChild
+        if(_contentPane === undefined) {
+            _contentPane =  _contentWrap.firstElementChild
         }
-        return _contentPanel
+        console.log('set content pane')
+        return _contentPane
     }
 
     // Pass a state for it to set to be active
@@ -130,7 +131,10 @@ TreeView.prototype = {
         // set the tree wrap
         this.setContentWindow()
         // set the questions wrap
-        this.setContentPanel()
+        this.setContentPane()
+        // let everyone know the tree view is ready
+        // emit that we've finished render
+        this.emit('ready', 'viewReady', this)
         // set the current state in the view
         let init = true
         this.setState(Tree.getState(), init)
@@ -206,7 +210,7 @@ TreeView.prototype = {
         }
 
         // if we're on a question, set the transform origin on the wrapper
-        let cPanel = this.getContentPanel()
+        let cPanel = this.getContentPane()
         let cWindow = this.getContentWindow()
         if(state.type === 'question' || state.type === 'end') {
 
@@ -239,7 +243,7 @@ TreeView.prototype = {
         }
         if(state.type === 'tree') {
             // if the state type is tree, set a max-height on the window.
-            let cPanel = this.getContentPanel()
+            let cPanel = this.getContentPane()
             let cWindow = this.getContentWindow()
             // content window is what you can see and the pane is the full height element with transform origin applied on it. Think of a big piece of paper (the panel) and it's covered up except for a small window that you're looking through
             cWindow.style.height = cPanel.getBoundingClientRect().height+'px';
@@ -323,6 +327,9 @@ TreeView.prototype = {
                 // this is usually Tree.update('state', dataAboutNewState)
                 Tree.update(item, data);
                 break
+            case 'ready':
+                // tell the Tree to let all the other observers know that the view is ready
+                Tree.message(item, data)
         }
 
     },

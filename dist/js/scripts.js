@@ -39,6 +39,67 @@ Handlebars.registerHelper('group_end', function (question_id, group_id, groups, 
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+function TreeHistoryView(options) {
+    var _TreeHistory, _container;
+
+    if (_typeof(options.container) !== 'object') {
+        console.error('Tree History View container must be a valid object. Try `container: document.getElementById(your-id)`.');
+        return false;
+    }
+
+    if (_typeof(options.TreeHistory) !== 'object') {
+        console.error('Tree History must be a valid object.');
+        return false;
+    }
+
+    // setters
+    this.setContainer = function (container) {
+        // only let it get set once
+        if (_container === undefined) {
+            var historyView = this.createView();
+            // place it in the passed container
+            container.insertBefore(historyView, container.firstElementChild);
+            // set our built div as the container
+            _container = container.firstElementChild;
+            console.log(container.firstElementChild);
+        }
+        return _container;
+    };
+
+    var _setTreeHistory = function _setTreeHistory(TreeHistory) {
+        _TreeHistory = TreeHistory;
+    };
+
+    _setTreeHistory(options.TreeHistory);
+    this.setContainer(options.container);
+
+    // getters
+    this.getContainer = function () {
+        return _container;
+    };
+    this.getTreeHistory = function () {
+        return _TreeHistory;
+    };
+}
+
+TreeHistoryView.prototype = {
+    constructor: TreeHistoryView,
+
+    on: function on() {},
+
+    createView: function createView() {
+        var elem = void 0;
+
+        elem = document.createElement('aside');
+        elem.classList.add('enp-tree__history');
+
+        return elem;
+    }
+};
+'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
 * Manages localStorage of current question state
 * and previous states of the current decision tree path
@@ -47,6 +108,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 function TreeHistory(options) {
     var _Tree, _history, _historyStorageName, _currentIndex, // where in the history we're at (current state)
     _currentIndexStorageName;
+
+    // keep an array of observers
+    this.observers = [];
 
     /**
     * Private functions
@@ -143,6 +207,8 @@ function TreeHistory(options) {
         // don't worry about matching that the state exists. Maybe someone wants to set the current index to the last one in the series. Who knows?
         return _saveCurrentIndex(index);
     };
+
+    this.setView = function (container) {};
 
     // if a Tree was passed, build the History now
     if (options.Tree) {
@@ -250,11 +316,20 @@ TreeHistory.prototype = {
             case 'update':
                 this.update(data);
                 break;
+            case 'viewReady':
+                // build the view
+                // this.setView(data)
+                // get the container
+                var treeView = data;
+                var container = treeView.getContentWindow();
+                var historyView = new TreeHistoryView({ TreeHistory: this, container: container });
+                // add this to the observers
+                this.addObserver(historyView);
         }
-    },
 
-    // sets the localStorage
-    save: function save() {},
+        // notify observers of these changes
+        this.notifyObservers(action, data);
+    },
 
     // updates the history state
     update: function update(states) {
@@ -345,6 +420,98 @@ TreeHistory.prototype = {
     },
 
     /**
+    * A little module pattern to manage the view. This way people
+    * can overwrite it if they want, and it's all isolated here
+    */
+    view: function view() {
+        this.view = undefined;
+        this.viewHistory = undefined;
+        this.viewPane = undefined;
+        return {
+            render: function render() {
+                var view = void 0,
+                    cPane = void 0;
+
+                this.view = this.getTreeView();
+
+                if (this.view === undefined) {
+                    console.error('Could not find a view. Trying again in 700ms');
+                }
+                this.viewPane = this.view.getContentPane();
+                console.log(this.viewPane);
+            },
+
+            getTreeView: function getTreeView() {
+                var Tree = void 0,
+                    observers = void 0;
+
+                Tree = this.getTree();
+                observers = Tree.getObservers();
+                // find the view
+                for (var i = 0; i < observers.length; i++) {
+                    if (observers[i].constructor.name === 'TreeView') {
+                        return observers[i];
+                    }
+                }
+                return undefined;
+            }
+        };
+    },
+
+    /**
+    * A little module pattern to manage the view. This way people
+    * can overwrite it if they want, and it's all isolated here
+    */
+    /*viewRender: function() {
+        let view,
+            cPane;
+         view = this.viewGetTreeView()
+         if(cPane === undefined) {
+            console.error('Could not find a view. Trying again in 700ms')
+        }
+        this.viewParent = view.getContentPane();
+     },
+     // Find the tree view so we can get the pane to attach it to.
+    viewGetTreeView() {
+        let Tree,
+            observers;
+         Tree = this.getTree();
+        observers = Tree.getObservers()
+        // find the view
+        for(let i = 0; i < observers.length; i++) {
+            if(observers[i].constructor.name === 'TreeView') {
+                return observers[i]
+            }
+        }
+        return undefined
+    },*/
+
+    setObservers: function setObservers(observers) {
+        for (var i = 0; i < observers.length; i++) {
+            this.addObserver(observers[i]);
+        }
+        return this.observers;
+    },
+
+    addObserver: function addObserver(observer) {
+        // no need to validate. anyone can listen
+        // we do need to check to make sure the observer hasn't already
+        // been added
+        this.observers.push(observer);
+    },
+
+    getObservers: function getObservers() {
+        return this.observers;
+    },
+
+    notifyObservers: function notifyObservers(action, data) {
+        console.log('Tree History notifying observers ' + action);
+        for (var i = 0; i < this.observers.length; i++) {
+            this.observers[i].on(action, data);
+        }
+    },
+
+    /**
     * Powers most all of the retrieval of data from the tree
     * Searches an array for a key that equals a certain value
     *
@@ -367,7 +534,7 @@ TreeHistory.prototype = {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function TreeView(options) {
-    var _Tree, _container, _treeEl, _contentWrap, _contentPanel, _activeEl;
+    var _Tree, _container, _treeEl, _contentWrap, _contentPane, _activeEl;
 
     if (_typeof(options.container) !== 'object') {
         console.error('Tree container must be a valid object. Try `container: document.getElementById(your-id)`.');
@@ -390,8 +557,8 @@ function TreeView(options) {
     this.getContentWindow = function () {
         return _contentWrap;
     };
-    this.getContentPanel = function () {
-        return _contentPanel;
+    this.getContentPane = function () {
+        return _contentPane;
     };
 
     // setters
@@ -421,12 +588,13 @@ function TreeView(options) {
         return _contentWrap;
     };
 
-    this.setContentPanel = function () {
+    this.setContentPane = function () {
         // only let it be set once
-        if (_contentPanel === undefined) {
-            _contentPanel = _contentWrap.firstElementChild;
+        if (_contentPane === undefined) {
+            _contentPane = _contentWrap.firstElementChild;
         }
-        return _contentPanel;
+        console.log('set content pane');
+        return _contentPane;
     };
 
     // Pass a state for it to set to be active
@@ -504,7 +672,10 @@ TreeView.prototype = {
         // set the tree wrap
         this.setContentWindow();
         // set the questions wrap
-        this.setContentPanel();
+        this.setContentPane();
+        // let everyone know the tree view is ready
+        // emit that we've finished render
+        this.emit('ready', 'viewReady', this);
         // set the current state in the view
         var init = true;
         this.setState(Tree.getState(), init);
@@ -582,7 +753,7 @@ TreeView.prototype = {
         }
 
         // if we're on a question, set the transform origin on the wrapper
-        var cPanel = this.getContentPanel();
+        var cPanel = this.getContentPane();
         var cWindow = this.getContentWindow();
         if (state.type === 'question' || state.type === 'end') {
 
@@ -614,7 +785,7 @@ TreeView.prototype = {
         }
         if (state.type === 'tree') {
             // if the state type is tree, set a max-height on the window.
-            var cPanel = this.getContentPanel();
+            var cPanel = this.getContentPane();
             var cWindow = this.getContentWindow();
             // content window is what you can see and the pane is the full height element with transform origin applied on it. Think of a big piece of paper (the panel) and it's covered up except for a small window that you're looking through
             cWindow.style.height = cPanel.getBoundingClientRect().height + 'px';
@@ -698,6 +869,9 @@ TreeView.prototype = {
                 // this is usually Tree.update('state', dataAboutNewState)
                 Tree.update(item, data);
                 break;
+            case 'ready':
+                // tell the Tree to let all the other observers know that the view is ready
+                Tree.message(item, data);
         }
     },
 
@@ -1022,17 +1196,23 @@ TreeView.prototype = {
         },
 
         /**
-        * Request to update the tree
+        * Request to update the tree o
         */
         update: function update(action, data) {
-            console.log('Tree.js request update with this data:');
-            console.log(data);
+
             switch (action) {
                 // data will be the element clicked
                 case 'state':
                     this.updateState(data);
                     break;
             }
+        },
+
+        /**
+        * How observers message the parent and each other
+        */
+        message: function message(action, data) {
+            this.emit(action, data);
         },
 
         /**
@@ -1271,6 +1451,7 @@ TreeView.prototype = {
             container: this.container
         });
         var treeHistory = new TreeHistory({});
+        console.log(treeHistory);
         // add the observers
         var observers = [treeView, treeHistory];
         // build the tree
