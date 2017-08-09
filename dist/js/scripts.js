@@ -85,7 +85,18 @@ function TreeHistoryView(options) {
 TreeHistoryView.prototype = {
     constructor: TreeHistoryView,
 
-    on: function on() {},
+    on: function on(action, data) {
+        console.log('TreeHistoryView "on" ' + action);
+        switch (action) {
+            case 'historyUpdate':
+                // data will be the tree itself
+                this.updateHistory(data);
+                break;
+            case 'historyIndexUpdate':
+                this.updateHistoryIndex(data);
+                break;
+        }
+    },
 
     createView: function createView() {
         var elem = void 0;
@@ -94,7 +105,19 @@ TreeHistoryView.prototype = {
         elem.classList.add('enp-tree__history');
 
         return elem;
+    },
+
+    updateHistory: function updateHistory(history) {
+        console.log('history update');
+    },
+
+    updateHistoryIndex: function updateHistoryIndex(index) {
+        console.log('history index update');
     }
+
+    // TODO: template it with Handlebars? Is that overkill? It should be a very simple template. BUUUUT, we already have the templating engine built so... ?
+    // TODO: Bind history data to an element so we know if we need to update it or not?
+    // TODO: Elements are being added/removed. Now would be a good time to know if we need to rerender to stay in sync.
 };
 'use strict';
 
@@ -191,8 +214,10 @@ function TreeHistory(options) {
     this.setHistory = function (history) {
         // TODO: different checks to make sure it's legit, like
         // don't add the same state twice.
-
-        return _saveHistory(history);
+        _saveHistory(history);
+        // notify observers
+        this.notifyObservers('historyUpdate', history);
+        return;
     };
 
     this.setCurrentIndex = function (index) {
@@ -205,7 +230,9 @@ function TreeHistory(options) {
         }
 
         // don't worry about matching that the state exists. Maybe someone wants to set the current index to the last one in the series. Who knows?
-        return _saveCurrentIndex(index);
+        _saveCurrentIndex(index);
+        this.notifyObservers('historyIndexUpdate', index);
+        return;
     };
 
     this.setView = function (container) {};

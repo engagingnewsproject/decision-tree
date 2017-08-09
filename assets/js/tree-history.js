@@ -86,8 +86,10 @@ function TreeHistory(options) {
     this.setHistory = function(history) {
         // TODO: different checks to make sure it's legit, like
         // don't add the same state twice.
-
-        return _saveHistory(history)
+        _saveHistory(history)
+        // notify observers
+        this.notifyObservers('historyUpdate', history)
+        return
     }
 
     this.setCurrentIndex = function(index) {
@@ -100,7 +102,9 @@ function TreeHistory(options) {
         }
 
         // don't worry about matching that the state exists. Maybe someone wants to set the current index to the last one in the series. Who knows?
-        return _saveCurrentIndex(index)
+        _saveCurrentIndex(index)
+        this.notifyObservers('historyIndexUpdate', index)
+        return
     }
 
     this.setView = function(container) {

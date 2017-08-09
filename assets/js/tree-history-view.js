@@ -43,8 +43,17 @@ function TreeHistoryView(options) {
 TreeHistoryView.prototype = {
     constructor: TreeHistoryView,
 
-    on: function() {
-
+    on: function(action, data) {
+        console.log('TreeHistoryView "on" '+action);
+        switch(action) {
+            case 'historyUpdate':
+                // data will be the tree itself
+                this.updateHistory(data)
+                break
+            case 'historyIndexUpdate':
+                this.updateHistoryIndex(data)
+                break
+        }
     },
 
     createView: function() {
@@ -54,5 +63,17 @@ TreeHistoryView.prototype = {
         elem.classList.add('enp-tree__history')
 
         return elem;
-    }
+    },
+
+    updateHistory: function(history) {
+        console.log('history update');
+    },
+
+    updateHistoryIndex: function(index) {
+        console.log('history index update');
+    },
+
+    // TODO: template it with Handlebars? Is that overkill? It should be a very simple template. BUUUUT, we already have the templating engine built so... ?
+    // TODO: Bind history data to an element so we know if we need to update it or not?
+    // TODO: Elements are being added/removed. Now would be a good time to know if we need to rerender to stay in sync.
 }
