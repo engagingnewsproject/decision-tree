@@ -59,7 +59,11 @@ function Tree(data, observers) {
             })
             return false
         }
-
+        // check if stateID is valid
+        if(stateID === null || stateID === '' || stateID === undefined) {
+            console.error('StateID is empty: '+stateID)
+            // return false
+        }
         // check if the stateID is a valid ID for this state
         if(stateType === 'tree') {
             if(stateID === this.getTreeID()) {
@@ -96,6 +100,8 @@ function Tree(data, observers) {
             type: _state.type,
             id: _state.id,
         }
+        console.log('tree.js emitting states update')
+        console.log({newState, oldState})
         // emit that we've changed it
         this.emit('update', {newState, oldState})
     }
@@ -127,7 +133,7 @@ Tree.prototype = {
     * 'ready', 'update', 'error'
     */
     emit: function(action, data) {
-        console.log('emitting '+action)
+        console.log('Tree.js emitting '+action)
         for(let i = 0; i < this.observers.length; i++) {
             this.observers[i].on(action, data)
         }
@@ -147,7 +153,7 @@ Tree.prototype = {
     * Request to update the tree
     */
     update: function(action, data) {
-        console.log('Request update with this data:');
+        console.log('Tree.js request update with this data:');
         console.log(data);
         switch(action) {
             // data will be the element clicked

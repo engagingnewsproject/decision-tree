@@ -51,7 +51,6 @@ function TreeHistory(options) {
     /**
     * Private functions
     */
-
     // save the passed history to localStorage and set the global _history to make sure everything is in sync
     var _saveHistory = function _saveHistory(history) {
         _history = history;
@@ -104,8 +103,7 @@ function TreeHistory(options) {
     * Sets variables and decides what state we'll init to
     */
     this.init = function () {
-        var history = void 0,
-            treeID = void 0;
+        var treeID = void 0;
 
         // get the tree id
         treeID = this.getTree().getTreeID();
@@ -121,13 +119,9 @@ function TreeHistory(options) {
         }
 
         // set from localStorage
-        _history = JSON.parse(localStorage.getItem(_historyStorageName));
-
+        this.setHistory(JSON.parse(localStorage.getItem(_historyStorageName)));
         // set currentIndex from localStorage
-        _currentIndex = JSON.parse(localStorage.getItem(_currentIndexStorageName));
-
-        // check that it's a valid state
-        this.setCurrentIndex(_currentIndex);
+        this.setCurrentIndex(JSON.parse(localStorage.getItem(_currentIndexStorageName)));
     };
 
     this.setHistory = function (history) {
@@ -135,39 +129,6 @@ function TreeHistory(options) {
         // don't add the same state twice.
 
         return _saveHistory(history);
-    };
-
-    this.addHistory = function (state) {
-        console.log('add history');
-        console.log(state);
-        // TODO: Validate state. Should be a function on the Tree
-        // check whitelist for state?
-
-        var history = this.getHistory();
-        // add the state to the history
-        history.push(state);
-        // save it
-        this.setHistory(history);
-    };
-
-    this.deleteHistoryAfter = function (index) {
-        // Don't let them delete the current state
-        if (index === this.getCurrentIndex()) {
-            console.error('Cannot delete current state.');
-            return false;
-        }
-
-        // don't allow them to delete history before the current index
-        if (index < this.getCurrentIndex) {
-            console.error('Cannot delete states before the current state.');
-            return false;
-        }
-
-        // ok, delete away!
-        // delete all history after the passed index
-        _history = _history.splice(index);
-
-        _saveHistory(_history);
     };
 
     this.setCurrentIndex = function (index) {
@@ -195,7 +156,39 @@ TreeHistory.prototype = {
     build: function build(Tree) {
         this.setTree(Tree);
         this.init();
-        // TODO: update the Tree state to match the History
+        this.forceCurrentState();
+    },
+
+    addHistory: function addHistory(state) {
+        // TODO: Validate state. Should be a function on the Tree
+        // check whitelist for state?
+
+        var history = this.getHistory();
+        // add the state to the history
+        history.push(state);
+        // save it
+        this.setHistory(history);
+    },
+
+    deleteHistoryAfter: function deleteHistoryAfter(index) {
+        var history = void 0;
+        // Don't let them delete the current state
+        if (index === this.getCurrentIndex()) {
+            console.error('Cannot delete current state.');
+            return false;
+        }
+
+        // don't allow them to delete history before the current index
+        if (index < this.getCurrentIndex) {
+            console.error('Cannot delete states before the current state.');
+            return false;
+        }
+
+        // ok, delete away!
+        // delete all history after the passed index
+        history = this.getHistory().splice(index);
+
+        setHistory(history);
     },
 
     getCurrentState: function getCurrentState() {
@@ -212,14 +205,35 @@ TreeHistory.prototype = {
     * Let our Tree know about the state we want to change to.
     */
     emit: function emit(action, item, data) {
+        var state = void 0;
         console.log('Tree History Emit: ' + action);
         console.log(data);
         var Tree = this.getTree();
         switch (action) {
-            case 'resume':
+            case 'update':
                 // this is usually Tree.update('state', dataAboutNewState)
-                Tree.update(item, data);
+                //  our format is data {type: 'question', id: #}, but the
+                // tree needs it in format {type: 'question', question_id: id}
+                state = { type: data.type };
+                state[data.type + '_id'] = data.id;
+
+                Tree.update(item, state);
                 break;
+        }
+    },
+
+    // tell the parent tree to update to our current state
+    forceCurrentState: function forceCurrentState() {
+        var currentIndex = void 0,
+            history = void 0;
+
+        // TODO: update the Tree state to match the History
+        // if we have a currentIndex and state, then pass it to the main tree to set the state to reflect our view
+        currentIndex = this.getCurrentIndex();
+        history = this.getHistory();
+
+        if (this.currentIndex !== null && history[currentIndex] !== undefined) {
+            this.emit('update', 'state', history[currentIndex]);
         }
     },
 
@@ -237,12 +251,6 @@ TreeHistory.prototype = {
                 this.update(data);
                 break;
         }
-    },
-
-    // if in overview state, brings back to their current state in the history
-    resume: function resume() {
-        // tell the main tree to set the state back to this question
-        this.emit('resume', 'state', this.getCurrentState());
     },
 
     // sets the localStorage
@@ -925,7 +933,11 @@ TreeView.prototype = {
                 });
                 return false;
             }
-
+            // check if stateID is valid
+            if (stateID === null || stateID === '' || stateID === undefined) {
+                console.error('StateID is empty: ' + stateID);
+                // return false
+            }
             // check if the stateID is a valid ID for this state
             if (stateType === 'tree') {
                 if (stateID === this.getTreeID()) {
@@ -960,8 +972,11 @@ TreeView.prototype = {
             newState = {
                 type: _state.type,
                 id: _state.id
-                // emit that we've changed it
-            };this.emit('update', { newState: newState, oldState: oldState });
+            };
+            console.log('tree.js emitting states update');
+            console.log({ newState: newState, oldState: oldState });
+            // emit that we've changed it
+            this.emit('update', { newState: newState, oldState: oldState });
         };
 
         /***********************
@@ -990,7 +1005,7 @@ TreeView.prototype = {
         * 'ready', 'update', 'error'
         */
         emit: function emit(action, data) {
-            console.log('emitting ' + action);
+            console.log('Tree.js emitting ' + action);
             for (var i = 0; i < this.observers.length; i++) {
                 this.observers[i].on(action, data);
             }
@@ -1010,7 +1025,7 @@ TreeView.prototype = {
         * Request to update the tree
         */
         update: function update(action, data) {
-            console.log('Request update with this data:');
+            console.log('Tree.js request update with this data:');
             console.log(data);
             switch (action) {
                 // data will be the element clicked
