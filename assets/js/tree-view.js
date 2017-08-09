@@ -1,10 +1,9 @@
 function TreeView(options) {
-    var _id,
+    var _Tree,
         _container,
         _treeEl,
         _contentWrap,
         _contentPanel,
-        _Tree,
         _activeEl;
 
     if(typeof options.container !== 'object') {
@@ -14,7 +13,6 @@ function TreeView(options) {
 
     // getters
     this.getContainer = function() { return _container}
-    this.getId = function() { return _id}
     this.getTree = function() { return _Tree}
     this.getTreeEl = function() { return _treeEl}
     this.getActiveEl = function() { return _activeEl}
@@ -91,7 +89,6 @@ function TreeView(options) {
     this.activeClassName = 'is-active'
     // how long animation classes are applied for until removed
     this.animationLength = 600
-    this.questionPadding = 50
     // set the el
     _container = options.container;
     // attach event listeners to the tree element with

@@ -401,12 +401,13 @@ function buildTree(request) {
     let treeView = new TreeView({
         container: this.container,
     });
-    let observers = [treeView]
-
+    let treeHistory = new TreeHistory({});
+    // add the observers
+    let observers = [treeView, treeHistory]
+    // build the tree
     let tree = new Tree(data, observers);
-
+    // send it to our trees array for access
     trees.push(tree);
-
 }
 
 function handleTreeDataError(err) {
