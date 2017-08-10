@@ -41,3 +41,21 @@
     background: $end_background;
     border: 1px solid $end_border;
 }
+
+
+.enp-tree__history-list-link {
+    background: $gray--light;
+    color: $black;
+    box-shadow: 0 0 2px rgba(0,0,0,.15);
+
+    &:hover,
+    &:focus {
+        background: darken($gray--light, 5);
+    }
+
+    &.is-active {
+        color: $btn_color;
+        background: $btn_background;
+        border-color: $btn_background;
+    }
+}

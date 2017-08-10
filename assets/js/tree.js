@@ -100,8 +100,8 @@ function Tree(data, observers) {
             type: _state.type,
             id: _state.id,
         }
-        console.log('tree.js emitting states update')
-        console.log({newState, oldState})
+        // console.log('tree.js emitting states update')
+        // console.log({newState, oldState})
         // emit that we've changed it
         this.emit('update', {newState, oldState})
     }
@@ -116,6 +116,7 @@ function Tree(data, observers) {
         this.setObservers(observers)
         // set the data
         _setData(data)
+        //console.log('about to emit tree is ready')
         // emit that we're ready for other code to utilize this tree
         this.emit('ready', this);
     } else {
@@ -133,11 +134,13 @@ Tree.prototype = {
     * 'ready', 'update', 'error'
     */
     emit: function(action, data) {
-
-
-        for(var observer of this.observers) {
-            console.log('Tree.js emitting '+action+' to '+observer.constructor.name)
-            observer.on(action, data)
+        //console.log('Tree.js emitting '+action)
+        for(let i = 0; i < this.observers.length; i++) {
+            // make the alert process async
+            setTimeout(() => {
+                //console.log('Tree.js emitting '+action+' to '+this.observers[i].constructor.name)
+                this.observers[i].on(action, data)
+          }, 0);
         }
     },
 
@@ -416,7 +419,7 @@ function buildTree(request) {
         container: this.container,
     });
     let treeHistory = new TreeHistory({});
-    console.log(treeHistory)
+    //console.log(treeHistory)
     // add the observers
     let observers = [treeView, treeHistory]
     // build the tree

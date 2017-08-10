@@ -20,13 +20,13 @@ function TreeHistory(options) {
     var _saveHistory = function(history) {
         _history = history;
         localStorage.setItem(_historyStorageName, JSON.stringify(_history));
-        console.log(_history)
+        // console.log(_history)
     }
 
     var _saveCurrentIndex = function(currentIndex) {
         _currentIndex = currentIndex
         localStorage.setItem(_currentIndexStorageName, JSON.stringify(_currentIndex))
-        console.log(_currentIndex)
+        // console.log(_currentIndex)
     }
 
     // getters
@@ -152,13 +152,12 @@ TreeHistory.prototype = {
             return false;
         }
 
-
-
+        history = this.getHistory()
         // ok, delete away!
         // delete all history after the passed index
-        history = this.getHistory().splice(index)
-
-        setHistory(history)
+        // splice returns the delete array elements
+        history.splice(index)
+        this.setHistory(history)
     },
 
     getCurrentState: function() {
@@ -176,8 +175,8 @@ TreeHistory.prototype = {
     */
     emit: function(action, item, data) {
         let state;
-        console.log('Tree History Emit: '+action);
-        console.log(data)
+        // console.log('Tree History Emit: '+action);
+        // console.log(data)
         let Tree = this.getTree()
         switch(action) {
             case 'update':
@@ -186,10 +185,17 @@ TreeHistory.prototype = {
                 // tree needs it in format {type: 'question', question_id: id}
                 state = {type: data.type}
                 state[data.type+'_id'] = data.id
-
+                console.log(item, state)
                 Tree.update(item, state);
                 break
         }
+    },
+
+    /**
+    * Get messages from observers
+    */
+    message: function(action, item, data) {
+        this.emit(action, item, data)
     },
 
     // tell the parent tree to update to our current state
@@ -211,7 +217,7 @@ TreeHistory.prototype = {
     * Listen to parent Tree's emitted actions and handle accordingly
     */
     on: function(action, data) {
-        console.log('TreeHistory "on" '+action);
+        // console.log('TreeHistory "on" '+action);
         switch(action) {
             case 'ready':
                 // data will be the tree itself
@@ -250,7 +256,7 @@ TreeHistory.prototype = {
         newState = states.newState
         oldState = states.oldState
         history = this.getHistory()
-        console.log('new state');
+        // console.log('new state');
 
         // check if we're resuming where we left off. ie, the updated state will match where we're at in the state history
         if(newState === this.getCurrentState()) {
@@ -344,7 +350,7 @@ TreeHistory.prototype = {
                     console.error('Could not find a view. Trying again in 700ms')
                 }
                 this.viewPane = this.view.getContentPane();
-                console.log(this.viewPane)
+                // console.log(this.viewPane)
             },
 
             getTreeView: function() {
@@ -416,9 +422,12 @@ TreeHistory.prototype = {
     },
 
     notifyObservers: function(action, data) {
-        console.log('Tree History notifying observers '+action)
+        // console.log('Tree History notifying observers '+action)
         for(let i = 0; i < this.observers.length; i++) {
-            this.observers[i].on(action, data)
+            // async emit
+            setTimeout(() => {
+                this.observers[i].on(action, data)
+            }, 0)
         }
     },
 

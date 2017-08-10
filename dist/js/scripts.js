@@ -114,7 +114,32 @@ TreeHistoryView.prototype = {
         }
     },
 
-    click: function click() {},
+    /**
+    * Let our Tree History know about whatever
+    */
+    message: function message(action, item, data) {
+        var TreeHistory = this.getTreeHistory();
+        // this is usually Tree.update('state', dataAboutNewState)
+        TreeHistory.message(action, item, data);
+    },
+
+    click: function click(event) {
+        var el = void 0;
+
+        el = event.target;
+
+        // check if it's a click on the parent tree (which we don't care about)
+        if (el !== event.currentTarget) {
+            if (el.nodeName === 'A') {
+                event.preventDefault();
+                // don't need to update if we're already the active one
+                if (!el.classList.contains('is-active')) {
+                    this.message('update', 'state', el.data);
+                }
+            }
+        }
+        event.stopPropagation();
+    },
 
     keydown: function keydown() {},
 
@@ -128,22 +153,18 @@ TreeHistoryView.prototype = {
     },
 
     updateHistory: function updateHistory(history) {
-        console.log('history update');
+        this.templateUpdateHistory(history);
     },
 
     updateHistoryIndex: function updateHistoryIndex(index) {
-        console.log('history index update');
+        this.templateUpdateIndex(index);
     },
 
-    // TODO: template it with Handlebars? Is that overkill? It should be a very simple template. BUUUUT, we already have the templating engine built so... ?
-    // TODO: Bind history data to an element so we know if we need to update it or not
     // TODO: Elements are being added/removed. Check each element to see if its element.data matches the history data in order. If one doesn't match, rerender from that point on.
     templateRender: function templateRender(history, currentIndex) {
         var container = void 0,
             list = void 0,
             current = void 0;
-        console.log('history');
-        console.log(history);
         container = this.getContainer();
         container.appendChild(this.templateUl());
         // set the list as the _list var
@@ -152,15 +173,90 @@ TreeHistoryView.prototype = {
 
         for (var i = 0; i < history.length; i++) {
             // generate list data and append to item
-            current = false;
-            if (i === currentIndex) {
-                current = true;
-            }
-            list.appendChild(templateLi(history[i], i, current));
+            list.appendChild(this.templateLi(history[i], i, currentIndex));
         }
     },
 
-    templateUpdate: function templateUpdate(history) {},
+    templateUpdateHistory: function templateUpdateHistory(history) {
+        var list = void 0,
+            li = void 0,
+            a = void 0,
+            deleteLi = void 0,
+            iterator = void 0;
+
+        // go through and compare
+        list = this.getList();
+        li = list.childNodes;
+        deleteLi = [];
+        iterator = li.length;
+
+        // if there's no history, delete all lis
+        if (!history.length) {
+            list.innerHtml = '';
+            return;
+        }
+
+        // if we don't have any lis, then create them all
+        if (!li.length) {
+            // create the elements
+            for (var i = 0; i < history.length; i++) {
+                list.appendChild(this.templateLi(history[i], i));
+            }
+            return;
+        }
+
+        // decide which is longer and set that as our iterator
+        if (li.length <= history.length) {
+            iterator = history.length;
+        }
+        // if we have lis and history, let's check out which ones we need to delete or add
+        for (var _i = 0; _i < iterator; _i++) {
+
+            if (li[_i] !== undefined) {
+                a = li[_i].firstElementChild;
+            }
+            if (deleteLi.length !== 0 || history[_i] === undefined) {
+                // add these to the ones to delete
+                deleteLi.push(li[_i]);
+            } else if (li[_i] === undefined) {
+                // create it
+                list.appendChild(this.templateLi(history[_i], _i));
+            }
+            // if both exist, compare values
+            else if (a.data !== undefined && a.data.id !== history[_i].id) {
+                    // add these to the ones to delete
+                    deleteLi.push(li[_i]);
+                } else {
+                    // nothing to do - they're the same!
+                }
+        }
+        // delete children if we need to
+        for (var _i2 = 0; _i2 < deleteLi.length; _i2++) {
+            list.removeChild(deleteLi[_i2]);
+        }
+    },
+
+    templateUpdateIndex: function templateUpdateIndex(currentIndex) {
+        var list = void 0,
+            li = void 0,
+            a = void 0;
+        list = this.getList();
+        li = list.childNodes;
+        console.log(li);
+        console.log(currentIndex);
+        // first check that we need to update anything
+        for (var i = 0; i < li.length; i++) {
+            a = li[i].firstElementChild;
+            if (a.classList.contains('is-active') && i !== currentIndex) {
+                a.classList.remove('is-active');
+            }
+        }
+        a = li[currentIndex].firstElementChild;
+        if (!a.classList.contains('is-active')) {
+            a.classList.add('is-active');
+        }
+    },
+
 
     templateUl: function templateUl() {
         var ul = document.createElement('ul');
@@ -168,11 +264,23 @@ TreeHistoryView.prototype = {
         return ul;
     },
 
-    templateLi: function templateLi(data, index) {
-        var li = document.createElement('li');
+    templateLi: function templateLi(data, index, currentIndex) {
+        var li = void 0,
+            a = void 0;
+
+        li = document.createElement('li');
+        a = document.createElement('a');
+        li.appendChild(a);
+
         li.classList.add('enp-tree__history-list-item');
-        li.innerHTML = index + 1;
-        li.data = data;
+
+        a.classList.add('enp-tree__history-list-link');
+        a.innerHTML = index + 1;
+        a.data = data;
+
+        if (currentIndex === index) {
+            a.classList.add('is-active');
+        }
         return li;
     }
 };
@@ -199,13 +307,13 @@ function TreeHistory(options) {
     var _saveHistory = function _saveHistory(history) {
         _history = history;
         localStorage.setItem(_historyStorageName, JSON.stringify(_history));
-        console.log(_history);
+        // console.log(_history)
     };
 
     var _saveCurrentIndex = function _saveCurrentIndex(currentIndex) {
         _currentIndex = currentIndex;
         localStorage.setItem(_currentIndexStorageName, JSON.stringify(_currentIndex));
-        console.log(_currentIndex);
+        // console.log(_currentIndex)
     };
 
     // getters
@@ -334,11 +442,12 @@ TreeHistory.prototype = {
             return false;
         }
 
+        history = this.getHistory();
         // ok, delete away!
         // delete all history after the passed index
-        history = this.getHistory().splice(index);
-
-        setHistory(history);
+        // splice returns the delete array elements
+        history.splice(index);
+        this.setHistory(history);
     },
 
     getCurrentState: function getCurrentState() {
@@ -356,8 +465,8 @@ TreeHistory.prototype = {
     */
     emit: function emit(action, item, data) {
         var state = void 0;
-        console.log('Tree History Emit: ' + action);
-        console.log(data);
+        // console.log('Tree History Emit: '+action);
+        // console.log(data)
         var Tree = this.getTree();
         switch (action) {
             case 'update':
@@ -366,10 +475,17 @@ TreeHistory.prototype = {
                 // tree needs it in format {type: 'question', question_id: id}
                 state = { type: data.type };
                 state[data.type + '_id'] = data.id;
-
+                console.log(item, state);
                 Tree.update(item, state);
                 break;
         }
+    },
+
+    /**
+    * Get messages from observers
+    */
+    message: function message(action, item, data) {
+        this.emit(action, item, data);
     },
 
     // tell the parent tree to update to our current state
@@ -391,7 +507,7 @@ TreeHistory.prototype = {
     * Listen to parent Tree's emitted actions and handle accordingly
     */
     on: function on(action, data) {
-        console.log('TreeHistory "on" ' + action);
+        // console.log('TreeHistory "on" '+action);
         switch (action) {
             case 'ready':
                 // data will be the tree itself
@@ -430,7 +546,7 @@ TreeHistory.prototype = {
         newState = states.newState;
         oldState = states.oldState;
         history = this.getHistory();
-        console.log('new state');
+        // console.log('new state');
 
         // check if we're resuming where we left off. ie, the updated state will match where we're at in the state history
         if (newState === this.getCurrentState()) {
@@ -522,7 +638,7 @@ TreeHistory.prototype = {
                     console.error('Could not find a view. Trying again in 700ms');
                 }
                 this.viewPane = this.view.getContentPane();
-                console.log(this.viewPane);
+                // console.log(this.viewPane)
             },
 
             getTreeView: function getTreeView() {
@@ -589,9 +705,18 @@ TreeHistory.prototype = {
     },
 
     notifyObservers: function notifyObservers(action, data) {
-        console.log('Tree History notifying observers ' + action);
+        var _this = this;
+
+        var _loop = function _loop(i) {
+            // async emit
+            setTimeout(function () {
+                _this.observers[i].on(action, data);
+            }, 0);
+        };
+
+        // console.log('Tree History notifying observers '+action)
         for (var i = 0; i < this.observers.length; i++) {
-            this.observers[i].on(action, data);
+            _loop(i);
         }
     },
 
@@ -787,6 +912,7 @@ TreeView.prototype = {
         oldState = data.oldState;
         newState = data.newState;
         oldActiveEl = this.getActiveEl();
+        console.log(oldActiveEl);
 
         // removes container state class
         if (oldState.type !== newState.type) {
@@ -1230,11 +1356,10 @@ TreeView.prototype = {
             newState = {
                 type: _state.type,
                 id: _state.id
-            };
-            console.log('tree.js emitting states update');
-            console.log({ newState: newState, oldState: oldState });
-            // emit that we've changed it
-            this.emit('update', { newState: newState, oldState: oldState });
+                // console.log('tree.js emitting states update')
+                // console.log({newState, oldState})
+                // emit that we've changed it
+            };this.emit('update', { newState: newState, oldState: oldState });
         };
 
         /***********************
@@ -1247,6 +1372,7 @@ TreeView.prototype = {
             this.setObservers(observers);
             // set the data
             _setData(data);
+            //console.log('about to emit tree is ready')
             // emit that we're ready for other code to utilize this tree
             this.emit('ready', this);
         } else {
@@ -1263,31 +1389,19 @@ TreeView.prototype = {
         * 'ready', 'update', 'error'
         */
         emit: function emit(action, data) {
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+            var _this = this;
 
-            try {
+            var _loop = function _loop(i) {
+                // make the alert process async
+                setTimeout(function () {
+                    //console.log('Tree.js emitting '+action+' to '+this.observers[i].constructor.name)
+                    _this.observers[i].on(action, data);
+                }, 0);
+            };
 
-                for (var _iterator = this.observers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var observer = _step.value;
-
-                    console.log('Tree.js emitting ' + action + ' to ' + observer.constructor.name);
-                    observer.on(action, data);
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
+            //console.log('Tree.js emitting '+action)
+            for (var i = 0; i < this.observers.length; i++) {
+                _loop(i);
             }
         },
 
@@ -1557,7 +1671,7 @@ TreeView.prototype = {
             container: this.container
         });
         var treeHistory = new TreeHistory({});
-        console.log(treeHistory);
+        //console.log(treeHistory)
         // add the observers
         var observers = [treeView, treeHistory];
         // build the tree

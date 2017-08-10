@@ -1,6 +1,23 @@
 .enp-tree__history {
-    background: red;
-    width: 50px;
-    height: 50px;
+    position: absolute;
+    z-index: 999;
+}
+
+.enp-tree__history-list {
+    @include no-list;
+}
+
+.enp-tree__history-list-item {
+    margin-bottom: $spacing__base/2;
+}
+
+.enp-tree__history-list-link {
     display: block;
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.9rem;
+    width: $spacing__base;
+    line-height: $spacing__base;
+    border-radius: 50%;
+    transition: all .15s;
 }

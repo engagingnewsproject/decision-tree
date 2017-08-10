@@ -70,8 +70,31 @@ TreeHistoryView.prototype = {
         }
     },
 
-    click: function() {
+    /**
+    * Let our Tree History know about whatever
+    */
+    message: function(action, item, data) {
+        let TreeHistory = this.getTreeHistory()
+        // this is usually Tree.update('state', dataAboutNewState)
+        TreeHistory.message(action, item, data);
+    },
 
+    click: function(event) {
+        let el;
+
+        el = event.target;
+
+        // check if it's a click on the parent tree (which we don't care about)
+        if (el !== event.currentTarget) {
+            if(el.nodeName === 'A') {
+                event.preventDefault()
+                // don't need to update if we're already the active one
+                if(!el.classList.contains('is-active')) {
+                    this.message('update', 'state', el.data)
+                }
+            }
+        }
+        event.stopPropagation()
     },
 
     keydown: function() {
@@ -88,22 +111,18 @@ TreeHistoryView.prototype = {
     },
 
     updateHistory: function(history) {
-        console.log('history update');
+        this.templateUpdateHistory(history)
     },
 
     updateHistoryIndex: function(index) {
-        console.log('history index update');
+        this.templateUpdateIndex(index)
     },
 
-    // TODO: template it with Handlebars? Is that overkill? It should be a very simple template. BUUUUT, we already have the templating engine built so... ?
-    // TODO: Bind history data to an element so we know if we need to update it or not
     // TODO: Elements are being added/removed. Check each element to see if its element.data matches the history data in order. If one doesn't match, rerender from that point on.
     templateRender: function(history, currentIndex) {
         let container,
             list,
             current;
-        console.log('history')
-        console.log(history)
         container = this.getContainer()
         container.appendChild(this.templateUl())
         // set the list as the _list var
@@ -112,16 +131,90 @@ TreeHistoryView.prototype = {
 
         for(let i = 0; i < history.length; i++) {
             // generate list data and append to item
-            current = false
-            if(i === currentIndex) {
-                current = true
-            }
-            list.appendChild(templateLi(history[i], i, current))
+            list.appendChild(this.templateLi(history[i], i, currentIndex))
         }
     },
 
-    templateUpdate: function(history) {
+    templateUpdateHistory: function(history) {
+        let list,
+            li,
+            a,
+            deleteLi,
+            iterator;
 
+        // go through and compare
+        list = this.getList()
+        li = list.childNodes
+        deleteLi = []
+        iterator = li.length
+
+        // if there's no history, delete all lis
+        if(!history.length) {
+            list.innerHtml = ''
+            return;
+        }
+
+        // if we don't have any lis, then create them all
+        if(!li.length) {
+            // create the elements
+            for(let i = 0; i < history.length; i++) {
+                list.appendChild(this.templateLi(history[i], i))
+            }
+            return;
+        }
+
+        // decide which is longer and set that as our iterator
+        if(li.length <= history.length) {
+            iterator = history.length
+        }
+        // if we have lis and history, let's check out which ones we need to delete or add
+        for(let i = 0; i < iterator; i++) {
+
+            if(li[i] !== undefined) {
+                a = li[i].firstElementChild
+            }
+            if(deleteLi.length !== 0 || history[i] === undefined) {
+                // add these to the ones to delete
+                deleteLi.push(li[i])
+            }
+            else if(li[i] === undefined) {
+                // create it
+                list.appendChild(this.templateLi(history[i], i))
+            }
+            // if both exist, compare values
+            else if(a.data !== undefined && a.data.id !== history[i].id) {
+                // add these to the ones to delete
+                deleteLi.push(li[i])
+            } else {
+                // nothing to do - they're the same!
+            }
+        }
+        // delete children if we need to
+        for(let i = 0; i < deleteLi.length; i++) {
+            list.removeChild(deleteLi[i])
+        }
+    },
+
+    templateUpdateIndex(currentIndex) {
+        let list,
+            li,
+            a;
+        list = this.getList()
+        li = list.childNodes;
+        console.log(li)
+        console.log(currentIndex)
+        // first check that we need to update anything
+        for(let i = 0; i < li.length; i++) {
+            a = li[i].firstElementChild
+            if(a.classList.contains('is-active') && i !== currentIndex) {
+                a.classList.remove('is-active')
+            }
+
+        }
+        a = li[currentIndex].firstElementChild
+        if(!a.classList.contains('is-active')) {
+            a.classList.add('is-active')
+        }
     },
 
     templateUl: function() {
@@ -130,11 +223,23 @@ TreeHistoryView.prototype = {
         return ul
     },
 
-    templateLi: function(data, index) {
-        let li = document.createElement('li')
+    templateLi: function(data, index, currentIndex) {
+        let li,
+            a;
+
+        li = document.createElement('li')
+        a = document.createElement('a')
+        li.appendChild(a)
+
         li.classList.add('enp-tree__history-list-item')
-        li.innerHTML = index + 1
-        li.data = data
+
+        a.classList.add('enp-tree__history-list-link')
+        a.innerHTML = index + 1
+        a.data = data
+
+        if(currentIndex === index) {
+            a.classList.add('is-active')
+        }
         return li
     }
 }

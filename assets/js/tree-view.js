@@ -162,6 +162,7 @@ TreeView.prototype = {
         oldState = data.oldState
         newState = data.newState
         oldActiveEl = this.getActiveEl()
+        console.log(oldActiveEl)
 
         // removes container state class
         if(oldState.type !== newState.type) {
