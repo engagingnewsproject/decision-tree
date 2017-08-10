@@ -20,13 +20,11 @@ function TreeHistory(options) {
     var _saveHistory = function(history) {
         _history = history;
         localStorage.setItem(_historyStorageName, JSON.stringify(_history));
-        // console.log(_history)
     }
 
     var _saveCurrentIndex = function(currentIndex) {
         _currentIndex = currentIndex
         localStorage.setItem(_currentIndexStorageName, JSON.stringify(_currentIndex))
-        // console.log(_currentIndex)
     }
 
     // getters
@@ -175,18 +173,13 @@ TreeHistory.prototype = {
     */
     emit: function(action, item, data) {
         let state;
-        // console.log('Tree History Emit: '+action);
-        // console.log(data)
         let Tree = this.getTree()
         switch(action) {
             case 'update':
                 // this is usually Tree.update('state', dataAboutNewState)
                 //  our format is data {type: 'question', id: #}, but the
                 // tree needs it in format {type: 'question', question_id: id}
-                state = {type: data.type}
-                state[data.type+'_id'] = data.id
-                console.log(item, state)
-                Tree.update(item, state);
+                Tree.update(item, data);
                 break
         }
     },
@@ -217,7 +210,6 @@ TreeHistory.prototype = {
     * Listen to parent Tree's emitted actions and handle accordingly
     */
     on: function(action, data) {
-        // console.log('TreeHistory "on" '+action);
         switch(action) {
             case 'ready':
                 // data will be the tree itself
@@ -256,7 +248,6 @@ TreeHistory.prototype = {
         newState = states.newState
         oldState = states.oldState
         history = this.getHistory()
-        // console.log('new state');
 
         // check if we're resuming where we left off. ie, the updated state will match where we're at in the state history
         if(newState === this.getCurrentState()) {
@@ -271,7 +262,7 @@ TreeHistory.prototype = {
         }
 
         // OK, we'll probably have to do something now
-        if(newState.type === 'question') {
+        if(newState.type === 'question' || newState.type === 'end') {
             Tree = this.getTree()
             questions = Tree.getQuestions()
             // try to find the new state in our history
@@ -319,10 +310,6 @@ TreeHistory.prototype = {
             }
         }
 
-        else if(newState.type === 'end') {
-            stateToAdd = newState
-        }
-
         // see if there's anything to add
         if(typeof stateToAdd === 'object' && stateToAdd !== undefined) {
             this.addHistory(stateToAdd)
@@ -350,7 +337,6 @@ TreeHistory.prototype = {
                     console.error('Could not find a view. Trying again in 700ms')
                 }
                 this.viewPane = this.view.getContentPane();
-                // console.log(this.viewPane)
             },
 
             getTreeView: function() {
@@ -422,7 +408,6 @@ TreeHistory.prototype = {
     },
 
     notifyObservers: function(action, data) {
-        // console.log('Tree History notifying observers '+action)
         for(let i = 0; i < this.observers.length; i++) {
             // async emit
             setTimeout(() => {

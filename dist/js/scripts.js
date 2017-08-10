@@ -91,7 +91,6 @@ function TreeHistoryView(options) {
 
     _setTreeHistory(options.TreeHistory);
     this.setContainer(options.container);
-    console.log(this.getTreeHistory().getHistory());
     this.templateRender(this.getTreeHistory().getHistory(), this.getTreeHistory().getCurrentIndex());
     // add click listener on container
     _container.addEventListener("click", this.click.bind(this));
@@ -102,7 +101,6 @@ TreeHistoryView.prototype = {
     constructor: TreeHistoryView,
 
     on: function on(action, data) {
-        console.log('TreeHistoryView "on" ' + action);
         switch (action) {
             case 'historyUpdate':
                 // data will be the tree itself
@@ -242,8 +240,6 @@ TreeHistoryView.prototype = {
             a = void 0;
         list = this.getList();
         li = list.childNodes;
-        console.log(li);
-        console.log(currentIndex);
         // first check that we need to update anything
         for (var i = 0; i < li.length; i++) {
             a = li[i].firstElementChild;
@@ -307,13 +303,11 @@ function TreeHistory(options) {
     var _saveHistory = function _saveHistory(history) {
         _history = history;
         localStorage.setItem(_historyStorageName, JSON.stringify(_history));
-        // console.log(_history)
     };
 
     var _saveCurrentIndex = function _saveCurrentIndex(currentIndex) {
         _currentIndex = currentIndex;
         localStorage.setItem(_currentIndexStorageName, JSON.stringify(_currentIndex));
-        // console.log(_currentIndex)
     };
 
     // getters
@@ -465,18 +459,13 @@ TreeHistory.prototype = {
     */
     emit: function emit(action, item, data) {
         var state = void 0;
-        // console.log('Tree History Emit: '+action);
-        // console.log(data)
         var Tree = this.getTree();
         switch (action) {
             case 'update':
                 // this is usually Tree.update('state', dataAboutNewState)
                 //  our format is data {type: 'question', id: #}, but the
                 // tree needs it in format {type: 'question', question_id: id}
-                state = { type: data.type };
-                state[data.type + '_id'] = data.id;
-                console.log(item, state);
-                Tree.update(item, state);
+                Tree.update(item, data);
                 break;
         }
     },
@@ -507,7 +496,6 @@ TreeHistory.prototype = {
     * Listen to parent Tree's emitted actions and handle accordingly
     */
     on: function on(action, data) {
-        // console.log('TreeHistory "on" '+action);
         switch (action) {
             case 'ready':
                 // data will be the tree itself
@@ -546,7 +534,6 @@ TreeHistory.prototype = {
         newState = states.newState;
         oldState = states.oldState;
         history = this.getHistory();
-        // console.log('new state');
 
         // check if we're resuming where we left off. ie, the updated state will match where we're at in the state history
         if (newState === this.getCurrentState()) {
@@ -561,7 +548,7 @@ TreeHistory.prototype = {
         }
 
         // OK, we'll probably have to do something now
-        if (newState.type === 'question') {
+        if (newState.type === 'question' || newState.type === 'end') {
             Tree = this.getTree();
             questions = Tree.getQuestions();
             // try to find the new state in our history
@@ -607,8 +594,6 @@ TreeHistory.prototype = {
                         // Nothing to do but add the state!
                         stateToAdd = newState;
                     }
-        } else if (newState.type === 'end') {
-            stateToAdd = newState;
         }
 
         // see if there's anything to add
@@ -638,7 +623,6 @@ TreeHistory.prototype = {
                     console.error('Could not find a view. Trying again in 700ms');
                 }
                 this.viewPane = this.view.getContentPane();
-                // console.log(this.viewPane)
             },
 
             getTreeView: function getTreeView() {
@@ -714,7 +698,6 @@ TreeHistory.prototype = {
             }, 0);
         };
 
-        // console.log('Tree History notifying observers '+action)
         for (var i = 0; i < this.observers.length; i++) {
             _loop(i);
         }
@@ -802,7 +785,6 @@ function TreeView(options) {
         if (_contentPane === undefined) {
             _contentPane = _contentWrap.firstElementChild;
         }
-        console.log('set content pane');
         return _contentPane;
     };
 
@@ -861,7 +843,6 @@ TreeView.prototype = {
     * Listen to parent Tree's emitted actions and handle accordingly
     */
     on: function on(action, data) {
-        console.log('TreeView "on" ' + action);
         switch (action) {
             case 'ready':
                 // data will be the tree itself
@@ -912,7 +893,6 @@ TreeView.prototype = {
         oldState = data.oldState;
         newState = data.newState;
         oldActiveEl = this.getActiveEl();
-        console.log(oldActiveEl);
 
         // removes container state class
         if (oldState.type !== newState.type) {
@@ -952,8 +932,6 @@ TreeView.prototype = {
         if (activeEl === false) {
             return false;
         }
-        console.log('TreeView state view is:');
-        console.log(state);
         // validated, so set the new class!
         activeEl.classList.add(this.activeClassName);
         // we don't want to add focus on init
@@ -1023,7 +1001,6 @@ TreeView.prototype = {
     },
 
     keydown: function keydown(event) {
-        console.log(event);
         // check to see if it's a spacebar or enter keypress
         // 13 = 'Enter'
         // 32 = 'Space'
@@ -1058,7 +1035,6 @@ TreeView.prototype = {
                 Tree = this.getTree();
                 state = Tree.getState();
                 // make sure we're not curently on this question
-                console.log(el.data);
                 if (el.data.type === 'question' && state.id !== el.data.question_id || state.type !== 'question') {
                     this.emit('update', 'state', el.data);
                 }
@@ -1071,8 +1047,6 @@ TreeView.prototype = {
     * Let our Tree know about the click.
     */
     emit: function emit(action, item, data) {
-        console.log('Tree View Emit: ' + action);
-        console.log(data);
         var Tree = this.getTree();
         switch (action) {
             case 'update':
@@ -1322,6 +1296,12 @@ TreeView.prototype = {
                 console.error('StateID is empty: ' + stateID);
                 // return false
             }
+
+            // check to make sure we're not trying to set the same state again
+            if (_state.type === stateType && _state.id === stateID) {
+                return false;
+            }
+
             // check if the stateID is a valid ID for this state
             if (stateType === 'tree') {
                 if (stateID === this.getTreeID()) {
@@ -1356,8 +1336,6 @@ TreeView.prototype = {
             newState = {
                 type: _state.type,
                 id: _state.id
-                // console.log('tree.js emitting states update')
-                // console.log({newState, oldState})
                 // emit that we've changed it
             };this.emit('update', { newState: newState, oldState: oldState });
         };
@@ -1372,7 +1350,6 @@ TreeView.prototype = {
             this.setObservers(observers);
             // set the data
             _setData(data);
-            //console.log('about to emit tree is ready')
             // emit that we're ready for other code to utilize this tree
             this.emit('ready', this);
         } else {
@@ -1394,12 +1371,10 @@ TreeView.prototype = {
             var _loop = function _loop(i) {
                 // make the alert process async
                 setTimeout(function () {
-                    //console.log('Tree.js emitting '+action+' to '+this.observers[i].constructor.name)
                     _this.observers[i].on(action, data);
                 }, 0);
             };
 
-            //console.log('Tree.js emitting '+action)
             for (var i = 0; i < this.observers.length; i++) {
                 _loop(i);
             }
@@ -1440,6 +1415,8 @@ TreeView.prototype = {
         * Validation and emitting happens with setState
         */
         updateState: function updateState(data) {
+            var id = void 0,
+                type = void 0;
             switch (data.type) {
                 case 'start':
                     // go to first question
@@ -1448,8 +1425,13 @@ TreeView.prototype = {
                     break;
 
                 case 'question':
+                    if (data.question_id === undefined) {
+                        id = data.id;
+                    } else {
+                        id = data.question_id;
+                    }
                     // find the destination
-                    this.setState(data.type, data.question_id);
+                    this.setState(data.type, id);
                     break;
 
                 case 'option':
@@ -1459,7 +1441,17 @@ TreeView.prototype = {
 
                 case 'end':
                     // find the destination
-                    this.setState(data.destination_type, data.destination_id);
+                    if (data.destination_type === undefined) {
+                        type = data.type;
+                    } else {
+                        type = data.destination_type;
+                    }
+                    if (data.destination_id === undefined) {
+                        id = data.id;
+                    } else {
+                        type = data.destination_id;
+                    }
+                    this.setState(type, id);
                     break;
 
                 case 'overview':
@@ -1671,7 +1663,6 @@ TreeView.prototype = {
             container: this.container
         });
         var treeHistory = new TreeHistory({});
-        //console.log(treeHistory)
         // add the observers
         var observers = [treeView, treeHistory];
         // build the tree

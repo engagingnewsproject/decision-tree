@@ -51,7 +51,6 @@ function TreeView(options) {
         if(_contentPane === undefined) {
             _contentPane =  _contentWrap.firstElementChild
         }
-        console.log('set content pane')
         return _contentPane
     }
 
@@ -111,7 +110,6 @@ TreeView.prototype = {
     * Listen to parent Tree's emitted actions and handle accordingly
     */
     on: function(action, data) {
-        console.log('TreeView "on" '+action);
         switch(action) {
             case 'ready':
                 // data will be the tree itself
@@ -162,7 +160,6 @@ TreeView.prototype = {
         oldState = data.oldState
         newState = data.newState
         oldActiveEl = this.getActiveEl()
-        console.log(oldActiveEl)
 
         // removes container state class
         if(oldState.type !== newState.type) {
@@ -200,8 +197,6 @@ TreeView.prototype = {
         if(activeEl === false) {
             return false;
         }
-        console.log('TreeView state view is:');
-        console.log(state)
         // validated, so set the new class!
         activeEl.classList.add(this.activeClassName)
         // we don't want to add focus on init
@@ -270,7 +265,6 @@ TreeView.prototype = {
     },
 
     keydown: function(event) {
-        console.log(event)
         // check to see if it's a spacebar or enter keypress
         // 13 = 'Enter'
         // 32 = 'Space'
@@ -306,7 +300,6 @@ TreeView.prototype = {
                 Tree = this.getTree()
                 state = Tree.getState();
                 // make sure we're not curently on this question
-                console.log(el.data)
                 if((el.data.type === 'question' && state.id !== el.data.question_id)  || state.type !== 'question' ) {
                     this.emit('update', 'state', el.data)
                 }
@@ -320,8 +313,6 @@ TreeView.prototype = {
     * Let our Tree know about the click.
     */
     emit: function(action, item, data) {
-        console.log('Tree View Emit: '+action);
-        console.log(data)
         let Tree = this.getTree()
         switch(action) {
             case 'update':

@@ -47,7 +47,6 @@ function TreeHistoryView(options) {
 
     _setTreeHistory(options.TreeHistory)
     this.setContainer(options.container)
-    console.log(this.getTreeHistory().getHistory())
     this.templateRender(this.getTreeHistory().getHistory(), this.getTreeHistory().getCurrentIndex())
     // add click listener on container
     _container.addEventListener("click", this.click.bind(this));
@@ -58,7 +57,6 @@ TreeHistoryView.prototype = {
     constructor: TreeHistoryView,
 
     on: function(action, data) {
-        console.log('TreeHistoryView "on" '+action);
         switch(action) {
             case 'historyUpdate':
                 // data will be the tree itself
@@ -201,8 +199,6 @@ TreeHistoryView.prototype = {
             a;
         list = this.getList()
         li = list.childNodes;
-        console.log(li)
-        console.log(currentIndex)
         // first check that we need to update anything
         for(let i = 0; i < li.length; i++) {
             a = li[i].firstElementChild

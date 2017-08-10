@@ -64,6 +64,12 @@ function Tree(data, observers) {
             console.error('StateID is empty: '+stateID)
             // return false
         }
+
+        // check to make sure we're not trying to set the same state again
+        if(_state.type === stateType && _state.id === stateID) {
+            return false;
+        }
+        
         // check if the stateID is a valid ID for this state
         if(stateType === 'tree') {
             if(stateID === this.getTreeID()) {
@@ -100,8 +106,6 @@ function Tree(data, observers) {
             type: _state.type,
             id: _state.id,
         }
-        // console.log('tree.js emitting states update')
-        // console.log({newState, oldState})
         // emit that we've changed it
         this.emit('update', {newState, oldState})
     }
@@ -116,7 +120,6 @@ function Tree(data, observers) {
         this.setObservers(observers)
         // set the data
         _setData(data)
-        //console.log('about to emit tree is ready')
         // emit that we're ready for other code to utilize this tree
         this.emit('ready', this);
     } else {
@@ -134,11 +137,9 @@ Tree.prototype = {
     * 'ready', 'update', 'error'
     */
     emit: function(action, data) {
-        //console.log('Tree.js emitting '+action)
         for(let i = 0; i < this.observers.length; i++) {
             // make the alert process async
             setTimeout(() => {
-                //console.log('Tree.js emitting '+action+' to '+this.observers[i].constructor.name)
                 this.observers[i].on(action, data)
           }, 0);
         }
@@ -179,6 +180,8 @@ Tree.prototype = {
     * Validation and emitting happens with setState
     */
     updateState: function(data) {
+        let id,
+            type;
         switch(data.type) {
             case 'start':
                 // go to first question
@@ -187,8 +190,13 @@ Tree.prototype = {
                 break
 
             case 'question':
+                if(data.question_id === undefined) {
+                    id = data.id
+                } else {
+                    id = data.question_id
+                }
                 // find the destination
-                this.setState(data.type, data.question_id);
+                this.setState(data.type, id);
                 break
 
             case 'option':
@@ -198,7 +206,17 @@ Tree.prototype = {
 
             case 'end':
                 // find the destination
-                this.setState(data.destination_type, data.destination_id);
+                if(data.destination_type === undefined) {
+                    type = data.type
+                } else {
+                    type = data.destination_type
+                }
+                if(data.destination_id === undefined) {
+                    id = data.id
+                }  else {
+                    type = data.destination_id
+                }
+                this.setState(type, id);
                 break
 
             case 'overview':
@@ -419,7 +437,6 @@ function buildTree(request) {
         container: this.container,
     });
     let treeHistory = new TreeHistory({});
-    //console.log(treeHistory)
     // add the observers
     let observers = [treeView, treeHistory]
     // build the tree
