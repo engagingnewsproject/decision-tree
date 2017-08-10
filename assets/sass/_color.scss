@@ -43,8 +43,7 @@
     border: 1px solid $end_border;
 }
 
-
-.enp-tree__history-list-link {
+@mixin historyLink {
     background: $white;
     color: $black;
     box-shadow: 0 0 2px rgba(0,0,0,.15);
@@ -53,10 +52,29 @@
     &:focus {
         background: darken($gray--light, 5);
     }
+}
+
+@mixin historyLinkActive {
+    color: $btn_color;
+    background: $btn_background;
+    border-color: $btn_background;
+}
+
+
+.enp-tree__history-list-link {
+    @include historyLink
 
     &.is-active {
-        color: $btn_color;
-        background: $btn_background;
-        border-color: $btn_background;
+        @include historyLinkActive
+    }
+}
+
+.enp-tree__state--tree {
+    .enp-tree__history-list-link--overview {
+        @include historyLinkActive
+    }
+
+    .enp-tree__history-list-link.is-active {
+        @include historyLink
     }
 }

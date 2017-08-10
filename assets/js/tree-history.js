@@ -267,7 +267,7 @@ TreeHistory.prototype = {
         }
 
         // see if we need to add our resume button in
-        if(newState.type === 'tree' && history.currentIndex !== null) {
+        if(newState.type === 'tree' && this.getCurrentIndex() !== null) {
             // TODO: add resume button next to Start button
             return;
         }
