@@ -69,7 +69,7 @@ function Tree(data, observers) {
         if(_state.type === stateType && _state.id === stateID) {
             return false;
         }
-        
+
         // check if the stateID is a valid ID for this state
         if(stateType === 'tree') {
             if(stateID === this.getTreeID()) {
@@ -159,7 +159,6 @@ Tree.prototype = {
     * Request to update the tree o
     */
     update: function(action, data) {
-
         switch(action) {
             // data will be the element clicked
             case 'state':
@@ -184,6 +183,9 @@ Tree.prototype = {
             type;
         switch(data.type) {
             case 'start':
+                // emit a start
+                this.emit('start', this)
+
                 // go to first question
                 let question = this.getQuestions()[0];
                 this.setState('question', question.question_id);
@@ -225,6 +227,8 @@ Tree.prototype = {
                 break
 
             case 'restart':
+                // emit a restart
+                this.emit('restart', this)
                 // go to first question
                 this.setState('question', this.getQuestions()[0].question_id);
                 break

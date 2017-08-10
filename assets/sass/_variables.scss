@@ -13,8 +13,9 @@ $question_background: $white;
 $question_border: darken($tree_background, 10);
 
 // option colors
-$option_background: rgba(0,0,0,.05);
-$option_background--hover: rgba(0,0,0,.09);
+$option_background: transparent;
+$option_border: rgba(0,0,0,.05);
+$option_background--hover: rgba(0,0,0,.03);
 
 // end colors
 $end_background: $white;

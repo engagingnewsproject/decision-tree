@@ -2,7 +2,9 @@
 function TreeHistoryView(options) {
     var _TreeHistory,
         _container,
-        _list;
+        _list,
+        _overviewBtn,
+        _resumeBtn;
 
     if(typeof options.container !== 'object') {
         console.error('Tree History View container must be a valid object. Try `container: document.getElementById(your-id)`.')
@@ -17,6 +19,8 @@ function TreeHistoryView(options) {
     // getters
     this.getContainer = function() { return _container}
     this.getList = function() { return _list}
+    this.getOverviewBtn = function() { return _OverviewBtn}
+    this.getResumeBtn = function() { return _resumeBtn}
     this.getTreeHistory = function() { return _TreeHistory}
 
     // setters
@@ -39,6 +43,24 @@ function TreeHistoryView(options) {
             _list = list
         }
         return _list
+    }
+
+    this.setOverviewBtn = function(overviewBtn) {
+        // only let it get set once
+        if(_overviewBtn === undefined) {
+            // set our built div as the overview
+            _overviewBtn = overviewBtn
+        }
+        return _overviewBtn
+    }
+
+    this.setResumeBtn = function(resumeBtn) {
+        // only let it get set once
+        if(_resumeBtn === undefined) {
+            // set our built div as the resume
+            _resumeBtn = resumeBtn
+        }
+        return _resumeBtn
     }
 
     var _setTreeHistory = function(TreeHistory) {
@@ -86,8 +108,8 @@ TreeHistoryView.prototype = {
         if (el !== event.currentTarget) {
             if(el.nodeName === 'A') {
                 event.preventDefault()
-                // don't need to update if we're already the active one
-                if(!el.classList.contains('is-active')) {
+                // see if we want to go to overview or new question/end
+                if(!el.classList.contains('is-active') || el.data.type === 'overview') {
                     this.message('update', 'state', el.data)
                 }
             }
@@ -106,6 +128,11 @@ TreeHistoryView.prototype = {
         elem.classList.add('enp-tree__history')
 
         return elem;
+    },
+
+    getHistoryNavItems() {
+        let list = this.getList()
+        return list.getElementsByClassName('enp-tree__history-list-item--nav')
     },
 
     updateHistory: function(history) {
@@ -127,9 +154,14 @@ TreeHistoryView.prototype = {
         this.setList(container.firstElementChild)
         list = this.getList()
 
+        // create the overview button
+        list.appendChild(this.templateOverviewBtn())
+        this.setOverviewBtn(list.firstElementChild)
+
+        // create the buttons
         for(let i = 0; i < history.length; i++) {
             // generate list data and append to item
-            list.appendChild(this.templateLi(history[i], i, currentIndex))
+            list.appendChild(this.templateHistoryItem(history[i], i, currentIndex))
         }
     },
 
@@ -142,13 +174,16 @@ TreeHistoryView.prototype = {
 
         // go through and compare
         list = this.getList()
-        li = list.childNodes
+        li = this.getHistoryNavItems()
+        // the first one is the overview button, so don't include it
         deleteLi = []
         iterator = li.length
 
         // if there's no history, delete all lis
         if(!history.length) {
-            list.innerHtml = ''
+            for(let i = 0; i < li.length; i++) {
+                list.removeChild(li[i])
+            }
             return;
         }
 
@@ -156,7 +191,7 @@ TreeHistoryView.prototype = {
         if(!li.length) {
             // create the elements
             for(let i = 0; i < history.length; i++) {
-                list.appendChild(this.templateLi(history[i], i))
+                list.appendChild(this.templateHistoryItem(history[i], i))
             }
             return;
         }
@@ -177,7 +212,7 @@ TreeHistoryView.prototype = {
             }
             else if(li[i] === undefined) {
                 // create it
-                list.appendChild(this.templateLi(history[i], i))
+                list.appendChild(this.templateHistoryItem(history[i], i))
             }
             // if both exist, compare values
             else if(a.data !== undefined && a.data.id !== history[i].id) {
@@ -194,11 +229,9 @@ TreeHistoryView.prototype = {
     },
 
     templateUpdateIndex(currentIndex) {
-        let list,
-            li,
+        let li,
             a;
-        list = this.getList()
-        li = list.childNodes;
+        li = this.getHistoryNavItems();
         // first check that we need to update anything
         for(let i = 0; i < li.length; i++) {
             a = li[i].firstElementChild
@@ -219,7 +252,9 @@ TreeHistoryView.prototype = {
         return ul
     },
 
-    templateLi: function(data, index, currentIndex) {
+    // The data needs to be formatted to send a message that
+    // we want to go to the overview mode
+    templateOverviewBtn: function() {
         let li,
             a;
 
@@ -227,9 +262,26 @@ TreeHistoryView.prototype = {
         a = document.createElement('a')
         li.appendChild(a)
 
-        li.classList.add('enp-tree__history-list-item')
+        li.classList.add('enp-tree__history-list-item', 'enp-tree__istory-list-item--overview')
 
-        a.classList.add('enp-tree__history-list-link')
+        a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview')
+        a.innerHTML = '[]'
+        a.data = {type: 'overview'}
+
+        return li
+    },
+
+    templateHistoryItem: function(data, index, currentIndex) {
+        let li,
+            a;
+
+        li = document.createElement('li')
+        a = document.createElement('a')
+        li.appendChild(a)
+
+        li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--nav')
+
+        a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav')
         a.innerHTML = index + 1
         a.data = data
 

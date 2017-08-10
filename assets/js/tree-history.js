@@ -227,6 +227,15 @@ TreeHistory.prototype = {
                 let historyView = new TreeHistoryView({TreeHistory: this, container: container})
                 // add this to the observers
                 this.addObserver(historyView)
+                break
+            case 'restart':
+                // delete the history
+                this.clearHistory()
+                break
+            case 'start':
+                // delete the history
+                this.clearHistory()
+                break
         }
 
         // notify observers of these changes
@@ -242,15 +251,17 @@ TreeHistory.prototype = {
             findNewStateIndex,
             findOldStateIndex,
             stateToAdd,
-            Tree;
+            Tree,
+            currentState;
 
         // data contains old state and new state
         newState = states.newState
         oldState = states.oldState
         history = this.getHistory()
+        currentState = this.getCurrentState()
 
         // check if we're resuming where we left off. ie, the updated state will match where we're at in the state history
-        if(newState === this.getCurrentState()) {
+        if(currentState !== undefined && newState.type === currentState.type && newState.id === currentState.id) {
             // do nothing! we're good
             return;
         }
@@ -270,20 +281,14 @@ TreeHistory.prototype = {
             // try to find the old state in our history
             findOldStateIndex = this.getIndexBy(history, 'id', oldState.id)
 
-            // if the old state is Tree or End and the current question is the first question, then they're just starting over, so let's clear the history (if any) and set the first question
-            if((oldState.type === 'tree' || oldState.type === 'end') && newState.id === questions[0].question_id) {
-                // clear the history
-                this.clearHistory()
-                // set it as our var to add
-                stateToAdd = newState;
-            }
+
 
             // If we can find the new state index in our history,
             // then we don't want to ADD it to the history, we just want to
             // change our currentIndex to match where they are.
             // EX. Someone clicked the "back" or "forward" buttons.
             // They're not adding history, they're just changing where they are
-            else if(findNewStateIndex !== undefined) {
+            if(findNewStateIndex !== undefined) {
                 // set the currentIndex accordingly
                 this.setCurrentIndex(findNewStateIndex);
             }
@@ -317,77 +322,6 @@ TreeHistory.prototype = {
             this.setCurrentIndex(this.getHistory().length-1)
         }
     },
-
-    /**
-    * A little module pattern to manage the view. This way people
-    * can overwrite it if they want, and it's all isolated here
-    */
-    view: function() {
-        this.view = undefined
-        this.viewHistory = undefined
-        this.viewPane = undefined
-        return {
-            render: function() {
-                let view,
-                    cPane;
-
-                this.view = this.getTreeView()
-
-                if(this.view === undefined) {
-                    console.error('Could not find a view. Trying again in 700ms')
-                }
-                this.viewPane = this.view.getContentPane();
-            },
-
-            getTreeView: function() {
-                let Tree,
-                    observers;
-
-                Tree = this.getTree();
-                observers = Tree.getObservers()
-                // find the view
-                for(let i = 0; i < observers.length; i++) {
-                    if(observers[i].constructor.name === 'TreeView') {
-                        return observers[i]
-                    }
-                }
-                return undefined
-            }
-        }
-    },
-
-    /**
-    * A little module pattern to manage the view. This way people
-    * can overwrite it if they want, and it's all isolated here
-    */
-    /*viewRender: function() {
-        let view,
-            cPane;
-
-        view = this.viewGetTreeView()
-
-        if(cPane === undefined) {
-            console.error('Could not find a view. Trying again in 700ms')
-        }
-        this.viewParent = view.getContentPane();
-
-    },
-
-    // Find the tree view so we can get the pane to attach it to.
-    viewGetTreeView() {
-        let Tree,
-            observers;
-
-        Tree = this.getTree();
-        observers = Tree.getObservers()
-        // find the view
-        for(let i = 0; i < observers.length; i++) {
-            if(observers[i].constructor.name === 'TreeView') {
-                return observers[i]
-            }
-        }
-        return undefined
-    },*/
 
     setObservers: function(observers) {
         for(let i = 0; i < observers.length; i++) {
