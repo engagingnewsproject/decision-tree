@@ -60,7 +60,7 @@ function TreeHistoryView(options) {
         return _list;
     };
     this.getOverviewBtn = function () {
-        return _OverviewBtn;
+        return _overviewBtn;
     };
     this.getResumeBtn = function () {
         return _resumeBtn;
@@ -133,6 +133,12 @@ TreeHistoryView.prototype = {
             case 'historyIndexUpdate':
                 this.updateHistoryIndex(data);
                 break;
+            case 'update':
+                // we only care if we're updating to/from an overview state
+                if (data.newState.type === 'tree' || data.oldState.type === 'tree') {
+                    this.updateOverview(data);
+                }
+                break;
         }
     },
 
@@ -186,6 +192,26 @@ TreeHistoryView.prototype = {
 
     updateHistoryIndex: function updateHistoryIndex(index) {
         this.templateUpdateIndex(index);
+    },
+
+    updateOverview: function updateOverview(data) {
+        var overviewBtn = void 0,
+            resumeBtn = void 0,
+            historyItems = void 0,
+            currentIndex = void 0;
+
+        overviewBtn = this.getOverviewBtn().firstElementChild;
+
+        // we're in the overview state, so let's show the resume button and set our classes
+        if (data.oldState.type === 'tree') {
+            // hide resume button. remove class from overview button
+            overviewBtn.classList.remove('is-active');
+            // add class back to current index button
+        } else if (data.newState.type === 'tree') {
+            // show resume button. add class to overview button
+            console.log('in tree view');
+            overviewBtn.classList.add('is-active');
+        }
     },
 
     // TODO: Elements are being added/removed. Check each element to see if its element.data matches the history data in order. If one doesn't match, rerender from that point on.
@@ -513,10 +539,10 @@ TreeHistory.prototype = {
     * Let our Tree know about the state we want to change to.
     */
     emit: function emit(action, item, data) {
-        var state = void 0;
-        var Tree = this.getTree();
+
         switch (action) {
             case 'update':
+                var Tree = this.getTree();
                 // this is usually Tree.update('state', dataAboutNewState)
                 //  our format is data {type: 'question', id: #}, but the
                 // tree needs it in format {type: 'question', question_id: id}
@@ -607,9 +633,9 @@ TreeHistory.prototype = {
             return;
         }
 
-        // see if we need to add our resume button in
         if (newState.type === 'tree' && this.getCurrentIndex() !== null) {
-            // TODO: add resume button next to Start button
+            // we're in the overview state, no need to do anything
+
             return;
         }
 

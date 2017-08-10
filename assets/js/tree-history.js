@@ -172,10 +172,10 @@ TreeHistory.prototype = {
     * Let our Tree know about the state we want to change to.
     */
     emit: function(action, item, data) {
-        let state;
-        let Tree = this.getTree()
+
         switch(action) {
             case 'update':
+                let Tree = this.getTree()
                 // this is usually Tree.update('state', dataAboutNewState)
                 //  our format is data {type: 'question', id: #}, but the
                 // tree needs it in format {type: 'question', question_id: id}
@@ -266,9 +266,10 @@ TreeHistory.prototype = {
             return;
         }
 
-        // see if we need to add our resume button in
+
         if(newState.type === 'tree' && this.getCurrentIndex() !== null) {
-            // TODO: add resume button next to Start button
+            // we're in the overview state, no need to do anything
+            
             return;
         }
 

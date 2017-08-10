@@ -19,7 +19,7 @@ function TreeHistoryView(options) {
     // getters
     this.getContainer = function() { return _container}
     this.getList = function() { return _list}
-    this.getOverviewBtn = function() { return _OverviewBtn}
+    this.getOverviewBtn = function() { return _overviewBtn}
     this.getResumeBtn = function() { return _resumeBtn}
     this.getTreeHistory = function() { return _TreeHistory}
 
@@ -87,7 +87,14 @@ TreeHistoryView.prototype = {
             case 'historyIndexUpdate':
                 this.updateHistoryIndex(data)
                 break
+            case 'update':
+                // we only care if we're updating to/from an overview state
+                if(data.newState.type === 'tree' || data.oldState.type === 'tree') {
+                    this.updateOverview(data)
+                }
+                break
         }
+
     },
 
     /**
@@ -141,6 +148,27 @@ TreeHistoryView.prototype = {
 
     updateHistoryIndex: function(index) {
         this.templateUpdateIndex(index)
+    },
+
+    updateOverview: function(data) {
+        let overviewBtn,
+            resumeBtn,
+            historyItems,
+            currentIndex;
+
+        overviewBtn = this.getOverviewBtn().firstElementChild
+
+        // we're in the overview state, so let's show the resume button and set our classes
+        if(data.oldState.type === 'tree') {
+            // hide resume button. remove class from overview button
+            overviewBtn.classList.remove('is-active')
+            // add class back to current index button
+
+        } else if(data.newState.type === 'tree') {
+            // show resume button. add class to overview button
+            console.log('in tree view')
+            overviewBtn.classList.add('is-active')
+        }
     },
 
     // TODO: Elements are being added/removed. Check each element to see if its element.data matches the history data in order. If one doesn't match, rerender from that point on.

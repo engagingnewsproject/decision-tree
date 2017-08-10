@@ -68,13 +68,3 @@
         @include historyLinkActive
     }
 }
-
-.enp-tree__state--tree {
-    .enp-tree__history-list-link--overview {
-        @include historyLinkActive
-    }
-
-    .enp-tree__history-list-link.is-active {
-        @include historyLink
-    }
-}
