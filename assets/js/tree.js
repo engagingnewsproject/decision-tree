@@ -133,9 +133,11 @@ Tree.prototype = {
     * 'ready', 'update', 'error'
     */
     emit: function(action, data) {
-        console.log('Tree.js emitting '+action)
-        for(let i = 0; i < this.observers.length; i++) {
-            this.observers[i].on(action, data)
+
+
+        for(var observer of this.observers) {
+            console.log('Tree.js emitting '+action+' to '+observer.constructor.name)
+            observer.on(action, data)
         }
     },
 

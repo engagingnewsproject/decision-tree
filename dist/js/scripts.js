@@ -40,7 +40,7 @@ Handlebars.registerHelper('group_end', function (question_id, group_id, groups, 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function TreeHistoryView(options) {
-    var _TreeHistory, _container;
+    var _TreeHistory, _container, _list;
 
     if (_typeof(options.container) !== 'object') {
         console.error('Tree History View container must be a valid object. Try `container: document.getElementById(your-id)`.');
@@ -52,6 +52,17 @@ function TreeHistoryView(options) {
         return false;
     }
 
+    // getters
+    this.getContainer = function () {
+        return _container;
+    };
+    this.getList = function () {
+        return _list;
+    };
+    this.getTreeHistory = function () {
+        return _TreeHistory;
+    };
+
     // setters
     this.setContainer = function (container) {
         // only let it get set once
@@ -61,9 +72,17 @@ function TreeHistoryView(options) {
             container.insertBefore(historyView, container.firstElementChild);
             // set our built div as the container
             _container = container.firstElementChild;
-            console.log(container.firstElementChild);
         }
         return _container;
+    };
+
+    this.setList = function (list) {
+        // only let it get set once
+        if (_list === undefined) {
+            // set our built div as the list
+            _list = list;
+        }
+        return _list;
     };
 
     var _setTreeHistory = function _setTreeHistory(TreeHistory) {
@@ -72,14 +91,11 @@ function TreeHistoryView(options) {
 
     _setTreeHistory(options.TreeHistory);
     this.setContainer(options.container);
-
-    // getters
-    this.getContainer = function () {
-        return _container;
-    };
-    this.getTreeHistory = function () {
-        return _TreeHistory;
-    };
+    console.log(this.getTreeHistory().getHistory());
+    this.templateRender(this.getTreeHistory().getHistory(), this.getTreeHistory().getCurrentIndex());
+    // add click listener on container
+    _container.addEventListener("click", this.click.bind(this));
+    _container.addEventListener("keydown", this.keydown.bind(this));
 }
 
 TreeHistoryView.prototype = {
@@ -98,6 +114,10 @@ TreeHistoryView.prototype = {
         }
     },
 
+    click: function click() {},
+
+    keydown: function keydown() {},
+
     createView: function createView() {
         var elem = void 0;
 
@@ -113,11 +133,48 @@ TreeHistoryView.prototype = {
 
     updateHistoryIndex: function updateHistoryIndex(index) {
         console.log('history index update');
-    }
+    },
 
     // TODO: template it with Handlebars? Is that overkill? It should be a very simple template. BUUUUT, we already have the templating engine built so... ?
-    // TODO: Bind history data to an element so we know if we need to update it or not?
-    // TODO: Elements are being added/removed. Now would be a good time to know if we need to rerender to stay in sync.
+    // TODO: Bind history data to an element so we know if we need to update it or not
+    // TODO: Elements are being added/removed. Check each element to see if its element.data matches the history data in order. If one doesn't match, rerender from that point on.
+    templateRender: function templateRender(history, currentIndex) {
+        var container = void 0,
+            list = void 0,
+            current = void 0;
+        console.log('history');
+        console.log(history);
+        container = this.getContainer();
+        container.appendChild(this.templateUl());
+        // set the list as the _list var
+        this.setList(container.firstElementChild);
+        list = this.getList();
+
+        for (var i = 0; i < history.length; i++) {
+            // generate list data and append to item
+            current = false;
+            if (i === currentIndex) {
+                current = true;
+            }
+            list.appendChild(templateLi(history[i], i, current));
+        }
+    },
+
+    templateUpdate: function templateUpdate(history) {},
+
+    templateUl: function templateUl() {
+        var ul = document.createElement('ul');
+        ul.classList.add('enp-tree__history-list');
+        return ul;
+    },
+
+    templateLi: function templateLi(data, index) {
+        var li = document.createElement('li');
+        li.classList.add('enp-tree__history-list-item');
+        li.innerHTML = index + 1;
+        li.data = data;
+        return li;
+    }
 };
 'use strict';
 
@@ -1206,9 +1263,31 @@ TreeView.prototype = {
         * 'ready', 'update', 'error'
         */
         emit: function emit(action, data) {
-            console.log('Tree.js emitting ' + action);
-            for (var i = 0; i < this.observers.length; i++) {
-                this.observers[i].on(action, data);
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+
+                for (var _iterator = this.observers[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var observer = _step.value;
+
+                    console.log('Tree.js emitting ' + action + ' to ' + observer.constructor.name);
+                    observer.on(action, data);
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
             }
         },
 
