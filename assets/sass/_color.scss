@@ -68,3 +68,16 @@
         @include historyLinkActive
     }
 }
+
+.enp-tree__overview-icon {
+    &,
+    &:after {
+        border: 2px solid $black;
+    }
+}
+.enp-tree__history-list-link--overview.is-active .enp-tree__overview-icon {
+    &,
+    &:after {
+        border: 2px solid $btn_color;
+    }
+}

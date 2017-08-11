@@ -158,8 +158,13 @@ TreeHistoryView.prototype = {
 
         // check if it's a click on the parent tree (which we don't care about)
         if (el !== event.currentTarget) {
-            if (el.nodeName === 'A') {
+            // also check for parent, as the
+            if (el.nodeName === 'A' || el.parentNode.nodeName === 'A') {
                 event.preventDefault();
+                // if our parent is the A, then set that as el, bc that's the one with the data set on it. This is for the overviewBtn
+                if (el.parentNode.nodeName === 'A') {
+                    el = el.parentNode;
+                }
                 // see if we want to go to overview or new question/end
                 if (!el.classList.contains('is-active') || el.data.type === 'overview') {
                     this.message('update', 'state', el.data);
@@ -180,6 +185,17 @@ TreeHistoryView.prototype = {
         return elem;
     },
 
+    getCurrentNav: function getCurrentNav() {
+        var TreeHistory = void 0,
+            currentIndex = void 0,
+            historyNav = void 0;
+
+        TreeHistory = this.getTreeHistory();
+        currentIndex = TreeHistory.getCurrentIndex();
+        historyNav = this.getHistoryNavItems();
+
+        return historyNav[currentIndex];
+    },
     getHistoryNavItems: function getHistoryNavItems() {
         var list = this.getList();
         return list.getElementsByClassName('enp-tree__history-list-item--nav');
@@ -197,20 +213,24 @@ TreeHistoryView.prototype = {
     updateOverview: function updateOverview(data) {
         var overviewBtn = void 0,
             resumeBtn = void 0,
-            historyItems = void 0,
-            currentIndex = void 0;
+            currentNav = void 0;
 
         overviewBtn = this.getOverviewBtn().firstElementChild;
-
+        currentNav = this.getCurrentNav();
         // we're in the overview state, so let's show the resume button and set our classes
         if (data.oldState.type === 'tree') {
             // hide resume button. remove class from overview button
             overviewBtn.classList.remove('is-active');
             // add class back to current index button
+            if (currentNav !== undefined) {
+                currentNav.firstElementChild.classList.add('is-active');
+            }
         } else if (data.newState.type === 'tree') {
             // show resume button. add class to overview button
-            console.log('in tree view');
             overviewBtn.classList.add('is-active');
+            if (currentNav !== undefined) {
+                currentNav.firstElementChild.classList.remove('is-active');
+            }
         }
     },
 
@@ -335,7 +355,7 @@ TreeHistoryView.prototype = {
         li.classList.add('enp-tree__history-list-item', 'enp-tree__istory-list-item--overview');
 
         a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview');
-        a.innerHTML = '[]';
+        a.innerHTML = '<div class="enp-tree__overview-icon"></div><div class="enp-tree__overview-icon"></div>';
         a.data = { type: 'overview' };
 
         return li;

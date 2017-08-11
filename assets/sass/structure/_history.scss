@@ -23,3 +23,41 @@
     border-radius: 50%;
     transition: all .15s;
 }
+
+.enp-tree__history-list-link--overview {
+    position: relative;
+    height: $spacing__base;
+}
+
+.enp-tree__overview-icon {
+    position: absolute;
+    top: 6px;
+    width: 2px;
+    height: 2px;
+
+    &:after {
+        width: 2px;
+        height: 2px;
+        content: '';
+        display: block;
+        position: absolute;
+        top: 6px;
+        left: -2px;
+    }
+
+    &:first-child {
+        left: 6px;
+
+        &:after {
+            left: -2px;
+        }
+    }
+
+    &:last-child {
+        right: 6px;
+
+        &:after {
+            right: -2px;
+        }
+    }
+}
