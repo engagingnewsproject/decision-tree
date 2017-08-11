@@ -57,6 +57,10 @@ html {
     will-change: transform;
     transform-origin: top center;
 
+    @media (max-width: $column_max_width) {
+        padding-left: 45px; // account for history nav
+    }
+
     @include breakpoint($mobile-large) {
         padding: $spacing__base;
         transform-origin: top left;
@@ -72,13 +76,6 @@ html {
             max-height: none;
             overflow: visible;
         }
-    }
-}
-
-.enp-tree__state--explore {
-    .enp-tree__content-window {
-        padding-top: $spacing__base*5;
-        padding-bottom: $spacing__base*8;
     }
 }
 
@@ -100,6 +97,9 @@ html {
         transform-origin: top center;
         max-height: 700px;
         overflow: scroll;
+        @media (max-width: $column_max_width) {
+            padding-left: 65px; // account for history nav
+        }
         @include breakpoint($mobile-large) {
             padding-top: $spacing__base * 3;
             max-height: none;

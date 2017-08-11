@@ -126,7 +126,6 @@ function Tree(data, observers) {
         console.error('Tree data is invalid.')
         return false;
     }
-
 }
 
 Tree.prototype = {

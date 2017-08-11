@@ -1,8 +1,15 @@
 .enp-tree__history {
     position: absolute;
-    left: 10px;
+    left: 5px;
     top: 10px;
     z-index: 999;
+    margin: 0;
+    transform-origin: top left;
+    transition: all .4s;
+
+    @include breakpoint($tablet + 100px) {
+        left: calc(50% - $column_max_width/1.5);
+    }
 }
 
 .enp-tree__history-list {
@@ -59,5 +66,16 @@
         &:after {
             right: -2px;
         }
+    }
+}
+
+.enp-tree__state--tree {
+    .enp-tree__history {
+        transform: scale(1.2);
+
+        @include breakpoint($mobile-large) {
+            transform: scale(1.5);
+        }
+
     }
 }

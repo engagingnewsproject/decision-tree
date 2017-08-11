@@ -1,5 +1,6 @@
 .enp-tree {
     font-family: "Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "Tahoma", sans-serif;
+    line-height: 1.6;
 }
 
 .enp-tree__title {
@@ -10,9 +11,15 @@
 }
 
 .enp-tree__title--question {
-    font-size: $question__font-size;
+    font-size: 1.2rem;
+    @include breakpoint($mobile-large) {
+        font-size: $question__font-size;
+    }
 }
 
 .enp-tree__title--end {
-    font-size: 1.9rem;
+    font-size: 1.6rem;
+    @include breakpoint($mobile-large) {
+        font-size: 1.9rem;
+    }
 }

@@ -6,20 +6,26 @@
 
 .enp-tree__question {
     width: 100%;
-    padding: $spacing__base * 2 $spacing__base $spacing__base * 1.5;
     margin-top: 0;
     margin-bottom: $spacing__base;
     transition: all .4s;
+    padding: $spacing__base $spacing__base * .75;
+
+    @include breakpoint($mobile-large) {
+        padding: $spacing__base * 2 $spacing__base $spacing__base * 1.5;
+    }
+
 }
 
 .enp-tree__state--tree {
     .enp-tree__question {
         position: relative;
+        transform: scale(1) translate3d(0,0,0);
         transition: all .15s;
 
         &:focus,
         &:hover {
-            transform: scale(1.02);
+            transform: scale(1.02) translate3d(0,0,0);
             box-shadow: 0 5px 5px rgba(0,0,0,.15);
         }
         // click layer so clicks on a question get sent to our
