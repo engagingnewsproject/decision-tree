@@ -4,7 +4,8 @@ function TreeHistoryView(options) {
         _container,
         _list,
         _overviewBtn,
-        _resumeBtn;
+        _resumeBtn,
+        _progressbar;
 
     if(typeof options.container !== 'object') {
         console.error('Tree History View container must be a valid object. Try `container: document.getElementById(your-id)`.')
@@ -21,6 +22,7 @@ function TreeHistoryView(options) {
     this.getList = function() { return _list}
     this.getOverviewBtn = function() { return _overviewBtn}
     this.getResumeBtn = function() { return _resumeBtn}
+    this.getProgressbar = function() { return _progressbar}
     this.getTreeHistory = function() { return _TreeHistory}
 
     // setters
@@ -61,6 +63,15 @@ function TreeHistoryView(options) {
             _resumeBtn = resumeBtn
         }
         return _resumeBtn
+    }
+
+    this.setProgressbar = function(progressbar) {
+        // only let it get set once
+        if(_progressbar === undefined) {
+            // set our built div as the resume
+            _progressbar = progressbar
+        }
+        return _progressbar
     }
 
     var _setTreeHistory = function(TreeHistory) {
@@ -202,6 +213,10 @@ TreeHistoryView.prototype = {
         this.setList(container.firstElementChild)
         list = this.getList()
 
+        // create the progressbar
+        container.appendChild(this.templateProgressbar())
+        this.setProgressbar(container.children[1])
+
         // create the overview button
         list.appendChild(this.templateOverviewBtn())
         this.setOverviewBtn(list.firstElementChild)
@@ -235,7 +250,7 @@ TreeHistoryView.prototype = {
             return;
         }
 
-        // if we don't have any lis, then create them all
+        // if we don't have any li's, then create them all
         if(!li.length) {
             // create the elements
             for(let i = 0; i < history.length; i++) {
@@ -278,8 +293,11 @@ TreeHistoryView.prototype = {
 
     templateUpdateIndex(currentIndex) {
         let li,
-            a;
-        li = this.getHistoryNavItems();
+            a,
+            progressbar,
+            progressbarHeight;
+
+        li = this.getHistoryNavItems()
         // first check that we need to update anything
         for(let i = 0; i < li.length; i++) {
             a = li[i].firstElementChild
@@ -292,12 +310,24 @@ TreeHistoryView.prototype = {
         if(!a.classList.contains('is-active')) {
             a.classList.add('is-active')
         }
+        // update the progressbar height now
+        progressbar = this.getProgressbar()
+
+        progressbarHeight = li[currentIndex].offsetTop
+        progressbar.style.height = progressbarHeight +'px'
+        console.log(progressbar)
     },
 
     templateUl: function() {
         let ul = document.createElement('ul')
         ul.classList.add('enp-tree__history-list')
         return ul
+    },
+
+    templateProgressbar: function() {
+        let progressbar = document.createElement('div')
+        progressbar.classList.add('enp-tree__history-progress')
+        return progressbar
     },
 
     // The data needs to be formatted to send a message that

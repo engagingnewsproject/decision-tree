@@ -40,7 +40,7 @@ Handlebars.registerHelper('group_end', function (question_id, group_id, groups, 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function TreeHistoryView(options) {
-    var _TreeHistory, _container, _list, _overviewBtn, _resumeBtn;
+    var _TreeHistory, _container, _list, _overviewBtn, _resumeBtn, _progressbar;
 
     if (_typeof(options.container) !== 'object') {
         console.error('Tree History View container must be a valid object. Try `container: document.getElementById(your-id)`.');
@@ -64,6 +64,9 @@ function TreeHistoryView(options) {
     };
     this.getResumeBtn = function () {
         return _resumeBtn;
+    };
+    this.getProgressbar = function () {
+        return _progressbar;
     };
     this.getTreeHistory = function () {
         return _TreeHistory;
@@ -107,6 +110,15 @@ function TreeHistoryView(options) {
             _resumeBtn = resumeBtn;
         }
         return _resumeBtn;
+    };
+
+    this.setProgressbar = function (progressbar) {
+        // only let it get set once
+        if (_progressbar === undefined) {
+            // set our built div as the resume
+            _progressbar = progressbar;
+        }
+        return _progressbar;
     };
 
     var _setTreeHistory = function _setTreeHistory(TreeHistory) {
@@ -245,6 +257,10 @@ TreeHistoryView.prototype = {
         this.setList(container.firstElementChild);
         list = this.getList();
 
+        // create the progressbar
+        container.appendChild(this.templateProgressbar());
+        this.setProgressbar(container.children[1]);
+
         // create the overview button
         list.appendChild(this.templateOverviewBtn());
         this.setOverviewBtn(list.firstElementChild);
@@ -278,7 +294,7 @@ TreeHistoryView.prototype = {
             return;
         }
 
-        // if we don't have any lis, then create them all
+        // if we don't have any li's, then create them all
         if (!li.length) {
             // create the elements
             for (var _i = 0; _i < history.length; _i++) {
@@ -320,7 +336,10 @@ TreeHistoryView.prototype = {
 
     templateUpdateIndex: function templateUpdateIndex(currentIndex) {
         var li = void 0,
-            a = void 0;
+            a = void 0,
+            progressbar = void 0,
+            progressbarHeight = void 0;
+
         li = this.getHistoryNavItems();
         // first check that we need to update anything
         for (var i = 0; i < li.length; i++) {
@@ -333,6 +352,12 @@ TreeHistoryView.prototype = {
         if (!a.classList.contains('is-active')) {
             a.classList.add('is-active');
         }
+        // update the progressbar height now
+        progressbar = this.getProgressbar();
+
+        progressbarHeight = li[currentIndex].offsetTop;
+        progressbar.style.height = progressbarHeight + 'px';
+        console.log(progressbar);
     },
 
 
@@ -340,6 +365,12 @@ TreeHistoryView.prototype = {
         var ul = document.createElement('ul');
         ul.classList.add('enp-tree__history-list');
         return ul;
+    },
+
+    templateProgressbar: function templateProgressbar() {
+        var progressbar = document.createElement('div');
+        progressbar.classList.add('enp-tree__history-progress');
+        return progressbar;
     },
 
     // The data needs to be formatted to send a message that
