@@ -1,13 +1,14 @@
 
 function TreeHistoryView(options) {
     var _TreeHistory,
+        _contentWindow,
         _container,
         _list,
         _overviewBtn,
         _resumeBtn,
         _progressbar;
 
-    if(typeof options.container !== 'object') {
+    if(typeof options.contentWindow !== 'object') {
         console.error('Tree History View container must be a valid object. Try `container: document.getElementById(your-id)`.')
         return false
     }
@@ -18,6 +19,7 @@ function TreeHistoryView(options) {
     }
 
     // getters
+    this.getContentWindow = function() { return _contentWindow}
     this.getContainer = function() { return _container}
     this.getList = function() { return _list}
     this.getOverviewBtn = function() { return _overviewBtn}
@@ -26,14 +28,24 @@ function TreeHistoryView(options) {
     this.getTreeHistory = function() { return _TreeHistory}
 
     // setters
-    this.setContainer = function(container) {
+    this.setContentWindow = function(contentWindow) {
+        // only let it get set once
+        if(_contentWindow === undefined) {
+            // set our built div as the contentWindow
+            _contentWindow = contentWindow
+        }
+        return _contentWindow
+    }
+
+    this.setContainer = function() {
         // only let it get set once
         if(_container === undefined) {
             let historyView = this.createView()
+            let cWindow = this.getContentWindow()
             // place it in the passed container
-            container.insertBefore(historyView, container.firstElementChild)
+            cWindow.insertBefore(historyView, cWindow.firstElementChild)
             // set our built div as the container
-            _container = container.firstElementChild
+            _container = cWindow.firstElementChild
         }
         return _container
     }
@@ -79,7 +91,8 @@ function TreeHistoryView(options) {
     }
 
     _setTreeHistory(options.TreeHistory)
-    this.setContainer(options.container)
+    this.setContentWindow(options.contentWindow)
+    this.setContainer()
     this.templateRender(this.getTreeHistory().getHistory(), this.getTreeHistory().getCurrentIndex())
     // add click listener on container
     _container.addEventListener("click", this.click.bind(this));
@@ -176,6 +189,7 @@ TreeHistoryView.prototype = {
 
     updateHistoryIndex: function(index) {
         this.templateUpdateIndex(index)
+        this.templateUpdateProgressbar(index);
     },
 
     updateOverview: function(data) {
@@ -226,6 +240,9 @@ TreeHistoryView.prototype = {
             // generate list data and append to item
             list.appendChild(this.templateHistoryItem(history[i], i, currentIndex))
         }
+
+        // set the progressbarHeight
+        this.templateUpdateProgressbar(currentIndex)
     },
 
     templateUpdateHistory: function(history) {
@@ -310,12 +327,56 @@ TreeHistoryView.prototype = {
         if(!a.classList.contains('is-active')) {
             a.classList.add('is-active')
         }
-        // update the progressbar height now
-        progressbar = this.getProgressbar()
 
-        progressbarHeight = li[currentIndex].offsetTop
-        progressbar.style.height = progressbarHeight +'px'
-        console.log(progressbar)
+    },
+
+    templateUpdateProgressbar: function(currentIndex) {
+        let progressbar,
+            progressbarHeight,
+            historyItems,
+            list,
+            listHeight,
+            container,
+            containerMoveUp,
+            cWindow,
+            cWindowHeight;
+
+        // see if we're taller than our frame
+        setTimeout(() => {
+
+            progressbar = this.getProgressbar()
+            historyItems = this.getHistoryNavItems()
+            progressbarHeight = historyItems[currentIndex].offsetTop
+            // update height
+            progressbar.style.height = progressbarHeight +'px'
+
+            container = this.getContainer()
+            cWindow = this.getContentWindow()
+            list = this.getList()
+            listHeight = list.getBoundingClientRect().height
+            cWindowHeight = parseFloat(cWindow.style.height)
+            // default to the top
+            containerMoveUp = 0
+
+            // OMG just don't. This was way harder on a Friday afternoon than it
+            // should have been.
+            // We're checking to see if the contentWindow is less than the listHeight AND if the progressbarHeight is tall enough that we need to address it.
+            // IE. We don't want to move the list all the way down if they have 10 items, but they've moved back to the second.
+            if(cWindowHeight < listHeight && cWindowHeight/2 < progressbarHeight) {
+                
+                if((listHeight - progressbarHeight) < cWindowHeight/2) {
+                    // the bottom element can be in the bottom half of the view, so stack it to the bottom.
+                    containerMoveUp = cWindowHeight - listHeight
+                } else {
+                    // Center it in the window because we're not near the top or bottom
+                    containerMoveUp = -(progressbarHeight - cWindowHeight/2 + historyItems[currentIndex].getBoundingClientRect().height/2)
+                }
+
+            }
+
+            container.style.transform = 'translate3d(0,'+ containerMoveUp +'px,0)'
+        }, 40)
+
     },
 
     templateUl: function() {

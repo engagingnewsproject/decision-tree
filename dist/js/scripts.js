@@ -40,9 +40,9 @@ Handlebars.registerHelper('group_end', function (question_id, group_id, groups, 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function TreeHistoryView(options) {
-    var _TreeHistory, _container, _list, _overviewBtn, _resumeBtn, _progressbar;
+    var _TreeHistory, _contentWindow, _container, _list, _overviewBtn, _resumeBtn, _progressbar;
 
-    if (_typeof(options.container) !== 'object') {
+    if (_typeof(options.contentWindow) !== 'object') {
         console.error('Tree History View container must be a valid object. Try `container: document.getElementById(your-id)`.');
         return false;
     }
@@ -53,6 +53,9 @@ function TreeHistoryView(options) {
     }
 
     // getters
+    this.getContentWindow = function () {
+        return _contentWindow;
+    };
     this.getContainer = function () {
         return _container;
     };
@@ -73,14 +76,24 @@ function TreeHistoryView(options) {
     };
 
     // setters
-    this.setContainer = function (container) {
+    this.setContentWindow = function (contentWindow) {
+        // only let it get set once
+        if (_contentWindow === undefined) {
+            // set our built div as the contentWindow
+            _contentWindow = contentWindow;
+        }
+        return _contentWindow;
+    };
+
+    this.setContainer = function () {
         // only let it get set once
         if (_container === undefined) {
             var historyView = this.createView();
+            var cWindow = this.getContentWindow();
             // place it in the passed container
-            container.insertBefore(historyView, container.firstElementChild);
+            cWindow.insertBefore(historyView, cWindow.firstElementChild);
             // set our built div as the container
-            _container = container.firstElementChild;
+            _container = cWindow.firstElementChild;
         }
         return _container;
     };
@@ -126,7 +139,8 @@ function TreeHistoryView(options) {
     };
 
     _setTreeHistory(options.TreeHistory);
-    this.setContainer(options.container);
+    this.setContentWindow(options.contentWindow);
+    this.setContainer();
     this.templateRender(this.getTreeHistory().getHistory(), this.getTreeHistory().getCurrentIndex());
     // add click listener on container
     _container.addEventListener("click", this.click.bind(this));
@@ -220,6 +234,7 @@ TreeHistoryView.prototype = {
 
     updateHistoryIndex: function updateHistoryIndex(index) {
         this.templateUpdateIndex(index);
+        this.templateUpdateProgressbar(index);
     },
 
     updateOverview: function updateOverview(data) {
@@ -270,6 +285,9 @@ TreeHistoryView.prototype = {
             // generate list data and append to item
             list.appendChild(this.templateHistoryItem(history[i], i, currentIndex));
         }
+
+        // set the progressbarHeight
+        this.templateUpdateProgressbar(currentIndex);
     },
 
     templateUpdateHistory: function templateUpdateHistory(history) {
@@ -352,14 +370,57 @@ TreeHistoryView.prototype = {
         if (!a.classList.contains('is-active')) {
             a.classList.add('is-active');
         }
-        // update the progressbar height now
-        progressbar = this.getProgressbar();
-
-        progressbarHeight = li[currentIndex].offsetTop;
-        progressbar.style.height = progressbarHeight + 'px';
-        console.log(progressbar);
     },
 
+
+    templateUpdateProgressbar: function templateUpdateProgressbar(currentIndex) {
+        var _this = this;
+
+        var progressbar = void 0,
+            progressbarHeight = void 0,
+            historyItems = void 0,
+            list = void 0,
+            listHeight = void 0,
+            container = void 0,
+            containerMoveUp = void 0,
+            cWindow = void 0,
+            cWindowHeight = void 0;
+
+        // see if we're taller than our frame
+        setTimeout(function () {
+
+            progressbar = _this.getProgressbar();
+            historyItems = _this.getHistoryNavItems();
+            progressbarHeight = historyItems[currentIndex].offsetTop;
+            // update height
+            progressbar.style.height = progressbarHeight + 'px';
+
+            container = _this.getContainer();
+            cWindow = _this.getContentWindow();
+            list = _this.getList();
+            listHeight = list.getBoundingClientRect().height;
+            cWindowHeight = parseFloat(cWindow.style.height);
+            // default to the top
+            containerMoveUp = 0;
+
+            // OMG just don't. This was way harder on a Friday afternoon than it
+            // should have been.
+            // We're checking to see if the contentWindow is less than the listHeight AND if the progressbarHeight is tall enough that we need to address it.
+            // IE. We don't want to move the list all the way down if they have 10 items, but they've moved back to the second.
+            if (cWindowHeight < listHeight && cWindowHeight / 2 < progressbarHeight) {
+
+                if (listHeight - progressbarHeight < cWindowHeight / 2) {
+                    // the bottom element can be in the bottom half of the view, so stack it to the bottom.
+                    containerMoveUp = cWindowHeight - listHeight;
+                } else {
+                    // Center it in the window because we're not near the top or bottom
+                    containerMoveUp = -(progressbarHeight - cWindowHeight / 2 + historyItems[currentIndex].getBoundingClientRect().height / 2);
+                }
+            }
+
+            container.style.transform = 'translate3d(0,' + containerMoveUp + 'px,0)';
+        }, 40);
+    },
 
     templateUl: function templateUl() {
         var ul = document.createElement('ul');
@@ -641,8 +702,8 @@ TreeHistory.prototype = {
                 // this.setView(data)
                 // get the container
                 var treeView = data;
-                var container = treeView.getContentWindow();
-                var historyView = new TreeHistoryView({ TreeHistory: this, container: container });
+                var cWindow = treeView.getContentWindow();
+                var historyView = new TreeHistoryView({ TreeHistory: this, contentWindow: cWindow });
                 // add this to the observers
                 this.addObserver(historyView);
                 break;
@@ -795,7 +856,7 @@ TreeHistory.prototype = {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function TreeView(options) {
-    var _Tree, _container, _treeEl, _contentWrap, _contentPane, _activeEl;
+    var _Tree, _container, _treeEl, _contentWindow, _contentPane, _activeEl;
 
     if (_typeof(options.container) !== 'object') {
         console.error('Tree container must be a valid object. Try `container: document.getElementById(your-id)`.');
@@ -816,7 +877,7 @@ function TreeView(options) {
         return _activeEl;
     };
     this.getContentWindow = function () {
-        return _contentWrap;
+        return _contentWindow;
     };
     this.getContentPane = function () {
         return _contentPane;
@@ -843,16 +904,16 @@ function TreeView(options) {
 
     this.setContentWindow = function () {
         // only let it be set once
-        if (_contentWrap === undefined) {
-            _contentWrap = document.getElementById('enp-tree__content-window--' + _Tree.getTreeID());
+        if (_contentWindow === undefined) {
+            _contentWindow = document.getElementById('enp-tree__content-window--' + _Tree.getTreeID());
         }
-        return _contentWrap;
+        return _contentWindow;
     };
 
     this.setContentPane = function () {
         // only let it be set once
         if (_contentPane === undefined) {
-            _contentPane = _contentWrap.firstElementChild;
+            _contentPane = _contentWindow.firstElementChild;
         }
         return _contentPane;
     };

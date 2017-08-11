@@ -2,7 +2,7 @@ function TreeView(options) {
     var _Tree,
         _container,
         _treeEl,
-        _contentWrap,
+        _contentWindow,
         _contentPane,
         _activeEl;
 
@@ -16,7 +16,7 @@ function TreeView(options) {
     this.getTree = function() { return _Tree}
     this.getTreeEl = function() { return _treeEl}
     this.getActiveEl = function() { return _activeEl}
-    this.getContentWindow = function() { return _contentWrap}
+    this.getContentWindow = function() { return _contentWindow}
     this.getContentPane = function() { return _contentPane}
 
     // setters
@@ -40,16 +40,16 @@ function TreeView(options) {
 
     this.setContentWindow = function() {
         // only let it be set once
-        if(_contentWrap === undefined) {
-            _contentWrap = document.getElementById('enp-tree__content-window--'+_Tree.getTreeID())
+        if(_contentWindow === undefined) {
+            _contentWindow = document.getElementById('enp-tree__content-window--'+_Tree.getTreeID())
         }
-        return _contentWrap
+        return _contentWindow
     }
 
     this.setContentPane = function() {
         // only let it be set once
         if(_contentPane === undefined) {
-            _contentPane =  _contentWrap.firstElementChild
+            _contentPane =  _contentWindow.firstElementChild
         }
         return _contentPane
     }

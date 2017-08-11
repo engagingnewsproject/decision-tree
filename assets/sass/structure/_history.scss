@@ -4,12 +4,9 @@
     top: $spacing__base;
     z-index: 999;
     margin: 0;
+    transform: translate3d(0,0,0);
     transform-origin: top left;
     transition: all .4s;
-
-    @include breakpoint($tablet + 100px) {
-        left: calc(50% - 350px);
-    }
 }
 
 .enp-tree__history-list {
@@ -18,7 +15,9 @@
 }
 
 .enp-tree__history-list-item {
-    margin-bottom: $spacing__base/2;
+    margin-bottom: $spacing__base;
+    transform: translate3d(0,0,0);
+    animation: enterHistoryItem .4s;
 }
 
 .enp-tree__history-list-link {
@@ -37,14 +36,14 @@
     display: block;
     width: 2px;
     background: rgba(0,0,0,.25);
-    height: 100px;
+    height: 0;
     position: absolute;
     z-index: -1;
     top: 0;
     left: 0;
     right: 0;
     margin: auto;
-    transition: height .4s;
+    transition: all .4s;
 }
 
 
@@ -93,6 +92,26 @@
         @include breakpoint($mobile-large) {
             transform: scale(1.5);
         }
+    }
+}
 
+.enp-tree__state--question,
+.enp-tree__state--end {
+    .enp-tree__history {
+        @include breakpoint($tablet + 100px) {
+            left: calc(50% - 350px);
+        }
+    }
+}
+
+
+@keyframes enterHistoryItem {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, -50px, 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0,0,0);
     }
 }

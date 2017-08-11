@@ -71,6 +71,7 @@ html {
     .enp-tree__content-window {
         max-height: 700px;
         overflow: scroll;
+        padding-left: 80px;
 
         @include breakpoint($mobile-large) {
             max-height: none;

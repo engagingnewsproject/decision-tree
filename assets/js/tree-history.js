@@ -223,8 +223,8 @@ TreeHistory.prototype = {
                 // this.setView(data)
                 // get the container
                 let treeView = data
-                let container = treeView.getContentWindow()
-                let historyView = new TreeHistoryView({TreeHistory: this, container: container})
+                let cWindow = treeView.getContentWindow()
+                let historyView = new TreeHistoryView({TreeHistory: this, contentWindow: cWindow})
                 // add this to the observers
                 this.addObserver(historyView)
                 break
@@ -269,7 +269,7 @@ TreeHistory.prototype = {
 
         if(newState.type === 'tree' && this.getCurrentIndex() !== null) {
             // we're in the overview state, no need to do anything
-            
+
             return;
         }
 
