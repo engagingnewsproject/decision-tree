@@ -416,8 +416,7 @@ TreeHistoryView.prototype = {
         // for things like Tree view where no index is needed
         if (currentIndex === null) {
             // reset translate3d property
-
-            container.style.transform = 'translate3d(0,0,0)';
+            container.style.transform = '';
             // set progressbarHeight to 0
             progressbar.style.height = '0px';
             return;

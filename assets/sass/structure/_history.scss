@@ -1,6 +1,5 @@
 .enp-tree__history {
     position: absolute;
-    left: 5px;
     top: $spacing__base;
     z-index: 999;
     margin: 0;
@@ -89,9 +88,11 @@
 .enp-tree__state--tree {
     .enp-tree__history {
         transform: scale(1.2);
+        left: 5px;
 
         @include breakpoint($mobile-large) {
             transform: scale(1.5);
+            left: 20px;
         }
     }
 }
@@ -99,6 +100,8 @@
 .enp-tree__state--question,
 .enp-tree__state--end {
     .enp-tree__history {
+        left: 5px;
+
         @include breakpoint($tablet + 100px) {
             left: calc(50% - 350px);
         }

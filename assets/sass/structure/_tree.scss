@@ -57,13 +57,15 @@ html {
     will-change: transform;
     transform-origin: top center;
 
-    @media (max-width: $column_max_width) {
-        padding-left: 45px; // account for history nav
-    }
+
 
     @include breakpoint($mobile-large) {
         padding: $spacing__base;
         transform-origin: top left;
+    }
+
+    @media (max-width: $tablet) {
+        padding-left: 45px; // account for history nav
     }
 }
 

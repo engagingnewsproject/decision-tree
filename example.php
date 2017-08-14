@@ -6,37 +6,18 @@
     <title>Example Decision Tree</title>
     <link rel='stylesheet' href="dist/css/base.min.css"/>
     <!--<link rel='stylesheet' href="assets/base-test.css"/>-->
-    <!--<style>
-        .enp-tree__question {
-            border: 1px solid #ddd;
+    <style>
+
+        body {
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
-        .enp-tree__content-window {
-            position: relative;
+        #enp-tree__citizen {
+            border: 1px solid #f2f2f2;
         }
-
-        .enp-tree__questions {
-            transition: all .4s;
-            position: relative;
-        }
-
-        .enp-tree__question {
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-        .enp-tree__state--tree .enp-tree__group {
-            position: absolute;
-            left: 100%;
-            top: 0;
-        }
-
-        .enp-tree__state--tree .enp-tree__content-window {
-            transform: scale(0.5);
-            transform-origin: top left;
-        }
-
-    </style>-->
+    </style>
 </head>
 <body>
 <main>
