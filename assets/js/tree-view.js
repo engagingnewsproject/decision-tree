@@ -88,7 +88,7 @@ function TreeView(options) {
     // set an active className
     this.activeClassName = 'is-active'
     // how long animation classes are applied for until removed
-    this.animationLength = 600
+    this.animationLength = 500
     // set the el
     _container = options.container;
     // attach event listeners to the tree element with
@@ -155,7 +155,8 @@ TreeView.prototype = {
     updateState: function(data) {
         let oldState,
             newState,
-            oldActiveEl;
+            oldActiveEl,
+            newStateSuccess;
 
         oldState = data.oldState
         newState = data.newState
@@ -170,19 +171,30 @@ TreeView.prototype = {
             oldActiveEl.classList.remove(this.activeClassName)
             // animate out
             oldActiveEl.classList.add('enp-tree__'+oldState.type+'--animate-out')
-            window.setTimeout(()=>{ oldActiveEl.classList.remove('enp-tree__'+oldState.type+'--animate-out') }, this.animationLength)
+            setTimeout(()=>{
+                 oldActiveEl.classList.remove('enp-tree__'+oldState.type+'--animate-out')
+            }, this.animationLength)
         }
 
         // activate new state
         // data.newState.id
-        newState = this.setState(data.newState)
+        newStateSuccess = this.setState(data.newState)
 
-        // revert back to old state
-        if(newState === false) {
-            this.setState(data.oldState)
+        // delay the updateViewHeight if we're switching to/from the 'tree' since there's a lot that happens height/transform wise in that time
+        if(oldState.type === 'tree' || newState.type === 'tree') {
+            setTimeout(()=>{
+                this.updateViewHeight(newState)
+            }, this.animationLength)
+        } else {
+            // don't worry about delaying
+            this.updateViewHeight(newState)
         }
 
-        // focus new active elemnt
+        // revert back to old state
+        if(newStateSuccess === false) {
+            this.setState(oldState)
+            this.updateViewHeight(oldState)
+        }
     },
 
     setState: function(state, init) {
@@ -205,9 +217,21 @@ TreeView.prototype = {
             activeEl.focus()
         }
 
+        return true;
+    },
+
+    updateViewHeight: function(state) {
+        let activeEl,
+            cPanel,
+            cWindow,
+            cWindowHeight,
+            cPanelTransform,
+            questionOffsetTop;
+
+        activeEl = this.getActiveEl()
         // if we're on a question, set the transform origin on the wrapper
-        let cPanel = this.getContentPane()
-        let cWindow = this.getContentWindow()
+        cPanel = this.getContentPane()
+        cWindow = this.getContentWindow()
         if(state.type === 'question' || state.type === 'end') {
 
             // this works well if we don't scale it
@@ -216,17 +240,32 @@ TreeView.prototype = {
             // the calculation on offsetTop. If we're going to do that, we need to
             // delay the margin change until after the animation has completed
             // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (cPanel) must be set position relative
-            this.setTransform(cPanel, 'translate3d(0,'+ - (activeEl.offsetTop)+'px,0)')
+            questionOffsetTop = -activeEl.offsetTop
+            cPanelTransform = 'translate3d(0,'+ questionOffsetTop+'px,0)'
             // set window scroll position to 0 (helps on mobile to center the question correctly)
             cWindow.scrollTop = 0
             // set a height
-            cWindow.style.height = activeEl.offsetHeight+'px'
+            cWindowHeight = activeEl.offsetHeight
 
-        } else {
-            this.setTransform(cPanel, '')
         }
 
-        return true;
+        // if the state type is tree, set a max-height on the window.
+        else if(state.type === 'tree') {
+            cWindowHeight = cPanel.getBoundingClientRect().height
+            // content window is what you can see and the pane is the full height element with transform origin applied on it. Think of a big piece of paper (the panel) and it's covered up except for a small window that you're looking through
+            cWindow.style.height = cWindowHeight+'px';
+            // reset the transform origin
+            cPanelTransform = ''
+        } else {
+            cPanelTransform = ''
+        }
+
+        // set the transforms
+        cWindow.style.height = cWindowHeight+'px'
+        this.setTransform(cPanel, cPanelTransform)
+
+        // emit to let everyone know we finished updating the height
+        this.emit('viewChange', 'viewHeightUpdate', {cWindowHeight: cWindowHeight, questionOffsetTop: questionOffsetTop })
     },
 
     addContainerState: function(state) {
@@ -236,13 +275,6 @@ TreeView.prototype = {
         // if the class isn't already there, add it
         if(!classes.contains('enp-tree__state--'+state.type)) {
             classes.add('enp-tree__state--'+state.type)
-        }
-        if(state.type === 'tree') {
-            // if the state type is tree, set a max-height on the window.
-            let cPanel = this.getContentPane()
-            let cWindow = this.getContentWindow()
-            // content window is what you can see and the pane is the full height element with transform origin applied on it. Think of a big piece of paper (the panel) and it's covered up except for a small window that you're looking through
-            cWindow.style.height = cPanel.getBoundingClientRect().height+'px';
         }
     },
 
@@ -322,6 +354,10 @@ TreeView.prototype = {
             case 'ready':
                 // tell the Tree to let all the other observers know that the view is ready
                 Tree.message(item, data)
+                break
+            case 'viewChange':
+                Tree.message(item, data)
+                break
         }
 
     },

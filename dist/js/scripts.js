@@ -159,6 +159,15 @@ TreeHistoryView.prototype = {
             case 'historyIndexUpdate':
                 this.updateHistoryIndex(data);
                 break;
+            case 'viewHeightUpdate':
+                // we need to wait until the viewHeights have been calculated and set so
+                // we can set the heights appropriately
+                var currentIndex = this.getCurrentIndex();
+                if (this.getCurrentState().type === 'tree') {
+                    currentIndex = null;
+                }
+                this.templateUpdateProgressbar(currentIndex);
+                break;
             case 'update':
                 // we only care if we're updating to/from an overview state
                 if (data.newState.type === 'tree' || data.oldState.type === 'tree') {
@@ -212,15 +221,31 @@ TreeHistoryView.prototype = {
     },
 
     getCurrentNav: function getCurrentNav() {
-        var TreeHistory = void 0,
-            currentIndex = void 0,
+        var currentIndex = void 0,
             historyNav = void 0;
 
-        TreeHistory = this.getTreeHistory();
-        currentIndex = TreeHistory.getCurrentIndex();
+        currentIndex = this.getCurrentIndex();
         historyNav = this.getHistoryNavItems();
 
         return historyNav[currentIndex];
+    },
+    getCurrentIndex: function getCurrentIndex() {
+        var currentIndex = void 0,
+            TreeHistory = void 0;
+
+        TreeHistory = this.getTreeHistory();
+        currentIndex = TreeHistory.getCurrentIndex();
+        return currentIndex;
+    },
+
+
+    // Gets current state of the tree
+    getCurrentState: function getCurrentState() {
+        var state = void 0;
+
+        state = this.getTreeHistory().getTree().getState();
+        console.log(state);
+        return state;
     },
     getHistoryNavItems: function getHistoryNavItems() {
         var list = this.getList();
@@ -234,13 +259,13 @@ TreeHistoryView.prototype = {
 
     updateHistoryIndex: function updateHistoryIndex(index) {
         this.templateUpdateIndex(index);
-        this.templateUpdateProgressbar(index);
     },
 
     updateOverview: function updateOverview(data) {
         var overviewBtn = void 0,
             resumeBtn = void 0,
-            currentNav = void 0;
+            currentNav = void 0,
+            currentHistoryState = void 0;
 
         overviewBtn = this.getOverviewBtn().firstElementChild;
         currentNav = this.getCurrentNav();
@@ -252,6 +277,8 @@ TreeHistoryView.prototype = {
             if (currentNav !== undefined) {
                 currentNav.firstElementChild.classList.add('is-active');
             }
+            // move progressbar to right location if we need to.
+            // check if the new state is the same as our old index. If it is, DON'T run it again, as it was already updated by the history index change.
         } else if (data.newState.type === 'tree') {
             // show resume button. add class to overview button
             overviewBtn.classList.add('is-active');
@@ -354,9 +381,7 @@ TreeHistoryView.prototype = {
 
     templateUpdateIndex: function templateUpdateIndex(currentIndex) {
         var li = void 0,
-            a = void 0,
-            progressbar = void 0,
-            progressbarHeight = void 0;
+            a = void 0;
 
         li = this.getHistoryNavItems();
         // first check that we need to update anything
@@ -374,8 +399,6 @@ TreeHistoryView.prototype = {
 
 
     templateUpdateProgressbar: function templateUpdateProgressbar(currentIndex) {
-        var _this = this;
-
         var progressbar = void 0,
             progressbarHeight = void 0,
             historyItems = void 0,
@@ -386,40 +409,52 @@ TreeHistoryView.prototype = {
             cWindow = void 0,
             cWindowHeight = void 0;
 
+        console.log('templateUpdateProgressbar', currentIndex);
+        container = this.getContainer();
+        progressbar = this.getProgressbar();
+
+        // for things like Tree view where no index is needed
+        if (currentIndex === null) {
+            // reset translate3d property
+
+            container.style.transform = 'translate3d(0,0,0)';
+            // set progressbarHeight to 0
+            progressbar.style.height = '0px';
+            return;
+        }
+
+        // TODO: Fire this after ViewHeight action is finished.
         // see if we're taller than our frame
-        setTimeout(function () {
 
-            progressbar = _this.getProgressbar();
-            historyItems = _this.getHistoryNavItems();
-            progressbarHeight = historyItems[currentIndex].offsetTop;
-            // update height
-            progressbar.style.height = progressbarHeight + 'px';
+        historyItems = this.getHistoryNavItems();
+        progressbarHeight = historyItems[currentIndex].offsetTop;
+        // update height
+        progressbar.style.height = progressbarHeight + 'px';
 
-            container = _this.getContainer();
-            cWindow = _this.getContentWindow();
-            list = _this.getList();
-            listHeight = list.getBoundingClientRect().height;
-            cWindowHeight = parseFloat(cWindow.style.height);
-            // default to the top
-            containerMoveUp = 0;
+        cWindow = this.getContentWindow();
+        list = this.getList();
+        listHeight = list.getBoundingClientRect().height;
+        cWindowHeight = parseFloat(cWindow.style.height);
+        console.log('listHeight', listHeight);
+        // default to the top
+        containerMoveUp = 0;
 
-            // OMG just don't. This was way harder on a Friday afternoon than it
-            // should have been.
-            // We're checking to see if the contentWindow is less than the listHeight AND if the progressbarHeight is tall enough that we need to address it.
-            // IE. We don't want to move the list all the way down if they have 10 items, but they've moved back to the second.
-            if (cWindowHeight < listHeight && cWindowHeight / 2 < progressbarHeight) {
+        // OMG just don't. This was way harder on a Friday afternoon than it
+        // should have been.
+        // We're checking to see if the contentWindow is less than the listHeight AND if the progressbarHeight is tall enough that we need to address it.
+        // IE. We don't want to move the list all the way down if they have 10 items, but they've moved back to the second.
+        if (cWindowHeight < listHeight && cWindowHeight / 2 < progressbarHeight) {
 
-                if (listHeight - progressbarHeight < cWindowHeight / 2) {
-                    // the bottom element can be in the bottom half of the view, so stack it to the bottom.
-                    containerMoveUp = cWindowHeight - listHeight;
-                } else {
-                    // Center it in the window because we're not near the top or bottom
-                    containerMoveUp = -(progressbarHeight - cWindowHeight / 2 + historyItems[currentIndex].getBoundingClientRect().height / 2);
-                }
+            if (listHeight - progressbarHeight < cWindowHeight / 2) {
+                // the bottom element can be in the bottom half of the view, so stack it to the bottom.
+                containerMoveUp = cWindowHeight - listHeight;
+            } else {
+                // Center it in the window because we're not near the top or bottom
+                containerMoveUp = -(progressbarHeight - cWindowHeight / 2 + historyItems[currentIndex].getBoundingClientRect().height / 2);
             }
+        }
 
-            container.style.transform = 'translate3d(0,' + containerMoveUp + 'px,0)';
-        }, 40);
+        container.style.transform = 'translate3d(0,' + containerMoveUp + 'px,0)';
     },
 
     templateUl: function templateUl() {
@@ -952,7 +987,7 @@ function TreeView(options) {
     // set an active className
     this.activeClassName = 'is-active';
     // how long animation classes are applied for until removed
-    this.animationLength = 600;
+    this.animationLength = 500;
     // set the el
     _container = options.container;
     // attach event listeners to the tree element with
@@ -1016,9 +1051,12 @@ TreeView.prototype = {
     * Used when a state is already set and we need to change it
     */
     updateState: function updateState(data) {
+        var _this = this;
+
         var oldState = void 0,
             newState = void 0,
-            oldActiveEl = void 0;
+            oldActiveEl = void 0,
+            newStateSuccess = void 0;
 
         oldState = data.oldState;
         newState = data.newState;
@@ -1033,21 +1071,30 @@ TreeView.prototype = {
             oldActiveEl.classList.remove(this.activeClassName);
             // animate out
             oldActiveEl.classList.add('enp-tree__' + oldState.type + '--animate-out');
-            window.setTimeout(function () {
+            setTimeout(function () {
                 oldActiveEl.classList.remove('enp-tree__' + oldState.type + '--animate-out');
             }, this.animationLength);
         }
 
         // activate new state
         // data.newState.id
-        newState = this.setState(data.newState);
+        newStateSuccess = this.setState(data.newState);
 
-        // revert back to old state
-        if (newState === false) {
-            this.setState(data.oldState);
+        // delay the updateViewHeight if we're switching to/from the 'tree' since there's a lot that happens height/transform wise in that time
+        if (oldState.type === 'tree' || newState.type === 'tree') {
+            setTimeout(function () {
+                _this.updateViewHeight(newState);
+            }, this.animationLength);
+        } else {
+            // don't worry about delaying
+            this.updateViewHeight(newState);
         }
 
-        // focus new active elemnt
+        // revert back to old state
+        if (newStateSuccess === false) {
+            this.setState(oldState);
+            this.updateViewHeight(oldState);
+        }
     },
 
     setState: function setState(state, init) {
@@ -1070,9 +1117,21 @@ TreeView.prototype = {
             activeEl.focus();
         }
 
+        return true;
+    },
+
+    updateViewHeight: function updateViewHeight(state) {
+        var activeEl = void 0,
+            cPanel = void 0,
+            cWindow = void 0,
+            cWindowHeight = void 0,
+            cPanelTransform = void 0,
+            questionOffsetTop = void 0;
+
+        activeEl = this.getActiveEl();
         // if we're on a question, set the transform origin on the wrapper
-        var cPanel = this.getContentPane();
-        var cWindow = this.getContentWindow();
+        cPanel = this.getContentPane();
+        cWindow = this.getContentWindow();
         if (state.type === 'question' || state.type === 'end') {
 
             // this works well if we don't scale it
@@ -1081,16 +1140,31 @@ TreeView.prototype = {
             // the calculation on offsetTop. If we're going to do that, we need to
             // delay the margin change until after the animation has completed
             // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (cPanel) must be set position relative
-            this.setTransform(cPanel, 'translate3d(0,' + -activeEl.offsetTop + 'px,0)');
+            questionOffsetTop = -activeEl.offsetTop;
+            cPanelTransform = 'translate3d(0,' + questionOffsetTop + 'px,0)';
             // set window scroll position to 0 (helps on mobile to center the question correctly)
             cWindow.scrollTop = 0;
             // set a height
-            cWindow.style.height = activeEl.offsetHeight + 'px';
-        } else {
-            this.setTransform(cPanel, '');
+            cWindowHeight = activeEl.offsetHeight;
         }
 
-        return true;
+        // if the state type is tree, set a max-height on the window.
+        else if (state.type === 'tree') {
+                cWindowHeight = cPanel.getBoundingClientRect().height;
+                // content window is what you can see and the pane is the full height element with transform origin applied on it. Think of a big piece of paper (the panel) and it's covered up except for a small window that you're looking through
+                cWindow.style.height = cWindowHeight + 'px';
+                // reset the transform origin
+                cPanelTransform = '';
+            } else {
+                cPanelTransform = '';
+            }
+
+        // set the transforms
+        cWindow.style.height = cWindowHeight + 'px';
+        this.setTransform(cPanel, cPanelTransform);
+
+        // emit to let everyone know we finished updating the height
+        this.emit('viewChange', 'viewHeightUpdate', { cWindowHeight: cWindowHeight, questionOffsetTop: questionOffsetTop });
     },
 
     addContainerState: function addContainerState(state) {
@@ -1100,13 +1174,6 @@ TreeView.prototype = {
         // if the class isn't already there, add it
         if (!classes.contains('enp-tree__state--' + state.type)) {
             classes.add('enp-tree__state--' + state.type);
-        }
-        if (state.type === 'tree') {
-            // if the state type is tree, set a max-height on the window.
-            var cPanel = this.getContentPane();
-            var cWindow = this.getContentWindow();
-            // content window is what you can see and the pane is the full height element with transform origin applied on it. Think of a big piece of paper (the panel) and it's covered up except for a small window that you're looking through
-            cWindow.style.height = cPanel.getBoundingClientRect().height + 'px';
         }
     },
 
@@ -1186,6 +1253,10 @@ TreeView.prototype = {
             case 'ready':
                 // tell the Tree to let all the other observers know that the view is ready
                 Tree.message(item, data);
+                break;
+            case 'viewChange':
+                Tree.message(item, data);
+                break;
         }
     },
 

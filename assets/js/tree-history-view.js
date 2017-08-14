@@ -111,6 +111,15 @@ TreeHistoryView.prototype = {
             case 'historyIndexUpdate':
                 this.updateHistoryIndex(data)
                 break
+            case 'viewHeightUpdate':
+                // we need to wait until the viewHeights have been calculated and set so
+                // we can set the heights appropriately
+                let currentIndex = this.getCurrentIndex()
+                if(this.getCurrentState().type === 'tree') {
+                    currentIndex = null
+                }
+                this.templateUpdateProgressbar(currentIndex)
+                break
             case 'update':
                 // we only care if we're updating to/from an overview state
                 if(data.newState.type === 'tree' || data.oldState.type === 'tree') {
@@ -167,15 +176,31 @@ TreeHistoryView.prototype = {
     },
 
     getCurrentNav() {
-        let TreeHistory,
-            currentIndex,
+        let currentIndex,
             historyNav;
 
-        TreeHistory = this.getTreeHistory();
-        currentIndex = TreeHistory.getCurrentIndex()
+        currentIndex = this.getCurrentIndex()
         historyNav = this.getHistoryNavItems()
 
         return historyNav[currentIndex]
+    },
+
+    getCurrentIndex() {
+        let currentIndex,
+            TreeHistory;
+
+        TreeHistory = this.getTreeHistory();
+        currentIndex = TreeHistory.getCurrentIndex()
+        return currentIndex
+    },
+
+    // Gets current state of the tree
+    getCurrentState() {
+        let state;
+
+        state = this.getTreeHistory().getTree().getState();
+        console.log(state)
+        return state
     },
 
     getHistoryNavItems() {
@@ -189,13 +214,13 @@ TreeHistoryView.prototype = {
 
     updateHistoryIndex: function(index) {
         this.templateUpdateIndex(index)
-        this.templateUpdateProgressbar(index);
     },
 
     updateOverview: function(data) {
         let overviewBtn,
             resumeBtn,
-            currentNav;
+            currentNav,
+            currentHistoryState;
 
         overviewBtn = this.getOverviewBtn().firstElementChild
         currentNav = this.getCurrentNav()
@@ -207,6 +232,9 @@ TreeHistoryView.prototype = {
             if(currentNav !== undefined) {
                 currentNav.firstElementChild.classList.add('is-active')
             }
+            // move progressbar to right location if we need to.
+            // check if the new state is the same as our old index. If it is, DON'T run it again, as it was already updated by the history index change.
+
         } else if(data.newState.type === 'tree') {
             // show resume button. add class to overview button
             overviewBtn.classList.add('is-active')
@@ -214,6 +242,7 @@ TreeHistoryView.prototype = {
                 currentNav.firstElementChild.classList.remove('is-active')
             }
         }
+
     },
 
     // TODO: Elements are being added/removed. Check each element to see if its element.data matches the history data in order. If one doesn't match, rerender from that point on.
@@ -310,9 +339,7 @@ TreeHistoryView.prototype = {
 
     templateUpdateIndex(currentIndex) {
         let li,
-            a,
-            progressbar,
-            progressbarHeight;
+            a;
 
         li = this.getHistoryNavItems()
         // first check that we need to update anything
@@ -341,41 +368,53 @@ TreeHistoryView.prototype = {
             cWindow,
             cWindowHeight;
 
+        console.log('templateUpdateProgressbar', currentIndex)
+        container = this.getContainer()
+        progressbar = this.getProgressbar()
+
+        // for things like Tree view where no index is needed
+        if(currentIndex === null) {
+            // reset translate3d property
+
+            container.style.transform = 'translate3d(0,0,0)'
+            // set progressbarHeight to 0
+            progressbar.style.height = '0px'
+            return
+        }
+
+        // TODO: Fire this after ViewHeight action is finished.
         // see if we're taller than our frame
-        setTimeout(() => {
 
-            progressbar = this.getProgressbar()
-            historyItems = this.getHistoryNavItems()
-            progressbarHeight = historyItems[currentIndex].offsetTop
-            // update height
-            progressbar.style.height = progressbarHeight +'px'
+        historyItems = this.getHistoryNavItems()
+        progressbarHeight = historyItems[currentIndex].offsetTop
+        // update height
+        progressbar.style.height = progressbarHeight +'px'
 
-            container = this.getContainer()
-            cWindow = this.getContentWindow()
-            list = this.getList()
-            listHeight = list.getBoundingClientRect().height
-            cWindowHeight = parseFloat(cWindow.style.height)
-            // default to the top
-            containerMoveUp = 0
+        cWindow = this.getContentWindow()
+        list = this.getList()
+        listHeight = list.getBoundingClientRect().height
+        cWindowHeight = parseFloat(cWindow.style.height)
+        console.log('listHeight', listHeight)
+        // default to the top
+        containerMoveUp = 0
 
-            // OMG just don't. This was way harder on a Friday afternoon than it
-            // should have been.
-            // We're checking to see if the contentWindow is less than the listHeight AND if the progressbarHeight is tall enough that we need to address it.
-            // IE. We don't want to move the list all the way down if they have 10 items, but they've moved back to the second.
-            if(cWindowHeight < listHeight && cWindowHeight/2 < progressbarHeight) {
-                
-                if((listHeight - progressbarHeight) < cWindowHeight/2) {
-                    // the bottom element can be in the bottom half of the view, so stack it to the bottom.
-                    containerMoveUp = cWindowHeight - listHeight
-                } else {
-                    // Center it in the window because we're not near the top or bottom
-                    containerMoveUp = -(progressbarHeight - cWindowHeight/2 + historyItems[currentIndex].getBoundingClientRect().height/2)
-                }
+        // OMG just don't. This was way harder on a Friday afternoon than it
+        // should have been.
+        // We're checking to see if the contentWindow is less than the listHeight AND if the progressbarHeight is tall enough that we need to address it.
+        // IE. We don't want to move the list all the way down if they have 10 items, but they've moved back to the second.
+        if(cWindowHeight < listHeight && cWindowHeight/2 < progressbarHeight) {
 
+            if((listHeight - progressbarHeight) < cWindowHeight/2) {
+                // the bottom element can be in the bottom half of the view, so stack it to the bottom.
+                containerMoveUp = cWindowHeight - listHeight
+            } else {
+                // Center it in the window because we're not near the top or bottom
+                containerMoveUp = -(progressbarHeight - cWindowHeight/2 + historyItems[currentIndex].getBoundingClientRect().height/2)
             }
 
-            container.style.transform = 'translate3d(0,'+ containerMoveUp +'px,0)'
-        }, 40)
+        }
+
+        container.style.transform = 'translate3d(0,'+ containerMoveUp +'px,0)'
 
     },
 
