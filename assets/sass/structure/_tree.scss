@@ -10,7 +10,7 @@ html {
 .enp-tree {
     width: 100%;
     position: relative;
-    overflow-y: hidden;
+    overflow: hidden;
 }
 
 // remove 300ms delay
@@ -46,6 +46,10 @@ html {
     padding: $spacing__base*0.6 $spacing__base;
     text-decoration: none;
     text-align: center;
+}
+
+.enp-tree__content-wrapper {
+    overflow: scroll;
 }
 
 .enp-tree__content-window {
