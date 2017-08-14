@@ -48,10 +48,6 @@ html {
     text-align: center;
 }
 
-.enp-tree__content-wrapper {
-    overflow: scroll;
-}
-
 .enp-tree__content-window {
     box-sizing: content-box;
     padding: 15px;
@@ -72,15 +68,21 @@ html {
 }
 
 .enp-tree__state--tree {
+
+    .enp-tree__content-wrapper {
+        overflow: scroll;
+    }
+
     .enp-tree__content-window {
         max-height: 700px;
         overflow: scroll;
         padding-left: 80px;
 
+        /*
         @include breakpoint($mobile-large) {
             max-height: none;
             overflow: visible;
-        }
+        }*/
     }
 }
 

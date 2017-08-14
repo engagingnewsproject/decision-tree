@@ -994,6 +994,9 @@ function TreeView(options) {
     // bound `this` so we get our reference to this element
     _container.addEventListener("click", this.click.bind(this));
     _container.addEventListener("keydown", this.keydown.bind(this));
+    // add a resize timeout so we know if one is already firing
+    this.resizeTimeout = null;
+    window.addEventListener("resize", this.resize.bind(this));
 
     // if a Tree was passed, build the view now
     if (options.Tree) {
@@ -1238,6 +1241,20 @@ TreeView.prototype = {
             }
         }
         event.stopPropagation();
+    },
+
+    resize: function resize() {
+        var _this2 = this;
+
+        // recalculate heights on resize
+        // debounce it, kinda, by waiting 100ms until they're done so we don't fire this constantly
+        this.resizeTimeout = null;
+        if (!this.resizeTimeout) {
+            this.resizeTimeout = setTimeout(function () {
+                // update the heights
+                _this2.updateViewHeight(_this2.getTree().getState());
+            }, 450);
+        }
     },
 
     /**
