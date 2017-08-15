@@ -87,13 +87,8 @@
 
 .enp-tree__state--tree {
     .enp-tree__history {
-        transform: scale(1.2);
-        left: 5px;
-
-        @include breakpoint($mobile-large) {
-            transform: scale(1.5);
-            left: 20px;
-        }
+        transform: scale(1.5);
+        left: 20px;
     }
 }
 

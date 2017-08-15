@@ -55,7 +55,7 @@ html {
     transition: all .4s;
     transform: translate3d(0,0,0);
     will-change: transform;
-    transform-origin: top center;
+    transform-origin: top left;
 
 
 
@@ -102,20 +102,16 @@ html {
 // overview of whole tree
 .enp-tree__state--tree {
     .enp-tree__content-window {
-        transform: scale(0.8) translate3d(0,0,0);
-        transform-origin: top center;
-        max-height: 700px;
-        overflow: scroll;
+        transform: scale(0.65) translate3d(0,0,0);
+        transform-origin: top left;
+        padding-top: $spacing__base * 3;
+        max-height: none;
+        overflow: visible;
+
         @media (max-width: $column_max_width) {
             padding-left: 65px; // account for history nav
         }
-        @include breakpoint($mobile-large) {
-            padding-top: $spacing__base * 3;
-            max-height: none;
-            overflow: visible;
-            transform: scale(0.65) translate3d(0,0,0);
-            transform-origin: top left;
-        }
+
     }
 }
 
@@ -140,11 +136,7 @@ html {
 
 .enp-tree__state--tree.enp-tree__state--animate-out--end {
     .enp-tree__content-window {
-        animation: animateToTreeMobile 0.5s;
-
-        @include breakpoint($mobile-large) {
-            animation: animateToTree 0.5s;
-        }
+        animation: animateToTree 0.5s;
 
     }
      .enp-tree__content-panel {
@@ -162,18 +154,5 @@ html {
         opacity: 1;
         transform: scale(0.65) translate3d(0, 0,0);
         transform-origin: top left;
-    }
-}
-
-@keyframes animateToTreeMobile {
-    0% {
-        opacity: 0;
-        transform: scale(0.7) translate3d(0,-50px,0);
-        transform-origin: top center;
-    },
-    100% {
-        opacity: 1;
-        transform: scale(0.8) translate3d(0, 0,0);
-        transform-origin: top center;
     }
 }

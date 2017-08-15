@@ -975,6 +975,7 @@ TreeView.prototype = {
         // set the current state in the view
         var init = true;
         this.setState(Tree.getState(), init);
+        this.updateViewHeight(Tree.getState());
     },
 
     render: function render(data) {
@@ -986,6 +987,14 @@ TreeView.prototype = {
 
         // bind question data
         this.bindAllData();
+    },
+
+    getGroups: function getGroups() {
+        var treeEl = void 0,
+            groups = void 0;
+
+        treeEl = this.getTreeEl();
+        return treeEl.getElementsByClassName('enp-tree__group');
     },
 
     /**
@@ -1067,7 +1076,13 @@ TreeView.prototype = {
             cWindow = void 0,
             cWindowHeight = void 0,
             cPanelTransform = void 0,
-            questionOffsetTop = void 0;
+            questionOffsetTop = void 0,
+            groups = void 0,
+            groupsHeight = void 0,
+            groupsWidth = void 0,
+            groupsOffsetLeft = void 0;
+
+        console.log('updateViewHeight', state);
 
         activeEl = this.getActiveEl();
         // if we're on a question, set the transform origin on the wrapper
@@ -1093,9 +1108,37 @@ TreeView.prototype = {
 
         // if the state type is tree, set a height on the window and distribute the groups accordingly
         else if (state.type === 'tree') {
+                // get the groups
+                groups = this.getGroups();
+                groupsHeight = 0;
+
+                for (var i = 0; i < groups.length; i++) {
+                    console.log(groups[i].getBoundingClientRect().height);
+                    if (i === 0) {
+                        groupsWidth = groups[i].getBoundingClientRect().width;
+                        if (groupsWidth < 350) {
+                            groupsOffsetLeft = 30;
+                        } else {
+                            groupsOffsetLeft = 50;
+                        }
+                    } else {
+                        groups[i].style.top = groupsHeight + 'px';
+                    }
+                    // set to the left
+                    groups[i].style.left = groupsWidth * 1.5 + groupsOffsetLeft + 'px';
+                    // add in the height of this one
+                    // an extra 100 seems to be about right for spacing
+                    groupsHeight = groupsHeight + groups[i].getBoundingClientRect().height * 1.5 + 100;
+                }
+                // make sure the height of the groups isn't taller than the cWindowHeight
                 cWindowHeight = cPanel.getBoundingClientRect().height;
 
+                if (cWindowHeight < groupsHeight) {
+                    cWindowHeight = groupsHeight;
+                }
+
                 cWindow.style.height = cWindowHeight + 'px';
+
                 // reset the transform origin
                 cPanelTransform = '';
             } else {

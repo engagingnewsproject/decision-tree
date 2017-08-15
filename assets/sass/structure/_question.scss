@@ -18,6 +18,10 @@
 }
 
 .enp-tree__state--tree {
+    .enp-tree__questions {
+        min-width: $column_min_width;
+    }
+
     .enp-tree__question {
         position: relative;
         transform: scale(1) translate3d(0,0,0);
