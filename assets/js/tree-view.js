@@ -393,6 +393,7 @@ TreeView.prototype = {
                 let id = elData[j][elTypes[i]+'_id']
                 // find the element in the DOM
                 let el = document.getElementById('enp-tree__el--'+id)
+                
                 // bind the data
                 this.bindDOMData(elData[j], el, elTypes[i])
 

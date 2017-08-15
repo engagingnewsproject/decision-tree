@@ -1292,6 +1292,7 @@ TreeView.prototype = {
                 var id = elData[j][elTypes[i] + '_id'];
                 // find the element in the DOM
                 var el = document.getElementById('enp-tree__el--' + id);
+
                 // bind the data
                 this.bindDOMData(elData[j], el, elTypes[i]);
 

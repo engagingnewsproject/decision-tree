@@ -151,3 +151,53 @@ INSERT INTO `tree_element_destination` (`el_id`,`el_id_destination`) VALUES (35,
 INSERT INTO `tree_element_destination` (`el_id`,`el_id_destination`) VALUES (34,26);
 INSERT INTO `tree_element_container` (`el_id`,`el_id_child`) VALUES (33,34);
 INSERT INTO `tree_element_container` (`el_id`,`el_id_child`) VALUES (33,35);
+
+
+INSERT INTO `tree`.`tree_element` (`el_id`, `tree_id`, `el_type_id`, `el_title`, `el_created_by`, `el_updated_by`) VALUES ('40', '1', '2', 'During the last three to five years, I have not taken a trip out of the United States that lasted one year or more.', '1', '1');
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (40,7);
+INSERT INTO `tree_element` (`el_id`,`tree_id`,`el_type_id`,`el_title`,`el_created_by`,`el_updated_by`) VALUES (41,1,3,'Yes',1,1);
+INSERT INTO `tree_element` (`el_id`,`tree_id`,`el_type_id`,`el_title`,`el_created_by`,`el_updated_by`) VALUES (42,1,3,'No',1,1);
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (41,1);
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (42,0);
+INSERT INTO `tree_element_destination` (`el_id`,`el_id_destination`) VALUES (42,6);
+INSERT INTO `tree_element_destination` (`el_id`,`el_id_destination`) VALUES (41,43);
+INSERT INTO `tree_element_container` (`el_id`,`el_id_child`) VALUES (40,41);
+INSERT INTO `tree_element_container` (`el_id`,`el_id_child`) VALUES (40,42);
+
+
+INSERT INTO `tree`.`tree_element` (`el_id`, `tree_id`, `el_type_id`, `el_title`, `el_created_by`, `el_updated_by`) VALUES ('43', '1', '2', 'I have resided in the district or state in which I am applying for citizenship for the last three months.', '1', '1');
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (43,8);
+INSERT INTO `tree_element` (`el_id`,`tree_id`,`el_type_id`,`el_title`,`el_created_by`,`el_updated_by`) VALUES (44,1,3,'Yes',1,1);
+INSERT INTO `tree_element` (`el_id`,`tree_id`,`el_type_id`,`el_title`,`el_created_by`,`el_updated_by`) VALUES (45,1,3,'No',1,1);
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (44,1);
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (45,0);
+INSERT INTO `tree_element_destination` (`el_id`,`el_id_destination`) VALUES (45,6);
+INSERT INTO `tree_element_destination` (`el_id`,`el_id_destination`) VALUES (44,46);
+INSERT INTO `tree_element_container` (`el_id`,`el_id_child`) VALUES (43,44);
+INSERT INTO `tree_element_container` (`el_id`,`el_id_child`) VALUES (43,45);
+
+
+INSERT INTO `tree`.`tree_element` (`el_id`, `tree_id`, `el_type_id`, `el_title`, `el_created_by`, `el_updated_by`) VALUES ('46', '1', '2', 'I can read, write and speak basic English.', '1', '1');
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (46,8);
+INSERT INTO `tree_element` (`el_id`,`tree_id`,`el_type_id`,`el_title`,`el_created_by`,`el_updated_by`) VALUES (47,1,3,'Yes',1,1);
+INSERT INTO `tree_element` (`el_id`,`tree_id`,`el_type_id`,`el_title`,`el_created_by`,`el_updated_by`) VALUES (48,1,3,'No',1,1);
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (47,1);
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (48,0);
+INSERT INTO `tree_element_destination` (`el_id`,`el_id_destination`) VALUES (48,6);
+INSERT INTO `tree_element_destination` (`el_id`,`el_id_destination`) VALUES (47,49);
+INSERT INTO `tree_element_container` (`el_id`,`el_id_child`) VALUES (46,47);
+INSERT INTO `tree_element_container` (`el_id`,`el_id_child`) VALUES (46,48);
+
+
+INSERT INTO `tree`.`tree_element` (`el_id`, `tree_id`, `el_type_id`, `el_title`, `el_created_by`, `el_updated_by`) VALUES ('52', '1', '2', 'I know the fundamentals of U.S. history and the form and principles of the U.S. government.', '1', '1');
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (52,8);
+INSERT INTO `tree_element` (`el_id`,`tree_id`,`el_type_id`,`el_title`,`el_created_by`,`el_updated_by`) VALUES (53,1,3,'Yes',1,1);
+INSERT INTO `tree_element` (`el_id`,`tree_id`,`el_type_id`,`el_title`,`el_created_by`,`el_updated_by`) VALUES (54,1,3,'No',1,1);
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (53,1);
+INSERT INTO `tree_element_order` (`el_id`,`el_order`) VALUES (54,0);
+INSERT INTO `tree_element_destination` (`el_id`,`el_id_destination`) VALUES (54,6);
+INSERT INTO `tree_element_container` (`el_id`,`el_id_child`) VALUES (52,53);
+INSERT INTO `tree_element_container` (`el_id`,`el_id_child`) VALUES (52,54);
+
+/* Destination from Previous's Yes to This Question. */
+INSERT INTO `tree_element_destination` (`el_id`,`el_id_destination`) VALUES (50,52);

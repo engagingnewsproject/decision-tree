@@ -36,7 +36,7 @@ class CompileTree extends DB {
         $this->write_file($tree['tree_slug'], $pretty_json);
         $this->write_file($tree['tree_slug'].'.min', $minified_json);
         // return the json, if they need it
-        return $compiled_json;
+        return $pretty_json;
     }
 
     protected function write_file($filename, $contents) {
@@ -68,7 +68,8 @@ class CompileTree extends DB {
         $i = 0;
 
         foreach($questions as $question) {
-
+            $questions[$i]['content'] = addslashes($questions[$i]['content']);
+            $questions[$i]['description'] = addslashes($questions[$i]['description']);
             $questions[$i]['options'] = $this->compile_options($question['question_id']);
             $i++;
         }

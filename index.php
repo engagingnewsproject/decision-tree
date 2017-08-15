@@ -130,7 +130,7 @@ $app->group('/api', function() {
             $question_id = $request->getAttribute('question_id');
 
             $DB = new \Enp\Database\DB();
-            $question = $DB->get_question($question_id, ['tree_id' => $tree_id]);
+            $question = $DB->get_question($question_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($question));
             return $response;

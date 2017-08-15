@@ -230,6 +230,39 @@ class DB extends PDO {
 		return $sql;
 	}
 
+	// Validation
+
+	// Make sure the tree_id exists
+	protected function validate_tree_id($tree_id) {
+
+	}
+
+	// Make sure the id is what it's supposed to be
+	protected function validate_el_type_id($tree_id, $el_type_id, $el_type) {
+		$is_valid = false;
+
+		// Query the $el_type_id
+		$whitelist = ['question', 'option', 'end', 'container'];
+		if(!in_array($el_type, $whitelist)) {
+			return $is_valid;
+		}
+
+		$function = 'get_'.$el_type;
+
+		$el_data = $this->$function($el_type_id, $tree_id);
+
+		if($el_data !== false) {
+			$is_valid = true;
+		}
+
+		return $is_valid;
+	}
+
+	// Must be of el_type = 'question' or 'end'
+	protected function validate_destination_id() {
+
+	}
+
 
 
 }
