@@ -4,7 +4,6 @@ function TreeHistoryView(options) {
         _contentWindow,
         _container,
         _list,
-        _overviewBtn,
         _resumeBtn,
         _progressbar;
 
@@ -22,7 +21,6 @@ function TreeHistoryView(options) {
     this.getContentWindow = function() { return _contentWindow}
     this.getContainer = function() { return _container}
     this.getList = function() { return _list}
-    this.getOverviewBtn = function() { return _overviewBtn}
     this.getResumeBtn = function() { return _resumeBtn}
     this.getProgressbar = function() { return _progressbar}
     this.getTreeHistory = function() { return _TreeHistory}
@@ -57,15 +55,6 @@ function TreeHistoryView(options) {
             _list = list
         }
         return _list
-    }
-
-    this.setOverviewBtn = function(overviewBtn) {
-        // only let it get set once
-        if(_overviewBtn === undefined) {
-            // set our built div as the overview
-            _overviewBtn = overviewBtn
-        }
-        return _overviewBtn
     }
 
     this.setResumeBtn = function(resumeBtn) {
@@ -115,16 +104,7 @@ TreeHistoryView.prototype = {
                 // we need to wait until the viewHeights have been calculated and set so
                 // we can set the heights appropriately
                 let currentIndex = this.getCurrentIndex()
-                if(this.getCurrentState().type === 'tree') {
-                    currentIndex = null
-                }
                 this.templateUpdateProgressbar(currentIndex)
-                break
-            case 'update':
-                // we only care if we're updating to/from an overview state
-                if(data.newState.type === 'tree' || data.oldState.type === 'tree') {
-                    this.updateOverview(data)
-                }
                 break
         }
 
@@ -199,13 +179,19 @@ TreeHistoryView.prototype = {
         let state;
 
         state = this.getTreeHistory().getTree().getState();
-        console.log(state)
         return state
     },
 
+    // just the history question/end items. Not the overview btn.
     getHistoryNavItems() {
         let list = this.getList()
         return list.getElementsByClassName('enp-tree__history-list-item--nav')
+    },
+
+    // All items, including overview button
+    getHistoryItems() {
+        let list = this.getList()
+        return list.children
     },
 
     updateHistory: function(history) {
@@ -216,40 +202,13 @@ TreeHistoryView.prototype = {
         this.templateUpdateIndex(index)
     },
 
-    updateOverview: function(data) {
-        let overviewBtn,
-            resumeBtn,
-            currentNav,
-            currentHistoryState;
-
-        overviewBtn = this.getOverviewBtn().firstElementChild
-        currentNav = this.getCurrentNav()
-        // we're in the overview state, so let's show the resume button and set our classes
-        if(data.oldState.type === 'tree') {
-            // hide resume button. remove class from overview button
-            overviewBtn.classList.remove('is-active')
-            // add class back to current index button
-            if(currentNav !== undefined) {
-                currentNav.firstElementChild.classList.add('is-active')
-            }
-            // move progressbar to right location if we need to.
-            // check if the new state is the same as our old index. If it is, DON'T run it again, as it was already updated by the history index change.
-
-        } else if(data.newState.type === 'tree') {
-            // show resume button. add class to overview button
-            overviewBtn.classList.add('is-active')
-            if(currentNav !== undefined) {
-                currentNav.firstElementChild.classList.remove('is-active')
-            }
-        }
-
-    },
-
     // TODO: Elements are being added/removed. Check each element to see if its element.data matches the history data in order. If one doesn't match, rerender from that point on.
     templateRender: function(history, currentIndex) {
         let container,
             list,
-            current;
+            current,
+            item;
+
         container = this.getContainer()
         container.appendChild(this.templateUl())
         // set the list as the _list var
@@ -260,18 +219,25 @@ TreeHistoryView.prototype = {
         container.appendChild(this.templateProgressbar())
         this.setProgressbar(container.children[1])
 
-        // create the overview button
-        list.appendChild(this.templateOverviewBtn())
-        this.setOverviewBtn(list.firstElementChild)
-
         // create the buttons
         for(let i = 0; i < history.length; i++) {
-            // generate list data and append to item
-            list.appendChild(this.templateHistoryItem(history[i], i, currentIndex))
+            if(i === 0) {
+                if(history[i].type !== 'tree') {
+                    console.error('First history item should be of type "Tree"')
+                }
+                item = this.templateOverviewBtn(history[i])
+            } else {
+                // generate list data and append to item
+                item  = this.templateHistoryItem(history[i], i, currentIndex)
+            }
+            list.appendChild(item)
         }
 
         // set the progressbarHeight
         this.templateUpdateProgressbar(currentIndex)
+
+        // set the active element
+        this.templateUpdateIndex(currentIndex)
     },
 
     templateUpdateHistory: function(history) {
@@ -283,7 +249,7 @@ TreeHistoryView.prototype = {
 
         // go through and compare
         list = this.getList()
-        li = this.getHistoryNavItems()
+        li = this.getHistoryItems()
         // the first one is the overview button, so don't include it
         deleteLi = []
         iterator = li.length
@@ -341,7 +307,7 @@ TreeHistoryView.prototype = {
         let li,
             a;
 
-        li = this.getHistoryNavItems()
+        li = this.getHistoryItems()
         // first check that we need to update anything
         for(let i = 0; i < li.length; i++) {
             a = li[i].firstElementChild
@@ -368,23 +334,10 @@ TreeHistoryView.prototype = {
             cWindow,
             cWindowHeight;
 
-        console.log('templateUpdateProgressbar', currentIndex)
         container = this.getContainer()
         progressbar = this.getProgressbar()
 
-        // for things like Tree view where no index is needed
-        if(currentIndex === null) {
-            // reset translate3d property
-            container.style.transform = ''
-            // set progressbarHeight to 0
-            progressbar.style.height = '0px'
-            return
-        }
-
-        // TODO: Fire this after ViewHeight action is finished.
-        // see if we're taller than our frame
-
-        historyItems = this.getHistoryNavItems()
+        historyItems = this.getHistoryItems()
         progressbarHeight = historyItems[currentIndex].offsetTop
         // update height
         progressbar.style.height = progressbarHeight +'px'
@@ -393,7 +346,6 @@ TreeHistoryView.prototype = {
         list = this.getList()
         listHeight = list.getBoundingClientRect().height
         cWindowHeight = parseFloat(cWindow.style.height)
-        console.log('listHeight', listHeight)
         // default to the top
         containerMoveUp = 0
 
@@ -431,7 +383,7 @@ TreeHistoryView.prototype = {
 
     // The data needs to be formatted to send a message that
     // we want to go to the overview mode
-    templateOverviewBtn: function() {
+    templateOverviewBtn: function(data) {
         let li,
             a;
 
@@ -443,12 +395,12 @@ TreeHistoryView.prototype = {
 
         a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview')
         a.innerHTML = '<div class="enp-tree__overview-icon"></div><div class="enp-tree__overview-icon"></div>'
-        a.data = {type: 'overview'}
+        a.data = data
 
         return li
     },
 
-    templateHistoryItem: function(data, index, currentIndex) {
+    templateHistoryItem: function(data, index) {
         let li,
             a;
 
@@ -459,12 +411,9 @@ TreeHistoryView.prototype = {
         li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--nav')
 
         a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav')
-        a.innerHTML = index + 1
+        a.innerHTML = index
         a.data = data
 
-        if(currentIndex === index) {
-            a.classList.add('is-active')
-        }
         return li
     }
 }

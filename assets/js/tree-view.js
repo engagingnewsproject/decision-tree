@@ -235,13 +235,15 @@ TreeView.prototype = {
         // if we're on a question, set the transform origin on the wrapper
         cPanel = this.getContentPane()
         cWindow = this.getContentWindow()
+
         if(state.type === 'question' || state.type === 'end') {
 
-            // this works well if we don't scale it
-            // this.getAbsoluteBoundingRect(activeEl).top - this.getAbsoluteBoundingRect(cPanel).top
+            // content window is what you can see and the pane is the full height element with transform origin applied on it. Think of a big piece of paper (the panel) and it's covered up except for a small window that you're looking through
+
             // if we change the margins based on a state change here, it'll mess up
             // the calculation on offsetTop. If we're going to do that, we need to
             // delay the margin change until after the animation has completed
+
             // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (cPanel) must be set position relative
             questionOffsetTop = -activeEl.offsetTop
             cPanelTransform = 'translate3d(0,'+ questionOffsetTop+'px,0)'
@@ -251,10 +253,10 @@ TreeView.prototype = {
             cWindowHeight = activeEl.offsetHeight
         }
 
-        // if the state type is tree, set a max-height on the window.
+        // if the state type is tree, set a height on the window and distribute the groups accordingly
         else if(state.type === 'tree') {
             cWindowHeight = cPanel.getBoundingClientRect().height
-            // content window is what you can see and the pane is the full height element with transform origin applied on it. Think of a big piece of paper (the panel) and it's covered up except for a small window that you're looking through
+
             cWindow.style.height = cWindowHeight+'px';
             // reset the transform origin
             cPanelTransform = ''
@@ -393,7 +395,7 @@ TreeView.prototype = {
                 let id = elData[j][elTypes[i]+'_id']
                 // find the element in the DOM
                 let el = document.getElementById('enp-tree__el--'+id)
-                
+
                 // bind the data
                 this.bindDOMData(elData[j], el, elTypes[i])
 

@@ -40,7 +40,7 @@ Handlebars.registerHelper('group_end', function (question_id, group_id, groups, 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function TreeHistoryView(options) {
-    var _TreeHistory, _contentWindow, _container, _list, _overviewBtn, _resumeBtn, _progressbar;
+    var _TreeHistory, _contentWindow, _container, _list, _resumeBtn, _progressbar;
 
     if (_typeof(options.contentWindow) !== 'object') {
         console.error('Tree History View container must be a valid object. Try `container: document.getElementById(your-id)`.');
@@ -61,9 +61,6 @@ function TreeHistoryView(options) {
     };
     this.getList = function () {
         return _list;
-    };
-    this.getOverviewBtn = function () {
-        return _overviewBtn;
     };
     this.getResumeBtn = function () {
         return _resumeBtn;
@@ -105,15 +102,6 @@ function TreeHistoryView(options) {
             _list = list;
         }
         return _list;
-    };
-
-    this.setOverviewBtn = function (overviewBtn) {
-        // only let it get set once
-        if (_overviewBtn === undefined) {
-            // set our built div as the overview
-            _overviewBtn = overviewBtn;
-        }
-        return _overviewBtn;
     };
 
     this.setResumeBtn = function (resumeBtn) {
@@ -163,16 +151,7 @@ TreeHistoryView.prototype = {
                 // we need to wait until the viewHeights have been calculated and set so
                 // we can set the heights appropriately
                 var currentIndex = this.getCurrentIndex();
-                if (this.getCurrentState().type === 'tree') {
-                    currentIndex = null;
-                }
                 this.templateUpdateProgressbar(currentIndex);
-                break;
-            case 'update':
-                // we only care if we're updating to/from an overview state
-                if (data.newState.type === 'tree' || data.oldState.type === 'tree') {
-                    this.updateOverview(data);
-                }
                 break;
         }
     },
@@ -244,12 +223,21 @@ TreeHistoryView.prototype = {
         var state = void 0;
 
         state = this.getTreeHistory().getTree().getState();
-        console.log(state);
         return state;
     },
+
+
+    // just the history question/end items. Not the overview btn.
     getHistoryNavItems: function getHistoryNavItems() {
         var list = this.getList();
         return list.getElementsByClassName('enp-tree__history-list-item--nav');
+    },
+
+
+    // All items, including overview button
+    getHistoryItems: function getHistoryItems() {
+        var list = this.getList();
+        return list.children;
     },
 
 
@@ -261,38 +249,13 @@ TreeHistoryView.prototype = {
         this.templateUpdateIndex(index);
     },
 
-    updateOverview: function updateOverview(data) {
-        var overviewBtn = void 0,
-            resumeBtn = void 0,
-            currentNav = void 0,
-            currentHistoryState = void 0;
-
-        overviewBtn = this.getOverviewBtn().firstElementChild;
-        currentNav = this.getCurrentNav();
-        // we're in the overview state, so let's show the resume button and set our classes
-        if (data.oldState.type === 'tree') {
-            // hide resume button. remove class from overview button
-            overviewBtn.classList.remove('is-active');
-            // add class back to current index button
-            if (currentNav !== undefined) {
-                currentNav.firstElementChild.classList.add('is-active');
-            }
-            // move progressbar to right location if we need to.
-            // check if the new state is the same as our old index. If it is, DON'T run it again, as it was already updated by the history index change.
-        } else if (data.newState.type === 'tree') {
-            // show resume button. add class to overview button
-            overviewBtn.classList.add('is-active');
-            if (currentNav !== undefined) {
-                currentNav.firstElementChild.classList.remove('is-active');
-            }
-        }
-    },
-
     // TODO: Elements are being added/removed. Check each element to see if its element.data matches the history data in order. If one doesn't match, rerender from that point on.
     templateRender: function templateRender(history, currentIndex) {
         var container = void 0,
             list = void 0,
-            current = void 0;
+            current = void 0,
+            item = void 0;
+
         container = this.getContainer();
         container.appendChild(this.templateUl());
         // set the list as the _list var
@@ -303,18 +266,25 @@ TreeHistoryView.prototype = {
         container.appendChild(this.templateProgressbar());
         this.setProgressbar(container.children[1]);
 
-        // create the overview button
-        list.appendChild(this.templateOverviewBtn());
-        this.setOverviewBtn(list.firstElementChild);
-
         // create the buttons
         for (var i = 0; i < history.length; i++) {
-            // generate list data and append to item
-            list.appendChild(this.templateHistoryItem(history[i], i, currentIndex));
+            if (i === 0) {
+                if (history[i].type !== 'tree') {
+                    console.error('First history item should be of type "Tree"');
+                }
+                item = this.templateOverviewBtn(history[i]);
+            } else {
+                // generate list data and append to item
+                item = this.templateHistoryItem(history[i], i, currentIndex);
+            }
+            list.appendChild(item);
         }
 
         // set the progressbarHeight
         this.templateUpdateProgressbar(currentIndex);
+
+        // set the active element
+        this.templateUpdateIndex(currentIndex);
     },
 
     templateUpdateHistory: function templateUpdateHistory(history) {
@@ -326,7 +296,7 @@ TreeHistoryView.prototype = {
 
         // go through and compare
         list = this.getList();
-        li = this.getHistoryNavItems();
+        li = this.getHistoryItems();
         // the first one is the overview button, so don't include it
         deleteLi = [];
         iterator = li.length;
@@ -383,7 +353,7 @@ TreeHistoryView.prototype = {
         var li = void 0,
             a = void 0;
 
-        li = this.getHistoryNavItems();
+        li = this.getHistoryItems();
         // first check that we need to update anything
         for (var i = 0; i < li.length; i++) {
             a = li[i].firstElementChild;
@@ -409,23 +379,10 @@ TreeHistoryView.prototype = {
             cWindow = void 0,
             cWindowHeight = void 0;
 
-        console.log('templateUpdateProgressbar', currentIndex);
         container = this.getContainer();
         progressbar = this.getProgressbar();
 
-        // for things like Tree view where no index is needed
-        if (currentIndex === null) {
-            // reset translate3d property
-            container.style.transform = '';
-            // set progressbarHeight to 0
-            progressbar.style.height = '0px';
-            return;
-        }
-
-        // TODO: Fire this after ViewHeight action is finished.
-        // see if we're taller than our frame
-
-        historyItems = this.getHistoryNavItems();
+        historyItems = this.getHistoryItems();
         progressbarHeight = historyItems[currentIndex].offsetTop;
         // update height
         progressbar.style.height = progressbarHeight + 'px';
@@ -434,7 +391,6 @@ TreeHistoryView.prototype = {
         list = this.getList();
         listHeight = list.getBoundingClientRect().height;
         cWindowHeight = parseFloat(cWindow.style.height);
-        console.log('listHeight', listHeight);
         // default to the top
         containerMoveUp = 0;
 
@@ -470,7 +426,7 @@ TreeHistoryView.prototype = {
 
     // The data needs to be formatted to send a message that
     // we want to go to the overview mode
-    templateOverviewBtn: function templateOverviewBtn() {
+    templateOverviewBtn: function templateOverviewBtn(data) {
         var li = void 0,
             a = void 0;
 
@@ -482,12 +438,12 @@ TreeHistoryView.prototype = {
 
         a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview');
         a.innerHTML = '<div class="enp-tree__overview-icon"></div><div class="enp-tree__overview-icon"></div>';
-        a.data = { type: 'overview' };
+        a.data = data;
 
         return li;
     },
 
-    templateHistoryItem: function templateHistoryItem(data, index, currentIndex) {
+    templateHistoryItem: function templateHistoryItem(data, index) {
         var li = void 0,
             a = void 0;
 
@@ -498,12 +454,9 @@ TreeHistoryView.prototype = {
         li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--nav');
 
         a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav');
-        a.innerHTML = index + 1;
+        a.innerHTML = index;
         a.data = data;
 
-        if (currentIndex === index) {
-            a.classList.add('is-active');
-        }
         return li;
     }
 };
@@ -553,9 +506,9 @@ function TreeHistory(options) {
     * Clears the history and currentIndex to an empty state
     */
     this.clearHistory = function () {
-        // create as an empty array
-        var history = [];
-        var currentIndex = null;
+        // create as the Tree overview state
+        var history = [{ type: 'tree', id: this.getTree().getTreeID() }];
+        var currentIndex = 0;
 
         _saveHistory(history);
         _saveCurrentIndex(currentIndex);
@@ -576,7 +529,8 @@ function TreeHistory(options) {
     * Sets variables and decides what state we'll init to
     */
     this.init = function () {
-        var treeID = void 0;
+        var treeID = void 0,
+            checkState = void 0;
 
         // get the tree id
         treeID = this.getTree().getTreeID();
@@ -671,7 +625,7 @@ TreeHistory.prototype = {
         this.setHistory(history);
     },
 
-    getCurrentState: function getCurrentState() {
+    getCurrentHistoryState: function getCurrentHistoryState() {
         var history = void 0,
             currentIndex = void 0;
 
@@ -689,9 +643,6 @@ TreeHistory.prototype = {
         switch (action) {
             case 'update':
                 var Tree = this.getTree();
-                // this is usually Tree.update('state', dataAboutNewState)
-                //  our format is data {type: 'question', id: #}, but the
-                // tree needs it in format {type: 'question', question_id: id}
                 Tree.update(item, data);
                 break;
         }
@@ -709,8 +660,6 @@ TreeHistory.prototype = {
         var currentIndex = void 0,
             history = void 0;
 
-        // TODO: update the Tree state to match the History
-        // if we have a currentIndex and state, then pass it to the main tree to set the state to reflect our view
         currentIndex = this.getCurrentIndex();
         history = this.getHistory();
 
@@ -729,6 +678,7 @@ TreeHistory.prototype = {
                 this.build(data);
                 break;
             case 'update':
+                console.log('update', data);
                 this.update(data);
                 break;
             case 'viewReady':
@@ -760,71 +710,60 @@ TreeHistory.prototype = {
         var newState = void 0,
             oldState = void 0,
             history = void 0,
-            questions = void 0,
             findNewStateIndex = void 0,
             findOldStateIndex = void 0,
             stateToAdd = void 0,
             Tree = void 0,
-            currentState = void 0;
+            currentHistoryState = void 0;
 
         // data contains old state and new state
         newState = states.newState;
         oldState = states.oldState;
         history = this.getHistory();
-        currentState = this.getCurrentState();
+        currentHistoryState = this.getCurrentHistoryState();
 
         // check if we're resuming where we left off. ie, the updated state will match where we're at in the state history
-        if (currentState !== undefined && newState.type === currentState.type && newState.id === currentState.id) {
+        if (currentHistoryState !== undefined && newState.type === currentHistoryState.type && newState.id === currentHistoryState.id) {
             // do nothing! we're good
             return;
         }
 
-        if (newState.type === 'tree' && this.getCurrentIndex() !== null) {
-            // we're in the overview state, no need to do anything
+        Tree = this.getTree();
+        // try to find the new state in our history
+        findNewStateIndex = this.getIndexBy(history, 'id', newState.id);
+        // try to find the old state in our history
+        findOldStateIndex = this.getIndexBy(history, 'id', oldState.id);
 
-            return;
+        // If we can find the new state index in our history,
+        // then we don't want to ADD it to the history, we just want to
+        // change our currentIndex to match where they are.
+        // EX. Someone clicked the "back" or "forward" buttons.
+        // They're not adding history, they're just changing where they are
+        if (findNewStateIndex !== undefined) {
+            // set the currentIndex accordingly
+            this.setCurrentIndex(findNewStateIndex);
         }
 
-        // OK, we'll probably have to do something now
-        if (newState.type === 'question' || newState.type === 'end') {
-            Tree = this.getTree();
-            questions = Tree.getQuestions();
-            // try to find the new state in our history
-            findNewStateIndex = this.getIndexBy(history, 'id', newState.id);
-            // try to find the old state in our history
-            findOldStateIndex = this.getIndexBy(history, 'id', oldState.id);
+        // try to find the previous state. is it the last one in the
+        // current state tree?
+        // if not, delete any history after the previous state.
+        // They've gone rogue by going back in history and
+        // then chose a new path
+        else if (findOldStateIndex !== undefined && findOldStateIndex !== history.length - 1) {
+                // delete anything after this point, because they've changed their state history
+                // we don't want to delete one by one because:
+                // 1. we won't allow them to do that
+                // 2. it'll be a lot slower to delete one by one
+                this.deleteHistoryAfter(findOldStateIndex + 1);
 
-            // If we can find the new state index in our history,
-            // then we don't want to ADD it to the history, we just want to
-            // change our currentIndex to match where they are.
-            // EX. Someone clicked the "back" or "forward" buttons.
-            // They're not adding history, they're just changing where they are
-            if (findNewStateIndex !== undefined) {
-                // set the currentIndex accordingly
-                this.setCurrentIndex(findNewStateIndex);
+                // add our new history
+                // set it as our var to add
+                stateToAdd = newState;
+            } else {
+                // welp, they're just going forwards.
+                // Nothing to do but add the state!
+                stateToAdd = newState;
             }
-
-            // try to find the previous state. is it the last one in the
-            // current state tree?
-            // if not, delete any history after the previous state.
-            // They've gone rogue by going back in history and
-            // then chose a new path
-            else if (findOldStateIndex !== undefined && findOldStateIndex !== history.length - 1) {
-                    // delete anything after this point, because they've changed their state history
-                    // we don't want to delete one by one because:
-                    // 1. we won't allow them to do that
-                    // 2. it'll be a lot slower to delete one by one
-                    this.deleteHistoryAfter(findOldStateIndex + 1);
-
-                    // add our new history
-                    // set it as our var to add
-                    stateToAdd = newState;
-                } else {
-                    // welp, they're just going forwards.
-                    // Nothing to do but add the state!
-                    stateToAdd = newState;
-                }
-        }
 
         // see if there's anything to add
         if ((typeof stateToAdd === 'undefined' ? 'undefined' : _typeof(stateToAdd)) === 'object' && stateToAdd !== undefined) {
@@ -1134,13 +1073,15 @@ TreeView.prototype = {
         // if we're on a question, set the transform origin on the wrapper
         cPanel = this.getContentPane();
         cWindow = this.getContentWindow();
+
         if (state.type === 'question' || state.type === 'end') {
 
-            // this works well if we don't scale it
-            // this.getAbsoluteBoundingRect(activeEl).top - this.getAbsoluteBoundingRect(cPanel).top
+            // content window is what you can see and the pane is the full height element with transform origin applied on it. Think of a big piece of paper (the panel) and it's covered up except for a small window that you're looking through
+
             // if we change the margins based on a state change here, it'll mess up
             // the calculation on offsetTop. If we're going to do that, we need to
             // delay the margin change until after the animation has completed
+
             // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (cPanel) must be set position relative
             questionOffsetTop = -activeEl.offsetTop;
             cPanelTransform = 'translate3d(0,' + questionOffsetTop + 'px,0)';
@@ -1150,10 +1091,10 @@ TreeView.prototype = {
             cWindowHeight = activeEl.offsetHeight;
         }
 
-        // if the state type is tree, set a max-height on the window.
+        // if the state type is tree, set a height on the window and distribute the groups accordingly
         else if (state.type === 'tree') {
                 cWindowHeight = cPanel.getBoundingClientRect().height;
-                // content window is what you can see and the pane is the full height element with transform origin applied on it. Think of a big piece of paper (the panel) and it's covered up except for a small window that you're looking through
+
                 cWindow.style.height = cWindowHeight + 'px';
                 // reset the transform origin
                 cPanelTransform = '';
@@ -1674,11 +1615,15 @@ TreeView.prototype = {
                     this.setState(type, id);
                     break;
 
+                // two ways to get to the tree overview 'overview' or 'tree'
                 case 'overview':
                     // go to tree overview
                     this.setState('tree', this.getTreeID());
                     break;
-
+                case 'tree':
+                    // go to tree overview
+                    this.setState('tree', this.getTreeID());
+                    break;
                 case 'restart':
                     // emit a restart
                     this.emit('restart', this);

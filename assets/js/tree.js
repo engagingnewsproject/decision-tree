@@ -220,11 +220,15 @@ Tree.prototype = {
                 this.setState(type, id);
                 break
 
+            // two ways to get to the tree overview 'overview' or 'tree'
             case 'overview':
                 // go to tree overview
                 this.setState('tree', this.getTreeID());
                 break
-
+            case 'tree':
+                // go to tree overview
+                this.setState('tree', this.getTreeID());
+                break
             case 'restart':
                 // emit a restart
                 this.emit('restart', this)

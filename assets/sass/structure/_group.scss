@@ -7,8 +7,9 @@
     @include breakpoint($mobile-large) {
         .enp-tree__group {
             position: absolute;
-            top: 0;
-            left: $column_max_width + 50px;
+            /*top: 0;
+            left: $column_max_width + 50px;*/
+
         }
         .enp-tree__title--group {
             position: absolute;

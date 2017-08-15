@@ -37,9 +37,11 @@ function TreeHistory(options) {
     * Clears the history and currentIndex to an empty state
     */
     this.clearHistory = function() {
-        // create as an empty array
-        let history = [];
-        let currentIndex = null;
+        // create as the Tree overview state
+        let history = [
+            {type: 'tree', id: this.getTree().getTreeID()}
+        ];
+        let currentIndex = 0;
 
         _saveHistory(history)
         _saveCurrentIndex(currentIndex)
@@ -60,7 +62,8 @@ function TreeHistory(options) {
     * Sets variables and decides what state we'll init to
     */
     this.init = function() {
-        let treeID;
+        let treeID,
+            checkState;
 
         // get the tree id
         treeID = this.getTree().getTreeID()
@@ -158,7 +161,7 @@ TreeHistory.prototype = {
         this.setHistory(history)
     },
 
-    getCurrentState: function() {
+    getCurrentHistoryState: function() {
         let history,
             currentIndex;
 
@@ -176,9 +179,6 @@ TreeHistory.prototype = {
         switch(action) {
             case 'update':
                 let Tree = this.getTree()
-                // this is usually Tree.update('state', dataAboutNewState)
-                //  our format is data {type: 'question', id: #}, but the
-                // tree needs it in format {type: 'question', question_id: id}
                 Tree.update(item, data);
                 break
         }
@@ -196,14 +196,13 @@ TreeHistory.prototype = {
         let currentIndex,
             history;
 
-        // TODO: update the Tree state to match the History
-        // if we have a currentIndex and state, then pass it to the main tree to set the state to reflect our view
         currentIndex = this.getCurrentIndex();
         history = this.getHistory()
 
         if(this.currentIndex !== null && history[currentIndex] !== undefined) {
             this.emit('update', 'state', history[currentIndex])
         }
+
     },
 
     /**
@@ -216,6 +215,7 @@ TreeHistory.prototype = {
                 this.build(data)
                 break
             case 'update':
+                console.log('update', data);
                 this.update(data)
                 break
             case 'viewReady':
@@ -247,73 +247,63 @@ TreeHistory.prototype = {
         let newState,
             oldState,
             history,
-            questions,
             findNewStateIndex,
             findOldStateIndex,
             stateToAdd,
             Tree,
-            currentState;
+            currentHistoryState;
 
         // data contains old state and new state
         newState = states.newState
         oldState = states.oldState
         history = this.getHistory()
-        currentState = this.getCurrentState()
+        currentHistoryState = this.getCurrentHistoryState()
 
         // check if we're resuming where we left off. ie, the updated state will match where we're at in the state history
-        if(currentState !== undefined && newState.type === currentState.type && newState.id === currentState.id) {
+        if(currentHistoryState !== undefined && newState.type === currentHistoryState.type && newState.id === currentHistoryState.id) {
             // do nothing! we're good
             return;
         }
 
 
-        if(newState.type === 'tree' && this.getCurrentIndex() !== null) {
-            // we're in the overview state, no need to do anything
 
-            return;
+        Tree = this.getTree()
+        // try to find the new state in our history
+        findNewStateIndex = this.getIndexBy(history, 'id', newState.id)
+        // try to find the old state in our history
+        findOldStateIndex = this.getIndexBy(history, 'id', oldState.id)
+
+
+
+        // If we can find the new state index in our history,
+        // then we don't want to ADD it to the history, we just want to
+        // change our currentIndex to match where they are.
+        // EX. Someone clicked the "back" or "forward" buttons.
+        // They're not adding history, they're just changing where they are
+        if(findNewStateIndex !== undefined) {
+            // set the currentIndex accordingly
+            this.setCurrentIndex(findNewStateIndex);
         }
 
-        // OK, we'll probably have to do something now
-        if(newState.type === 'question' || newState.type === 'end') {
-            Tree = this.getTree()
-            questions = Tree.getQuestions()
-            // try to find the new state in our history
-            findNewStateIndex = this.getIndexBy(history, 'id', newState.id)
-            // try to find the old state in our history
-            findOldStateIndex = this.getIndexBy(history, 'id', oldState.id)
+        // try to find the previous state. is it the last one in the
+        // current state tree?
+        // if not, delete any history after the previous state.
+        // They've gone rogue by going back in history and
+        // then chose a new path
+        else if(findOldStateIndex !== undefined && findOldStateIndex !== history.length - 1) {
+            // delete anything after this point, because they've changed their state history
+            // we don't want to delete one by one because:
+            // 1. we won't allow them to do that
+            // 2. it'll be a lot slower to delete one by one
+            this.deleteHistoryAfter(findOldStateIndex + 1)
 
-
-
-            // If we can find the new state index in our history,
-            // then we don't want to ADD it to the history, we just want to
-            // change our currentIndex to match where they are.
-            // EX. Someone clicked the "back" or "forward" buttons.
-            // They're not adding history, they're just changing where they are
-            if(findNewStateIndex !== undefined) {
-                // set the currentIndex accordingly
-                this.setCurrentIndex(findNewStateIndex);
-            }
-
-            // try to find the previous state. is it the last one in the
-            // current state tree?
-            // if not, delete any history after the previous state.
-            // They've gone rogue by going back in history and
-            // then chose a new path
-            else if(findOldStateIndex !== undefined && findOldStateIndex !== history.length - 1) {
-                // delete anything after this point, because they've changed their state history
-                // we don't want to delete one by one because:
-                // 1. we won't allow them to do that
-                // 2. it'll be a lot slower to delete one by one
-                this.deleteHistoryAfter(findOldStateIndex + 1)
-
-                // add our new history
-                // set it as our var to add
-                stateToAdd = newState;
-            } else {
-                // welp, they're just going forwards.
-                // Nothing to do but add the state!
-                stateToAdd = newState;
-            }
+            // add our new history
+            // set it as our var to add
+            stateToAdd = newState;
+        } else {
+            // welp, they're just going forwards.
+            // Nothing to do but add the state!
+            stateToAdd = newState;
         }
 
         // see if there's anything to add
