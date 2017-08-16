@@ -318,8 +318,13 @@ TreeHistoryView.prototype = {
         // create the buttons
         for (var i = 0; i < history.length; i++) {
             if (i === 0) {
+                if (history[i].type !== 'intro') {
+                    console.error('First history item should be of type "intro"');
+                }
+                item = this.templateStartBtn(history[i]);
+            } else if (i === 1) {
                 if (history[i].type !== 'tree') {
-                    console.error('First history item should be of type "Tree"');
+                    console.error('Second history item should be of type "tree"');
                 }
                 item = this.templateOverviewBtn(history[i]);
             } else {
@@ -473,6 +478,23 @@ TreeHistoryView.prototype = {
         return progressbar;
     },
 
+    // a button so we can display all the buttons in the html without having to show the start button
+    templateStartBtn: function templateStartBtn(data) {
+        var li = void 0,
+            a = void 0;
+
+        li = document.createElement('li');
+        a = document.createElement('a');
+        li.appendChild(a);
+
+        li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--start');
+
+        a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--start');
+        a.data = data;
+
+        return li;
+    },
+
     // The data needs to be formatted to send a message that
     // we want to go to the overview mode
     templateOverviewBtn: function templateOverviewBtn(data) {
@@ -503,7 +525,9 @@ TreeHistoryView.prototype = {
         li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--nav');
 
         a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav');
-        a.innerHTML = index;
+        // because of the start button (hidden) and overview button before it
+        // we need to subtract 1 from the index
+        a.innerHTML = index - 1;
         a.data = data;
 
         return li;
@@ -555,8 +579,10 @@ function TreeHistory(options) {
     * Clears the history and currentIndex to an empty state
     */
     this.clearHistory = function () {
-        // create as the Tree overview state
-        var history = [{ type: 'intro', id: this.getTree().getTreeID() }];
+        var tree_id = void 0;
+        tree_id = this.getTree().getTreeID();
+        // create as the Tree intro state with overview and index at start.
+        var history = [{ type: 'intro', id: tree_id }, { type: 'tree', id: tree_id }];
         var currentIndex = 0;
 
         _saveHistory(history);
@@ -727,7 +753,6 @@ TreeHistory.prototype = {
                 this.build(data);
                 break;
             case 'update':
-                console.log('update', data);
                 this.update(data);
                 break;
             case 'viewReady':
@@ -779,9 +804,11 @@ TreeHistory.prototype = {
 
         Tree = this.getTree();
         // try to find the new state in our history
-        findNewStateIndex = this.getIndexBy(history, 'id', newState.id);
+        findNewStateIndex = this.getHistoryItemIndex(newState);
+
         // try to find the old state in our history
-        findOldStateIndex = this.getIndexBy(history, 'id', oldState.id);
+        findOldStateIndex = this.getHistoryItemIndex(oldState);
+        // this.getIndexBy(history, 'id', oldState.id)
 
         // If we can find the new state index in our history,
         // then we don't want to ADD it to the history, we just want to
@@ -798,12 +825,16 @@ TreeHistory.prototype = {
         // if not, delete any history after the previous state.
         // They've gone rogue by going back in history and
         // then chose a new path
+        // unless we're going from Start to the First Question. We want to keep the overview in there.
         else if (findOldStateIndex !== undefined && findOldStateIndex !== history.length - 1) {
                 // delete anything after this point, because they've changed their state history
                 // we don't want to delete one by one because:
                 // 1. we won't allow them to do that
                 // 2. it'll be a lot slower to delete one by one
-                this.deleteHistoryAfter(findOldStateIndex + 1);
+                // make sure we're not trying to delete the intro or tree states from the history
+                if (oldState.type !== 'intro' && oldState.type !== 'tree') {
+                    this.deleteHistoryAfter(findOldStateIndex + 1);
+                }
 
                 // add our new history
                 // set it as our var to add
@@ -854,6 +885,24 @@ TreeHistory.prototype = {
             _loop(i);
         }
     },
+
+    // finds an item in the history object.
+    getHistoryItemIndex: function getHistoryItemIndex(state) {
+        var history = void 0,
+            index = void 0;
+
+        history = this.getHistory();
+        // check for tree or intro here because there will only ever be one in the history
+        // and their ID is set as the tree_id which matches each other
+        if (state.type === 'tree' || state.type === 'intro') {
+            index = this.getIndexBy(history, 'type', state.type);
+        } else {
+            index = this.getIndexBy(history, 'id', state.id);
+        }
+
+        return index;
+    },
+
 
     /**
     * Powers most all of the retrieval of data from the tree
@@ -1148,8 +1197,6 @@ TreeView.prototype = {
             questionOffsetTop = void 0,
             groupsHeight = void 0;
 
-        console.log('updateViewHeight', state);
-
         activeEl = this.getActiveEl();
         // if we're on a question, set the transform origin on the wrapper
         cPanel = this.getContentPane();
@@ -1172,7 +1219,6 @@ TreeView.prototype = {
             cWindowHeight = activeEl.offsetHeight;
         } else if (state.type === 'intro') {
             groupsHeight = this.arrangeGroups();
-            console.log('group intro');
         }
         // if the state type is tree, set a height on the window and distribute the groups accordingly
         else if (state.type === 'tree') {

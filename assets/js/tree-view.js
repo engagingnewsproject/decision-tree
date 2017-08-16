@@ -261,8 +261,6 @@ TreeView.prototype = {
             questionOffsetTop,
             groupsHeight;
 
-        console.log('updateViewHeight', state)
-
         activeEl = this.getActiveEl()
         // if we're on a question, set the transform origin on the wrapper
         cPanel = this.getContentPane()
@@ -287,7 +285,6 @@ TreeView.prototype = {
 
         else if(state.type === 'intro') {
             groupsHeight = this.arrangeGroups()
-            console.log('group intro')
         }
         // if the state type is tree, set a height on the window and distribute the groups accordingly
         else if(state.type === 'tree') {

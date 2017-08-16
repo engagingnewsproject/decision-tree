@@ -46,6 +46,9 @@
     transition: all .4s;
 }
 
+.enp-tree__history-list-item--start {
+    display: none;
+}
 
 .enp-tree__history-list-link--overview {
     position: relative;

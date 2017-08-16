@@ -37,9 +37,12 @@ function TreeHistory(options) {
     * Clears the history and currentIndex to an empty state
     */
     this.clearHistory = function() {
-        // create as the Tree overview state
+        let tree_id;
+        tree_id = this.getTree().getTreeID()
+        // create as the Tree intro state with overview and index at start.
         let history = [
-            {type: 'intro', id: this.getTree().getTreeID()}
+            {type: 'intro', id: tree_id},
+            {type: 'tree', id: tree_id}
         ];
         let currentIndex = 0;
 
@@ -215,7 +218,6 @@ TreeHistory.prototype = {
                 this.build(data)
                 break
             case 'update':
-                console.log('update', data);
                 this.update(data)
                 break
             case 'viewReady':
@@ -265,15 +267,13 @@ TreeHistory.prototype = {
             return;
         }
 
-
-
         Tree = this.getTree()
         // try to find the new state in our history
-        findNewStateIndex = this.getIndexBy(history, 'id', newState.id)
+        findNewStateIndex = this.getHistoryItemIndex(newState)
+
         // try to find the old state in our history
-        findOldStateIndex = this.getIndexBy(history, 'id', oldState.id)
-
-
+        findOldStateIndex = this.getHistoryItemIndex(oldState)
+        // this.getIndexBy(history, 'id', oldState.id)
 
         // If we can find the new state index in our history,
         // then we don't want to ADD it to the history, we just want to
@@ -290,12 +290,16 @@ TreeHistory.prototype = {
         // if not, delete any history after the previous state.
         // They've gone rogue by going back in history and
         // then chose a new path
+        // unless we're going from Start to the First Question. We want to keep the overview in there.
         else if(findOldStateIndex !== undefined && findOldStateIndex !== history.length - 1) {
             // delete anything after this point, because they've changed their state history
             // we don't want to delete one by one because:
             // 1. we won't allow them to do that
             // 2. it'll be a lot slower to delete one by one
-            this.deleteHistoryAfter(findOldStateIndex + 1)
+            // make sure we're not trying to delete the intro or tree states from the history
+            if(oldState.type !== 'intro' && oldState.type !== 'tree') {
+                this.deleteHistoryAfter(findOldStateIndex + 1)
+            }
 
             // add our new history
             // set it as our var to add
@@ -339,6 +343,23 @@ TreeHistory.prototype = {
                 this.observers[i].on(action, data)
             }, 0)
         }
+    },
+
+    // finds an item in the history object.
+    getHistoryItemIndex(state) {
+        let history,
+            index;
+
+        history = this.getHistory()
+        // check for tree or intro here because there will only ever be one in the history
+        // and their ID is set as the tree_id which matches each other
+        if(state.type === 'tree' || state.type === 'intro') {
+            index = this.getIndexBy(history, 'type', state.type)
+        } else {
+            index = this.getIndexBy(history, 'id', state.id)
+        }
+
+        return index;
     },
 
     /**

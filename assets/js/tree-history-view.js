@@ -222,8 +222,14 @@ TreeHistoryView.prototype = {
         // create the buttons
         for(let i = 0; i < history.length; i++) {
             if(i === 0) {
+                if(history[i].type !== 'intro') {
+                    console.error('First history item should be of type "intro"')
+                }
+                item  = this.templateStartBtn(history[i])
+            }
+            else if(i === 1) {
                 if(history[i].type !== 'tree') {
-                    console.error('First history item should be of type "Tree"')
+                    console.error('Second history item should be of type "tree"')
                 }
                 item = this.templateOverviewBtn(history[i])
             } else {
@@ -246,6 +252,7 @@ TreeHistoryView.prototype = {
             a,
             deleteLi,
             iterator;
+
 
         // go through and compare
         list = this.getList()
@@ -381,6 +388,23 @@ TreeHistoryView.prototype = {
         return progressbar
     },
 
+    // a button so we can display all the buttons in the html without having to show the start button
+    templateStartBtn: function(data) {
+        let li,
+            a;
+
+        li = document.createElement('li')
+        a = document.createElement('a')
+        li.appendChild(a)
+
+        li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--start')
+
+        a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--start')
+        a.data = data
+
+        return li
+    },
+
     // The data needs to be formatted to send a message that
     // we want to go to the overview mode
     templateOverviewBtn: function(data) {
@@ -411,7 +435,9 @@ TreeHistoryView.prototype = {
         li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--nav')
 
         a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav')
-        a.innerHTML = index
+        // because of the start button (hidden) and overview button before it
+        // we need to subtract 1 from the index
+        a.innerHTML = index - 1
         a.data = data
 
         return li
