@@ -161,6 +161,26 @@ TreeView.prototype = {
         return treeEl.getElementsByClassName('enp-tree__group')
     },
 
+    getQuestions: function() {
+        let treeEl,
+            groups;
+
+        treeEl = this.getTreeEl()
+        return treeEl.getElementsByClassName('enp-tree__question')
+    },
+
+    getDestination: function(destination_id) {
+        return document.getElementById('enp-tree__el--'+destination_id)
+    },
+
+    getOptions: function(question) {
+        return question.getElementsByClassName('enp-tree__option-link')
+    },
+
+    getDestinationIcon: function(option_id) {
+        return document.getElementById('enp-tree__destination-icon--'+option_id)
+    },
+
     /**
     * Used when a state is already set and we need to change it
     */
@@ -242,7 +262,17 @@ TreeView.prototype = {
             groups,
             groupsHeight,
             groupsWidth,
-            groupsOffsetLeft;
+            groupsOffsetLeft,
+            questions,
+            destination,
+            destinationPosition,
+            destinationCoords,
+            options,
+            arrow,
+            arrowPosition,
+            arrowAngle,
+            arrowCoords,
+            arrowAngleNormalized;
 
         console.log('updateViewHeight', state)
 
@@ -275,7 +305,6 @@ TreeView.prototype = {
             groupsHeight = 0
 
             for(let i = 0; i < groups.length; i++) {
-                console.log(groups[i].getBoundingClientRect().height)
                 if(i === 0) {
                     groupsWidth = groups[i].getBoundingClientRect().width
                     if(groupsWidth < 350) {
@@ -292,6 +321,82 @@ TreeView.prototype = {
                 // add in the height of this one
                 // an extra 100 seems to be about right for spacing
                 groupsHeight = groupsHeight + (groups[i].getBoundingClientRect().height * 1.5)  + 100
+
+                questions = this.getQuestions()
+                // figure out arrow directions
+                for(let q = 0; q < questions.length; q++) {
+
+                    options = this.getOptions(questions[q])
+
+                    for(let o = 0; o < options.length; o++) {
+                        if(options[o].data.destination_type === 'question') {
+                            // see if the question and option destination are in
+                            // the same column.
+                            destination = this.getDestination(options[o].data.destination_id)
+                            if(questions[q].data.group_id === destination.data.group_id) {
+                                // if so, skip it (just use the down arrow)
+                                continue;
+                            }
+                            // ok, they're in different columns, figure out what direction it needs to go
+                            arrow = this.getDestinationIcon(options[o].data.option_id)
+                            arrowPosition = this.getAbsoluteBoundingRect(arrow)
+                            destinationPosition = this.getAbsoluteBoundingRect(destination)
+
+                            arrowCoords = {y: arrowPosition.top + (arrowPosition.height/2)}
+                            // we want the top third of the destination
+                            destinationCoords = {y: destinationPosition.top + (destinationPosition.height/2)}
+
+                            // we're returning to the main column
+                            /*if(destination.data.group_id === null) {
+                                arrowCoords.x = arrowPosition.left
+                                destinationCoords.x = destinationPosition.left + destinationPosition.width
+                            } else {*/
+                                // we're going to an attachment
+                                arrowCoords.x = arrowPosition.left + (arrowPosition.width/2)
+                                destinationCoords.x = destinationPosition.left + (destinationPosition.width/2)
+                            // }
+                            arrowAngle = this.lineAngle(arrowCoords, destinationCoords)
+
+                            // adjust the arrow angle to be between 0 and 360 and
+
+
+                            // now normalize it for 0 = pointing to right
+                            arrowAngleNormalized = 360-arrowAngle
+                            // arrow angle is between 70 and 120
+                            if(80 < arrowAngleNormalized && arrowAngleNormalized < 90) {
+                                this.templateArrowUpRight(arrow)
+                            }
+                            else if(90 < arrowAngleNormalized && arrowAngleNormalized < 100) {
+                                this.templateArrowUpLeft(arrow)
+                            }
+                            // arrow angle is between 0-20 or 340-360
+                            else if(arrowAngleNormalized < 10 || 350 < arrowAngleNormalized) {
+                                // straight to the right (since we start with a down arrow)
+                                this.templateArrow(arrow, 'arrow')
+                                arrow.style.transform = 'rotate(180deg)'
+                            }
+                            else if(170 < arrowAngleNormalized && arrowAngleNormalized < 190) {
+                                // straight to the left (since we start with a down arrow)
+                                this.templateArrow(arrow, 'arrow')
+                                arrow.style.transform = 'rotate(-180deg)'
+                            }
+                            // down and to the right
+                            else if(270 < arrowAngleNormalized && arrowAngleNormalized < 280) {
+                                // straight to the left (since we start with a down arrow)
+                                this.templateArrowDownRight(arrow)
+                            }
+                            else if(260 < arrowAngleNormalized && arrowAngleNormalized < 270) {
+                                // straight to the left (since we start with a down arrow)
+                                this.templateArrowDownLeft(arrow)
+                            } else {
+                                this.templateArrow(arrow, 'arrow')
+                                arrow.style.transform = 'rotate('+arrowAngle+'deg)'
+                            }
+
+                        }
+
+                    }
+                }
 
             }
             // make sure the height of the groups isn't taller than the cWindowHeight
@@ -370,14 +475,18 @@ TreeView.prototype = {
 
         // check if it's a click on the parent tree (which we don't care about)
         if (el !== event.currentTarget) {
-            if(el.nodeName === 'A') {
+            if(el.nodeName === 'A' || (el.nodeName === 'SPAN' && el.parentNode.nodeName === 'A')) {
+                // see if the parent is a link
+                if(el.nodeName === 'SPAN') {
+                    el = el.parentElement
+                }
                 event.preventDefault()
                 this.emit('update', 'state', el.data)
             }
 
             // Let people click questions (that isn't the current question)
             // to get to the question
-            if(el.nodeName === 'SECTION') {
+            else if(el.nodeName === 'SECTION') {
                 event.preventDefault()
                 Tree = this.getTree()
                 state = Tree.getState();
@@ -503,7 +612,8 @@ TreeView.prototype = {
                     clonedObj = {
                         question_id: data.question_id,
                         type: 'question',
-                        order: data.order
+                        order: data.order,
+                        group_id: data.group_id
                     }
                     clonedObj.options = []
                     // add options
@@ -594,5 +704,45 @@ TreeView.prototype = {
             top   : rect.top + offsetY,
             width : rect.width
         };
+    },
+
+    // https://gist.github.com/conorbuck/2606166
+    // p1 and p2 need x and y cordinates
+    // p1 = {x: 12, y: 15}
+    lineAngle: function(p1, p2) {
+        let degrees;
+        // angle in radians
+        // let angleRadians = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        // angle in degrees
+        degrees = Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI;
+        if(Math.sign(degrees) === -1) {
+            degrees = degrees + 360
+        }
+        return degrees
+    },
+
+    templateArrowUpRight(svg) {
+        this.templateArrow(svg, 'arrow-turn')
+        svg.style.transform = 'rotateX(-180deg)'
+    },
+
+    templateArrowUpLeft(svg) {
+        this.templateArrow(svg, 'arrow-turn')
+        svg.style.transform = 'rotate(180deg)'
+    },
+
+    templateArrowDownRight(svg) {
+        this.templateArrow(svg, 'arrow-turn')
+        svg.style.transform = 'rotate(0deg)'
+    },
+
+    templateArrowDownLeft(svg) {
+        this.templateArrow(svg, 'arrow-turn')
+        svg.style.transform = 'rotateX(-180deg)'
+    },
+
+    templateArrow(svg, iconName) {
+        svg.children[0].setAttribute('xlink:href', '#icon-'+iconName)
+        return svg
     }
 }

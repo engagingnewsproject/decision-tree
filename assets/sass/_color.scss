@@ -1,5 +1,6 @@
 .enp-tree {
     background: $tree_background;
+    color: $black;
 }
 
 .enp-tree__intro {
@@ -33,6 +34,29 @@
     &:focus {
         background: $option_background--hover;
         color: $text_color;
+    }
+}
+
+
+.enp-tree__destination--question {
+    color: $option_destination;
+}
+
+.enp-tree__destination--end {
+    color: $option_destination--end;
+}
+
+.enp-tree__icon--arrow {
+    fill: $option_destination;
+}
+
+.enp-tree__el-number {
+    color: $number;
+}
+
+.enp-tree__state--tree {
+    .enp-tree__el-number {
+        color: $number--tree_state;
     }
 }
 

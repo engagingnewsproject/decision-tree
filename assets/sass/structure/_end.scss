@@ -42,7 +42,7 @@
 
 .enp-tree__state--tree {
     .enp-tree__ends {
-        display: none; // we don't have anything to connect them to right now, so don't worry about displaying them
+        display: flex; // we don't have anything to connect them to right now, so don't worry about displaying them
     }
 
     .enp-tree__end {
