@@ -63,7 +63,7 @@ Handlebars.registerHelper('destination', function(destination_id, destination_ty
             destination = data[i];
             if(destination_type === 'question') {
                 destination_number = i+ 1
-                destination_title = 'Go to Question '+ destination_number
+                destination_title = 'Question '+ destination_number
                 destination_icon = 'arrow'
             } else {
                 destination_title = data[i].title

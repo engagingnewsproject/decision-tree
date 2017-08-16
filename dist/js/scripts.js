@@ -65,7 +65,7 @@ Handlebars.registerHelper('destination', function (destination_id, destination_t
             destination = data[i];
             if (destination_type === 'question') {
                 destination_number = i + 1;
-                destination_title = 'Go to Question ' + destination_number;
+                destination_title = 'Question ' + destination_number;
                 destination_icon = 'arrow';
             } else {
                 destination_title = data[i].title;
@@ -1146,20 +1146,7 @@ TreeView.prototype = {
             cWindowHeight = void 0,
             cPanelTransform = void 0,
             questionOffsetTop = void 0,
-            groups = void 0,
-            groupsHeight = void 0,
-            groupsWidth = void 0,
-            groupsOffsetLeft = void 0,
-            questions = void 0,
-            destination = void 0,
-            destinationPosition = void 0,
-            destinationCoords = void 0,
-            options = void 0,
-            arrow = void 0,
-            arrowPosition = void 0,
-            arrowAngle = void 0,
-            arrowCoords = void 0,
-            arrowAngleNormalized = void 0;
+            groupsHeight = void 0;
 
         console.log('updateViewHeight', state);
 
@@ -1183,102 +1170,15 @@ TreeView.prototype = {
             cWindow.scrollTop = 0;
             // set a height
             cWindowHeight = activeEl.offsetHeight;
+        } else if (state.type === 'intro') {
+            groupsHeight = this.arrangeGroups();
+            console.log('group intro');
         }
-
         // if the state type is tree, set a height on the window and distribute the groups accordingly
         else if (state.type === 'tree') {
-                // get the groups
-                groups = this.getGroups();
-                groupsHeight = 0;
+                groupsHeight = this.arrangeGroups();
 
-                for (var i = 0; i < groups.length; i++) {
-                    if (i === 0) {
-                        groupsWidth = groups[i].getBoundingClientRect().width;
-                        if (groupsWidth < 350) {
-                            groupsOffsetLeft = 30;
-                        } else {
-                            groupsOffsetLeft = 50;
-                        }
-                    } else {
-                        groups[i].style.top = groupsHeight + 'px';
-                    }
-                    // set to the left
-                    groups[i].style.left = groupsWidth * 1.5 + groupsOffsetLeft + 'px';
-                    // add in the height of this one
-                    // an extra 100 seems to be about right for spacing
-                    groupsHeight = groupsHeight + groups[i].getBoundingClientRect().height * 1.5 + 100;
-
-                    questions = this.getQuestions();
-                    // figure out arrow directions
-                    for (var q = 0; q < questions.length; q++) {
-
-                        options = this.getOptions(questions[q]);
-
-                        for (var o = 0; o < options.length; o++) {
-                            if (options[o].data.destination_type === 'question') {
-                                // see if the question and option destination are in
-                                // the same column.
-                                destination = this.getDestination(options[o].data.destination_id);
-                                if (questions[q].data.group_id === destination.data.group_id) {
-                                    // if so, skip it (just use the down arrow)
-                                    continue;
-                                }
-                                // ok, they're in different columns, figure out what direction it needs to go
-                                arrow = this.getDestinationIcon(options[o].data.option_id);
-                                arrowPosition = this.getAbsoluteBoundingRect(arrow);
-                                destinationPosition = this.getAbsoluteBoundingRect(destination);
-
-                                arrowCoords = { y: arrowPosition.top + arrowPosition.height / 2
-                                    // we want the top third of the destination
-                                };destinationCoords = { y: destinationPosition.top + destinationPosition.height / 2
-
-                                    // we're returning to the main column
-                                    /*if(destination.data.group_id === null) {
-                                        arrowCoords.x = arrowPosition.left
-                                        destinationCoords.x = destinationPosition.left + destinationPosition.width
-                                    } else {*/
-                                    // we're going to an attachment
-                                };arrowCoords.x = arrowPosition.left + arrowPosition.width / 2;
-                                destinationCoords.x = destinationPosition.left + destinationPosition.width / 2;
-                                // }
-                                arrowAngle = this.lineAngle(arrowCoords, destinationCoords);
-
-                                // adjust the arrow angle to be between 0 and 360 and
-
-
-                                // now normalize it for 0 = pointing to right
-                                arrowAngleNormalized = 360 - arrowAngle;
-                                // arrow angle is between 70 and 120
-                                if (80 < arrowAngleNormalized && arrowAngleNormalized < 90) {
-                                    this.templateArrowUpRight(arrow);
-                                } else if (90 < arrowAngleNormalized && arrowAngleNormalized < 100) {
-                                    this.templateArrowUpLeft(arrow);
-                                }
-                                // arrow angle is between 0-20 or 340-360
-                                else if (arrowAngleNormalized < 10 || 350 < arrowAngleNormalized) {
-                                        // straight to the right (since we start with a down arrow)
-                                        this.templateArrow(arrow, 'arrow');
-                                        arrow.style.transform = 'rotate(180deg)';
-                                    } else if (170 < arrowAngleNormalized && arrowAngleNormalized < 190) {
-                                        // straight to the left (since we start with a down arrow)
-                                        this.templateArrow(arrow, 'arrow');
-                                        arrow.style.transform = 'rotate(-180deg)';
-                                    }
-                                    // down and to the right
-                                    else if (270 < arrowAngleNormalized && arrowAngleNormalized < 280) {
-                                            // straight to the left (since we start with a down arrow)
-                                            this.templateArrowDownRight(arrow);
-                                        } else if (260 < arrowAngleNormalized && arrowAngleNormalized < 270) {
-                                            // straight to the left (since we start with a down arrow)
-                                            this.templateArrowDownLeft(arrow);
-                                        } else {
-                                            this.templateArrow(arrow, 'arrow');
-                                            arrow.style.transform = 'rotate(' + arrowAngle + 'deg)';
-                                        }
-                            }
-                        }
-                    }
-                }
+                this.displayArrowDirection();
                 // make sure the height of the groups isn't taller than the cWindowHeight
                 cWindowHeight = cPanel.getBoundingClientRect().height;
 
@@ -1582,6 +1482,37 @@ TreeView.prototype = {
         };
     },
 
+    arrangeGroups: function arrangeGroups() {
+        var groups = void 0,
+            groupsHeight = void 0,
+            groupsWidth = void 0,
+            groupsOffsetLeft = void 0;
+
+        // get the groups
+        groups = this.getGroups();
+        groupsHeight = 0;
+
+        for (var i = 0; i < groups.length; i++) {
+            if (i === 0) {
+                groupsWidth = groups[i].getBoundingClientRect().width;
+                if (groupsWidth < 350) {
+                    groupsOffsetLeft = 30;
+                } else {
+                    groupsOffsetLeft = 50;
+                }
+            } else {
+                groups[i].style.top = groupsHeight + 'px';
+            }
+            // set to the left
+            groups[i].style.left = groupsWidth * 1.5 + groupsOffsetLeft + 'px';
+            // add in the height of this one
+            // an extra 100 seems to be about right for spacing
+            groupsHeight = groupsHeight + groups[i].getBoundingClientRect().height * 1.5 + 100;
+        }
+
+        return groupsHeight;
+    },
+
     // https://gist.github.com/conorbuck/2606166
     // p1 and p2 need x and y cordinates
     // p1 = {x: 12, y: 15}
@@ -1595,6 +1526,85 @@ TreeView.prototype = {
             degrees = degrees + 360;
         }
         return degrees;
+    },
+
+    displayArrowDirection: function displayArrowDirection() {
+        var questions = void 0,
+            destination = void 0,
+            destinationPosition = void 0,
+            destinationCoords = void 0,
+            options = void 0,
+            arrow = void 0,
+            arrowPosition = void 0,
+            arrowAngle = void 0,
+            arrowCoords = void 0,
+            arrowAngleNormalized = void 0;
+
+        questions = this.getQuestions();
+        // figure out arrow directions
+        for (var q = 0; q < questions.length; q++) {
+
+            options = this.getOptions(questions[q]);
+
+            for (var o = 0; o < options.length; o++) {
+                if (options[o].data.destination_type === 'question') {
+                    // see if the question and option destination are in
+                    // the same column.
+                    destination = this.getDestination(options[o].data.destination_id);
+                    if (questions[q].data.group_id === destination.data.group_id) {
+                        // if so, skip it (just use the down arrow)
+                        continue;
+                    }
+                    // ok, they're in different columns, figure out what direction it needs to go
+                    arrow = this.getDestinationIcon(options[o].data.option_id);
+                    arrowPosition = this.getAbsoluteBoundingRect(arrow);
+                    destinationPosition = this.getAbsoluteBoundingRect(destination);
+
+                    arrowCoords = { y: arrowPosition.top + arrowPosition.height / 2
+                        // we want the top third of the destination
+                    };destinationCoords = { y: destinationPosition.top + destinationPosition.height / 2
+
+                        // we're going to an attachment
+                    };arrowCoords.x = arrowPosition.left + arrowPosition.width / 2;
+                    destinationCoords.x = destinationPosition.left + destinationPosition.width / 2;
+
+                    arrowAngle = this.lineAngle(arrowCoords, destinationCoords);
+
+                    // adjust the arrow angle to be between 0 and 360 and
+
+
+                    // now normalize it for 0 = pointing to right
+                    arrowAngleNormalized = 360 - arrowAngle;
+                    // arrow angle is between 70 and 120
+                    if (80 < arrowAngleNormalized && arrowAngleNormalized < 90) {
+                        this.templateArrowUpRight(arrow);
+                    } else if (90 < arrowAngleNormalized && arrowAngleNormalized < 100) {
+                        this.templateArrowUpLeft(arrow);
+                    }
+                    // arrow angle is between 0-20 or 340-360
+                    else if (arrowAngleNormalized < 10 || 350 < arrowAngleNormalized) {
+                            // straight to the right (since we start with a down arrow)
+                            this.templateArrow(arrow, 'arrow');
+                            arrow.style.transform = 'rotate(180deg)';
+                        } else if (170 < arrowAngleNormalized && arrowAngleNormalized < 190) {
+                            // straight to the left (since we start with a down arrow)
+                            this.templateArrow(arrow, 'arrow');
+                            arrow.style.transform = 'rotate(-180deg)';
+                        }
+                        // down and to the right
+                        else if (270 < arrowAngleNormalized && arrowAngleNormalized < 280) {
+                                // straight to the left (since we start with a down arrow)
+                                this.templateArrowDownRight(arrow);
+                            } else if (260 < arrowAngleNormalized && arrowAngleNormalized < 270) {
+                                // straight to the left (since we start with a down arrow)
+                                this.templateArrowDownLeft(arrow);
+                            } else {
+                                this.templateArrow(arrow, 'arrow');
+                                arrow.style.transform = 'rotate(' + arrowAngle + 'deg)';
+                            }
+                }
+            }
+        }
     },
 
     templateArrowUpRight: function templateArrowUpRight(svg) {
@@ -1646,7 +1656,7 @@ TreeView.prototype = {
             _data = data;
             _state = {
                 id: data.tree_id,
-                type: 'tree'
+                type: 'intro'
             };
         };
 
@@ -1669,7 +1679,7 @@ TreeView.prototype = {
                 oldState = void 0,
                 newState = void 0;
 
-            whitelist = ['tree', 'start', 'question', 'end'];
+            whitelist = ['intro', 'tree', 'start', 'question', 'end'];
 
             // TODO: Check that start can't go straight to end?
             // TODO: Check that the next state is valid from the question's options?
@@ -1701,6 +1711,9 @@ TreeView.prototype = {
                 } else {
                     validateState = false;
                 }
+            } else if (stateType === 'intro') {
+                // it's always fine
+                validateState = true;
             } else {
                 validateState = this.getDataByType(stateType, stateID);
             }
@@ -1809,6 +1822,9 @@ TreeView.prototype = {
             var id = void 0,
                 type = void 0;
             switch (data.type) {
+                case 'intro':
+                    this.setState('intro', this.getTreeID());
+                    break;
                 case 'start':
                     // emit a start
                     this.emit('start', this);
@@ -2062,9 +2078,10 @@ TreeView.prototype = {
         var treeView = new TreeView({
             container: this.container
         });
-        var treeHistory = new TreeHistory({});
+        // let treeHistory = new TreeHistory({});
         // add the observers
-        var observers = [treeView, treeHistory];
+        // let observers = [treeView, treeHistory]
+        var observers = [treeView];
         // build the tree
         var tree = new Tree(data, observers);
         // send it to our trees array for access

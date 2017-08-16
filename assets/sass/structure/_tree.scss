@@ -22,6 +22,7 @@ html {
 .enp-tree__title {
     margin-top: 0;
     margin-bottom: $spacing__base;
+    transition: all .4s;
 }
 
 .enp-tree__intro {
@@ -30,6 +31,26 @@ html {
     padding: $spacing__base;
     position: relative;
     z-index: 99;
+    transition: all .4s;
+}
+
+.enp-tree__state--intro {
+    .enp-tree__intro {
+        padding: $spacing__base*5 $spacing__base;
+        background: rgba(255,255,255,.75);
+    }
+
+    .enp-tree__title--tree {
+        max-width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: $spacing__base*2;
+    }
+
+    .enp-tree__content-wrapper {
+        position: absolute;
+        top: 0;
+    }
 }
 
 .enp-tree__state--end,
@@ -79,12 +100,6 @@ html {
         max-height: 700px;
         overflow: scroll;
         padding-left: 80px;
-
-        /*
-        @include breakpoint($mobile-large) {
-            max-height: none;
-            overflow: visible;
-        }*/
     }
 }
 
@@ -100,6 +115,7 @@ html {
 }
 
 // overview of whole tree
+.enp-tree__state--intro,
 .enp-tree__state--tree {
     .enp-tree__content-window {
         transform: scale(0.65) translate3d(0,0,0);
@@ -131,8 +147,6 @@ html {
         padding-top: $spacing__base;
     }
 }
-
-
 
 .enp-tree__state--tree.enp-tree__state--animate-out--end {
     .enp-tree__content-window {

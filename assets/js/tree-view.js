@@ -259,20 +259,7 @@ TreeView.prototype = {
             cWindowHeight,
             cPanelTransform,
             questionOffsetTop,
-            groups,
-            groupsHeight,
-            groupsWidth,
-            groupsOffsetLeft,
-            questions,
-            destination,
-            destinationPosition,
-            destinationCoords,
-            options,
-            arrow,
-            arrowPosition,
-            arrowAngle,
-            arrowCoords,
-            arrowAngleNormalized;
+            groupsHeight;
 
         console.log('updateViewHeight', state)
 
@@ -298,107 +285,15 @@ TreeView.prototype = {
             cWindowHeight = activeEl.offsetHeight
         }
 
+        else if(state.type === 'intro') {
+            groupsHeight = this.arrangeGroups()
+            console.log('group intro')
+        }
         // if the state type is tree, set a height on the window and distribute the groups accordingly
         else if(state.type === 'tree') {
-            // get the groups
-            groups = this.getGroups()
-            groupsHeight = 0
+            groupsHeight = this.arrangeGroups()
 
-            for(let i = 0; i < groups.length; i++) {
-                if(i === 0) {
-                    groupsWidth = groups[i].getBoundingClientRect().width
-                    if(groupsWidth < 350) {
-                        groupsOffsetLeft = 30
-                    } else {
-                        groupsOffsetLeft = 50
-                    }
-
-                } else {
-                    groups[i].style.top = groupsHeight + 'px'
-                }
-                // set to the left
-                groups[i].style.left = groupsWidth * 1.5 + groupsOffsetLeft + 'px'
-                // add in the height of this one
-                // an extra 100 seems to be about right for spacing
-                groupsHeight = groupsHeight + (groups[i].getBoundingClientRect().height * 1.5)  + 100
-
-                questions = this.getQuestions()
-                // figure out arrow directions
-                for(let q = 0; q < questions.length; q++) {
-
-                    options = this.getOptions(questions[q])
-
-                    for(let o = 0; o < options.length; o++) {
-                        if(options[o].data.destination_type === 'question') {
-                            // see if the question and option destination are in
-                            // the same column.
-                            destination = this.getDestination(options[o].data.destination_id)
-                            if(questions[q].data.group_id === destination.data.group_id) {
-                                // if so, skip it (just use the down arrow)
-                                continue;
-                            }
-                            // ok, they're in different columns, figure out what direction it needs to go
-                            arrow = this.getDestinationIcon(options[o].data.option_id)
-                            arrowPosition = this.getAbsoluteBoundingRect(arrow)
-                            destinationPosition = this.getAbsoluteBoundingRect(destination)
-
-                            arrowCoords = {y: arrowPosition.top + (arrowPosition.height/2)}
-                            // we want the top third of the destination
-                            destinationCoords = {y: destinationPosition.top + (destinationPosition.height/2)}
-
-                            // we're returning to the main column
-                            /*if(destination.data.group_id === null) {
-                                arrowCoords.x = arrowPosition.left
-                                destinationCoords.x = destinationPosition.left + destinationPosition.width
-                            } else {*/
-                                // we're going to an attachment
-                                arrowCoords.x = arrowPosition.left + (arrowPosition.width/2)
-                                destinationCoords.x = destinationPosition.left + (destinationPosition.width/2)
-                            // }
-                            arrowAngle = this.lineAngle(arrowCoords, destinationCoords)
-
-                            // adjust the arrow angle to be between 0 and 360 and
-
-
-                            // now normalize it for 0 = pointing to right
-                            arrowAngleNormalized = 360-arrowAngle
-                            // arrow angle is between 70 and 120
-                            if(80 < arrowAngleNormalized && arrowAngleNormalized < 90) {
-                                this.templateArrowUpRight(arrow)
-                            }
-                            else if(90 < arrowAngleNormalized && arrowAngleNormalized < 100) {
-                                this.templateArrowUpLeft(arrow)
-                            }
-                            // arrow angle is between 0-20 or 340-360
-                            else if(arrowAngleNormalized < 10 || 350 < arrowAngleNormalized) {
-                                // straight to the right (since we start with a down arrow)
-                                this.templateArrow(arrow, 'arrow')
-                                arrow.style.transform = 'rotate(180deg)'
-                            }
-                            else if(170 < arrowAngleNormalized && arrowAngleNormalized < 190) {
-                                // straight to the left (since we start with a down arrow)
-                                this.templateArrow(arrow, 'arrow')
-                                arrow.style.transform = 'rotate(-180deg)'
-                            }
-                            // down and to the right
-                            else if(270 < arrowAngleNormalized && arrowAngleNormalized < 280) {
-                                // straight to the left (since we start with a down arrow)
-                                this.templateArrowDownRight(arrow)
-                            }
-                            else if(260 < arrowAngleNormalized && arrowAngleNormalized < 270) {
-                                // straight to the left (since we start with a down arrow)
-                                this.templateArrowDownLeft(arrow)
-                            } else {
-                                this.templateArrow(arrow, 'arrow')
-                                arrow.style.transform = 'rotate('+arrowAngle+'deg)'
-                            }
-
-                        }
-
-                    }
-                }
-
-            }
+            this.displayArrowDirection()
             // make sure the height of the groups isn't taller than the cWindowHeight
             cWindowHeight = cPanel.getBoundingClientRect().height
 
@@ -706,6 +601,38 @@ TreeView.prototype = {
         };
     },
 
+    arrangeGroups: function() {
+        let groups,
+            groupsHeight,
+            groupsWidth,
+            groupsOffsetLeft;
+
+        // get the groups
+        groups = this.getGroups()
+        groupsHeight = 0
+
+        for(let i = 0; i < groups.length; i++) {
+            if(i === 0) {
+                groupsWidth = groups[i].getBoundingClientRect().width
+                if(groupsWidth < 350) {
+                    groupsOffsetLeft = 30
+                } else {
+                    groupsOffsetLeft = 50
+                }
+
+            } else {
+                groups[i].style.top = groupsHeight + 'px'
+            }
+            // set to the left
+            groups[i].style.left = groupsWidth * 1.5 + groupsOffsetLeft + 'px'
+            // add in the height of this one
+            // an extra 100 seems to be about right for spacing
+            groupsHeight = groupsHeight + (groups[i].getBoundingClientRect().height * 1.5)  + 100
+        }
+
+        return groupsHeight
+    },
+
     // https://gist.github.com/conorbuck/2606166
     // p1 and p2 need x and y cordinates
     // p1 = {x: 12, y: 15}
@@ -719,6 +646,91 @@ TreeView.prototype = {
             degrees = degrees + 360
         }
         return degrees
+    },
+
+    displayArrowDirection: function() {
+        let questions,
+            destination,
+            destinationPosition,
+            destinationCoords,
+            options,
+            arrow,
+            arrowPosition,
+            arrowAngle,
+            arrowCoords,
+            arrowAngleNormalized;
+
+        questions = this.getQuestions()
+        // figure out arrow directions
+        for(let q = 0; q < questions.length; q++) {
+
+            options = this.getOptions(questions[q])
+
+            for(let o = 0; o < options.length; o++) {
+                if(options[o].data.destination_type === 'question') {
+                    // see if the question and option destination are in
+                    // the same column.
+                    destination = this.getDestination(options[o].data.destination_id)
+                    if(questions[q].data.group_id === destination.data.group_id) {
+                        // if so, skip it (just use the down arrow)
+                        continue;
+                    }
+                    // ok, they're in different columns, figure out what direction it needs to go
+                    arrow = this.getDestinationIcon(options[o].data.option_id)
+                    arrowPosition = this.getAbsoluteBoundingRect(arrow)
+                    destinationPosition = this.getAbsoluteBoundingRect(destination)
+
+                    arrowCoords = {y: arrowPosition.top + (arrowPosition.height/2)}
+                    // we want the top third of the destination
+                    destinationCoords = {y: destinationPosition.top + (destinationPosition.height/2)}
+
+
+                        // we're going to an attachment
+                    arrowCoords.x = arrowPosition.left + (arrowPosition.width/2)
+                    destinationCoords.x = destinationPosition.left + (destinationPosition.width/2)
+
+                    arrowAngle = this.lineAngle(arrowCoords, destinationCoords)
+
+                    // adjust the arrow angle to be between 0 and 360 and
+
+
+                    // now normalize it for 0 = pointing to right
+                    arrowAngleNormalized = 360-arrowAngle
+                    // arrow angle is between 70 and 120
+                    if(80 < arrowAngleNormalized && arrowAngleNormalized < 90) {
+                        this.templateArrowUpRight(arrow)
+                    }
+                    else if(90 < arrowAngleNormalized && arrowAngleNormalized < 100) {
+                        this.templateArrowUpLeft(arrow)
+                    }
+                    // arrow angle is between 0-20 or 340-360
+                    else if(arrowAngleNormalized < 10 || 350 < arrowAngleNormalized) {
+                        // straight to the right (since we start with a down arrow)
+                        this.templateArrow(arrow, 'arrow')
+                        arrow.style.transform = 'rotate(180deg)'
+                    }
+                    else if(170 < arrowAngleNormalized && arrowAngleNormalized < 190) {
+                        // straight to the left (since we start with a down arrow)
+                        this.templateArrow(arrow, 'arrow')
+                        arrow.style.transform = 'rotate(-180deg)'
+                    }
+                    // down and to the right
+                    else if(270 < arrowAngleNormalized && arrowAngleNormalized < 280) {
+                        // straight to the left (since we start with a down arrow)
+                        this.templateArrowDownRight(arrow)
+                    }
+                    else if(260 < arrowAngleNormalized && arrowAngleNormalized < 270) {
+                        // straight to the left (since we start with a down arrow)
+                        this.templateArrowDownLeft(arrow)
+                    } else {
+                        this.templateArrow(arrow, 'arrow')
+                        arrow.style.transform = 'rotate('+arrowAngle+'deg)'
+                    }
+
+                }
+
+            }
+        }
     },
 
     templateArrowUpRight(svg) {

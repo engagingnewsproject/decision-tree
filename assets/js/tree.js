@@ -25,7 +25,7 @@ function Tree(data, observers) {
         _data = data
         _state = {
             id: data.tree_id,
-            type: 'tree'
+            type: 'intro'
         }
     }
 
@@ -45,7 +45,7 @@ function Tree(data, observers) {
             oldState,
             newState;
 
-        whitelist = ['tree', 'start','question','end']
+        whitelist = ['intro', 'tree', 'start','question','end']
 
         // TODO: Check that start can't go straight to end?
         // TODO: Check that the next state is valid from the question's options?
@@ -77,7 +77,12 @@ function Tree(data, observers) {
             } else {
                 validateState = false
             }
-        } else {
+        }
+        else if (stateType === 'intro') {
+            // it's always fine
+            validateState = true
+        }
+        else {
             validateState = this.getDataByType(stateType, stateID);
         }
 
@@ -181,6 +186,9 @@ Tree.prototype = {
         let id,
             type;
         switch(data.type) {
+            case 'intro':
+                this.setState('intro', this.getTreeID())
+                break
             case 'start':
                 // emit a start
                 this.emit('start', this)
@@ -443,9 +451,10 @@ function buildTree(request) {
     let treeView = new TreeView({
         container: this.container,
     });
-    let treeHistory = new TreeHistory({});
+    // let treeHistory = new TreeHistory({});
     // add the observers
-    let observers = [treeView, treeHistory]
+    // let observers = [treeView, treeHistory]
+    let observers = [treeView]
     // build the tree
     let tree = new Tree(data, observers);
     // send it to our trees array for access
