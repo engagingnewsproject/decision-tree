@@ -39,7 +39,7 @@ function TreeHistory(options) {
     this.clearHistory = function() {
         // create as the Tree overview state
         let history = [
-            {type: 'tree', id: this.getTree().getTreeID()}
+            {type: 'intro', id: this.getTree().getTreeID()}
         ];
         let currentIndex = 0;
 

@@ -6,20 +6,29 @@
 .enp-tree__title {
     line-height: 1.2;
 }
+
+
 .enp-tree__title--tree {
-    font-size: 1.2rem;
+    font-size: 1.9rem;
 }
 
-.enp-tree__state--tree {
+.enp-tree__state--question,
+.enp-tree__state--end {
     .enp-tree__title--tree {
-        font-size: 1.9rem;
+        font-size: 1.2rem;
     }
 }
 
 .enp-tree__state--intro {
-    .enp-tree__title--tree {
-        font-size: 2.5rem;
+    @include breakpoint($mobile-large) {
+        .enp-tree__title--tree {
+            font-size: 2.5rem;
+        }
+        .enp-tree__start {
+            font-size: 1.125rem;
+        }
     }
+
 }
 
 

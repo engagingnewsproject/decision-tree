@@ -19,13 +19,7 @@ html {
     touch-action: manipulation;
 }
 
-.enp-tree__title {
-    margin-top: 0;
-    margin-bottom: $spacing__base;
-    transition: all .4s;
-}
-
-.enp-tree__intro {
+.enp-tree__intro-wrapper {
     text-align: center;
     width: 100%;
     padding: $spacing__base;
@@ -34,17 +28,30 @@ html {
     transition: all .4s;
 }
 
+.enp-tree__title {
+    margin-top: 0;
+    margin-bottom: $spacing__base;
+    transition: all .4s;
+}
+
 .enp-tree__state--intro {
+    .enp-tree__intro-wrapper {
+        padding: $spacing__base*4 $spacing__base;
+    }
+
     .enp-tree__intro {
-        padding: $spacing__base*5 $spacing__base;
-        background: rgba(255,255,255,.75);
+        padding: $spacing__base*2 $spacing__base;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 80%;
     }
 
     .enp-tree__title--tree {
-        max-width: 80%;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: $spacing__base*2;
+        margin-bottom: $spacing__base*1.6;
+    }
+
+    .enp-tree__start {
+        padding: $spacing__base*0.8 $spacing__base*1.4;
     }
 
     .enp-tree__content-wrapper {

@@ -451,10 +451,9 @@ function buildTree(request) {
     let treeView = new TreeView({
         container: this.container,
     });
-    // let treeHistory = new TreeHistory({});
+    let treeHistory = new TreeHistory({});
     // add the observers
-    // let observers = [treeView, treeHistory]
-    let observers = [treeView]
+    let observers = [treeView, treeHistory]
     // build the tree
     let tree = new Tree(data, observers);
     // send it to our trees array for access

@@ -556,7 +556,7 @@ function TreeHistory(options) {
     */
     this.clearHistory = function () {
         // create as the Tree overview state
-        var history = [{ type: 'tree', id: this.getTree().getTreeID() }];
+        var history = [{ type: 'intro', id: this.getTree().getTreeID() }];
         var currentIndex = 0;
 
         _saveHistory(history);
@@ -2078,10 +2078,9 @@ TreeView.prototype = {
         var treeView = new TreeView({
             container: this.container
         });
-        // let treeHistory = new TreeHistory({});
+        var treeHistory = new TreeHistory({});
         // add the observers
-        // let observers = [treeView, treeHistory]
-        var observers = [treeView];
+        var observers = [treeView, treeHistory];
         // build the tree
         var tree = new Tree(data, observers);
         // send it to our trees array for access

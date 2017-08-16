@@ -3,10 +3,28 @@
     color: $black;
 }
 
-.enp-tree__intro {
+
+.enp-tree__intro-wrapper {
     background: $intro_background;
+}
+
+.enp-tree__intro-wrapper {
     border-bottom: 1px solid rgba(0,0,0,.15);
 }
+
+.enp-tree__state--intro {
+    background: darken($tree_background, 5);
+
+    .enp-tree__intro-wrapper {
+        background: rgba(255,255,255,0.6);
+        border-bottom: none;
+    }
+    .enp-tree__intro {
+        background: rgba(255,255,255,0.9);
+        border: 1px solid rgba(0,0,0,.1);
+    }
+}
+
 
 .enp-tree__btn {
     background: $btn_background;
