@@ -144,7 +144,11 @@ Tree.prototype = {
         for(let i = 0; i < this.observers.length; i++) {
             // make the alert process async
             setTimeout(() => {
+
+                console.time("observer");
+                console.log(this.observers[i], action)
                 this.observers[i].on(action, data)
+                console.timeEnd("observer");
           }, 0);
         }
     },
@@ -453,7 +457,9 @@ function buildTree(request) {
     });
     let treeHistory = new TreeHistory({});
     // add the observers
-    let observers = [treeView, treeHistory]
+    // bind history first so it will load the correct state and
+    // not cause layout to have to be repainted twice (if different states)
+    let observers = [treeHistory, treeView]
     // build the tree
     let tree = new Tree(data, observers);
     // send it to our trees array for access

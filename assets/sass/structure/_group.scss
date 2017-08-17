@@ -3,16 +3,17 @@
     max-width: 100%;
 }
 
+.enp-tree__title--group {
+    position: absolute;
+    bottom: 100%;
+}
+
 .enp-tree__state--intro,
 .enp-tree__state--tree {
     .enp-tree__group {
         position: absolute;
         top: 0;
         min-width: $column_min_width;
-    }
-    .enp-tree__title--group {
-        position: absolute;
-        bottom: 100%;
     }
 }
 .enp-tree__state--question {

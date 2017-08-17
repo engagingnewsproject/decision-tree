@@ -89,6 +89,8 @@ function TreeView(options) {
     this.activeClassName = 'is-active'
     // how long animation classes are applied for until removed
     this.animationLength = 500
+    // not ideal to pass this, but it's SOOO much faster performance wise
+    this.scaledSize = 0.65
     // set the el
     _container = options.container;
     // attach event listeners to the tree element with
@@ -125,8 +127,12 @@ TreeView.prototype = {
     },
 
     build: function(Tree) {
+
         this.setTree(Tree)
+        console.time('render');
         this.render(Tree.getData())
+        console.timeEnd('render');
+        console.time("build");
         // set the Tree El
         this.setTreeEl()
         // set the tree wrap
@@ -138,8 +144,15 @@ TreeView.prototype = {
         this.emit('ready', 'viewReady', this)
         // set the current state in the view
         let init = true
+        // calculate size
         this.setState(Tree.getState(), init)
+        console.timeEnd("build");
+        console.time("updateViewHeight");
         this.updateViewHeight(Tree.getState())
+
+        console.timeEnd("updateViewHeight");
+        // if we don't have any groups calculated, go ahead and calculate to store the values
+        this.checkForGroupsCalc()
     },
 
     render: function(data) {
@@ -252,6 +265,19 @@ TreeView.prototype = {
         return true;
     },
 
+    calculateQuestionsSize: function() {
+        let questions,
+            bounds;
+            console.log('calculateQuestionsSize')
+        questions = this.getQuestions()
+        for(let i =0; i < questions.length; i++) {
+            questions[i].data.bounds = {
+                offsetHeight: questions[i].offsetHeight,
+                offsetTop: questions[i].offsetTop
+            }
+        }
+    },
+
     updateViewHeight: function(state) {
         let activeEl,
             cPanel,
@@ -275,16 +301,26 @@ TreeView.prototype = {
             // delay the margin change until after the animation has completed
 
             // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (cPanel) must be set position relative
-            questionOffsetTop = -activeEl.offsetTop
+            // reset group transforms
+            this.resetArrangeGroups()
+            // check to make sure we have sizes
+            if(activeEl.data.bounds === undefined) {
+                this.calculateQuestionsSize()
+
+            }
+
+            questionOffsetTop = -activeEl.data.bounds.offsetTop
             cPanelTransform = 'translate3d(0,'+ questionOffsetTop+'px,0)'
             // set window scroll position to 0 (helps on mobile to center the question correctly)
             cWindow.scrollTop = 0
             // set a height
-            cWindowHeight = activeEl.offsetHeight
+            cWindowHeight = activeEl.data.bounds.offsetHeight
         }
 
         else if(state.type === 'intro') {
-            groupsHeight = this.arrangeGroups()
+            console.time('arrangeGroups')
+            this.arrangeGroups()
+            console.timeEnd('arrangeGroups')
         }
         // if the state type is tree, set a height on the window and distribute the groups accordingly
         else if(state.type === 'tree') {
@@ -309,7 +345,7 @@ TreeView.prototype = {
 
         // set the transforms
         cWindow.style.height = cWindowHeight+'px'
-        this.setTransform(cPanel, cPanelTransform)
+        cPanel.style.transform = cPanelTransform
 
         // emit to let everyone know we finished updating the height
         this.emit('viewChange', 'viewHeightUpdate', {cWindowHeight: cWindowHeight, questionOffsetTop: questionOffsetTop })
@@ -598,38 +634,83 @@ TreeView.prototype = {
         };
     },
 
+    // calculate bind the group sizes to the DOM
+    calculateGroups: function() {
+        let groups,
+            groupsBound;
+
+            // get the groups
+            groups = this.getGroups()
+
+            console.time('binding sizes')
+            for(let i = 0; i < groups.length; i++) {
+                console.time('groupsGetBound')
+                groups[i].data.size = {
+                    width: groups[i].offsetWidth,
+                    height: groups[i].offsetHeight
+                }
+                console.timeEnd('groupsGetBound')
+            }
+            console.timeEnd('binding sizes')
+
+    },
+
+    // check if we need to calclate the groups
+    checkForGroupsCalc: function() {
+        let groups = this.getGroups()
+
+        // first time it gets called, calculate heights
+        if(groups[0].data.size === undefined) {
+            this.calculateGroups()
+        }
+    },
+
     arrangeGroups: function() {
         let groups,
+            groupSize,
+            groupsOffsetLeft,
             groupsHeight,
-            groupsWidth,
-            groupsOffsetLeft;
+            groupsWidth;
 
-        // get the groups
         groups = this.getGroups()
+        // get the groups
+        this.checkForGroupsCalc()
         groupsHeight = 0
-
+        // batch style changes for faster painting
+        console.time('applyStyles');
         for(let i = 0; i < groups.length; i++) {
+            groupSize = groups[i].data.size
+
             if(i === 0) {
-                groupsWidth = groups[i].getBoundingClientRect().width
+                groupsWidth = groupSize.width * this.scaledSize
                 if(groupsWidth < 350) {
-                    groupsOffsetLeft = 30
+                    groupsWidth = groupsWidth * 1.5 + 30
                 } else {
-                    groupsOffsetLeft = 50
+                    groupsWidth = groupsWidth * 1.5 + 50
                 }
-
-            } else {
-                groups[i].style.top = groupsHeight + 'px'
             }
-            // set to the left
-            groups[i].style.left = groupsWidth * 1.5 + groupsOffsetLeft + 'px'
-            // add in the height of this one
-            // an extra 100 seems to be about right for spacing
-            groupsHeight = groupsHeight + (groups[i].getBoundingClientRect().height * 1.5)  + 100
-        }
 
+            console.log('width', groupSize.width)
+            console.log('height', groupSize.height)
+            groups[i].style.transform = 'translate3d('+groupsWidth+'px, '+groupsHeight + 'px, 0)'
+            // add in the height of this one
+            // an extra 110 seems to be about right for spacing
+            groupsHeight = groupsHeight + groupSize.height  + 110
+        }
+        console.timeEnd('applyStyles');
         return groupsHeight
     },
 
+    resetArrangeGroups: function() {
+        let groups;
+        groups = this.getGroups()
+        if(groups[0].style.transform !== '') {
+            for(let i = 0; i < groups.length; i++) {
+                groups[i].style.transform = ''
+            }
+        }
+
+    },
     // https://gist.github.com/conorbuck/2606166
     // p1 and p2 need x and y cordinates
     // p1 = {x: 12, y: 15}

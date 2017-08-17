@@ -1024,6 +1024,8 @@ function TreeView(options) {
     this.activeClassName = 'is-active';
     // how long animation classes are applied for until removed
     this.animationLength = 500;
+    // not ideal to pass this, but it's SOOO much faster performance wise
+    this.scaledSize = 0.65;
     // set the el
     _container = options.container;
     // attach event listeners to the tree element with
@@ -1059,8 +1061,12 @@ TreeView.prototype = {
     },
 
     build: function build(Tree) {
+
         this.setTree(Tree);
+        console.time('render');
         this.render(Tree.getData());
+        console.timeEnd('render');
+        console.time("build");
         // set the Tree El
         this.setTreeEl();
         // set the tree wrap
@@ -1072,8 +1078,15 @@ TreeView.prototype = {
         this.emit('ready', 'viewReady', this);
         // set the current state in the view
         var init = true;
+        // calculate size
         this.setState(Tree.getState(), init);
+        console.timeEnd("build");
+        console.time("updateViewHeight");
         this.updateViewHeight(Tree.getState());
+
+        console.timeEnd("updateViewHeight");
+        // if we don't have any groups calculated, go ahead and calculate to store the values
+        this.checkForGroupsCalc();
     },
 
     render: function render(data) {
@@ -1188,6 +1201,19 @@ TreeView.prototype = {
         return true;
     },
 
+    calculateQuestionsSize: function calculateQuestionsSize() {
+        var questions = void 0,
+            bounds = void 0;
+        console.log('calculateQuestionsSize');
+        questions = this.getQuestions();
+        for (var i = 0; i < questions.length; i++) {
+            questions[i].data.bounds = {
+                offsetHeight: questions[i].offsetHeight,
+                offsetTop: questions[i].offsetTop
+            };
+        }
+    },
+
     updateViewHeight: function updateViewHeight(state) {
         var activeEl = void 0,
             cPanel = void 0,
@@ -1211,14 +1237,23 @@ TreeView.prototype = {
             // delay the margin change until after the animation has completed
 
             // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (cPanel) must be set position relative
-            questionOffsetTop = -activeEl.offsetTop;
+            // reset group transforms
+            this.resetArrangeGroups();
+            // check to make sure we have sizes
+            if (activeEl.data.bounds === undefined) {
+                this.calculateQuestionsSize();
+            }
+
+            questionOffsetTop = -activeEl.data.bounds.offsetTop;
             cPanelTransform = 'translate3d(0,' + questionOffsetTop + 'px,0)';
             // set window scroll position to 0 (helps on mobile to center the question correctly)
             cWindow.scrollTop = 0;
             // set a height
-            cWindowHeight = activeEl.offsetHeight;
+            cWindowHeight = activeEl.data.bounds.offsetHeight;
         } else if (state.type === 'intro') {
-            groupsHeight = this.arrangeGroups();
+            console.time('arrangeGroups');
+            this.arrangeGroups();
+            console.timeEnd('arrangeGroups');
         }
         // if the state type is tree, set a height on the window and distribute the groups accordingly
         else if (state.type === 'tree') {
@@ -1242,7 +1277,7 @@ TreeView.prototype = {
 
         // set the transforms
         cWindow.style.height = cWindowHeight + 'px';
-        this.setTransform(cPanel, cPanelTransform);
+        cPanel.style.transform = cPanelTransform;
 
         // emit to let everyone know we finished updating the height
         this.emit('viewChange', 'viewHeightUpdate', { cWindowHeight: cWindowHeight, questionOffsetTop: questionOffsetTop });
@@ -1528,37 +1563,81 @@ TreeView.prototype = {
         };
     },
 
-    arrangeGroups: function arrangeGroups() {
+    // calculate bind the group sizes to the DOM
+    calculateGroups: function calculateGroups() {
         var groups = void 0,
-            groupsHeight = void 0,
-            groupsWidth = void 0,
-            groupsOffsetLeft = void 0;
+            groupsBound = void 0;
 
         // get the groups
         groups = this.getGroups();
-        groupsHeight = 0;
 
+        console.time('binding sizes');
         for (var i = 0; i < groups.length; i++) {
-            if (i === 0) {
-                groupsWidth = groups[i].getBoundingClientRect().width;
-                if (groupsWidth < 350) {
-                    groupsOffsetLeft = 30;
-                } else {
-                    groupsOffsetLeft = 50;
-                }
-            } else {
-                groups[i].style.top = groupsHeight + 'px';
-            }
-            // set to the left
-            groups[i].style.left = groupsWidth * 1.5 + groupsOffsetLeft + 'px';
-            // add in the height of this one
-            // an extra 100 seems to be about right for spacing
-            groupsHeight = groupsHeight + groups[i].getBoundingClientRect().height * 1.5 + 100;
+            console.time('groupsGetBound');
+            groups[i].data.size = {
+                width: groups[i].offsetWidth,
+                height: groups[i].offsetHeight
+            };
+            console.timeEnd('groupsGetBound');
         }
+        console.timeEnd('binding sizes');
+    },
 
+    // check if we need to calclate the groups
+    checkForGroupsCalc: function checkForGroupsCalc() {
+        var groups = this.getGroups();
+
+        // first time it gets called, calculate heights
+        if (groups[0].data.size === undefined) {
+            this.calculateGroups();
+        }
+    },
+
+    arrangeGroups: function arrangeGroups() {
+        var groups = void 0,
+            groupSize = void 0,
+            groupsOffsetLeft = void 0,
+            groupsHeight = void 0,
+            groupsWidth = void 0;
+
+        groups = this.getGroups();
+        // get the groups
+        this.checkForGroupsCalc();
+        groupsHeight = 0;
+        // batch style changes for faster painting
+        console.time('applyStyles');
+        for (var i = 0; i < groups.length; i++) {
+            groupSize = groups[i].data.size;
+
+            if (i === 0) {
+                groupsWidth = groupSize.width * this.scaledSize;
+                if (groupsWidth < 350) {
+                    groupsWidth = groupsWidth * 1.5 + 30;
+                } else {
+                    groupsWidth = groupsWidth * 1.5 + 50;
+                }
+            }
+
+            console.log('width', groupSize.width);
+            console.log('height', groupSize.height);
+            groups[i].style.transform = 'translate3d(' + groupsWidth + 'px, ' + groupsHeight + 'px, 0)';
+            // add in the height of this one
+            // an extra 110 seems to be about right for spacing
+            groupsHeight = groupsHeight + groupSize.height + 110;
+        }
+        console.timeEnd('applyStyles');
         return groupsHeight;
     },
 
+    resetArrangeGroups: function resetArrangeGroups() {
+        var groups = void 0;
+        groups = this.getGroups();
+        if (groups[0].style.transform !== '') {
+            for (var i = 0; i < groups.length; i++) {
+                groups[i].style.transform = '';
+            }
+        }
+    },
     // https://gist.github.com/conorbuck/2606166
     // p1 and p2 need x and y cordinates
     // p1 = {x: 12, y: 15}
@@ -1822,7 +1901,11 @@ TreeView.prototype = {
             var _loop = function _loop(i) {
                 // make the alert process async
                 setTimeout(function () {
+
+                    console.time("observer");
+                    console.log(_this.observers[i], action);
                     _this.observers[i].on(action, data);
+                    console.timeEnd("observer");
                 }, 0);
             };
 
@@ -2126,7 +2209,9 @@ TreeView.prototype = {
         });
         var treeHistory = new TreeHistory({});
         // add the observers
-        var observers = [treeView, treeHistory];
+        // bind history first so it will load the correct state and
+        // not cause layout to have to be repainted twice (if different states)
+        var observers = [treeHistory, treeView];
         // build the tree
         var tree = new Tree(data, observers);
         // send it to our trees array for access
