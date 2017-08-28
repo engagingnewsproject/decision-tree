@@ -91,6 +91,8 @@ function TreeView(options) {
     this.animationLength = 500
     // not ideal to pass this, but it's SOOO much faster performance wise
     this.scaledSize = 0.65
+    // create a stylesheet we can add rules to
+    this.stylesheet = this.createStylesheet()
     // set the el
     _container = options.container;
     // attach event listeners to the tree element with
@@ -130,8 +132,7 @@ TreeView.prototype = {
 
         this.setTree(Tree)
         this.render(Tree.getData())
-        // set the Tree El
-        this.setTreeEl()
+
         // set the tree wrap
         this.setContentWindow()
         // set the questions wrap
@@ -155,7 +156,8 @@ TreeView.prototype = {
         var treeHTML = template(data)
         // set the HTML into the passed container
         this.getContainer().innerHTML = treeHTML
-
+        // set the Tree El
+        this.setTreeEl()
         // bind question data
         this.bindAllData()
     },
@@ -186,6 +188,25 @@ TreeView.prototype = {
 
     getDestinationIcon: function(option_id) {
         return document.getElementById('enp-tree__destination-icon--'+option_id)
+    },
+
+    getStylesheet: function() {
+        return this.stylesheet
+    },
+
+    // from https://davidwalsh.name/add-rules-stylesheets
+    createStylesheet: function() {
+        let style
+
+        style = document.createElement('style')
+
+    	// WebKit hack :(
+    	style.appendChild(document.createTextNode(""))
+
+    	// Add the <style> element to the page
+    	document.head.appendChild(style)
+
+    	return style.sheet
     },
 
     /**
@@ -262,7 +283,6 @@ TreeView.prototype = {
     calculateQuestionsSize: function() {
         let questions,
             bounds;
-            console.log('calculateQuestionsSize')
         questions = this.getQuestions()
         for(let i =0; i < questions.length; i++) {
             questions[i].data.bounds = {
@@ -295,12 +315,9 @@ TreeView.prototype = {
             // delay the margin change until after the animation has completed
 
             // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (cPanel) must be set position relative
-            // reset group transforms
-            this.resetArrangeGroups()
             // check to make sure we have sizes
             if(activeEl.data.bounds === undefined) {
                 this.calculateQuestionsSize()
-
             }
 
             questionOffsetTop = -activeEl.data.bounds.offsetTop
@@ -312,11 +329,15 @@ TreeView.prototype = {
         }
 
         else if(state.type === 'intro') {
-            this.arrangeGroups()
+            // kicks off the process for calculating necesary group data if necessary
+            this.checkForGroupsCalc()
         }
         // if the state type is tree, set a height on the window and distribute the groups accordingly
         else if(state.type === 'tree') {
-            groupsHeight = this.arrangeGroups()
+            // kicks off the process for calculating necesary group data if necessary
+            this.checkForGroupsCalc()
+            // get the groups height
+            groupsHeight = this.getGroupsHeight()
 
             this.displayArrowDirection()
             // make sure the height of the groups isn't taller than the cWindowHeight
@@ -427,6 +448,8 @@ TreeView.prototype = {
         this.resizeTimeout = null;
         if ( !this.resizeTimeout ) {
             this.resizeTimeout = setTimeout(()=>{
+                // update the group sizes
+                this.calculateGroups()
                 // update the heights
                 this.updateViewHeight(this.getTree().getState())
             }, 450);
@@ -458,8 +481,13 @@ TreeView.prototype = {
     * Bind tree data to the element for easy access to data when we need it
     */
     bindAllData: function() {
-        Tree = this.getTree();
+        let Tree = this.getTree();
         let elTypes = ['question', 'start', 'end', 'group']
+        // bind a quick empty object for our treeEl so we can add data to it as needed
+        let treeEl = this.getTreeEl()
+        if(!treeEl.hasOwnProperty('data')) {
+            treeEl.data = {}
+        }
         // loop through the data and find the corresponding elements
         for(let i = 0; i < elTypes.length; i++) {
             // get the data: ex {question_id: 2, order: 2, etc}
@@ -641,7 +669,63 @@ TreeView.prototype = {
                 }
             }
 
+            // also calculate groupsSizes to get set on treeEl
+            this.calculateGroupsSize()
+            // creates the styles we need
+            this.addGroupStyles()
     },
+
+    // write group transforms to a dynamic stylesheet to improve perf.
+    // rebuilds on resize
+    addGroupStyles: function() {
+        let groups,
+            groupStyles,
+            groupsOffsetLeft,
+            treeEl;
+
+        // get the groups
+        groups = this.getGroups()
+        // get the treeEl for our groupsOffsetLeft data
+        treeEl = this.getTreeEl()
+        groupsOffsetLeft = treeEl.data.groupsOffsetLeft
+
+        for(let i = 0; i < groups.length; i++) {
+            this.addStylesheetRule('.enp-tree__state--tree #'+groups[i].id+', .enp-tree__state--intro #'+groups[i].id, [['transform', 'translate3d('+groupsOffsetLeft+'px,'+ groups[i].data.offsetTop+'px, 0)']])
+        }
+    },
+
+
+    // TODO: Let there be more than one rule passed at a time
+    // rules = array of arrays where those arrays are properties [key, value]
+    addStylesheetRule: function(selector, rules) {
+        let styles,
+            insertAt;
+        insertAt = null
+        styles = this.getStylesheet()
+
+        // check if the rule exists
+        for(let i = 0; i < styles.rules.length; i++) {
+            // check if this selector already exists
+            if(styles.rules[i].selectorText === selector) {
+                insertAt = i
+                break
+            }
+        }
+
+        // TODO: Let there be more than one rule passed at a time
+        if(insertAt === null) {
+            // it doesn't exist, so create it
+            // Insert CSS Rule
+            styles.insertRule(selector + '{' + rules[0][0] + ': '+rules[0][1]+'}', styles.cssRules.length);
+        } else {
+            // it exists, so update it
+            styles.rules[insertAt].style[rules[0][0]] = rules[0][1]
+        }
+
+
+
+
+  },
 
     // check if we need to calclate the groups
     checkForGroupsCalc: function() {
@@ -653,16 +737,15 @@ TreeView.prototype = {
         }
     },
 
-    arrangeGroups: function() {
+    calculateGroupsSize: function() {
         let groups,
             groupSize,
             groupsOffsetLeft,
             groupsHeight,
-            groupsWidth;
+            groupsWidth,
+            treeEl;
 
         groups = this.getGroups()
-        // get the groups
-        this.checkForGroupsCalc()
         groupsHeight = 0
         // batch style changes for faster painting
         for(let i = 0; i < groups.length; i++) {
@@ -671,32 +754,42 @@ TreeView.prototype = {
             if(i === 0) {
                 groupsWidth = groupSize.width * this.scaledSize
                 if(groupsWidth < 350) {
-                    groupsWidth = groupsWidth * 1.5 + 30
+                    groupsOffsetLeft = groupsWidth * 1.5 + 30
                 } else {
-                    groupsWidth = groupsWidth * 1.5 + 50
+                    groupsOffsetLeft = groupsWidth * 1.5 + 50
                 }
             }
 
-            console.log('width', groupSize.width)
-            console.log('height', groupSize.height)
-            groups[i].style.transform = 'translate3d('+groupsWidth+'px, '+groupsHeight + 'px, 0)'
+            // groups[i].style.transform = 'translate3d('+groupsWidth+'px, '+groupsHeight + 'px, 0)'
+            // add the offsetTop for the tree state
+            groups[i].data.offsetTop = groupsHeight
             // add in the height of this one
             // an extra 110 seems to be about right for spacing
             groupsHeight = groupsHeight + groupSize.height  + 110
         }
+
+        // write the groupsOffsetLeft and groupsHeight to our tree el
+        treeEl = this.getTreeEl()
+        treeEl.data.groupsOffsetLeft = groupsOffsetLeft
+        treeEl.data.groupsHeight = groupsHeight
+
         return groupsHeight
     },
 
-    resetArrangeGroups: function() {
-        let groups;
-        groups = this.getGroups()
-        if(groups[0].style.transform !== '') {
-            for(let i = 0; i < groups.length; i++) {
-                groups[i].style.transform = ''
-            }
+    getGroupsHeight: function() {
+        let treeEl,
+            groupsHeight;
+
+        treeEl = this.getTreeEl()
+
+        // check if the key exists, if not, add it
+        if(!treeEl.data.hasOwnProperty('groupsHeight')) {
+            this.calculateGroupsSize()
         }
 
+        return treeEl.data.groupsHeight
     },
+
     // https://gist.github.com/conorbuck/2606166
     // p1 and p2 need x and y cordinates
     // p1 = {x: 12, y: 15}
