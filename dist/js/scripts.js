@@ -181,7 +181,6 @@ function TreeHistoryView(options) {
     this.templateRender(this.getTreeHistory().getHistory(), this.getTreeHistory().getCurrentIndex());
     // add click listener on container
     _container.addEventListener("click", this.click.bind(this));
-    _container.addEventListener("keydown", this.keydown.bind(this));
 }
 
 TreeHistoryView.prototype = {
@@ -222,10 +221,10 @@ TreeHistoryView.prototype = {
         // check if it's a click on the parent tree (which we don't care about)
         if (el !== event.currentTarget) {
             // also check for parent, as the
-            if (el.nodeName === 'A' || el.parentNode.nodeName === 'A') {
+            if (el.nodeName === 'BUTTON' || el.parentNode.nodeName === 'BUTTON') {
                 event.preventDefault();
                 // if our parent is the A, then set that as el, bc that's the one with the data set on it. This is for the overviewBtn
-                if (el.parentNode.nodeName === 'A') {
+                if (el.parentNode.nodeName === 'BUTTON') {
                     el = el.parentNode;
                 }
                 // see if we want to go to overview or new question/end
@@ -344,7 +343,7 @@ TreeHistoryView.prototype = {
     templateUpdateHistory: function templateUpdateHistory(history) {
         var list = void 0,
             li = void 0,
-            a = void 0,
+            button = void 0,
             deleteLi = void 0,
             iterator = void 0;
 
@@ -380,7 +379,7 @@ TreeHistoryView.prototype = {
         for (var _i2 = 0; _i2 < iterator; _i2++) {
 
             if (li[_i2] !== undefined) {
-                a = li[_i2].firstElementChild;
+                button = li[_i2].firstElementChild;
             }
             if (deleteLi.length !== 0 || history[_i2] === undefined) {
                 // add these to the ones to delete
@@ -390,7 +389,7 @@ TreeHistoryView.prototype = {
                 list.appendChild(this.templateHistoryItem(history[_i2], _i2));
             }
             // if both exist, compare values
-            else if (a.data !== undefined && a.data.id !== history[_i2].id) {
+            else if (button.data !== undefined && button.data.id !== history[_i2].id) {
                     // add these to the ones to delete
                     deleteLi.push(li[_i2]);
                 } else {
@@ -405,19 +404,19 @@ TreeHistoryView.prototype = {
 
     templateUpdateIndex: function templateUpdateIndex(currentIndex) {
         var li = void 0,
-            a = void 0;
+            button = void 0;
 
         li = this.getHistoryItems();
         // first check that we need to update anything
         for (var i = 0; i < li.length; i++) {
-            a = li[i].firstElementChild;
-            if (a.classList.contains('is-active') && i !== currentIndex) {
-                a.classList.remove('is-active');
+            button = li[i].firstElementChild;
+            if (button.classList.contains('is-active') && i !== currentIndex) {
+                button.classList.remove('is-active');
             }
         }
-        a = li[currentIndex].firstElementChild;
-        if (!a.classList.contains('is-active')) {
-            a.classList.add('is-active');
+        button = li[currentIndex].firstElementChild;
+        if (!button.classList.contains('is-active')) {
+            button.classList.add('is-active');
         }
     },
 
@@ -481,16 +480,16 @@ TreeHistoryView.prototype = {
     // a button so we can display all the buttons in the html without having to show the start button
     templateStartBtn: function templateStartBtn(data) {
         var li = void 0,
-            a = void 0;
+            button = void 0;
 
         li = document.createElement('li');
-        a = document.createElement('a');
-        li.appendChild(a);
+        button = document.createElement('button');
+        li.appendChild(button);
 
         li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--start');
 
-        a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--start');
-        a.data = data;
+        button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--start');
+        button.data = data;
 
         return li;
     },
@@ -499,36 +498,36 @@ TreeHistoryView.prototype = {
     // we want to go to the overview mode
     templateOverviewBtn: function templateOverviewBtn(data) {
         var li = void 0,
-            a = void 0;
+            button = void 0;
 
         li = document.createElement('li');
-        a = document.createElement('a');
-        li.appendChild(a);
+        button = document.createElement('button');
+        li.appendChild(button);
 
         li.classList.add('enp-tree__history-list-item', 'enp-tree__istory-list-item--overview');
 
-        a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview');
-        a.innerHTML = '<div class="enp-tree__overview-icon"></div><div class="enp-tree__overview-icon"></div>';
-        a.data = data;
+        button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview');
+        button.innerHTML = '<div class="enp-tree__overview-icon"></div><div class="enp-tree__overview-icon"></div>';
+        button.data = data;
 
         return li;
     },
 
     templateHistoryItem: function templateHistoryItem(data, index) {
         var li = void 0,
-            a = void 0;
+            button = void 0;
 
         li = document.createElement('li');
-        a = document.createElement('a');
-        li.appendChild(a);
+        button = document.createElement('button');
+        li.appendChild(button);
 
         li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--nav');
 
-        a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav');
+        button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav');
         // because of the start button (hidden) and overview button before it
         // we need to subtract 1 from the index
-        a.innerHTML = index - 1;
-        a.data = data;
+        button.innerHTML = index - 1;
+        button.data = data;
 
         return li;
     }
@@ -1105,11 +1104,17 @@ TreeView.prototype = {
     },
 
     getQuestions: function getQuestions() {
-        var treeEl = void 0,
-            groups = void 0;
+        var treeEl = void 0;
 
         treeEl = this.getTreeEl();
         return treeEl.getElementsByClassName('enp-tree__question');
+    },
+
+    getEnds: function getEnds() {
+        var treeEl = void 0;
+
+        treeEl = this.getTreeEl();
+        return treeEl.getElementsByClassName('enp-tree__end');
     },
 
     getDestination: function getDestination(destination_id) {
@@ -1154,14 +1159,18 @@ TreeView.prototype = {
             oldActiveEl = void 0,
             newStateSuccess = void 0;
 
+        console.time('updateState');
         oldState = data.oldState;
         newState = data.newState;
         oldActiveEl = this.getActiveEl();
 
+        console.time('removeContainerState');
         // removes container state class
         if (oldState.type !== newState.type) {
             this.removeContainerState(oldState);
         }
+        console.timeEnd('removeContainerState');
+        console.time('changeState');
         if (oldState.id !== newState.id) {
             // get active element
             oldActiveEl.classList.remove(this.activeClassName);
@@ -1171,48 +1180,65 @@ TreeView.prototype = {
                 oldActiveEl.classList.remove('enp-tree__' + oldState.type + '--animate-out');
             }, this.animationLength);
         }
+        console.timeEnd('changeState');
 
         // activate new state
         // data.newState.id
         newStateSuccess = this.setState(data.newState);
 
         // delay the updateViewHeight if we're switching to/from the 'tree' since there's a lot that happens height/transform wise in that time
+        console.time('changeStateUpdateViewHeight');
         if (oldState.type === 'tree' || newState.type === 'tree') {
             setTimeout(function () {
+                console.time('internalUpdateViewHeight');
                 _this.updateViewHeight(newState);
+                console.timeEnd('internalUpdateViewHeight');
             }, this.animationLength);
         } else {
             // don't worry about delaying
             this.updateViewHeight(newState);
         }
+        console.timeEnd('changeStateUpdateViewHeight');
 
         // revert back to old state
         if (newStateSuccess === false) {
             this.setState(oldState);
             this.updateViewHeight(oldState);
         }
+        console.timeEnd('updateState');
     },
 
     setState: function setState(state, init) {
         var activeEl = void 0;
-
+        console.time('setState');
+        console.time('addContainerState');
         this.addContainerState(state);
-
+        console.timeEnd('addContainerState');
         // set active element
+        console.time('setActiveEl');
         activeEl = this.setActiveEl(state);
+        console.timeEnd('setActiveEl');
 
         // if set active fails... what to do?
         if (activeEl === false) {
             return false;
         }
+        console.time('addClassName');
         // validated, so set the new class!
         activeEl.classList.add(this.activeClassName);
+        console.timeEnd('addClassName');
         // we don't want to add focus on init
+
         if (init !== true) {
             // focus it
+            console.time('focus');
+
             activeEl.focus();
+
+            console.timeEnd('focus');
         }
 
+        console.timeEnd('setState');
         return true;
     },
 
@@ -1228,6 +1254,18 @@ TreeView.prototype = {
         }
     },
 
+    calculateEndsSize: function calculateEndsSize() {
+        var ends = void 0,
+            bounds = void 0;
+        ends = this.getEnds();
+        for (var i = 0; i < ends.length; i++) {
+            ends[i].data.bounds = {
+                offsetHeight: ends[i].offsetHeight,
+                offsetTop: ends[i].offsetTop
+            };
+        }
+    },
+
     updateViewHeight: function updateViewHeight(state) {
         var activeEl = void 0,
             cPanel = void 0,
@@ -1236,6 +1274,7 @@ TreeView.prototype = {
             cPanelTransform = void 0,
             questionOffsetTop = void 0,
             groupsHeight = void 0;
+        console.time('updateViewHeight');
 
         activeEl = this.getActiveEl();
         // if we're on a question, set the transform origin on the wrapper
@@ -1253,7 +1292,9 @@ TreeView.prototype = {
             // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (cPanel) must be set position relative
             // check to make sure we have sizes
             if (activeEl.data.bounds === undefined) {
+                // calculate both for reference
                 this.calculateQuestionsSize();
+                this.calculateEndsSize();
             }
 
             questionOffsetTop = -activeEl.data.bounds.offsetTop;
@@ -1295,6 +1336,7 @@ TreeView.prototype = {
 
         // emit to let everyone know we finished updating the height
         this.emit('viewChange', 'viewHeightUpdate', { cWindowHeight: cWindowHeight, questionOffsetTop: questionOffsetTop });
+        console.timeEnd('updateViewHeight');
     },
 
     addContainerState: function addContainerState(state) {
@@ -1641,14 +1683,18 @@ TreeView.prototype = {
             }
         }
 
-        // TODO: Let there be more than one rule passed at a time
+        // If it couldn't be found, create the rule
         if (insertAt === null) {
             // it doesn't exist, so create it
             // Insert CSS Rule
-            styles.insertRule(selector + '{' + rules[0][0] + ': ' + rules[0][1] + '}', styles.cssRules.length);
-        } else {
-            // it exists, so update it
-            styles.rules[insertAt].style[rules[0][0]] = rules[0][1];
+            insertAt = styles.cssRules.length;
+            // add the first rule as a placeholder
+            styles.insertRule(selector + '{' + rules[0][0] + ': ' + rules[0][1] + '}', insertAt);
+        }
+
+        // now add all the rules
+        for (var _i = 0; _i < rules.length; _i++) {
+            styles.rules[insertAt].style[rules[_i][0]] = rules[_i][1];
         }
     },
 

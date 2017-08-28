@@ -85,7 +85,6 @@ function TreeHistoryView(options) {
     this.templateRender(this.getTreeHistory().getHistory(), this.getTreeHistory().getCurrentIndex())
     // add click listener on container
     _container.addEventListener("click", this.click.bind(this));
-    _container.addEventListener("keydown", this.keydown.bind(this));
 }
 
 TreeHistoryView.prototype = {
@@ -127,10 +126,10 @@ TreeHistoryView.prototype = {
         // check if it's a click on the parent tree (which we don't care about)
         if (el !== event.currentTarget) {
             // also check for parent, as the
-            if(el.nodeName === 'A' || el.parentNode.nodeName === 'A') {
+            if(el.nodeName === 'BUTTON' || el.parentNode.nodeName === 'BUTTON') {
                 event.preventDefault()
                 // if our parent is the A, then set that as el, bc that's the one with the data set on it. This is for the overviewBtn
-                if(el.parentNode.nodeName === 'A') {
+                if(el.parentNode.nodeName === 'BUTTON') {
                     el = el.parentNode
                 }
                 // see if we want to go to overview or new question/end
@@ -249,7 +248,7 @@ TreeHistoryView.prototype = {
     templateUpdateHistory: function(history) {
         let list,
             li,
-            a,
+            button,
             deleteLi,
             iterator;
 
@@ -286,7 +285,7 @@ TreeHistoryView.prototype = {
         for(let i = 0; i < iterator; i++) {
 
             if(li[i] !== undefined) {
-                a = li[i].firstElementChild
+                button = li[i].firstElementChild
             }
             if(deleteLi.length !== 0 || history[i] === undefined) {
                 // add these to the ones to delete
@@ -297,7 +296,7 @@ TreeHistoryView.prototype = {
                 list.appendChild(this.templateHistoryItem(history[i], i))
             }
             // if both exist, compare values
-            else if(a.data !== undefined && a.data.id !== history[i].id) {
+            else if(button.data !== undefined && button.data.id !== history[i].id) {
                 // add these to the ones to delete
                 deleteLi.push(li[i])
             } else {
@@ -312,20 +311,20 @@ TreeHistoryView.prototype = {
 
     templateUpdateIndex(currentIndex) {
         let li,
-            a;
+            button;
 
         li = this.getHistoryItems()
         // first check that we need to update anything
         for(let i = 0; i < li.length; i++) {
-            a = li[i].firstElementChild
-            if(a.classList.contains('is-active') && i !== currentIndex) {
-                a.classList.remove('is-active')
+            button = li[i].firstElementChild
+            if(button.classList.contains('is-active') && i !== currentIndex) {
+                button.classList.remove('is-active')
             }
 
         }
-        a = li[currentIndex].firstElementChild
-        if(!a.classList.contains('is-active')) {
-            a.classList.add('is-active')
+        button = li[currentIndex].firstElementChild
+        if(!button.classList.contains('is-active')) {
+            button.classList.add('is-active')
         }
 
     },
@@ -391,16 +390,16 @@ TreeHistoryView.prototype = {
     // a button so we can display all the buttons in the html without having to show the start button
     templateStartBtn: function(data) {
         let li,
-            a;
+            button;
 
         li = document.createElement('li')
-        a = document.createElement('a')
-        li.appendChild(a)
+        button = document.createElement('button')
+        li.appendChild(button)
 
         li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--start')
 
-        a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--start')
-        a.data = data
+        button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--start')
+        button.data = data
 
         return li
     },
@@ -409,36 +408,36 @@ TreeHistoryView.prototype = {
     // we want to go to the overview mode
     templateOverviewBtn: function(data) {
         let li,
-            a;
+            button;
 
         li = document.createElement('li')
-        a = document.createElement('a')
-        li.appendChild(a)
+        button = document.createElement('button')
+        li.appendChild(button)
 
         li.classList.add('enp-tree__history-list-item', 'enp-tree__istory-list-item--overview')
 
-        a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview')
-        a.innerHTML = '<div class="enp-tree__overview-icon"></div><div class="enp-tree__overview-icon"></div>'
-        a.data = data
+        button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview')
+        button.innerHTML = '<div class="enp-tree__overview-icon"></div><div class="enp-tree__overview-icon"></div>'
+        button.data = data
 
         return li
     },
 
     templateHistoryItem: function(data, index) {
         let li,
-            a;
+            button;
 
         li = document.createElement('li')
-        a = document.createElement('a')
-        li.appendChild(a)
+        button = document.createElement('button')
+        li.appendChild(button)
 
         li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--nav')
 
-        a.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav')
+        button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav')
         // because of the start button (hidden) and overview button before it
         // we need to subtract 1 from the index
-        a.innerHTML = index - 1
-        a.data = data
+        button.innerHTML = index - 1
+        button.data = data
 
         return li
     }

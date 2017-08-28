@@ -171,11 +171,17 @@ TreeView.prototype = {
     },
 
     getQuestions: function() {
-        let treeEl,
-            groups;
+        let treeEl;
 
         treeEl = this.getTreeEl()
         return treeEl.getElementsByClassName('enp-tree__question')
+    },
+
+    getEnds: function() {
+        let treeEl;
+
+        treeEl = this.getTreeEl()
+        return treeEl.getElementsByClassName('enp-tree__end')
     },
 
     getDestination: function(destination_id) {
@@ -218,14 +224,20 @@ TreeView.prototype = {
             oldActiveEl,
             newStateSuccess;
 
+
+        console.time('updateState')
         oldState = data.oldState
         newState = data.newState
         oldActiveEl = this.getActiveEl()
 
+
+        console.time('removeContainerState')
         // removes container state class
         if(oldState.type !== newState.type) {
             this.removeContainerState(oldState)
         }
+        console.timeEnd('removeContainerState')
+        console.time('changeState')
         if(oldState.id !== newState.id) {
             // get active element
             oldActiveEl.classList.remove(this.activeClassName)
@@ -235,48 +247,65 @@ TreeView.prototype = {
                  oldActiveEl.classList.remove('enp-tree__'+oldState.type+'--animate-out')
             }, this.animationLength)
         }
+        console.timeEnd('changeState')
 
         // activate new state
         // data.newState.id
         newStateSuccess = this.setState(data.newState)
 
         // delay the updateViewHeight if we're switching to/from the 'tree' since there's a lot that happens height/transform wise in that time
+        console.time('changeStateUpdateViewHeight')
         if(oldState.type === 'tree' || newState.type === 'tree') {
             setTimeout(()=>{
+                console.time('internalUpdateViewHeight')
                 this.updateViewHeight(newState)
+                console.timeEnd('internalUpdateViewHeight')
             }, this.animationLength)
         } else {
             // don't worry about delaying
             this.updateViewHeight(newState)
         }
+        console.timeEnd('changeStateUpdateViewHeight')
 
         // revert back to old state
         if(newStateSuccess === false) {
             this.setState(oldState)
             this.updateViewHeight(oldState)
         }
+        console.timeEnd('updateState')
     },
 
     setState: function(state, init) {
         let activeEl;
-
+        console.time('setState')
+        console.time('addContainerState')
         this.addContainerState(state)
-
+        console.timeEnd('addContainerState')
         // set active element
+        console.time('setActiveEl')
         activeEl = this.setActiveEl(state)
+        console.timeEnd('setActiveEl')
 
         // if set active fails... what to do?
         if(activeEl === false) {
             return false;
         }
+        console.time('addClassName')
         // validated, so set the new class!
         activeEl.classList.add(this.activeClassName)
+        console.timeEnd('addClassName')
         // we don't want to add focus on init
+
         if(init !== true) {
             // focus it
+            console.time('focus')
+
             activeEl.focus()
+
+            console.timeEnd('focus')
         }
 
+        console.timeEnd('setState')
         return true;
     },
 
@@ -292,6 +321,18 @@ TreeView.prototype = {
         }
     },
 
+    calculateEndsSize: function() {
+        let ends,
+            bounds;
+        ends = this.getEnds()
+        for(let i =0; i < ends.length; i++) {
+            ends[i].data.bounds = {
+                offsetHeight: ends[i].offsetHeight,
+                offsetTop: ends[i].offsetTop
+            }
+        }
+    },
+
     updateViewHeight: function(state) {
         let activeEl,
             cPanel,
@@ -300,6 +341,7 @@ TreeView.prototype = {
             cPanelTransform,
             questionOffsetTop,
             groupsHeight;
+        console.time('updateViewHeight')
 
         activeEl = this.getActiveEl()
         // if we're on a question, set the transform origin on the wrapper
@@ -317,7 +359,9 @@ TreeView.prototype = {
             // Also, offsetTop only works to the next RELATIVELY positioned element, so the activeEl container (cPanel) must be set position relative
             // check to make sure we have sizes
             if(activeEl.data.bounds === undefined) {
+                // calculate both for reference
                 this.calculateQuestionsSize()
+                this.calculateEndsSize()
             }
 
             questionOffsetTop = -activeEl.data.bounds.offsetTop
@@ -362,6 +406,7 @@ TreeView.prototype = {
 
         // emit to let everyone know we finished updating the height
         this.emit('viewChange', 'viewHeightUpdate', {cWindowHeight: cWindowHeight, questionOffsetTop: questionOffsetTop })
+        console.timeEnd('updateViewHeight')
     },
 
     addContainerState: function(state) {
@@ -712,14 +757,18 @@ TreeView.prototype = {
             }
         }
 
-        // TODO: Let there be more than one rule passed at a time
+        // If it couldn't be found, create the rule
         if(insertAt === null) {
             // it doesn't exist, so create it
             // Insert CSS Rule
-            styles.insertRule(selector + '{' + rules[0][0] + ': '+rules[0][1]+'}', styles.cssRules.length);
-        } else {
-            // it exists, so update it
-            styles.rules[insertAt].style[rules[0][0]] = rules[0][1]
+            insertAt = styles.cssRules.length
+            // add the first rule as a placeholder
+            styles.insertRule(selector + '{' + rules[0][0] + ': '+rules[0][1]+'}', insertAt);
+        }
+
+        // now add all the rules
+        for(let i = 0; i < rules.length; i++) {
+            styles.rules[insertAt].style[rules[i][0]] = rules[i][1]
         }
 
 
