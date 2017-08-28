@@ -53,6 +53,15 @@ class Helpers {
         }
         return '';
     }
+
+    public static function el_number($order) {
+        return $order + 1;
+    }
+
+    // we don't need this function for the php version
+    public static function destination($destination_id, $destination_type, $option_id, $question_index, $options) {
+        return '';
+    }
 }
 
 ?>
