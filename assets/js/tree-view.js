@@ -724,11 +724,11 @@ TreeView.prototype = {
             insertAt;
         insertAt = null
         styles = this.getStylesheet()
-
+        console.log(styles)
         // check if the rule exists
-        for(let i = 0; i < styles.rules.length; i++) {
+        for(let i = 0; i < styles.cssRules.length; i++) {
             // check if this selector already exists
-            if(styles.rules[i].selectorText === selector) {
+            if(styles.cssRules[i].selectorText === selector) {
                 insertAt = i
                 break
             }
@@ -745,7 +745,7 @@ TreeView.prototype = {
 
         // now add all the rules
         for(let i = 0; i < rules.length; i++) {
-            styles.rules[insertAt].style[rules[i][0]] = rules[i][1]
+            styles.cssRules[insertAt].style[rules[i][0]] = rules[i][1]
         }
 
 

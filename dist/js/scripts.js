@@ -1650,11 +1650,11 @@ TreeView.prototype = {
             insertAt = void 0;
         insertAt = null;
         styles = this.getStylesheet();
-
+        console.log(styles);
         // check if the rule exists
-        for (var i = 0; i < styles.rules.length; i++) {
+        for (var i = 0; i < styles.cssRules.length; i++) {
             // check if this selector already exists
-            if (styles.rules[i].selectorText === selector) {
+            if (styles.cssRules[i].selectorText === selector) {
                 insertAt = i;
                 break;
             }
@@ -1671,7 +1671,7 @@ TreeView.prototype = {
 
         // now add all the rules
         for (var _i = 0; _i < rules.length; _i++) {
-            styles.rules[insertAt].style[rules[_i][0]] = rules[_i][1];
+            styles.cssRules[insertAt].style[rules[_i][0]] = rules[_i][1];
         }
     },
 
