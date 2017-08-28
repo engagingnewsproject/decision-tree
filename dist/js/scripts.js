@@ -1408,6 +1408,9 @@ TreeView.prototype = {
         this.resizeTimeout = null;
         if (!this.resizeTimeout) {
             this.resizeTimeout = setTimeout(function () {
+                // update the question and end sizes
+                _this2.calculateQuestionsSize();
+                _this2.calculateEndsSize();
                 // update the group sizes
                 _this2.calculateGroups();
                 // update the heights
@@ -1657,7 +1660,6 @@ TreeView.prototype = {
             insertAt = void 0;
         insertAt = null;
         styles = this.getStylesheet();
-        console.log(styles);
         // check if the rule exists
         for (var i = 0; i < styles.cssRules.length; i++) {
             // check if this selector already exists
