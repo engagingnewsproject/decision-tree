@@ -63,6 +63,7 @@ html {
 .enp-tree__state--end,
 .enp-tree__state--question {
     .enp-tree__title--tree {
+        transform: scale(0.7);
         margin-bottom: 0;
     }
     .enp-tree__start-container {
