@@ -231,13 +231,10 @@ TreeView.prototype = {
         oldActiveEl = this.getActiveEl()
 
 
-        console.time('removeContainerState')
         // removes container state class
         if(oldState.type !== newState.type) {
             this.removeContainerState(oldState)
         }
-        console.timeEnd('removeContainerState')
-        console.time('changeState')
         if(oldState.id !== newState.id) {
             // get active element
             oldActiveEl.classList.remove(this.activeClassName)
@@ -247,25 +244,20 @@ TreeView.prototype = {
                  oldActiveEl.classList.remove('enp-tree__'+oldState.type+'--animate-out')
             }, this.animationLength)
         }
-        console.timeEnd('changeState')
 
         // activate new state
         // data.newState.id
         newStateSuccess = this.setState(data.newState)
 
         // delay the updateViewHeight if we're switching to/from the 'tree' since there's a lot that happens height/transform wise in that time
-        console.time('changeStateUpdateViewHeight')
         if(oldState.type === 'tree' || newState.type === 'tree') {
             setTimeout(()=>{
-                console.time('internalUpdateViewHeight')
                 this.updateViewHeight(newState)
-                console.timeEnd('internalUpdateViewHeight')
             }, this.animationLength)
         } else {
             // don't worry about delaying
             this.updateViewHeight(newState)
         }
-        console.timeEnd('changeStateUpdateViewHeight')
 
         // revert back to old state
         if(newStateSuccess === false) {
@@ -278,31 +270,21 @@ TreeView.prototype = {
     setState: function(state, init) {
         let activeEl;
         console.time('setState')
-        console.time('addContainerState')
         this.addContainerState(state)
-        console.timeEnd('addContainerState')
         // set active element
-        console.time('setActiveEl')
         activeEl = this.setActiveEl(state)
-        console.timeEnd('setActiveEl')
 
         // if set active fails... what to do?
         if(activeEl === false) {
             return false;
         }
-        console.time('addClassName')
         // validated, so set the new class!
         activeEl.classList.add(this.activeClassName)
-        console.timeEnd('addClassName')
         // we don't want to add focus on init
 
         if(init !== true) {
             // focus it
-            console.time('focus')
-
             activeEl.focus()
-
-            console.timeEnd('focus')
         }
 
         console.timeEnd('setState')
