@@ -1159,7 +1159,6 @@ TreeView.prototype = {
             oldActiveEl = void 0,
             newStateSuccess = void 0;
 
-        console.time('updateState');
         oldState = data.oldState;
         newState = data.newState;
         oldActiveEl = this.getActiveEl();
@@ -1197,12 +1196,10 @@ TreeView.prototype = {
             this.setState(oldState);
             this.updateViewHeight(oldState);
         }
-        console.timeEnd('updateState');
     },
 
     setState: function setState(state, init) {
         var activeEl = void 0;
-        console.time('setState');
         this.addContainerState(state);
         // set active element
         activeEl = this.setActiveEl(state);
@@ -1217,10 +1214,10 @@ TreeView.prototype = {
 
         if (init !== true) {
             // focus it
+            // TODO: when going from question state to tree state, this takes 30ms when it should only take less than 1ms
             activeEl.focus();
         }
 
-        console.timeEnd('setState');
         return true;
     },
 
@@ -1256,7 +1253,6 @@ TreeView.prototype = {
             cPanelTransform = void 0,
             questionOffsetTop = void 0,
             groupsHeight = void 0;
-        console.time('updateViewHeight');
 
         activeEl = this.getActiveEl();
         // if we're on a question, set the transform origin on the wrapper
@@ -1318,7 +1314,6 @@ TreeView.prototype = {
 
         // emit to let everyone know we finished updating the height
         this.emit('viewChange', 'viewHeightUpdate', { cWindowHeight: cWindowHeight, questionOffsetTop: questionOffsetTop });
-        console.timeEnd('updateViewHeight');
     },
 
     addContainerState: function addContainerState(state) {
