@@ -126,8 +126,15 @@ TreeHistory.prototype = {
     constructor: TreeHistory,
 
     build: function(Tree) {
+        let history;
         this.setTree(Tree)
         this.init()
+        // check the validity of the history, if it's not cool, clear history and run again
+        history = this.getHistory()
+        // if the first and second items aren't valid, reset it
+        if(history[0].type !== 'intro' || history[1].type !== 'tree' ) {
+            this.clearHistory()
+        }
         this.forceCurrentState()
     },
 
