@@ -129,10 +129,7 @@ TreeView.prototype = {
     build: function(Tree) {
 
         this.setTree(Tree)
-        console.time('render');
         this.render(Tree.getData())
-        console.timeEnd('render');
-        console.time("build");
         // set the Tree El
         this.setTreeEl()
         // set the tree wrap
@@ -146,11 +143,8 @@ TreeView.prototype = {
         let init = true
         // calculate size
         this.setState(Tree.getState(), init)
-        console.timeEnd("build");
-        console.time("updateViewHeight");
         this.updateViewHeight(Tree.getState())
 
-        console.timeEnd("updateViewHeight");
         // if we don't have any groups calculated, go ahead and calculate to store the values
         this.checkForGroupsCalc()
     },
@@ -318,9 +312,7 @@ TreeView.prototype = {
         }
 
         else if(state.type === 'intro') {
-            console.time('arrangeGroups')
             this.arrangeGroups()
-            console.timeEnd('arrangeGroups')
         }
         // if the state type is tree, set a height on the window and distribute the groups accordingly
         else if(state.type === 'tree') {
@@ -642,16 +634,12 @@ TreeView.prototype = {
             // get the groups
             groups = this.getGroups()
 
-            console.time('binding sizes')
             for(let i = 0; i < groups.length; i++) {
-                console.time('groupsGetBound')
                 groups[i].data.size = {
                     width: groups[i].offsetWidth,
                     height: groups[i].offsetHeight
                 }
-                console.timeEnd('groupsGetBound')
             }
-            console.timeEnd('binding sizes')
 
     },
 
@@ -677,7 +665,6 @@ TreeView.prototype = {
         this.checkForGroupsCalc()
         groupsHeight = 0
         // batch style changes for faster painting
-        console.time('applyStyles');
         for(let i = 0; i < groups.length; i++) {
             groupSize = groups[i].data.size
 
@@ -697,7 +684,6 @@ TreeView.prototype = {
             // an extra 110 seems to be about right for spacing
             groupsHeight = groupsHeight + groupSize.height  + 110
         }
-        console.timeEnd('applyStyles');
         return groupsHeight
     },
 

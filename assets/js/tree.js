@@ -144,11 +144,7 @@ Tree.prototype = {
         for(let i = 0; i < this.observers.length; i++) {
             // make the alert process async
             setTimeout(() => {
-
-                console.time("observer");
-                console.log(this.observers[i], action)
                 this.observers[i].on(action, data)
-                console.timeEnd("observer");
           }, 0);
         }
     },
