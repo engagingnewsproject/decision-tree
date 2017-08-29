@@ -13,10 +13,6 @@
             max-width: 1000px;
             margin: 0 auto;
         }
-
-        #enp-tree__citizen {
-            border: 1px solid #f2f2f2;
-        }
     </style>
 </head>
 <body>
@@ -44,6 +40,12 @@
 
     // you can access all your trees with var trees
     createTree(treeOptions);
+
+    function focusIt(elem) {
+        console.time('focus')
+        elem.focus()
+        console.timeEnd('focus')
+    }
 </script>
 </body>
 </html>

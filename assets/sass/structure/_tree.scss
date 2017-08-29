@@ -62,10 +62,15 @@ html {
 
 .enp-tree__state--end,
 .enp-tree__state--question {
+    .enp-tree__intro-wrapper {
+        padding: $spacing__base/5;
+    }
+
     .enp-tree__title--tree {
-        transform: scale(0.7);
+        transform: scale(0.5);
         margin-bottom: 0;
     }
+
     .enp-tree__start-container {
         display: none;
     }

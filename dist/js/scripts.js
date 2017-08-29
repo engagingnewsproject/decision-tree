@@ -1221,10 +1221,13 @@ TreeView.prototype = {
 
         if (init !== true) {
             // focus it
-            // TODO: when going from question state to tree state, this takes 30ms when it should only take less than 1ms
-            activeEl.focus();
+            // don't add focus until after the event has finished animating.
+            // This prevents a big jump on the page when focus an element before it arrives into view
+            // also it's a big performance hit (30ms) when focusing an element outside of the view. it makes the browser think it needs to repaint everything.
+            window.setTimeout(function () {
+                activeEl.focus();
+            }, this.animationLength);
         }
-
         return true;
     },
 

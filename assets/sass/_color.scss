@@ -1,8 +1,11 @@
+@mixin focus {
+    box-shadow: 0px 0px 5px darken($focus, 10);
+}
 .enp-tree {
     background: $tree_background;
     color: $black;
+    border: 1px solid $tree_border;
 }
-
 
 .enp-tree__intro-wrapper {
     background: $intro_background;
@@ -40,6 +43,11 @@
 .enp-tree__question {
     background: $question_background;
     border: 1px solid $question_border;
+    outline: none;
+
+    &:focus {
+        @include focus;
+    }
 }
 
 .enp-tree__option-link,
@@ -47,11 +55,17 @@
     background: $option_background;
     color: $text_color;
     border: 1px solid $option_border;
+    -webkit-tap-highlight-color: rgba(0,0,0,.15);
+    outline: none;
 
     &:hover,
     &:focus {
         background: $option_background--hover;
         color: $text_color;
+    }
+
+    &:focus {
+        @include focus;
     }
 }
 
@@ -84,16 +98,27 @@
 .enp-tree__end {
     background: $end_background;
     border: 1px solid $end_border;
+    outline: none;
+
+    &:focus {
+        @include focus;
+    }
 }
 
 @mixin historyLink {
     background: $white;
     color: $black;
     box-shadow: 0 0 2px rgba(0,0,0,.15);
+    outline: none;
 
     &:hover,
     &:focus {
         background: darken($gray--light, 5);
+
+    }
+
+    &:focus {
+        @include focus;
     }
 }
 
@@ -105,6 +130,7 @@
 
 
 .enp-tree__history-list-link {
+    -webkit-tap-highlight-color: rgba(0,0,0,.15);
     @include historyLink
 
     &.is-active {
