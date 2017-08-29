@@ -34,20 +34,64 @@ html {
     transition: all .4s;
 }
 
+.enp-tree__stats-list {
+    @include no-list;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    max-width: 300px;
+    margin: auto;
+
+    @include breakpoint($tablet) {
+        max-width: none;
+    }
+}
+
+.enp-tree__stats-item {
+    text-align: center;
+    padding: $spacing__base/2;
+    margin-bottom: $spacing__base/2;
+    width: 100%;
+
+    @include breakpoint($mobile-large) {
+        width: calc(50% - #{$spacing__base}/4);
+        margin-right: $spacing__base/2;
+
+        &:nth-child(even) {
+            margin-right: 0;
+        }
+    }
+
+    @include breakpoint($tablet) {
+        width: auto;
+        margin-right: $spacing__base/2;
+
+        &:nth-child(even) {
+            margin-right: $spacing__base/2;
+        }
+    }
+}
+
+.enp-tree__title--stats-item {
+    margin-bottom: $spacing__base/5;
+}
+
 .enp-tree__state--intro {
     .enp-tree__intro-wrapper {
         padding: $spacing__base*4 $spacing__base;
     }
 
     .enp-tree__intro {
-        padding: $spacing__base*2 $spacing__base;
         margin-left: auto;
         margin-right: auto;
-        max-width: 80%;
-    }
+        padding: $spacing__base $spacing__base/2;
 
-    .enp-tree__title--tree {
-        margin-bottom: $spacing__base*1.6;
+        @include breakpoint($mobile-large) {
+            padding: $spacing__base*2 $spacing__base;
+            max-width: 80%;
+        }
+
     }
 
     .enp-tree__start {
@@ -71,7 +115,8 @@ html {
         margin-bottom: 0;
     }
 
-    .enp-tree__start-container {
+    .enp-tree__start-container,
+    .enp-tree__stats {
         display: none;
     }
 }

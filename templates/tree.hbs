@@ -3,6 +3,25 @@
     <div class="enp-tree__intro-wrapper">
         <div id="enp-tree__intro--{{{tree_id}}}" class="enp-tree__intro">
             <h2 class="enp-tree__title enp-tree__title--tree">{{{title}}}</h2>
+            <div class="enp-tree__stats">
+                <ul class="enp-tree__stats-list">
+                    <li class="enp-tree__stats-item">
+                        <h3 class="enp-tree__title enp-tree__title--stats-item">Total Paths</h3>
+                        <div class="enp-tree__stat">{{{stats.total_paths}}}</div>
+                    </li>
+                    <li class="enp-tree__stats-item">
+                        <h3 class="enp-tree__title enp-tree__title--stats-item">Longest Path</h3>
+                        <div class="enp-tree__stat">{{{stats.longest_path}}}</div>
+                    </li>
+
+                    {{#each stats.path_ends}}
+                        <li class="enp-tree__stats-item">
+                            <h3 class="enp-tree__title enp-tree__title--stats-item">{{{title}}} Paths</h3>
+                            <div class="enp-tree__stat">{{{percentage}}}%</div>
+                        </li>
+                    {{/each}}
+                </ul>
+            </div>
             {{#if starts}}
                 <div class="enp-tree__start-container">
                     {{#each starts}}

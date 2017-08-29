@@ -23,11 +23,15 @@
         border-bottom: none;
     }
     .enp-tree__intro {
-        background: rgba(255,255,255,0.9);
+        background: rgba(255,255,255,0.95);
         border: 1px solid rgba(0,0,0,.1);
     }
 }
 
+
+.enp-tree__stats-item {
+    border: 1px solid rgba(0,0,0,.1);
+}
 
 .enp-tree__btn {
     background: $btn_background;
