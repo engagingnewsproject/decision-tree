@@ -1,6 +1,6 @@
 // colors
 $green: #3bb275;
-$black: #222;
+$black: #2d2a28;
 $gray: #6f6f6f;
 $white: white;
 $gray--light: #f8f8f9;
@@ -9,8 +9,10 @@ $border_radius: 3px;
 $focus: #4d90fe;
 $box_shadow: rgba(0,0,0,.2);
 // tree colors
-$tree_gradient_start: #f1f7f7;
-$tree_background: #f8faf8;
+$tree_background:  #daecf3;
+//$tree_gradient_end: lighten(#cde8e0, 3);
+$tree_gradient_end: #D7EDEC;
+
 $intro_background: $white;
 $tree_border: #f2f2f2;
 
@@ -23,7 +25,7 @@ $number: darken($green, 10);
 
 // option colors
 $option_background: $white;
-$option_border: rgba(0,0,0,.05);
+$option_border: transparent;
 $option_background--hover: rgba(0,0,0,.03);
 $option_destination: $number;
 $option_destination--end: #212e3d;
@@ -43,7 +45,7 @@ $link_hover: darken($link, 10);
 
 // button colors
 $btn_color: $white;
-$btn_background: $green;
+$btn_background: #BF5700;
 $btn_background--hover: darken($btn_background, 6);
 
 // structural variables

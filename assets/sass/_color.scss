@@ -3,8 +3,8 @@
 }
 .enp-tree {
     background: $tree_background;
-    background: -webkit-linear-gradient(to right, $tree_gradient_start, lighten($tree_background, 1)); /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, $tree_gradient_start, lighten($tree_background, 1)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: -webkit-linear-gradient(to right, $tree_background, $tree_gradient_end); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, $tree_background, $tree_gradient_end); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     color: $black;
     border: 1px solid $tree_border;
 }
@@ -16,8 +16,8 @@
 
 .enp-tree__state--intro {
     background: darken($tree_background, 5);
-    background: -webkit-linear-gradient(to right, darken($tree_gradient_start, 5),  darken($tree_gradient_start, 3)); /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, darken($tree_gradient_start, 5),  darken($tree_gradient_start, 3)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: -webkit-linear-gradient(to right, darken($tree_background, 5),  darken($tree_gradient_end, 3)); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, darken($tree_background, 5),  darken($tree_gradient_end, 3)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
     .enp-tree__intro-wrapper {
         background: rgba(255,255,255,0.6);
@@ -93,17 +93,10 @@
     background: transparent;
 }
 
-.enp-tree__state--question,
-.enp-tree__state--end {
-    .enp-tree__intro-wrapper {
-        background: rgba(255,255,255,.3);
-    }
-}
-
 .enp-tree__state--end {
     background: $state_background--end;
-    background: -webkit-linear-gradient(to right, darken($tree_gradient_start, 5),  darken($tree_gradient_start, 3)); /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, darken($tree_gradient_start, 5),  darken($tree_gradient_start, 3)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: -webkit-linear-gradient(to right, darken($tree_background, 5),  darken($tree_gradient_end, 3)); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, darken($tree_background, 5),  darken($tree_gradient_end, 3)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 .enp-tree__end {
     background: $end_background;
@@ -112,7 +105,7 @@
 }
 
 @mixin historyLink {
-    background: $tree_gradient_start;
+    background: $tree_background;
     color: lighten($black, 8);
     outline: none;
 
