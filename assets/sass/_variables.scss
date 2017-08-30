@@ -9,15 +9,15 @@ $border_radius: 3px;
 $focus: #4d90fe;
 $box_shadow: rgba(0,0,0,.2);
 // tree colors
-$tree_background: $gray--light;
+$tree_gradient_start: #f1f7f7;
+$tree_background: #f8faf8;
 $intro_background: $white;
 $tree_border: #f2f2f2;
 
 // question colors
 $question_background: transparent;
 $question_border: transparent;
-$number: transparent;
-$number--tree_state: darken($green, 10);
+$number: darken($green, 10);
 // #234449
 // #233949
 
@@ -25,7 +25,7 @@ $number--tree_state: darken($green, 10);
 $option_background: $white;
 $option_border: rgba(0,0,0,.05);
 $option_background--hover: rgba(0,0,0,.03);
-$option_destination: $number--tree_state;
+$option_destination: $number;
 $option_destination--end: #212e3d;
 
 // end colors

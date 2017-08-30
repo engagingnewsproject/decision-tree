@@ -10,11 +10,15 @@
 
 .enp-tree__title--tree {
     font-size: 1.5rem;
-    
+
     @include breakpoint($mobile-large) {
         font-size: 1.9rem;
     }
 
+}
+.enp-tree__title--group {
+    font-size: 1rem;
+    font-weight: 400;
 }
 
 .enp-tree__state--intro {
