@@ -12,7 +12,7 @@
 
 .enp-tree__intro-wrapper {
     background: $white;
-    border-bottom: 1px solid rgba(0,0,0,.08);
+    border-bottom: 1px solid rgba(0,0,0,.15);
 }
 
 .enp-tree__state--intro {
@@ -60,6 +60,12 @@
         background: $btn_background--hover;
         color: $btn_color;
     }
+}
+
+.enp-tree__state--question {
+    background: lighten($tree_background, 3);
+    background: -webkit-linear-gradient(to right, lighten($tree_background, 3),  lighten($tree_gradient_end, 3)); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, lighten($tree_background, 3),  lighten($tree_gradient_end, 3)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
 .enp-tree__question {
@@ -122,7 +128,7 @@
 }
 
 @mixin historyLink {
-    background: $tree_background;
+    background: lighten($tree_background, 3);
     color: lighten($black, 8);
     outline: none;
 
