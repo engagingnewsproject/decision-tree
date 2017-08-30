@@ -3,15 +3,14 @@
 }
 .enp-tree {
     background: $tree_background;
+    background: -webkit-linear-gradient(to right, #f2f7f7, lighten($tree_background, 1)); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #f2f7f7, lighten($tree_background, 1)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     color: $black;
     border: 1px solid $tree_border;
 }
 
 .enp-tree__intro-wrapper {
     background: $intro_background;
-}
-
-.enp-tree__intro-wrapper {
     border-bottom: 1px solid rgba(0,0,0,.15);
 }
 
@@ -24,6 +23,8 @@
     }
     .enp-tree__intro {
         background: rgba(255,255,255,0.95);
+        //background: -webkit-linear-gradient(to bottom, #134e5e, #71b280); /* Chrome 10-25, Safari 5.1-6 */
+        // background: linear-gradient(to bottom, #134e5e, #71b280); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
         border: 1px solid rgba(0,0,0,.1);
     }
 }
@@ -45,12 +46,10 @@
 }
 
 .enp-tree__question {
-    background: $question_background;
-    border: 1px solid $question_border;
     outline: none;
 
     &:focus {
-        @include focus;
+        // box-shadow: 0 1px 3px $box_shadow;
     }
 }
 
@@ -64,8 +63,9 @@
 
     &:hover,
     &:focus {
-        background: $option_background--hover;
+        //background: $option_background--hover;
         color: $text_color;
+        box-shadow: 0 1px 1px rgba(0,0,0,.1);
     }
 
     &:focus {
@@ -98,6 +98,8 @@
 
 .enp-tree__state--end {
     background: $state_background--end;
+    background: -webkit-linear-gradient(to right, darken(#f2f7f7, 5),  darken(#f2f7f7, 3)); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, darken(#f2f7f7, 5),  darken(#f2f7f7, 3)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 .enp-tree__end {
     background: $end_background;
@@ -105,7 +107,7 @@
     outline: none;
 
     &:focus {
-        @include focus;
+        // @include focus;
     }
 }
 
@@ -117,7 +119,8 @@
 
     &:hover,
     &:focus {
-        background: darken($gray--light, 5);
+        // background: darken($gray--light, 5);
+        box-shadow: 0 1px 3px rgba(0,0,0,.15);
 
     }
 
@@ -153,4 +156,8 @@
     &:after {
         border: 2px solid $btn_color;
     }
+}
+
+.enp-tree__history-progress {
+    background: rgba(0,0,0,.08);
 }

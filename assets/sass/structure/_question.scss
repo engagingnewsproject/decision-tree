@@ -11,6 +11,7 @@
     transition: transform .4s, opacity .4s, box-shadow .2s;
     padding: $spacing__base * 1.5 $spacing__base * .75 $spacing__base;
     position: relative;
+    border-radius: $border_radius;
 
     @include breakpoint($mobile-large) {
         padding: $spacing__base * 2 $spacing__base $spacing__base * 1.5;
@@ -39,8 +40,8 @@
 
         &:focus,
         &:hover {
-            transform: scale(1.02) translate3d(0,0,0);
-            box-shadow: 0 5px 5px rgba(0,0,0,.15);
+            /*transform: scale(1.02) translate3d(0,0,0);
+            box-shadow: 0 5px 5px $box_shadow;*/
         }
         // click layer so clicks on a question get sent to our
         // JS as a question instead of something inside it, like a heading
@@ -61,6 +62,10 @@
         margin-left: auto;
         margin-right: auto;
         -webkit-tap-highlight-color: rgba(0,0,0,0);
+    }
+
+    .enp-tree__el-number {
+        opacity: 0;
     }
 }
 // .enp-tree__state--#{state} classes are applied with JS,
