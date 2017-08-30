@@ -2,7 +2,9 @@
 $green: #3bb275;
 $black: #2d2a28;
 $gray: #6f6f6f;
+$orange: #BF5700;
 $white: white;
+$blue: #438499;
 $gray--light: #f8f8f9;
 
 $border_radius: 3px;
@@ -45,7 +47,7 @@ $link_hover: darken($link, 10);
 
 // button colors
 $btn_color: $white;
-$btn_background: #BF5700;
+$btn_background: $orange;
 $btn_background--hover: darken($btn_background, 6);
 
 // structural variables
