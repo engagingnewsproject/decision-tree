@@ -10,12 +10,14 @@
 }
 
 .enp-tree__intro-wrapper {
-    background: $intro_background;
-    border-bottom: 1px solid rgba(0,0,0,.15);
+    background: $white;
+    border-bottom: 1px solid rgba(0,0,0,.08);
 }
 
 .enp-tree__state--intro {
     background: darken($tree_background, 5);
+    background: -webkit-linear-gradient(to right, darken($tree_gradient_start, 5),  darken($tree_gradient_start, 3)); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, darken($tree_gradient_start, 5),  darken($tree_gradient_start, 3)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
     .enp-tree__intro-wrapper {
         background: rgba(255,255,255,0.6);
@@ -23,8 +25,6 @@
     }
     .enp-tree__intro {
         background: rgba(255,255,255,0.95);
-        //background: -webkit-linear-gradient(to bottom, #134e5e, #71b280); /* Chrome 10-25, Safari 5.1-6 */
-        // background: linear-gradient(to bottom, #134e5e, #71b280); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
         border: 1px solid rgba(0,0,0,.1);
     }
 }
@@ -91,6 +91,13 @@
 
 .enp-tree__title--group {
     background: transparent;
+}
+
+.enp-tree__state--question,
+.enp-tree__state--end {
+    .enp-tree__intro-wrapper {
+        background: rgba(255,255,255,.3);
+    }
 }
 
 .enp-tree__state--end {
