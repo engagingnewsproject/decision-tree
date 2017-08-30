@@ -70,6 +70,23 @@
     <div class="enp-tree__intro-wrapper">
         <div id="enp-tree__intro--'.LR::raw($cx, (($inary && isset($in['tree_id'])) ? $in['tree_id'] : null)).'" class="enp-tree__intro">
             <h2 class="enp-tree__title enp-tree__title--tree">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</h2>
+            <div class="enp-tree__stats">
+                <ul class="enp-tree__stats-list">
+                    <li class="enp-tree__stats-item">
+                        <h3 class="enp-tree__title enp-tree__title--stats-item">Total Paths</h3>
+                        <div class="enp-tree__stat">'.LR::raw($cx, ((isset($in['stats']) && is_array($in['stats']) && isset($in['stats']['total_paths'])) ? $in['stats']['total_paths'] : null)).'</div>
+                    </li>
+                    <li class="enp-tree__stats-item">
+                        <h3 class="enp-tree__title enp-tree__title--stats-item">Longest Path</h3>
+                        <div class="enp-tree__stat">'.LR::raw($cx, ((isset($in['stats']) && is_array($in['stats']) && isset($in['stats']['longest_path'])) ? $in['stats']['longest_path'] : null)).'</div>
+                    </li>
+
+'.LR::sec($cx, ((isset($in['stats']) && is_array($in['stats']) && isset($in['stats']['path_ends'])) ? $in['stats']['path_ends'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '                        <li class="enp-tree__stats-item">
+                            <h3 class="enp-tree__title enp-tree__title--stats-item">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).' Paths</h3>
+                            <div class="enp-tree__stat">'.LR::raw($cx, (($inary && isset($in['percentage'])) ? $in['percentage'] : null)).'%</div>
+                        </li>
+';}).'                </ul>
+            </div>
 '.((LR::ifvar($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), false)) ? '                <div class="enp-tree__start-container">
 '.LR::sec($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '                        <p><a id="enp-tree__el--'.LR::encq($cx, (($inary && isset($in['start_id'])) ? $in['start_id'] : null)).'" class="enp-tree__btn enp-tree__start" href="#enp-tree__el--'.LR::raw($cx, (($inary && isset($in['destination_id'])) ? $in['destination_id'] : null)).'">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</a></p>
 '.((LR::ifvar($cx, (($inary && isset($in['content'])) ? $in['content'] : null), false)) ? '                            <div class="enp-tree__description enp-tree__description--start">

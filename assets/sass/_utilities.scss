@@ -16,6 +16,16 @@ $mobile: 320px;
     padding-left: 0;
 }
 
+.enp-tree__screen-reader {
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute !important;
+    left:-10000px;
+    top:auto;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+}
+
 .enp-tree__no-transition {
     .enp-tree__intro-wrapper,
     .enp-tree__title,

@@ -505,7 +505,7 @@ TreeHistoryView.prototype = {
         li.appendChild(button);
 
         li.classList.add('enp-tree__history-list-item', 'enp-tree__istory-list-item--overview');
-
+        button.setAttribute('aria-label', 'Go to Overview');
         button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview');
         button.innerHTML = '<div class="enp-tree__overview-icon"></div><div class="enp-tree__overview-icon"></div>';
         button.data = data;
@@ -520,7 +520,7 @@ TreeHistoryView.prototype = {
         li = document.createElement('li');
         button = document.createElement('button');
         li.appendChild(button);
-
+        button.setAttribute('aria-label', 'Go to question ' + (index - 1));
         li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--nav');
 
         button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav');
