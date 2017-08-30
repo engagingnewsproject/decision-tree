@@ -14,7 +14,7 @@
     width: 100%;
     padding: $spacing__base/2;
     text-decoration: none;
-    transition: all .2s;
+    transition: all .2s $easing;
 }
 
 .enp-tree__destination {

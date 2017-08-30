@@ -5,7 +5,7 @@
     margin: 0;
     transform: translate3d(0,0,0);
     transform-origin: top left;
-    transition: all .4s;
+    transition: all .4s $easing;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
@@ -17,7 +17,7 @@
 .enp-tree__history-list-item {
     margin-bottom: $spacing__base;
     transform: translate3d(0,0,0);
-    animation: enterHistoryItem .4s;
+    animation: enterHistoryItem .4s $easing;
 }
 
 .enp-tree__history-list-link {
@@ -30,7 +30,7 @@
     padding: 0;
     border: 0;
     border-radius: 50%;
-    transition: all .15s;
+    transition: all .15s $easing;
     position: relative;
 }
 
@@ -44,7 +44,7 @@
     left: 0;
     right: 0;
     margin: auto;
-    transition: all .4s;
+    transition: all .4s $easing;
 }
 
 .enp-tree__history-list-item--start {

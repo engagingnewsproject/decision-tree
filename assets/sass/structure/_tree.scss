@@ -26,13 +26,13 @@ html {
     padding: $spacing__base*2 $spacing__base;
     position: relative;
     z-index: 99;
-    transition: all .4s;
+    transition: all .4s $easing;
 }
 
 .enp-tree__title {
     margin-top: 0;
     margin-bottom: $spacing__base;
-    transition: all .4s;
+    transition: all .4s $easing;
 }
 
 .enp-tree__title--tree {
@@ -152,7 +152,7 @@ html {
     box-sizing: content-box;
     padding: 15px;
     position: relative; // !important!!!! need this to make offsetTop in JS calculate correctly
-    transition: all .4s;
+    transition: all .4s $easing;
     transform: translate3d(0,0,0);
     will-change: transform;
     transform-origin: top left;
@@ -190,7 +190,7 @@ html {
 .enp-tree__content-panel {
     position: relative;
     will-change: transform;
-    transition: all .5s;
+    transition: all .5s $easing;
 }
 
 // overview of whole tree
@@ -229,7 +229,7 @@ html {
 
 .enp-tree__state--tree.enp-tree__state--animate-out--end {
     .enp-tree__content-window {
-        animation: animateToTree 0.5s;
+        animation: animateToTree 0.5s $easing;
 
     }
      .enp-tree__content-panel {
