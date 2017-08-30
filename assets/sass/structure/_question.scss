@@ -21,13 +21,17 @@
 
 .enp-tree__el-number {
     position: absolute;
-    top: $spacing__base/5;
+    top: 0;
     left: ($spacing__base* 1.2)/2;
     padding: 0;
     width: $spacing__base * 1.2;
     line-height: $spacing__base * 1.2;
     text-align: center;
     border-radius: 50%;
+
+    @include breakpoint($mobile-large) {
+        top: $spacing__base/5;
+    }
 }
 
 .enp-tree__state--tree {
