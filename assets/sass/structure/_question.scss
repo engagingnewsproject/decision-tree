@@ -16,8 +16,18 @@
     @include breakpoint($mobile-large) {
         padding: $spacing__base * 2 $spacing__base $spacing__base * 1.5;
     }
-
 }
+
+.enp-tree__state--question,
+.enp-tree__state--end {
+    .enp-tree__question {
+        opacity: 0.25;
+        &.is-active {
+            opacity: 1;
+        }
+    }
+}
+
 
 .enp-tree__el-number {
     position: absolute;
