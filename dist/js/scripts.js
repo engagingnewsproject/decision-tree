@@ -2309,7 +2309,7 @@ TreeView.prototype = {
 
             var request = new XMLHttpRequest();
             request.overrideMimeType("application/json");
-            request.open('GET', baseUrl + '/api/v1/trees/' + slug + '/compiled?minfied=true', true);
+            request.open('GET', baseUrl + '/api/v1/trees/' + slug + '/compiled?minified=true', true);
             //request.responseType = 'json';
             // When the request loads, check whether it was successful
             request.onload = function () {
