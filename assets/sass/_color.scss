@@ -123,7 +123,7 @@
 }
 
 @mixin historyLink {
-    background: lighten($tree_background, 3);
+    background: transparent;
     color: lighten($black, 8);
     outline: none;
 
@@ -133,14 +133,18 @@
     }
 
     &:focus {
-        @include focus;
+        //@include focus;
     }
 }
 
 @mixin historyLinkActive {
     color: $btn_color;
+    background: transparent;
+}
+
+.enp-tree__history-current-indicator {
     background: $btn_background;
-    border-color: $btn_background;
+    color: $btn_color;
 }
 
 
@@ -153,6 +157,18 @@
     }
 }
 
+.enp-tree__state--end,
+.enp-tree__state--tree {
+    .enp-tree__history-list-link {
+        background: lighten($tree_background, 3);
+
+        &.is-active {
+            background: transparent;
+        }
+    }
+}
+
+
 .enp-tree__overview-icon {
     &,
     &:after {
@@ -164,8 +180,4 @@
     &:after {
         border: 2px solid $btn_color;
     }
-}
-
-.enp-tree__history-progress {
-    background: rgba(0,0,0,.08);
 }

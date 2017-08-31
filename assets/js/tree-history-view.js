@@ -5,7 +5,8 @@ function TreeHistoryView(options) {
         _container,
         _list,
         _resumeBtn,
-        _progressbar;
+        _progressbar,
+        _indicator;
 
     if(typeof options.contentWindow !== 'object') {
         console.error('Tree History View container must be a valid object. Try `container: document.getElementById(your-id)`.')
@@ -23,6 +24,7 @@ function TreeHistoryView(options) {
     this.getList = function() { return _list}
     this.getResumeBtn = function() { return _resumeBtn}
     this.getProgressbar = function() { return _progressbar}
+    this.getIndicator = function() { return _indicator}
     this.getTreeHistory = function() { return _TreeHistory}
 
     // setters
@@ -66,13 +68,22 @@ function TreeHistoryView(options) {
         return _resumeBtn
     }
 
-    this.setProgressbar = function(progressbar) {
+    this.setProgressbar = function(progre) {
         // only let it get set once
         if(_progressbar === undefined) {
             // set our built div as the resume
-            _progressbar = progressbar
+            _progressbar = progre
         }
         return _progressbar
+    }
+
+    this.setIndicator = function(indicator) {
+        // only let it get set once
+        if(_indicator === undefined) {
+            // set our built div as the resume
+            _indicator = indicator
+        }
+        return _indicator
     }
 
     var _setTreeHistory = function(TreeHistory) {
@@ -146,12 +157,11 @@ TreeHistoryView.prototype = {
     },
 
     createView: function() {
-        let elem;
+        let nav;
 
-        elem = document.createElement('aside')
-        elem.classList.add('enp-tree__history')
-
-        return elem;
+        nav = document.createElement('nav')
+        nav.classList.add('enp-tree__history')
+        return nav;
     },
 
     getCurrentNav() {
@@ -205,6 +215,7 @@ TreeHistoryView.prototype = {
     templateRender: function(history, currentIndex) {
         let container,
             list,
+            indicator,
             current,
             item;
 
@@ -217,6 +228,11 @@ TreeHistoryView.prototype = {
         // create the progressbar
         container.appendChild(this.templateProgressbar())
         this.setProgressbar(container.children[1])
+
+        indicator = document.createElement('div')
+        indicator.classList.add('enp-tree__history-current-indicator')
+        container.appendChild(indicator)
+        this.setIndicator(container.children[2])
 
         // create the buttons
         for(let i = 0; i < history.length; i++) {
@@ -319,12 +335,14 @@ TreeHistoryView.prototype = {
             button = li[i].firstElementChild
             if(button.classList.contains('is-active') && i !== currentIndex) {
                 button.classList.remove('is-active')
+                li[i].classList.remove('is-active')
             }
 
         }
         button = li[currentIndex].firstElementChild
         if(!button.classList.contains('is-active')) {
             button.classList.add('is-active')
+            li[currentIndex].classList.add('is-active')
         }
 
     },
@@ -332,6 +350,8 @@ TreeHistoryView.prototype = {
     templateUpdateProgressbar: function(currentIndex) {
         let progressbar,
             progressbarHeight,
+            indicator,
+            indicatorHeight,
             historyItems,
             list,
             listHeight,
@@ -347,6 +367,13 @@ TreeHistoryView.prototype = {
         progressbarHeight = historyItems[currentIndex].offsetTop
         // update height
         progressbar.style.height = progressbarHeight +'px'
+
+        indicator = this.getIndicator()
+        indicator.style.transform = 'translate3d(0,'+ progressbarHeight +'px, 0)';
+        indicator.classList.add('enp-tree__history-current-indicator--gooify')
+        setTimeout(()=>{
+            indicator.classList.remove('enp-tree__history-current-indicator--gooify')
+        }, 500)
 
         cWindow = this.getContentWindow()
         list = this.getList()
@@ -414,7 +441,7 @@ TreeHistoryView.prototype = {
         button = document.createElement('button')
         li.appendChild(button)
 
-        li.classList.add('enp-tree__history-list-item', 'enp-tree__istory-list-item--overview')
+        li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--overview')
         button.setAttribute('aria-label', 'Go to Overview')
         button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview')
         button.innerHTML = '<div class="enp-tree__overview-icon"></div><div class="enp-tree__overview-icon"></div>'

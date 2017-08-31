@@ -89,7 +89,7 @@ Handlebars.registerHelper('destination', function (destination_id, destination_t
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function TreeHistoryView(options) {
-    var _TreeHistory, _contentWindow, _container, _list, _resumeBtn, _progressbar;
+    var _TreeHistory, _contentWindow, _container, _list, _resumeBtn, _progressbar, _indicator;
 
     if (_typeof(options.contentWindow) !== 'object') {
         console.error('Tree History View container must be a valid object. Try `container: document.getElementById(your-id)`.');
@@ -116,6 +116,9 @@ function TreeHistoryView(options) {
     };
     this.getProgressbar = function () {
         return _progressbar;
+    };
+    this.getIndicator = function () {
+        return _indicator;
     };
     this.getTreeHistory = function () {
         return _TreeHistory;
@@ -162,13 +165,22 @@ function TreeHistoryView(options) {
         return _resumeBtn;
     };
 
-    this.setProgressbar = function (progressbar) {
+    this.setProgressbar = function (progre) {
         // only let it get set once
         if (_progressbar === undefined) {
             // set our built div as the resume
-            _progressbar = progressbar;
+            _progressbar = progre;
         }
         return _progressbar;
+    };
+
+    this.setIndicator = function (indicator) {
+        // only let it get set once
+        if (_indicator === undefined) {
+            // set our built div as the resume
+            _indicator = indicator;
+        }
+        return _indicator;
     };
 
     var _setTreeHistory = function _setTreeHistory(TreeHistory) {
@@ -239,12 +251,11 @@ TreeHistoryView.prototype = {
     keydown: function keydown() {},
 
     createView: function createView() {
-        var elem = void 0;
+        var nav = void 0;
 
-        elem = document.createElement('aside');
-        elem.classList.add('enp-tree__history');
-
-        return elem;
+        nav = document.createElement('nav');
+        nav.classList.add('enp-tree__history');
+        return nav;
     },
 
     getCurrentNav: function getCurrentNav() {
@@ -301,6 +312,7 @@ TreeHistoryView.prototype = {
     templateRender: function templateRender(history, currentIndex) {
         var container = void 0,
             list = void 0,
+            indicator = void 0,
             current = void 0,
             item = void 0;
 
@@ -313,6 +325,11 @@ TreeHistoryView.prototype = {
         // create the progressbar
         container.appendChild(this.templateProgressbar());
         this.setProgressbar(container.children[1]);
+
+        indicator = document.createElement('div');
+        indicator.classList.add('enp-tree__history-current-indicator');
+        container.appendChild(indicator);
+        this.setIndicator(container.children[2]);
 
         // create the buttons
         for (var i = 0; i < history.length; i++) {
@@ -412,11 +429,13 @@ TreeHistoryView.prototype = {
             button = li[i].firstElementChild;
             if (button.classList.contains('is-active') && i !== currentIndex) {
                 button.classList.remove('is-active');
+                li[i].classList.remove('is-active');
             }
         }
         button = li[currentIndex].firstElementChild;
         if (!button.classList.contains('is-active')) {
             button.classList.add('is-active');
+            li[currentIndex].classList.add('is-active');
         }
     },
 
@@ -424,6 +443,8 @@ TreeHistoryView.prototype = {
     templateUpdateProgressbar: function templateUpdateProgressbar(currentIndex) {
         var progressbar = void 0,
             progressbarHeight = void 0,
+            indicator = void 0,
+            indicatorHeight = void 0,
             historyItems = void 0,
             list = void 0,
             listHeight = void 0,
@@ -439,6 +460,13 @@ TreeHistoryView.prototype = {
         progressbarHeight = historyItems[currentIndex].offsetTop;
         // update height
         progressbar.style.height = progressbarHeight + 'px';
+
+        indicator = this.getIndicator();
+        indicator.style.transform = 'translate3d(0,' + progressbarHeight + 'px, 0)';
+        indicator.classList.add('enp-tree__history-current-indicator--gooify');
+        setTimeout(function () {
+            indicator.classList.remove('enp-tree__history-current-indicator--gooify');
+        }, 500);
 
         cWindow = this.getContentWindow();
         list = this.getList();
@@ -504,7 +532,7 @@ TreeHistoryView.prototype = {
         button = document.createElement('button');
         li.appendChild(button);
 
-        li.classList.add('enp-tree__history-list-item', 'enp-tree__istory-list-item--overview');
+        li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--overview');
         button.setAttribute('aria-label', 'Go to Overview');
         button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview');
         button.innerHTML = '<div class="enp-tree__overview-icon"></div><div class="enp-tree__overview-icon"></div>';
