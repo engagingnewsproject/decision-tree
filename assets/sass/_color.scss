@@ -127,13 +127,13 @@
     color: lighten($black, 8);
     outline: none;
 
-    &:hover,
-    &:focus {
-        background: $white;
+    &:hover {
+        box-shadow: 0 0 2px rgba(0,0,0,.4);
     }
 
     &:focus {
-        //@include focus;
+        box-shadow: 0 0 2px rgba(0,0,0,.4);
+        transform: scale(1.15);
     }
 }
 
@@ -178,6 +178,6 @@
 .enp-tree__history-list-link--overview.is-active .enp-tree__overview-icon {
     &,
     &:after {
-        border: 2px solid $btn_color;
+        border: 2px solid $white;
     }
 }

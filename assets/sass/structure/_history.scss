@@ -59,10 +59,14 @@
     padding: 0;
     border: 0;
     border-radius: 50%;
-    transition: all .15s $easing;
+    transition: transform .2s $easing, box_shadow .2s $easing, color .15s $easing;
     position: relative;
-}
 
+    &.is-active {
+        transition: transform .2s $easing, box_shadow .2s $easing, color .15s $easing .3s;
+    }
+}
+/*
 .enp-tree__history-progress {
     display: block;
     width: 1px;
@@ -75,6 +79,7 @@
     margin: auto;
     transition: all .4s $easing;
 }
+*/
 
 .enp-tree__history-list-item--start {
     display: none;
@@ -83,6 +88,7 @@
 .enp-tree__history-list-link--overview {
     position: relative;
     height: $spacing__base * 1.1;
+    z-index: 2;
 }
 
 .enp-tree__overview-icon {
