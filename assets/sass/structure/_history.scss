@@ -59,11 +59,11 @@
     padding: 0;
     border: 0;
     border-radius: 50%;
-    transition: transform .2s $easing, box_shadow .2s $easing, color .15s $easing;
+    transition: transform .2s $easing, box-shadow .2s $easing, color .15s $easing;
     position: relative;
 
     &.is-active {
-        transition: transform .2s $easing, box_shadow .2s $easing, color .15s $easing .3s;
+        transition: transform .2s $easing, box-shadow .2s $easing, color .15s $easing .3s;
     }
 }
 /*
