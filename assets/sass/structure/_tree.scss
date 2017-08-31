@@ -131,6 +131,7 @@ html {
     .enp-tree__title--tree {
         transform: scale(0.5);
         margin-bottom: 0;
+        padding-bottom: 0;
     }
 
     .enp-tree__start-container,
@@ -150,7 +151,7 @@ html {
 
 .enp-tree__content-window {
     box-sizing: content-box;
-    padding: 15px;
+    padding: $spacing__base*0.6 $spacing__base * 0.8 $spacing__base;
     position: relative; // !important!!!! need this to make offsetTop in JS calculate correctly
     transition: all .4s $easing;
     transform: translate3d(0,0,0);
@@ -160,10 +161,10 @@ html {
 
 
     @include breakpoint($mobile-large) {
-        padding: $spacing__base;
+        padding-top: $spacing__base * 1;
+        padding-bottom: $spacing__base * 1.5;
         transform-origin: top left;
     }
-
     @media (max-width: $tablet) {
         padding-left: 45px; // account for history nav
     }

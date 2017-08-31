@@ -1418,15 +1418,15 @@ TreeView.prototype = {
 
             // Let people click questions (that isn't the current question)
             // to get to the question
-            else if (el.nodeName === 'SECTION') {
-                    event.preventDefault();
-                    Tree = this.getTree();
-                    state = Tree.getState();
-                    // make sure we're not curently on this question
-                    if (el.data.type === 'question' && state.id !== el.data.question_id || state.type !== 'question') {
-                        this.emit('update', 'state', el.data);
-                    }
+            /*else if(el.nodeName === 'SECTION') {
+                event.preventDefault()
+                Tree = this.getTree()
+                state = Tree.getState();
+                // make sure we're not curently on this question
+                if((el.data.type === 'question' && state.id !== el.data.question_id)  || state.type !== 'question' ) {
+                    this.emit('update', 'state', el.data)
                 }
+             }*/
         }
         event.stopPropagation();
     },

@@ -454,7 +454,7 @@ TreeView.prototype = {
 
             // Let people click questions (that isn't the current question)
             // to get to the question
-            else if(el.nodeName === 'SECTION') {
+            /*else if(el.nodeName === 'SECTION') {
                 event.preventDefault()
                 Tree = this.getTree()
                 state = Tree.getState();
@@ -463,7 +463,7 @@ TreeView.prototype = {
                     this.emit('update', 'state', el.data)
                 }
 
-            }
+            }*/
         }
         event.stopPropagation()
     },
