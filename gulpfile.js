@@ -30,7 +30,7 @@ const declare = require('gulp-declare');
 
 
 // Static Server + watching scss/html files
-gulp.task('serve', ['sass', 'js', 'compressImg', 'svgstore',  'handlebars'], function() {
+gulp.task('serve', ['sass', 'js', 'compressImg', 'svgstore',  'handlebars', 'concatTreeJS'], function() {
 
     browserSync({
         proxy: localhost
@@ -45,12 +45,16 @@ gulp.task('serve', ['sass', 'js', 'compressImg', 'svgstore',  'handlebars'], fun
     gulp.watch('assets/svg/*.svg', ['svgstore']);
     // compile templates
     gulp.watch('templates/*.hbs', ['handlebars']);
+    // compile js
+    gulp.watch(["dist/js/scripts.js", "dist/js/handlebars.runtime.js", "dist/js/templates.js"], ['concatTreeJS']);
     // Watch our CSS file and reload when it's done compiling
     gulp.watch("dist/css/*.css").on('change', reload);
     // Watch php file
     gulp.watch("../*/*.php").on('change', reload);
     // watch javascript files
-    gulp.watch("dist/js/*.js").on('change', reload);
+    gulp.watch("dist/js/enp-tree.min.js").on('change', reload);
+
+    compressJS("dist/js/handlebars.runtime.js");
 });
 
 gulp.task('svgstore', function () {
@@ -94,9 +98,8 @@ gulp.task('js', function() {
         .pipe(gulp.dest(jsDest));
 });
 
-function compressJS(filename) {
-    rootPath = "assets/js/";
-    src = "assets/js/"+filename+".js";
+function compressJS(src) {
+
     dist = 'dist/js/';
 
     return gulp.src(src)
@@ -107,6 +110,23 @@ function compressJS(filename) {
         }))
         .pipe(gulp.dest(dist));
 }
+
+gulp.task('concatTreeJS', function() {
+    dist = 'dist/js/';
+    src = [dist+'handlebars.runtime.js',
+           dist+'templates.js',
+           dist+'scripts.js'];
+    filename = 'enp-tree';
+
+    return gulp.src(src)
+    .pipe(concat('enp-tree.js'))
+    .pipe(gulp.dest(dist))
+    .pipe(rename({
+      suffix: '.min'
+    }))
+    .pipe(uglify())
+    .pipe(gulp.dest(dist));
+});
 
 gulp.task('compressImg', function() {
     return gulp.src('assets/img/*')
@@ -148,6 +168,9 @@ gulp.task('handlebars', function(){
         noRedeclare: true, // Avoid duplicate declarations
       }))
       .pipe(concat('templates.js'))
+      .pipe(gulp.dest('dist/js/'))
+      .pipe(rename('templates.min.js'))
+      .pipe(uglify())
       .pipe(gulp.dest('dist/js/'));
 });
 
