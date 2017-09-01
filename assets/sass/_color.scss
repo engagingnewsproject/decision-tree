@@ -49,18 +49,23 @@
 .enp-tree__btn {
     background: $btn_background;
     color: $btn_color;
+    outline: none;
 
     &:hover,
     &:focus {
         background: $btn_background--hover;
         color: $btn_color;
     }
+
+    &:focus {
+        @include focus;
+    }
 }
 
 .enp-tree__state--question {
-    background: lighten($tree_background, 3);
-    background: -webkit-linear-gradient(to right, lighten($tree_background, 3),  lighten($tree_gradient_end, 3)); /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, lighten($tree_background, 3),  lighten($tree_gradient_end, 3)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: lighten($tree_background, 1.5);
+    background: -webkit-linear-gradient(to right, lighten($tree_background, 1.5),  lighten($tree_gradient_end, 1.5)); /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, lighten($tree_background, 1.5),  lighten($tree_gradient_end, 1.5)); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
 .enp-tree__question {
@@ -179,6 +184,31 @@
         &.is-active {
             background: transparent;
         }
+    }
+
+
+}
+
+.enp-tree__state--tree {
+    .enp-tree__question,
+    .enp-tree__end {
+        &:focus {
+            @include focus;
+            animation: focusPop .6s $easing;
+        }
+    }
+}
+
+@keyframes focusPop {
+    0% {
+        box-shadow: 0px 0px 1px darken($focus,0);
+    }
+    40% {
+        box-shadow: 0px 0px 15px darken($focus, 10);
+    }
+
+    100% {
+        box-shadow: 0px 0px 5px darken($focus, 10);
     }
 }
 

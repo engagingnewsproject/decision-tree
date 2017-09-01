@@ -478,7 +478,7 @@ TreeView.prototype = {
 
         if(newState.type === 'question' || newState.type === 'end') {
             // set tabindex -1 on focusable options
-            newFocusedEl = this.getDestination(newState.id)
+            newFocusedEl = el = this.getDestination(newState.id)
             this.addFocusable(newFocusedEl)
         }
 
@@ -531,30 +531,43 @@ TreeView.prototype = {
             Tree,
             state;
         el = event.target;
-
         // check if it's a click on the parent tree (which we don't care about)
         if (el !== event.currentTarget) {
-            if(el.nodeName === 'A' || (el.nodeName === 'SPAN' && el.parentNode.nodeName === 'A')) {
-                // see if the parent is a link
-                if(el.nodeName === 'SPAN') {
-                    el = el.parentElement
+
+            // we're not on an A, but try to find one
+            if(el.nodeName !== 'A') {
+                // try to find one
+                el = this.findAncestor(el, 'A')
+            }
+            // now continue on with checking if we found one or not.
+            if(el.nodeName === 'A' && el.data !== undefined) {
+                // check for el.data
+                // if we're in the tree view, don't switch the state, just go to that question on the page
+                if(this.getTree().getState().type !== 'tree') {
+                    event.preventDefault()
+                    this.emit('update', 'state', el.data)
+                } else {
+                    // in tree state
+                    event.preventDefault()
+                    // focus that question/end state to show them where it is
+                    el = this.getDestination(el.data.destination_id)
+                    el.focus()
+                    console.log(el)
                 }
-                event.preventDefault()
-                this.emit('update', 'state', el.data)
             }
 
-            // Let people click questions (that isn't the current question)
-            // to get to the question
-            /*else if(el.nodeName === 'SECTION') {
+            // They're clicking on a question. Don't add focus
+            else if(el.nodeName === 'SECTION') {
                 event.preventDefault()
-                Tree = this.getTree()
+                // if it's a click on a question, it will have recieved focus, so we need to unset the focus. Move it to the previously focused element?
+                /*Tree = this.getTree()
                 state = Tree.getState();
                 // make sure we're not curently on this question
                 if((el.data.type === 'question' && state.id !== el.data.question_id)  || state.type !== 'question' ) {
                     this.emit('update', 'state', el.data)
-                }
+                }*/
 
-            }*/
+            }
         }
         event.stopPropagation()
     },
@@ -1037,5 +1050,17 @@ TreeView.prototype = {
     templateArrow(svg, iconName) {
         svg.children[0].setAttribute('xlink:href', '#icon-'+iconName)
         return svg
+    },
+
+    findAncestor(el, theNodeName) {
+        let i = 0;
+        // only check a few elements so we don't go too crazy
+        while (el.nodeName != theNodeName && i < 4) {
+            el = el.parentElement;
+            i++;
+        }
+
+        return el;
+
     }
 }
