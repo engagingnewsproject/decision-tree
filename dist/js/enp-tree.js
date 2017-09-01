@@ -1551,6 +1551,8 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
     + ((stack1 = ((helper = (helper = helpers.option_id || (depth0 != null ? depth0.option_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"option_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\" href=\"#enp-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.destination_id || (depth0 != null ? depth0.destination_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"destination_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + "\"\n                                        aria-describedby=\"enp-tree__el--"
+    + ((stack1 = ((helper = (helper = helpers.question_id || (depth0 != null ? depth0.question_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"question_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\">\n                                            <span class=\"enp-tree__option-title\">"
     + container.escapeExpression(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
     + "</span>\n                                            <span class=\"enp-tree__destination enp-tree__destination--"
@@ -1622,7 +1624,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
     + ((stack1 = ((helper = (helper = helpers.tree_id || (depth0 != null ? depth0.tree_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"tree_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\" class=\"enp-tree__intro\">\n            <h2 class=\"enp-tree__title enp-tree__title--tree\">"
     + ((stack1 = ((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper))) != null ? stack1 : "")
-    + "</h2>\n            <div class=\"enp-tree__stats\">\n                <ul class=\"enp-tree__stats-list\">\n                    <li class=\"enp-tree__stats-item\">\n                        <h3 class=\"enp-tree__title enp-tree__title--stats-item\">Total Paths</h3>\n                        <div class=\"enp-tree__stat\">"
+    + "</h2>\n            <div class=\"enp-tree__stats\">\n                <ul class=\"enp-tree__stats-list\">\n                    <li class=\"enp-tree__stats-item\">\n                        <h3 class=\"enp-tree__title enp-tree__title--stats-item\">Possible Paths</h3>\n                        <div class=\"enp-tree__stat\">"
     + ((stack1 = alias4(((stack1 = (depth0 != null ? depth0.stats : depth0)) != null ? stack1.total_paths : stack1), depth0)) != null ? stack1 : "")
     + "</div>\n                    </li>\n                    <li class=\"enp-tree__stats-item\">\n                        <h3 class=\"enp-tree__title enp-tree__title--stats-item\">Longest Path</h3>\n                        <div class=\"enp-tree__stat\">"
     + ((stack1 = alias4(((stack1 = (depth0 != null ? depth0.stats : depth0)) != null ? stack1.longest_path : stack1), depth0)) != null ? stack1 : "")

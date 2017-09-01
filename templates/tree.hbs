@@ -6,7 +6,7 @@
             <div class="enp-tree__stats">
                 <ul class="enp-tree__stats-list">
                     <li class="enp-tree__stats-item">
-                        <h3 class="enp-tree__title enp-tree__title--stats-item">Total Paths</h3>
+                        <h3 class="enp-tree__title enp-tree__title--stats-item">Possible Paths</h3>
                         <div class="enp-tree__stat">{{{stats.total_paths}}}</div>
                     </li>
                     <li class="enp-tree__stats-item">
@@ -57,7 +57,8 @@
                             {{#if options}}
                                 <ul class="enp-tree__options">
                                     {{#each options}}
-                                        <li class="enp-tree__option"><a class="enp-tree__option-link" id="enp-tree__el--{{{option_id}}}" href="#enp-tree__el--{{{destination_id}}}">
+                                        <li class="enp-tree__option"><a class="enp-tree__option-link" id="enp-tree__el--{{{option_id}}}" href="#enp-tree__el--{{{destination_id}}}"
+                                        aria-describedby="enp-tree__el--{{{question_id}}}">
                                             <span class="enp-tree__option-title">{{title}}</span>
                                             <span class="enp-tree__destination enp-tree__destination--{{{destination_type}}}">
                                                 {{#destination destination_id destination_type option_id @../index}}
