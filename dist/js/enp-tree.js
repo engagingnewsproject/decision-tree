@@ -3167,8 +3167,8 @@ TreeView.prototype = {
             // now continue on with checking if we found one or not.
             if (el.nodeName === 'A' && el.data !== undefined) {
                 // check for el.data
-                // if we're in the tree view, don't switch the state, just go to that question on the page
-                if (this.getTree().getState().type !== 'tree') {
+                // if we're in the tree view, don't switch the state (unless they click the start button), just go to that question on the page
+                if (this.getTree().getState().type !== 'tree' || this.getTree().getState().type === 'tree' && el.data.type === 'start') {
                     event.preventDefault();
                     this.emit('update', 'state', el.data);
                 } else {
@@ -3177,7 +3177,6 @@ TreeView.prototype = {
                     // focus that question/end state to show them where it is
                     el = this.getDestination(el.data.destination_id);
                     el.focus();
-                    console.log(el);
                 }
             }
 
