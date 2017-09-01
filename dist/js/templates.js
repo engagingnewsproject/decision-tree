@@ -42,7 +42,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
   return ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.group_id : depth0),{"name":"if","hash":{},"fn":container.program(9, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "                        <section id=\"enp-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.question_id || (depth0 != null ? depth0.question_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"question_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
-    + "\" class=\"enp-tree__question\" tabindex=\"0\">\n                            <span class=\"enp-tree__el-number\">"
+    + "\" class=\"enp-tree__question\" tabindex=\"-1\">\n                            <span class=\"enp-tree__el-number\">"
     + alias4((helpers.el_number || (depth0 && depth0.el_number) || alias2).call(alias1,(depth0 != null ? depth0.order : depth0),{"name":"el_number","hash":{},"data":data}))
     + "</span>\n                            <h4 class=\"enp-tree__title enp-tree__title--question\">"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
@@ -78,7 +78,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
 },"15":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function";
 
-  return "                                        <li class=\"enp-tree__option\"><a class=\"enp-tree__option-link\" id=\"enp-tree__el--"
+  return "                                        <li class=\"enp-tree__option\"><a  class=\"enp-tree__option-link\" id=\"enp-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.option_id || (depth0 != null ? depth0.option_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"option_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\" href=\"#enp-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.destination_id || (depth0 != null ? depth0.destination_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"destination_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
@@ -125,7 +125,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
 
   return "\n                        <section id=\"enp-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.end_id || (depth0 != null ? depth0.end_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"end_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
-    + "\" class=\"enp-tree__end\" tabindex=\"0\">\n                            <h3 class=\"enp-tree__title enp-tree__title--end\">"
+    + "\" class=\"enp-tree__end\" tabindex=\"-1\">\n                            <h3 class=\"enp-tree__title enp-tree__title--end\">"
     + ((stack1 = ((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "</h3>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.content : depth0),{"name":"if","hash":{},"fn":container.program(24, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")

@@ -48,7 +48,7 @@
                                     <h3 class="enp-tree__title enp-tree__title--group">{{group_title}}</h3>
                             {{/group_start}}
                         {{/if}}
-                        <section id="enp-tree__el--{{{question_id}}}" class="enp-tree__question" tabindex="0">
+                        <section id="enp-tree__el--{{{question_id}}}" class="enp-tree__question" tabindex="-1">
                             <span class="enp-tree__el-number">{{el_number order}}</span>
                             <h4 class="enp-tree__title enp-tree__title--question">{{title}}</h4>
                             {{#if content}}
@@ -57,7 +57,7 @@
                             {{#if options}}
                                 <ul class="enp-tree__options">
                                     {{#each options}}
-                                        <li class="enp-tree__option"><a class="enp-tree__option-link" id="enp-tree__el--{{{option_id}}}" href="#enp-tree__el--{{{destination_id}}}"
+                                        <li class="enp-tree__option"><a  class="enp-tree__option-link" id="enp-tree__el--{{{option_id}}}" href="#enp-tree__el--{{{destination_id}}}"
                                         aria-describedby="enp-tree__el--{{{question_id}}}">
                                             <span class="enp-tree__option-title">{{title}}</span>
                                             <span class="enp-tree__destination enp-tree__destination--{{{destination_type}}}">
@@ -86,7 +86,7 @@
                 <div class="enp-tree__ends">
                     {{#each ends}}
 
-                        <section id="enp-tree__el--{{{end_id}}}" class="enp-tree__end" tabindex="0">
+                        <section id="enp-tree__el--{{{end_id}}}" class="enp-tree__end" tabindex="-1">
                             <h3 class="enp-tree__title enp-tree__title--end">{{{title}}}</h3>
                             {{#if content}}
                                 <div class="enp-tree__description enp-tree__description--end">{{content}}</div>

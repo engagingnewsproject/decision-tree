@@ -16,14 +16,25 @@ $mobile: 320px;
     padding-left: 0;
 }
 
-.enp-tree__screen-reader {
+.enp-tree__visually-hidden {
     clip: rect(1px, 1px, 1px, 1px);
     position: absolute !important;
     left:-10000px;
-    top:auto;
+    top: 10px;
     width:1px;
     height:1px;
     overflow:hidden;
+    z-index: -1;
+
+    &:focus {
+        clip: auto !important;
+        display: block;
+        height: auto;
+        width: auto;
+        left: 10px;
+        top: 10px;
+        z-index: 9999999;
+    }
 }
 
 .enp-tree__no-transition {

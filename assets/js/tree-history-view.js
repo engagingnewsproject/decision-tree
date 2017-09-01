@@ -157,10 +157,19 @@ TreeHistoryView.prototype = {
     },
 
     createView: function() {
-        let nav;
+        let nav,
+            navTitle;
 
         nav = document.createElement('nav')
         nav.classList.add('enp-tree__history')
+        nav.id = 'enp-tree__history--'+this.getTreeHistory().getTree().getTreeID()
+        nav.tabIndex = -1
+
+        navTitle = document.createElement('h3')
+        navTitle.innerHTML = 'History Navigation: Go to Overview and Previously Answered Questions'
+        navTitle.classList.add('enp-tree__title--history-nav', 'enp-tree__visually-hidden')
+        nav.appendChild(navTitle)
+
         return nav;
     },
 
@@ -222,17 +231,27 @@ TreeHistoryView.prototype = {
         container = this.getContainer()
         container.appendChild(this.templateUl())
         // set the list as the _list var
-        this.setList(container.firstElementChild)
+        this.setList(container.children[1])
         list = this.getList()
 
         // create the progressbar
         container.appendChild(this.templateProgressbar())
-        this.setProgressbar(container.children[1])
+        this.setProgressbar(container.children[2])
 
+        // create the current position indicator
         indicator = document.createElement('div')
         indicator.classList.add('enp-tree__history-current-indicator')
         container.appendChild(indicator)
-        this.setIndicator(container.children[2])
+        this.setIndicator(container.children[3])
+
+        // create a visually hidden "go to history navigation" button
+        goToHistoryNav = document.createElement('a')
+        goToHistoryNav.href = '#'+container.id
+        goToHistoryNav.classList.add('enp-tree__visually-hidden', 'enp-tree__go-to-history-nav', 'enp-tree__btn')
+        goToHistoryNav.innerHTML = 'Go to History Navigation'
+        this.getContentWindow().appendChild(goToHistoryNav)
+
+
 
         // create the buttons
         for(let i = 0; i < history.length; i++) {
@@ -362,7 +381,6 @@ TreeHistoryView.prototype = {
 
         container = this.getContainer()
         progressbar = this.getProgressbar()
-
         historyItems = this.getHistoryItems()
         progressbarHeight = historyItems[currentIndex].offsetTop
         // update height
@@ -457,7 +475,7 @@ TreeHistoryView.prototype = {
         li = document.createElement('li')
         button = document.createElement('button')
         li.appendChild(button)
-        button.setAttribute('aria-label', 'Go to question '+(index-1))
+        button.setAttribute('aria-label', 'Question '+(index-1))
         li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--nav')
 
         button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav')

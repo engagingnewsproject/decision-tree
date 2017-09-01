@@ -1511,7 +1511,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
   return ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.group_id : depth0),{"name":"if","hash":{},"fn":container.program(9, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "                        <section id=\"enp-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.question_id || (depth0 != null ? depth0.question_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"question_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
-    + "\" class=\"enp-tree__question\" tabindex=\"0\">\n                            <span class=\"enp-tree__el-number\">"
+    + "\" class=\"enp-tree__question\" tabindex=\"-1\">\n                            <span class=\"enp-tree__el-number\">"
     + alias4((helpers.el_number || (depth0 && depth0.el_number) || alias2).call(alias1,(depth0 != null ? depth0.order : depth0),{"name":"el_number","hash":{},"data":data}))
     + "</span>\n                            <h4 class=\"enp-tree__title enp-tree__title--question\">"
     + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
@@ -1547,7 +1547,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
 },"15":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function";
 
-  return "                                        <li class=\"enp-tree__option\"><a class=\"enp-tree__option-link\" id=\"enp-tree__el--"
+  return "                                        <li class=\"enp-tree__option\"><a  class=\"enp-tree__option-link\" id=\"enp-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.option_id || (depth0 != null ? depth0.option_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"option_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\" href=\"#enp-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.destination_id || (depth0 != null ? depth0.destination_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"destination_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
@@ -1594,7 +1594,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
 
   return "\n                        <section id=\"enp-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.end_id || (depth0 != null ? depth0.end_id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"end_id","hash":{},"data":data}) : helper))) != null ? stack1 : "")
-    + "\" class=\"enp-tree__end\" tabindex=\"0\">\n                            <h3 class=\"enp-tree__title enp-tree__title--end\">"
+    + "\" class=\"enp-tree__end\" tabindex=\"-1\">\n                            <h3 class=\"enp-tree__title enp-tree__title--end\">"
     + ((stack1 = ((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "</h3>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.content : depth0),{"name":"if","hash":{},"fn":container.program(24, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
@@ -1897,10 +1897,19 @@ TreeHistoryView.prototype = {
     keydown: function keydown() {},
 
     createView: function createView() {
-        var nav = void 0;
+        var nav = void 0,
+            navTitle = void 0;
 
         nav = document.createElement('nav');
         nav.classList.add('enp-tree__history');
+        nav.id = 'enp-tree__history--' + this.getTreeHistory().getTree().getTreeID();
+        nav.tabIndex = -1;
+
+        navTitle = document.createElement('h3');
+        navTitle.innerHTML = 'History Navigation: Go to Overview and Previously Answered Questions';
+        navTitle.classList.add('enp-tree__title--history-nav', 'enp-tree__visually-hidden');
+        nav.appendChild(navTitle);
+
         return nav;
     },
 
@@ -1965,17 +1974,25 @@ TreeHistoryView.prototype = {
         container = this.getContainer();
         container.appendChild(this.templateUl());
         // set the list as the _list var
-        this.setList(container.firstElementChild);
+        this.setList(container.children[1]);
         list = this.getList();
 
         // create the progressbar
         container.appendChild(this.templateProgressbar());
-        this.setProgressbar(container.children[1]);
+        this.setProgressbar(container.children[2]);
 
+        // create the current position indicator
         indicator = document.createElement('div');
         indicator.classList.add('enp-tree__history-current-indicator');
         container.appendChild(indicator);
-        this.setIndicator(container.children[2]);
+        this.setIndicator(container.children[3]);
+
+        // create a visually hidden "go to history navigation" button
+        goToHistoryNav = document.createElement('a');
+        goToHistoryNav.href = '#' + container.id;
+        goToHistoryNav.classList.add('enp-tree__visually-hidden', 'enp-tree__go-to-history-nav', 'enp-tree__btn');
+        goToHistoryNav.innerHTML = 'Go to History Navigation';
+        this.getContentWindow().appendChild(goToHistoryNav);
 
         // create the buttons
         for (var i = 0; i < history.length; i++) {
@@ -2101,7 +2118,6 @@ TreeHistoryView.prototype = {
 
         container = this.getContainer();
         progressbar = this.getProgressbar();
-
         historyItems = this.getHistoryItems();
         progressbarHeight = historyItems[currentIndex].offsetTop;
         // update height
@@ -2194,7 +2210,7 @@ TreeHistoryView.prototype = {
         li = document.createElement('li');
         button = document.createElement('button');
         li.appendChild(button);
-        button.setAttribute('aria-label', 'Go to question ' + (index - 1));
+        button.setAttribute('aria-label', 'Question ' + (index - 1));
         li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--nav');
 
         button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav');
@@ -2791,11 +2807,19 @@ TreeView.prototype = {
         return treeEl.getElementsByClassName('enp-tree__question');
     },
 
+    getQuestion: function getQuestion(id) {
+        return this.getDestination(id);
+    },
+
     getEnds: function getEnds() {
         var treeEl = void 0;
 
         treeEl = this.getTreeEl();
         return treeEl.getElementsByClassName('enp-tree__end');
+    },
+
+    getEnd: function getEnd(id) {
+        return this.getDestination(id);
     },
 
     getDestination: function getDestination(destination_id) {
@@ -2872,6 +2896,9 @@ TreeView.prototype = {
             this.updateViewHeight(newState);
         }
 
+        // update focusable elements
+        this.updateFocusable(oldState, newState);
+
         // revert back to old state
         if (newStateSuccess === false) {
             this.setState(oldState);
@@ -2901,6 +2928,12 @@ TreeView.prototype = {
             window.setTimeout(function () {
                 activeEl.focus();
             }, this.animationLength);
+        } else {
+            // if it's the first ever load, we need to remove focus
+            if (state.type !== 'tree') {
+                // if init is true && state= doesn't equal tree/overview, then remove all focus as a starting point
+                this.removeAllFocusable();
+            }
         }
         return true;
     },
@@ -3034,6 +3067,7 @@ TreeView.prototype = {
         // check to see if it's a spacebar or enter keypress
         // 13 = 'Enter'
         // 32 = 'Space'
+        // 9 = 'Tab'
         if (event.keyCode === 13 || event.keyCode === 32) {
             // call the click
             this.click(event);
@@ -3043,6 +3077,78 @@ TreeView.prototype = {
 
         // TODO: don't allow focus on options if in tree state view
 
+    },
+
+    updateFocusable: function updateFocusable(oldState, newState) {
+        var oldFocusedEl = void 0,
+            newFocusedEl = void 0;
+
+        // intro & old tree get everything removed
+        if (newState.type === 'intro' || oldState.type === 'tree') {
+            // remove focus from everything
+            this.removeAllFocusable();
+        }
+
+        // questions & ends
+        if (oldState.type === 'question' || oldState.type === 'end') {
+            // set tabindex -1 on focusable options
+
+            oldFocusedEl = this.getDestination(oldState.id);
+            this.removeFocusable(oldFocusedEl);
+        }
+
+        // we need to add all focusable if in tree state
+        if (newState.type === 'tree') {
+            // remove focus from everything
+            this.addAllFocusable();
+        }
+
+        if (newState.type === 'question' || newState.type === 'end') {
+            // set tabindex -1 on focusable options
+            newFocusedEl = this.getDestination(newState.id);
+            this.addFocusable(newFocusedEl);
+        }
+    },
+
+    // parentEl
+    // sets them all 'a' els to tabindex = -1
+    removeFocusable: function removeFocusable(parentEl) {
+        var focusable = void 0;
+
+        focusable = parentEl.querySelectorAll('a');
+        for (var i = 0; i < focusable.length; i++) {
+            focusable[i].tabIndex = -1;
+        }
+    },
+
+    // parentEl
+    // sets them all 'a' els to tabindex = -1
+    addFocusable: function addFocusable(parentEl) {
+        var focusable = void 0;
+        focusable = parentEl.querySelectorAll('a');
+        for (var i = 0; i < focusable.length; i++) {
+            focusable[i].tabIndex = 0;
+        }
+    },
+
+    addAllFocusable: function addAllFocusable() {
+        var focusable = void 0;
+
+        // combine them into one array
+        focusable = document.querySelectorAll('.enp-tree__question, .enp-tree__end');
+
+        for (var i = 0; i < focusable.length; i++) {
+            this.addFocusable(focusable[i]);
+        }
+    },
+
+    removeAllFocusable: function removeAllFocusable() {
+        var focusable = void 0;
+        // combine them into one array
+        focusable = document.querySelectorAll('.enp-tree__question, .enp-tree__end');
+        for (var i = 0; i < focusable.length; i++) {
+            this.removeFocusable(focusable[i]);
+        }
     },
 
     click: function click(event) {

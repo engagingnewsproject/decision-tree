@@ -177,11 +177,19 @@ TreeView.prototype = {
         return treeEl.getElementsByClassName('enp-tree__question')
     },
 
+    getQuestion: function(id) {
+        return this.getDestination(id)
+    },
+
     getEnds: function() {
         let treeEl;
 
         treeEl = this.getTreeEl()
         return treeEl.getElementsByClassName('enp-tree__end')
+    },
+
+    getEnd: function(id) {
+        return this.getDestination(id)
     },
 
     getDestination: function(destination_id) {
@@ -258,6 +266,9 @@ TreeView.prototype = {
             this.updateViewHeight(newState)
         }
 
+        // update focusable elements
+        this.updateFocusable(oldState, newState)
+
         // revert back to old state
         if(newStateSuccess === false) {
             this.setState(oldState)
@@ -287,8 +298,12 @@ TreeView.prototype = {
             window.setTimeout(()=>{
                 activeEl.focus()
             }, this.animationLength)
-
-
+        } else {
+            // if it's the first ever load, we need to remove focus
+            if(state.type !== 'tree') {
+                // if init is true && state= doesn't equal tree/overview, then remove all focus as a starting point
+                this.removeAllFocusable()
+            }
         }
         return true;
     },
@@ -423,10 +438,12 @@ TreeView.prototype = {
         // check to see if it's a spacebar or enter keypress
         // 13 = 'Enter'
         // 32 = 'Space'
+        // 9 = 'Tab'
         if(event.keyCode === 13 || event.keyCode === 32) {
             // call the click
             this.click(event)
         }
+
 
         // TODO: don't allow focus on other questions if question view
 
@@ -434,6 +451,80 @@ TreeView.prototype = {
 
 
     },
+
+    updateFocusable: function(oldState, newState) {
+        let oldFocusedEl,
+            newFocusedEl;
+
+        // intro & old tree get everything removed
+        if(newState.type === 'intro' || oldState.type === 'tree') {
+            // remove focus from everything
+            this.removeAllFocusable()
+        }
+
+        // questions & ends
+        if(oldState.type === 'question' || oldState.type === 'end') {
+            // set tabindex -1 on focusable options
+
+            oldFocusedEl = this.getDestination(oldState.id)
+            this.removeFocusable(oldFocusedEl)
+        }
+
+        // we need to add all focusable if in tree state
+        if(newState.type === 'tree') {
+            // remove focus from everything
+            this.addAllFocusable()
+        }
+
+        if(newState.type === 'question' || newState.type === 'end') {
+            // set tabindex -1 on focusable options
+            newFocusedEl = this.getDestination(newState.id)
+            this.addFocusable(newFocusedEl)
+        }
+
+    },
+
+    // parentEl
+    // sets them all 'a' els to tabindex = -1
+    removeFocusable: function(parentEl) {
+        let focusable;
+
+        focusable = parentEl.querySelectorAll('a')
+        for(let i = 0; i < focusable.length; i++) {
+            focusable[i].tabIndex = -1
+        }
+    },
+
+    // parentEl
+    // sets them all 'a' els to tabindex = -1
+    addFocusable: function(parentEl) {
+        let focusable;
+        focusable = parentEl.querySelectorAll('a')
+        for(let i = 0; i < focusable.length; i++) {
+            focusable[i].tabIndex = 0
+        }
+    },
+
+    addAllFocusable: function() {
+        let focusable;
+
+        // combine them into one array
+        focusable = document.querySelectorAll('.enp-tree__question, .enp-tree__end');
+
+        for(let i = 0; i < focusable.length; i++) {
+            this.addFocusable(focusable[i])
+        }
+    },
+
+    removeAllFocusable: function() {
+        let focusable;
+        // combine them into one array
+        focusable = document.querySelectorAll('.enp-tree__question, .enp-tree__end');
+        for(let i = 0; i < focusable.length; i++) {
+            this.removeFocusable(focusable[i])
+        }
+    },
+
 
     click: function(event) {
         let el,

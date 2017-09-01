@@ -34,7 +34,7 @@ For fine-tuned support if you already have handlebars.runtime on your site
 <script src="dist/js/templates.min.js"></script>
 <script src="dist/js/scripts.min.js"></script>
 -->
-<script src="dist/js/enp-tree.min.js"></script>
+<script src="dist/js/enp-tree.js"></script>
 <script>
 
     treeOptions = {
