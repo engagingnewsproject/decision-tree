@@ -323,7 +323,8 @@ TreeHistoryView.prototype = {
             list = void 0,
             indicator = void 0,
             current = void 0,
-            item = void 0;
+            item = void 0,
+            goToHistoryNav = void 0;
 
         container = this.getContainer();
         container.appendChild(this.templateUl());

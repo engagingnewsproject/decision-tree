@@ -52,6 +52,8 @@ html {
 
     @include breakpoint($tablet) {
         max-width: none;
+        justify-content: space-between;
+        flex-wrap: nowrap;
     }
 }
 
@@ -75,6 +77,10 @@ html {
 
         &:nth-child(even) {
             margin-right: $spacing__base/2;
+        }
+
+        &:last-child {
+            margin-right: 0;
         }
     }
 }

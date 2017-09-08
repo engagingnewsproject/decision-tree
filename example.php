@@ -34,7 +34,7 @@ For fine-tuned support if you already have handlebars.runtime on your site
 <script src="dist/js/templates.min.js"></script>
 <script src="dist/js/scripts.min.js"></script>
 -->
-<script src="dist/js/enp-tree.js"></script>
+<script src="dist/js/enp-tree.min.js"></script>
 <script>
 
     treeOptions = {
@@ -44,12 +44,6 @@ For fine-tuned support if you already have handlebars.runtime on your site
 
     // you can access all your trees with var trees
     createTree(treeOptions);
-
-    function focusIt(elem) {
-        console.time('focus')
-        elem.focus()
-        console.timeEnd('focus')
-    }
 </script>
 </body>
 </html>

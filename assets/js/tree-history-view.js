@@ -226,7 +226,8 @@ TreeHistoryView.prototype = {
             list,
             indicator,
             current,
-            item;
+            item,
+            goToHistoryNav;
 
         container = this.getContainer()
         container.appendChild(this.templateUl())
@@ -405,6 +406,7 @@ TreeHistoryView.prototype = {
         // We're checking to see if the contentWindow is less than the listHeight AND if the progressbarHeight is tall enough that we need to address it.
         // IE. We don't want to move the list all the way down if they have 10 items, but they've moved back to the second.
         if(cWindowHeight < listHeight && cWindowHeight/2 < progressbarHeight) {
+
 
             if((listHeight - progressbarHeight) < cWindowHeight/2) {
                 // the bottom element can be in the bottom half of the view, so stack it to the bottom.
