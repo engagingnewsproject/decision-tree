@@ -52,8 +52,6 @@ html {
 
     @include breakpoint($tablet) {
         max-width: none;
-        justify-content: space-between;
-        flex-wrap: nowrap;
     }
 }
 
@@ -125,6 +123,14 @@ html {
     .enp-tree__content-wrapper {
         position: absolute;
         top: 0;
+    }
+
+    .enp-tree__stats-list {
+        @include breakpoint($tablet) {
+            justify-content: space-between;
+            flex-wrap: nowrap;
+        }
+
     }
 }
 
