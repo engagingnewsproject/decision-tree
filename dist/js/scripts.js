@@ -1079,6 +1079,8 @@ function TreeView(options) {
     this.scaledSize = 0.65;
     // create a stylesheet we can add rules to
     this.stylesheet = this.createStylesheet();
+    // get the window width for resize checks
+    this.windowWidth = window.innerWidth;
     // set the el
     _container = options.container;
     // attach event listeners to the tree element with
@@ -1317,6 +1319,23 @@ TreeView.prototype = {
         }
     },
 
+    checkEndPositionAccuracy: function checkEndPositionAccuracy() {
+        var ends = void 0,
+            end = void 0,
+            accurate = false;
+
+        // get the last end
+        ends = this.getEnds();
+        end = ends[ends.length - 1];
+
+        // check if the end positions match the stored data
+        if (end.data.bounds !== undefined && end.data.bounds.offsetHeight === end.offsetHeight && end.data.bounds.offsetTop === end.offsetTop) {
+            accurate = true;
+        }
+
+        return accurate;
+    },
+
     updateViewHeight: function updateViewHeight(state) {
         var activeEl = void 0,
             cPanel = void 0,
@@ -1350,9 +1369,30 @@ TreeView.prototype = {
             questionOffsetTop = -activeEl.data.bounds.offsetTop;
             cPanelTransform = 'translate3d(0,' + questionOffsetTop + 'px,0)';
             // set window scroll position to 0 (helps on mobile to center the question correctly)
-            cWindow.scrollTop = 0;
+            // cWindow.scrollTop = 0
             // set a height
             cWindowHeight = activeEl.data.bounds.offsetHeight;
+
+            // do an async check to see if we need to recalculate the positions
+            /*
+            // This doesn't seem necessary since I had tried to use this to fix
+            setTimeout(() =>{
+                console.log('resize check')
+                 // check the position of the first end state
+                if(this.checkEndPositionAccuracy() !== true) {
+                    // pass true to force the resize
+                    this.resize(true)
+                }
+            }, 200)*/
+
+            setTimeout(function () {
+                // this is generally wrong on iOS safari when transitioning a long distance
+                // like from 1st question to an end state.
+                // it will be 0 on desktop browsers though.
+                // console.log('cwindowScrollTop', cWindow.scrollTop)
+                // in order to fix this, set it to scrollTop = 0 at the end of the transition time
+                cWindow.scrollTop = 0;
+            }, this.animationLength);
         } else if (state.type === 'intro') {
             // kicks off the process for calculating necesary group data if necessary
             this.checkForGroupsCalc();
@@ -1460,7 +1500,7 @@ TreeView.prototype = {
 
         if (newState.type === 'question' || newState.type === 'end') {
             // set tabindex -1 on focusable options
-            newFocusedEl = el = this.getDestination(newState.id);
+            newFocusedEl = this.getDestination(newState.id);
             this.addFocusable(newFocusedEl);
         }
     },
@@ -1550,8 +1590,21 @@ TreeView.prototype = {
         event.stopPropagation();
     },
 
-    resize: function resize() {
+    // pass forceResize = true to skip any validation
+    resize: function resize(forceResize) {
         var _this2 = this;
+
+        // iOS fires a resize event when you switch scroll direction vertically (like, scrolling up and then back down) when the url address bar expands/retracts. We don't actually need to do this costly resize on each of those, so we'll do our questionAccuracty check.
+        if (forceResize !== true) {
+            // check the value of our stored window width  vs the new window width
+            if (this.windowWidth === window.innerWidth) {
+                // console.log('window is still the same width')
+                // they match, so skip this resize.
+                // Remember, you can bypass this check by passing forceResize = true to resize
+                // this.resize(true)
+                return false;
+            }
+        }
 
         // recalculate heights on resize
         // debounce it, kinda, by waiting 100ms until they're done so we don't fire this constantly
@@ -1565,6 +1618,8 @@ TreeView.prototype = {
                 _this2.calculateGroups();
                 // update the heights
                 _this2.updateViewHeight(_this2.getTree().getState());
+                // update the windowWidth var to match what we just set it to
+                _this2.windowWidth = window.innerWidth;
             }, 450);
         }
     },
@@ -1609,10 +1664,10 @@ TreeView.prototype = {
                 // this is like saying: getDataByType('question').question_id
                 var id = elData[j][elTypes[i] + '_id'];
                 // find the element in the DOM
-                var _el = document.getElementById('enp-tree__el--' + id);
+                var el = document.getElementById('enp-tree__el--' + id);
 
                 // bind the data
-                this.bindDOMData(elData[j], _el, elTypes[i]);
+                this.bindDOMData(elData[j], el, elTypes[i]);
 
                 // see if we're working with a question or end
                 switch (elTypes[i]) {
