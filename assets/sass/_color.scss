@@ -188,6 +188,13 @@
 
 
 }
+.enp-tree__state--end {
+    .enp-tree__history-list-item:nth-last-child(2) {
+        &:after {
+            background: rgba(0,0,0,.3);
+        }
+    }
+}
 
 .enp-tree__state--tree {
     .enp-tree__question,

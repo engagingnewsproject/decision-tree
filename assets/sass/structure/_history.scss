@@ -142,7 +142,6 @@
     }
 }
 
-
 @keyframes enterHistoryItem {
     0% {
         opacity: 0;
@@ -196,4 +195,52 @@
         width: $spacing__base * 1.1;
         height: $spacing__base * 1.1;
     }
+}
+
+.enp-tree__state--end {
+    .enp-tree__history-list-item:nth-last-child(2) {
+        animation: pulseIt 1.6s .5s ease infinite;
+
+        &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            border-radius: 50%;
+            animation: pulse 1.6s .5s ease infinite;
+            z-index: -1;
+        }
+    }
+}
+@keyframes pulseIt {
+  0% {
+    transform: scale(1.075);
+  }
+  60% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.075);
+  }
+}
+
+
+@keyframes pulse {
+  0% {
+    transform: scale(1.4);
+    border-radius: 45%;
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1);
+    border-radius: 50%;
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.4);
+    border-radius: 45%;
+    opacity: 0;
+  }
 }
