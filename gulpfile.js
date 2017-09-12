@@ -115,7 +115,8 @@ gulp.task('concatTreeJS', function() {
     dist = 'dist/js/';
     src = [dist+'handlebars.runtime.js',
            dist+'templates.js',
-           dist+'scripts.js'];
+           dist+'scripts.js'
+       ];
     filename = 'enp-tree';
 
     return gulp.src(src)

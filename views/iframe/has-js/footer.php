@@ -7,12 +7,13 @@
 <script src="<?php echo $url;?>/dist/js/templates.js"></script>
 <script src="<?php echo $url;?>/dist/js/scripts.js"></script>
 <script>
-treeOptions = {
+var treeOptions = {
         slug: '<?php echo $tree_slug;?>',
         container: document.getElementById('enp-tree')
 };
 
-var tree = new Tree(treeOptions);
+// you can access all your trees with var trees
+createTree(treeOptions);
 </script>
 
 </body>

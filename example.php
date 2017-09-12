@@ -23,21 +23,20 @@
             <iframe width="100%" height="500px" src="api/v1/trees/citizen/iframe?js=false"></iframe>
         </noscript>
     </div>
-
 </main>
 <footer>
     <h2>Footer</h2>
 </footer>
 
 <!-- For fine-tuned support if you already have handlebars.runtime on your site -->
-<script src="dist/js/handlebars.runtime.js"></script>
+<!--<script src="dist/js/handlebars.runtime.js"></script>
 <script src="dist/js/templates.js"></script>
-<script src="dist/js/scripts.js"></script>
+<script src="dist/js/scripts.js"></script>-->
 
-<!--<script src="dist/js/enp-tree.min.js"></script>-->
+<script src="dist/js/enp-tree.min.js"></script>
 <script>
 
-    treeOptions = {
+    var treeOptions = {
             slug: 'citizen',
             container: document.getElementById('enp-tree__citizen')
     };
