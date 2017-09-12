@@ -129,7 +129,8 @@ TreeData.prototype = {
                 this.build(data)
                 break
             case 'update':
-                // this.update(data)
+                this.saveData(data)
+                    .then(this.log);
                 break
             case 'restart':
                 // delete the history

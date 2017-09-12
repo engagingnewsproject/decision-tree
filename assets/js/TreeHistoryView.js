@@ -130,9 +130,12 @@ TreeHistoryView.prototype = {
     },
 
     click: function(event) {
-        let el;
+        let el,
+            extraData;
 
         el = event.target;
+
+        extraData = {updatedBy: 'click', observer: 'TreeHistoryView'}
 
         // check if it's a click on the parent tree (which we don't care about)
         if (el !== event.currentTarget) {
@@ -145,7 +148,7 @@ TreeHistoryView.prototype = {
                 }
                 // see if we want to go to overview or new question/end
                 if(!el.classList.contains('is-active') || el.data.type === 'overview') {
-                    this.message('update', 'state', el.data)
+                    this.message('update', 'state', Object.assign(el.data, extraData))
                 }
             }
         }

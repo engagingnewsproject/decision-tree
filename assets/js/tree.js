@@ -39,7 +39,8 @@ function Tree(data, observers) {
     this.getState = function() { return _state }
 
     // setters
-    this.setState = function(stateType, stateID) {
+    // @param data is simply the data that was originally passed to the function
+    this.setState = function(stateType, stateID, data) {
         let whitelist,
             validateState,
             oldState,
@@ -112,7 +113,7 @@ function Tree(data, observers) {
             id: _state.id,
         }
         // emit that we've changed it
-        this.emit('update', {newState, oldState})
+        this.emit('update', {newState, oldState, data})
     }
 
     /***********************
@@ -160,7 +161,7 @@ Tree.prototype = {
     },
 
     /**
-    * Request to update the tree o
+    * Request to update the tree
     */
     update: function(action, data) {
         switch(action) {
@@ -187,7 +188,7 @@ Tree.prototype = {
             type;
         switch(data.type) {
             case 'intro':
-                this.setState('intro', this.getTreeID())
+                this.setState('intro', this.getTreeID(), data)
                 break
             case 'start':
                 // emit a start
@@ -195,7 +196,7 @@ Tree.prototype = {
 
                 // go to first question
                 let question = this.getQuestions()[0];
-                this.setState('question', question.question_id);
+                this.setState('question', question.question_id, data);
                 break
 
             case 'question':
@@ -205,12 +206,12 @@ Tree.prototype = {
                     id = data.question_id
                 }
                 // find the destination
-                this.setState(data.type, id);
+                this.setState(data.type, id, data);
                 break
 
             case 'option':
                 // find the destination
-                this.setState(data.destination_type, data.destination_id);
+                this.setState(data.destination_type, data.destination_id, data);
                 break
 
             case 'end':
@@ -225,23 +226,23 @@ Tree.prototype = {
                 }  else {
                     type = data.destination_id
                 }
-                this.setState(type, id);
+                this.setState(type, id, data);
                 break
 
             // two ways to get to the tree overview 'overview' or 'tree'
             case 'overview':
                 // go to tree overview
-                this.setState('tree', this.getTreeID());
+                this.setState('tree', this.getTreeID(), data);
                 break
             case 'tree':
                 // go to tree overview
-                this.setState('tree', this.getTreeID());
+                this.setState('tree', this.getTreeID(), data);
                 break
             case 'restart':
                 // emit a restart
                 this.emit('restart', this)
                 // go to first question
-                this.setState('question', this.getQuestions()[0].question_id);
+                this.setState('question', this.getQuestions()[0].question_id, data);
                 break
         }
     },

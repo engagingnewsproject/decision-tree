@@ -483,15 +483,8 @@ TreeView.prototype = {
         // 9 = 'Tab'
         if(event.keyCode === 13 || event.keyCode === 32) {
             // call the click
-            this.click(event)
+            this.click(event, {updatedBy: 'keypress', observer: 'TreeView'})
         }
-
-
-        // TODO: don't allow focus on other questions if question view
-
-        // TODO: don't allow focus on options if in tree state view
-
-
     },
 
     updateFocusable: function(oldState, newState) {
@@ -568,10 +561,13 @@ TreeView.prototype = {
     },
 
 
-    click: function(event) {
+    click: function(event, extraData) {
         let el,
             Tree,
             state;
+        if(extraData === undefined) {
+            extraData = {updatedBy: 'click', observer: 'TreeView'}
+        }
         el = event.target;
         // check if it's a click on the parent tree (which we don't care about)
         if (el !== event.currentTarget) {
@@ -587,7 +583,7 @@ TreeView.prototype = {
                 // if we're in the tree view, don't switch the state (unless they click the start button), just go to that question on the page
                 if(this.getTree().getState().type !== 'tree' || (this.getTree().getState().type === 'tree' && el.data.type === 'start') ) {
                     event.preventDefault()
-                    this.emit('update', 'state', el.data)
+                    this.emit('update', 'state', Object.assign(el.data, extraData))
                 } else {
                     // in tree state
                     event.preventDefault()

@@ -204,13 +204,15 @@ TreeHistory.prototype = {
     // tell the parent tree to update to our current state
     forceCurrentState: function() {
         let currentIndex,
-            history;
+            history,
+            data;
 
         currentIndex = this.getCurrentIndex();
         history = this.getHistory()
 
         if(this.currentIndex !== null && history[currentIndex] !== undefined) {
-            this.emit('update', 'state', history[currentIndex])
+            data = Object.assign(history[currentIndex], {updatedBy: 'forceCurrentState', observer: 'TreeHistory'})
+            this.emit('update', 'state', data)
         }
 
     },

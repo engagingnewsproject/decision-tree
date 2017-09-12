@@ -43,7 +43,8 @@
         };
 
         // setters
-        this.setState = function (stateType, stateID) {
+        // @param data is simply the data that was originally passed to the function
+        this.setState = function (stateType, stateID, data) {
             var whitelist = void 0,
                 validateState = void 0,
                 oldState = void 0,
@@ -112,7 +113,7 @@
                 type: _state.type,
                 id: _state.id
                 // emit that we've changed it
-            };this.emit('update', { newState: newState, oldState: oldState });
+            };this.emit('update', { newState: newState, oldState: oldState, data: data });
         };
 
         /***********************
@@ -166,7 +167,7 @@
         },
 
         /**
-        * Request to update the tree o
+        * Request to update the tree
         */
         update: function update(action, data) {
             switch (action) {
@@ -193,7 +194,7 @@
                 type = void 0;
             switch (data.type) {
                 case 'intro':
-                    this.setState('intro', this.getTreeID());
+                    this.setState('intro', this.getTreeID(), data);
                     break;
                 case 'start':
                     // emit a start
@@ -201,7 +202,7 @@
 
                     // go to first question
                     var question = this.getQuestions()[0];
-                    this.setState('question', question.question_id);
+                    this.setState('question', question.question_id, data);
                     break;
 
                 case 'question':
@@ -211,12 +212,12 @@
                         id = data.question_id;
                     }
                     // find the destination
-                    this.setState(data.type, id);
+                    this.setState(data.type, id, data);
                     break;
 
                 case 'option':
                     // find the destination
-                    this.setState(data.destination_type, data.destination_id);
+                    this.setState(data.destination_type, data.destination_id, data);
                     break;
 
                 case 'end':
@@ -231,23 +232,23 @@
                     } else {
                         type = data.destination_id;
                     }
-                    this.setState(type, id);
+                    this.setState(type, id, data);
                     break;
 
                 // two ways to get to the tree overview 'overview' or 'tree'
                 case 'overview':
                     // go to tree overview
-                    this.setState('tree', this.getTreeID());
+                    this.setState('tree', this.getTreeID(), data);
                     break;
                 case 'tree':
                     // go to tree overview
-                    this.setState('tree', this.getTreeID());
+                    this.setState('tree', this.getTreeID(), data);
                     break;
                 case 'restart':
                     // emit a restart
                     this.emit('restart', this);
                     // go to first question
-                    this.setState('question', this.getQuestions()[0].question_id);
+                    this.setState('question', this.getQuestions()[0].question_id, data);
                     break;
             }
         },
@@ -606,7 +607,7 @@ TreeData.prototype = {
                 this.build(data);
                 break;
             case 'update':
-                // this.update(data)
+                this.saveData(data).then(this.log);
                 break;
             case 'restart':
                 // delete the history
@@ -841,13 +842,15 @@ TreeHistory.prototype = {
     // tell the parent tree to update to our current state
     forceCurrentState: function forceCurrentState() {
         var currentIndex = void 0,
-            history = void 0;
+            history = void 0,
+            data = void 0;
 
         currentIndex = this.getCurrentIndex();
         history = this.getHistory();
 
         if (this.currentIndex !== null && history[currentIndex] !== undefined) {
-            this.emit('update', 'state', history[currentIndex]);
+            data = Object.assign(history[currentIndex], { updatedBy: 'forceCurrentState', observer: 'TreeHistory' });
+            this.emit('update', 'state', data);
         }
     },
 
@@ -1172,12 +1175,15 @@ TreeHistoryView.prototype = {
     },
 
     click: function click(event) {
-        var el = void 0;
+        var el = void 0,
+            extraData = void 0;
 
         el = event.target;
 
-        // check if it's a click on the parent tree (which we don't care about)
-        if (el !== event.currentTarget) {
+        extraData = { updatedBy: 'click', observer: 'TreeHistoryView'
+
+            // check if it's a click on the parent tree (which we don't care about)
+        };if (el !== event.currentTarget) {
             // also check for parent, as the
             if (el.nodeName === 'BUTTON' || el.parentNode.nodeName === 'BUTTON') {
                 event.preventDefault();
@@ -1187,7 +1193,7 @@ TreeHistoryView.prototype = {
                 }
                 // see if we want to go to overview or new question/end
                 if (!el.classList.contains('is-active') || el.data.type === 'overview') {
-                    this.message('update', 'state', el.data);
+                    this.message('update', 'state', Object.assign(el.data, extraData));
                 }
             }
         }
@@ -2015,13 +2021,8 @@ TreeView.prototype = {
         // 9 = 'Tab'
         if (event.keyCode === 13 || event.keyCode === 32) {
             // call the click
-            this.click(event);
+            this.click(event, { updatedBy: 'keypress', observer: 'TreeView' });
         }
-
-        // TODO: don't allow focus on other questions if question view
-
-        // TODO: don't allow focus on options if in tree state view
-
     },
 
     updateFocusable: function updateFocusable(oldState, newState) {
@@ -2096,10 +2097,13 @@ TreeView.prototype = {
         }
     },
 
-    click: function click(event) {
+    click: function click(event, extraData) {
         var el = void 0,
             Tree = void 0,
             state = void 0;
+        if (extraData === undefined) {
+            extraData = { updatedBy: 'click', observer: 'TreeView' };
+        }
         el = event.target;
         // check if it's a click on the parent tree (which we don't care about)
         if (el !== event.currentTarget) {
@@ -2115,7 +2119,7 @@ TreeView.prototype = {
                 // if we're in the tree view, don't switch the state (unless they click the start button), just go to that question on the page
                 if (this.getTree().getState().type !== 'tree' || this.getTree().getState().type === 'tree' && el.data.type === 'start') {
                     event.preventDefault();
-                    this.emit('update', 'state', el.data);
+                    this.emit('update', 'state', Object.assign(el.data, extraData));
                 } else {
                     // in tree state
                     event.preventDefault();
