@@ -6,7 +6,8 @@
 function TreeData(options) {
     var _Tree,
         _rootURL,
-        _postURL;
+        _postURL,
+        _userID;
     /**
     * Private functions
     */
@@ -32,10 +33,30 @@ function TreeData(options) {
         return _rootURL
     }
 
+    var _setUserID = function() {
+        let userIDStorageName = 'treeUserID'
+        let userID = localStorage.getItem(userIDStorageName)
+        if(userID === null) {
+             userID = ''
+             for(let i = 0; i < 8; i++) {
+                 userID = userID + Math.floor((1 + Math.random()) * 0x10000)
+                   .toString(16)
+                   .substring(1)
+             }
+             localStorage.setItem(userIDStorageName, userID)
+        }
+
+        _userID = userID
+
+        return _userID
+    }
+
     // getters
     this.getTree = function() { return _Tree}
     this.getRootURL = function() { return _rootURL}
     this.getPostURL = function() { return _postURL}
+    this.getUserID = function() { return _userID}
+    this.getUserIDStorageName = function() { return _userIDStorageName}
 
     // setters
     /**
@@ -59,6 +80,9 @@ function TreeData(options) {
         // TODO validate the data to be saved
         let postURL = this.getPostURL()
         let treeID =  this.getTree().getTreeID()
+        // combine data and our userID
+        data = Object.assign(data, {userID: this.getUserID()})
+
         return new Promise(function(resolve, reject) {
 
           var request = new XMLHttpRequest();
@@ -82,13 +106,14 @@ function TreeData(options) {
               reject(Error('There was a network error.'));
           };
 
-
+          console.log(data)
           // Send the request
           request.send(JSON.stringify(data));
         })
     }
 
     this.init = function() {
+        _setUserID()
         // what do we want to do here? Save that the tree loaded?
         this.setPostURL()
         // send our load

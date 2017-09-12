@@ -4,8 +4,6 @@
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <title>Example Decision Tree</title>
-    <link rel='stylesheet' href="dist/css/base.min.css"/>
-    <!--<link rel='stylesheet' href="assets/base-test.css"/>-->
     <style>
 
         body {

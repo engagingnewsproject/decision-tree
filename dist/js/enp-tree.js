@@ -2127,7 +2127,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
 * (so people can go back to previous questions)
 */
 function TreeData(options) {
-    var _Tree, _rootURL, _postURL;
+    var _Tree, _rootURL, _postURL, _userID;
     /**
     * Private functions
     */
@@ -2153,6 +2153,22 @@ function TreeData(options) {
         return _rootURL;
     };
 
+    var _setUserID = function _setUserID() {
+        var userIDStorageName = 'treeUserID';
+        var userID = localStorage.getItem(userIDStorageName);
+        if (userID === null) {
+            userID = '';
+            for (var i = 0; i < 8; i++) {
+                userID = userID + Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+            }
+            localStorage.setItem(userIDStorageName, userID);
+        }
+
+        _userID = userID;
+
+        return _userID;
+    };
+
     // getters
     this.getTree = function () {
         return _Tree;
@@ -2162,6 +2178,12 @@ function TreeData(options) {
     };
     this.getPostURL = function () {
         return _postURL;
+    };
+    this.getUserID = function () {
+        return _userID;
+    };
+    this.getUserIDStorageName = function () {
+        return _userIDStorageName;
     };
 
     // setters
@@ -2186,6 +2208,9 @@ function TreeData(options) {
         // TODO validate the data to be saved
         var postURL = this.getPostURL();
         var treeID = this.getTree().getTreeID();
+        // combine data and our userID
+        data = Object.assign(data, { userID: this.getUserID() });
+
         return new Promise(function (resolve, reject) {
 
             var request = new XMLHttpRequest();
@@ -2209,12 +2234,14 @@ function TreeData(options) {
                 reject(Error('There was a network error.'));
             };
 
+            console.log(data);
             // Send the request
             request.send(JSON.stringify(data));
         });
     };
 
     this.init = function () {
+        _setUserID();
         // what do we want to do here? Save that the tree loaded?
         this.setPostURL();
         // send our load
