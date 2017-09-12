@@ -40,7 +40,7 @@ $app->group('/api', function() {
 
             // compile it
             $compiled = new \Enp\Database\CompileTree($tree_slug);
-            
+
             // return the file that got written
             $response->getBody()->write(file_get_contents("data/".$tree_slug.$ext.".json"));
         });
@@ -187,6 +187,26 @@ $app->group('/api', function() {
             $end = $DB->get_end($end_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($end));
+            return $response;
+        });
+
+        // save data
+        $this->post('/trees/{tree_id}/response-data/new', function (Request $request, Response $response) {
+            $tree_id = $request->getAttribute('tree_id');
+            // passed data
+            $data = $request->getParsedBody();
+            // validate it
+            // print_r($data);
+            // save it
+
+            // build the response
+            $savedData = ['success'=>true,
+                          'savedData' => json_decode($data)
+                      ];
+            // return the JSON
+            $response->withStatus(200)
+                ->withHeader("Content-Type", "application/json")
+                ->write(json_encode($data));
             return $response;
         });
 

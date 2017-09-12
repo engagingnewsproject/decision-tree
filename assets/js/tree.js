@@ -448,14 +448,18 @@ function buildTree(request) {
     }
 
     let data = JSON.parse(request.response);
+    // the TreeView needs a container to display into
     let treeView = new TreeView({
         container: this.container,
     });
+    // Manages TreeHistory feature and TreeHistoryView
     let treeHistory = new TreeHistory({});
+    // Manages passes usage Data to CME so we can continue to get funding to continue developing this tool and create new ones
+    let treeData = new TreeData({});
     // add the observers
     // bind history first so it will load the correct state and
     // not cause layout to have to be repainted twice (if different states)
-    let observers = [treeHistory, treeView]
+    let observers = [treeHistory, treeView, treeData]
     // build the tree
     let tree = new Tree(data, observers);
     // send it to our trees array for access

@@ -1,0 +1,160 @@
+/**
+* Manages localStorage of current question state
+* and previous states of the current decision tree path
+* (so people can go back to previous questions)
+*/
+function TreeData(options) {
+    var _Tree,
+        _rootURL,
+        _postURL;
+    /**
+    * Private functions
+    */
+    var _setRootURL = function() {
+        let scripts,
+            currentScript,
+            regex,
+            rootURL;
+        // get the current script being processed (this one)
+        scripts = document.querySelectorAll( 'script[src]' )
+        currentScript = scripts[ scripts.length - 1 ].src
+
+        // regex it to see if it's one of our DEV urls
+        // If you want to see what it matches/doesn't match, go here: http://regexr.com/3g4rc
+        regex = /https?:\/\/(?:(?:localhost:3000|dev)\/decision-tree|(?:enptree)\.(?:staging\.)?wpengine\.com)\b/
+        _rootURL = regex.exec(currentScript)
+
+        if(rootURL === null) {
+            // we're not on DEV, so pass the rootURL as our PROD url
+            _rootURL = 'https://tree.mediaengagement.org'
+        }
+
+        return _rootURL
+    }
+
+    // getters
+    this.getTree = function() { return _Tree}
+    this.getRootURL = function() { return _rootURL}
+    this.getPostURL = function() { return _postURL}
+
+    // setters
+    /**
+    * Sets the parent Tree
+    */
+    this.setTree = function(Tree) {
+        // only let it be set once
+        if(_Tree === undefined) {
+            _Tree = Tree
+        }
+        return _Tree
+    }
+
+    this.setPostURL = function() {
+        _postURL = this.getRootURL()+'/api/v1/trees/'+this.getTree().getTreeID()+'/response-data/new';
+        return _postURL
+    }
+
+    // save the passed history to localStorage and set the global _history to make sure everything is in sync
+    this.saveData = function(data) {
+        // TODO validate the data to be saved
+        let postURL = this.getPostURL()
+        let treeID =  this.getTree().getTreeID()
+        return new Promise(function(resolve, reject) {
+
+          var request = new XMLHttpRequest();
+          // request.overrideMimeType("application/json");
+          request.open('POST', postURL);
+          request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+          // When the request loads, check whether it was successful
+          request.onload = function() {
+            if (request.status === 200) {
+            // If successful, resolve the promise by passing back the request response
+              resolve(request);
+            } else {
+            // If it fails, reject the promise with a error message
+              reject(Error('Tree data could not be saved:' + request.statusText));
+            }
+          };
+          request.onerror = function() {
+          // Also deal with the case when the entire request fails to begin with
+          // This is probably a network error, so reject the promise with an appropriate message
+              reject(Error('There was a network error.'));
+          };
+
+
+          // Send the request
+          request.send(JSON.stringify(data));
+        })
+    }
+
+    this.init = function() {
+        // what do we want to do here? Save that the tree loaded?
+        this.setPostURL()
+        // send our load
+        this.saveData({"action": "loaded"})
+            .then(this.log);
+    }
+
+    this.log = function(request) {
+        let data = JSON.parse(request.response)
+        console.log(data)
+    }
+
+    // set the rootURL
+    _setRootURL()
+
+    // if a Tree was passed, Do whatever you need to do
+    if(options.Tree) {
+        this.build(options.Tree)
+    }
+}
+
+
+TreeData.prototype = {
+    constructor: TreeData,
+
+    build: function(Tree) {
+        this.setTree(Tree)
+        this.init()
+    },
+
+    /**
+    * Listen to parent Tree's emitted actions and handle accordingly
+    */
+    on: function(action, data) {
+        switch(action) {
+            case 'ready':
+                // data will be the tree itself
+                this.build(data)
+                break
+            case 'update':
+                // this.update(data)
+                break
+            case 'restart':
+                // delete the history
+                break
+            case 'start':
+                // delete the history
+                break
+        }
+
+    },
+
+    /**
+    * Let our Tree know about what actions we did
+    */
+    emit: function(action, item, data) {
+        let Tree = this.getTree()
+        switch(action) {
+            case 'ready':
+                // tell the Tree to let all the other observers know that the TreeData class is ready
+                Tree.message(item, data)
+                break
+            case 'saveData':
+                // tell the Tree to let all the other observers know that we saved data
+                Tree.message(item, data)
+                break
+        }
+    }
+}

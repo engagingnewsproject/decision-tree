@@ -1,89 +1,1035 @@
 'use strict';
 
-Handlebars.registerHelper('environment', function (options) {
-    return 'has-js';
-});
+/**
+* Must have one view to initialize
+*/
+(function () {
 
-Handlebars.registerHelper('group_start', function (question_id, group_id, groups, options) {
-    // find the group
-    for (var i = 0; i < groups.length; i++) {
-        if (groups[i].group_id === group_id) {
-            // check if it's the first in the question order
-            if (groups[i].questions[0] === question_id) {
-                // pass the values we'll need in the template
-                return options.fn({ group_id: groups[i].group_id, group_title: groups[i].title });
-            } else {
-                return '';
+    function Tree(data, observers) {
+        var _data, _state;
+
+        // keep an array of observers
+        this.observers = [];
+
+        /**
+        * Private functions
+        */
+        var _validateData = function _validateData(data) {
+            // TODO: make sure the data is valid
+            return true;
+        };
+
+        /*
+        * Private function to set Data and State on Init
+        */
+        var _setData = function _setData(data) {
+            _data = data;
+            _state = {
+                id: data.tree_id,
+                type: 'intro'
+            };
+        };
+
+        /**
+        ** Public functinos
+        **/
+
+        // getters
+        this.getData = function () {
+            return _data;
+        };
+        this.getState = function () {
+            return _state;
+        };
+
+        // setters
+        this.setState = function (stateType, stateID) {
+            var whitelist = void 0,
+                validateState = void 0,
+                oldState = void 0,
+                newState = void 0;
+
+            whitelist = ['intro', 'tree', 'start', 'question', 'end'];
+
+            // TODO: Check that start can't go straight to end?
+            // TODO: Check that the next state is valid from the question's options?
+
+            // check allowed states
+            if (!whitelist.includes(stateType)) {
+                console.error(stateType + " is not an allowed state. Allowed states are " + whitelist.toString());
+                this.emitError('invalidStateType', {
+                    stateType: stateType,
+                    stateID: stateID
+                });
+                return false;
             }
-        }
-    }
-    return '';
-});
-
-Handlebars.registerHelper('group_end', function (question_id, group_id, groups, options) {
-    // find the group
-    for (var i = 0; i < groups.length; i++) {
-        if (groups[i].group_id === group_id) {
-            var questions = groups[i].questions;
-            // check if it's the last in the question order
-            if (questions[questions.length - 1] === question_id) {
-                return options.fn(this);
-            } else {
-                return '';
-            }
-        }
-    }
-    return '';
-});
-
-Handlebars.registerHelper('el_number', function (el_order) {
-
-    // for the arrow direction we could calculate the position on the tree-view and set an angle so the arrow points towards the destination...
-    return parseInt(el_order) + 1;
-});
-
-Handlebars.registerHelper('destination', function (destination_id, destination_type, option_id, question_index, options) {
-    var data = void 0,
-        destination = void 0,
-        destination_number = void 0,
-        destination_title = void 0,
-        destination_icon = void 0,
-        i = void 0;
-    // set data (either questions or ends most likely) from main data tree
-    data = options.data.root[destination_type + 's'];
-    i = 0;
-    if (destination_type === 'question') {
-        // start it at the question_index.
-        // An option will never go backwards, so we don't care
-        // about the previous ones
-        i = question_index;
-    }
-
-    // find the destination
-    for (i; i < data.length; i++) {
-        if (data[i][destination_type + '_id'] === destination_id) {
-            destination = data[i];
-            if (destination_type === 'question') {
-                destination_number = i + 1;
-                destination_title = 'Question ' + destination_number;
-                destination_icon = 'arrow';
-            } else {
-                destination_title = data[i].title;
-                destination_icon = '';
+            // check if stateID is valid
+            if (stateID === null || stateID === '' || stateID === undefined) {
+                console.error('StateID is empty: ' + stateID);
+                // return false
             }
 
-            break;
+            // check to make sure we're not trying to set the same state again
+            if (_state.type === stateType && _state.id === stateID) {
+                return false;
+            }
+
+            // check if the stateID is a valid ID for this state
+            if (stateType === 'tree') {
+                if (stateID === this.getTreeID()) {
+                    validateState = true;
+                } else {
+                    validateState = false;
+                }
+            } else if (stateType === 'intro') {
+                // it's always fine
+                validateState = true;
+            } else {
+                validateState = this.getDataByType(stateType, stateID);
+            }
+
+            if (validateState === false || validateState === undefined) {
+                console.error(stateID + " is invalid for the current state of '" + stateType + "'");
+                this.emitError('invalidState', {
+                    stateType: stateType,
+                    stateID: stateID
+                });
+                return false;
+            }
+
+            // looks valid! Set the state
+            // store the old state
+            oldState = {
+                type: _state.type,
+                id: _state.id
+
+                // set the state
+            };_state.type = stateType;
+            _state.id = stateID;
+
+            // build a new state
+            newState = {
+                type: _state.type,
+                id: _state.id
+                // emit that we've changed it
+            };this.emit('update', { newState: newState, oldState: oldState });
+        };
+
+        /***********************
+        ******** INIT  *********
+        ***********************/
+        // set the data
+        if (_validateData(data)) {
+            // start with one observer so we can
+            // alert them on ready
+            this.setObservers(observers);
+            // set the data
+            _setData(data);
+            // emit that we're ready for other code to utilize this tree
+            this.emit('ready', this);
+        } else {
+            console.error('Tree data is invalid.');
+            return false;
         }
     }
 
-    // for the arrow direction we could calculate the position on the tree-view and set an angle so the arrow points towards the destination...
-    return options.fn({
-        destination_title: destination_title,
-        destination_type: destination_type,
-        destination_icon: destination_icon,
-        option_id: option_id
-    });
-});
+    Tree.prototype = {
+        constructor: Tree,
+
+        /**
+        * Let Observers know about different actions
+        * 'ready', 'update', 'error'
+        */
+        emit: function emit(action, data) {
+            var _this = this;
+
+            var _loop = function _loop(i) {
+                // make the alert process async
+                setTimeout(function () {
+                    _this.observers[i].on(action, data);
+                }, 0);
+            };
+
+            for (var i = 0; i < this.observers.length; i++) {
+                _loop(i);
+            }
+        },
+
+        /**
+        * Let our observers know about the error
+        */
+        emitError: function emitError(action, data) {
+            this.emit('error', {
+                action: action,
+                data: data
+            });
+        },
+
+        /**
+        * Request to update the tree o
+        */
+        update: function update(action, data) {
+            switch (action) {
+                // data will be the element clicked
+                case 'state':
+                    this.updateState(data);
+                    break;
+            }
+        },
+
+        /**
+        * How observers message the parent and each other
+        */
+        message: function message(action, data) {
+            this.emit(action, data);
+        },
+
+        /**
+        * Attempt to update a sate
+        * Validation and emitting happens with setState
+        */
+        updateState: function updateState(data) {
+            var id = void 0,
+                type = void 0;
+            switch (data.type) {
+                case 'intro':
+                    this.setState('intro', this.getTreeID());
+                    break;
+                case 'start':
+                    // emit a start
+                    this.emit('start', this);
+
+                    // go to first question
+                    var question = this.getQuestions()[0];
+                    this.setState('question', question.question_id);
+                    break;
+
+                case 'question':
+                    if (data.question_id === undefined) {
+                        id = data.id;
+                    } else {
+                        id = data.question_id;
+                    }
+                    // find the destination
+                    this.setState(data.type, id);
+                    break;
+
+                case 'option':
+                    // find the destination
+                    this.setState(data.destination_type, data.destination_id);
+                    break;
+
+                case 'end':
+                    // find the destination
+                    if (data.destination_type === undefined) {
+                        type = data.type;
+                    } else {
+                        type = data.destination_type;
+                    }
+                    if (data.destination_id === undefined) {
+                        id = data.id;
+                    } else {
+                        type = data.destination_id;
+                    }
+                    this.setState(type, id);
+                    break;
+
+                // two ways to get to the tree overview 'overview' or 'tree'
+                case 'overview':
+                    // go to tree overview
+                    this.setState('tree', this.getTreeID());
+                    break;
+                case 'tree':
+                    // go to tree overview
+                    this.setState('tree', this.getTreeID());
+                    break;
+                case 'restart':
+                    // emit a restart
+                    this.emit('restart', this);
+                    // go to first question
+                    this.setState('question', this.getQuestions()[0].question_id);
+                    break;
+            }
+        },
+
+        /**
+        * Allowed types, 'question', 'group', 'end', 'start'
+        */
+        getDataByType: function getDataByType(type, id) {
+            var typeIndex = void 0,
+                whitelist = void 0,
+                data = void 0;
+            // check allowed types
+            whitelist = ['question', 'group', 'end', 'start'];
+
+            if (!whitelist.includes(type)) {
+                console.error("Allowed getDataByType types are " + whitelist.toString());
+                return false;
+            }
+            // get the data of this type
+            data = this.getData();
+            // append 's' to get the right array
+            // 'question' becomes 'questions'
+            data = data[type + 's'];
+
+            // if there's an ID, let's get the specific one they're after
+            if (id !== undefined) {
+                // get the individual item
+                typeIndex = this.getIndexBy(data, type + '_id', id);
+                if (typeIndex !== undefined) {
+                    // found one!
+                    data = data[typeIndex];
+                } else {
+                    data = undefined;
+                }
+            }
+
+            return data;
+        },
+
+        getTreeID: function getTreeID() {
+            return this.getData().tree_id;
+        },
+
+        getQuestions: function getQuestions(id) {
+            var question = void 0;
+            if (id !== undefined) {
+                // get the individual item
+                question = this.getDataByType('question', id);
+            } else {
+                question = this.getDataByType('question');
+            }
+            return question;
+        },
+
+        getStarts: function getStarts(id) {
+            var start = void 0;
+            if (id !== undefined) {
+                // get the individual item
+                start = this.getDataByType('start', id);
+            } else {
+                start = this.getDataByType('start');
+            }
+            return start;
+        },
+
+        getEnds: function getEnds(id) {
+            var end = void 0;
+            if (id !== undefined) {
+                // get the individual item
+                end = this.getDataByType('end', id);
+            } else {
+                end = this.getDataByType('end');
+            }
+            return end;
+        },
+
+        getGroups: function getGroups(id) {
+            var group = void 0;
+            if (id !== undefined) {
+                // get the individual item
+                group = this.getDataByType('group', id);
+            } else {
+                group = this.getDataByType('group');
+            }
+            return group;
+        },
+
+        getOptions: function getOptions(question_id, option_id) {
+            var option = void 0,
+                optionIndex = void 0,
+                question = void 0;
+
+            // get the individual item
+            question = this.getQuestions(question_id);
+
+            if (option_id !== undefined) {
+                optionIndex = this.getIndexBy(question.options, 'option_id', option_id);
+                option = question.options[optionIndex];
+            } else {
+                option = question.options;
+            }
+
+            return option;
+        },
+
+        setObservers: function setObservers(observers) {
+            for (var i = 0; i < observers.length; i++) {
+                this.addObserver(observers[i]);
+            }
+            return this.observers;
+        },
+
+        addObserver: function addObserver(observer) {
+            // no need to validate. anyone can listen
+            // we do need to check to make sure the observer hasn't already
+            // been added
+            this.observers.push(observer);
+        },
+
+        getObservers: function getObservers() {
+            return this.observers;
+        },
+
+        /**
+        * Powers most all of the retrieval of data from the tree
+        * Searches an array for a key that equals a certain value
+        *
+        * @param objArray (ARRAY of OBJECTS)
+        * @param name (STRING) of the key you're wanting to find the matching value of
+        * @param value (MIXED) the value you want to find a match for
+        * @return INT of the index that matches or UNDEFINED if not found
+        */
+        getIndexBy: function getIndexBy(objArray, name, value) {
+            for (var i = 0; i < objArray.length; i++) {
+                if (objArray[i][name] == value) {
+                    return i;
+                }
+            }
+            return undefined;
+        }
+    };
+
+    function createTree(options) {
+        // required options
+        if (typeof options.slug !== 'string') {
+            console.error('Tree slug must be a string.');
+            return false;
+        }
+        // INIT
+        // Request our Tree Data
+        // create the tree
+        getTreeData(options.slug).then(buildTree.bind(options)).catch(handleTreeDataError);
+    }
+
+    function getTreeData(slug) {
+
+        return new Promise(function (resolve, reject) {
+            var baseUrl = void 0;
+            if (/https?:\/\/(?:dev\/decision-tree|localhost:3000\/decision-tree)\//.test(window.location.href)) {
+                baseUrl = 'http://dev/decision-tree';
+            } else {
+                baseUrl = 'http://enptree.wpengine.com';
+            }
+
+            var request = new XMLHttpRequest();
+            request.overrideMimeType("application/json");
+            request.open('GET', baseUrl + '/api/v1/trees/' + slug + '/compiled?minified=true', true);
+            //request.responseType = 'json';
+            // When the request loads, check whether it was successful
+            request.onload = function () {
+                if (request.status === 200) {
+                    // If successful, resolve the promise by passing back the request response
+                    resolve(request);
+                } else {
+                    // If it fails, reject the promise with a error message
+                    reject(Error('Tree could not be loaded:' + request.statusText));
+                }
+            };
+            request.onerror = function () {
+                // Also deal with the case when the entire request fails to begin with
+                // This is probably a network error, so reject the promise with an appropriate message
+                reject(Error('There was a network error.'));
+            };
+            // Send the request
+            request.send();
+        });
+    }
+
+    function buildTree(request) {
+
+        // check our response URL to make sure it's from a trusted source
+        if (!/https?:\/\/(?:dev\/decision-tree|tree\.engagingnewsproject\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
+            console.error('responseURL from an invalidated source.');
+            return false;
+        }
+
+        var data = JSON.parse(request.response);
+        // the TreeView needs a container to display into
+        var treeView = new TreeView({
+            container: this.container
+        });
+        // Manages TreeHistory feature and TreeHistoryView
+        var treeHistory = new TreeHistory({});
+        // Manages passes usage Data to CME so we can continue to get funding to continue developing this tool and create new ones
+        var treeData = new TreeData({});
+        // add the observers
+        // bind history first so it will load the correct state and
+        // not cause layout to have to be repainted twice (if different states)
+        var observers = [treeHistory, treeView, treeData];
+        // build the tree
+        var tree = new Tree(data, observers);
+        // send it to our trees array for access
+        trees.push(tree);
+    }
+
+    function handleTreeDataError(err) {
+        console.error(err);
+    }
+
+    var trees = [];
+    window.Tree = Tree;
+    window.createTree = createTree;
+    window.trees = trees;
+})(window);
+'use strict';
+
+/**
+* Manages localStorage of current question state
+* and previous states of the current decision tree path
+* (so people can go back to previous questions)
+*/
+function TreeData(options) {
+    var _Tree, _rootURL, _postURL;
+    /**
+    * Private functions
+    */
+    var _setRootURL = function _setRootURL() {
+        var scripts = void 0,
+            currentScript = void 0,
+            regex = void 0,
+            rootURL = void 0;
+        // get the current script being processed (this one)
+        scripts = document.querySelectorAll('script[src]');
+        currentScript = scripts[scripts.length - 1].src;
+
+        // regex it to see if it's one of our DEV urls
+        // If you want to see what it matches/doesn't match, go here: http://regexr.com/3g4rc
+        regex = /https?:\/\/(?:(?:localhost:3000|dev)\/decision-tree|(?:enptree)\.(?:staging\.)?wpengine\.com)\b/;
+        _rootURL = regex.exec(currentScript);
+
+        if (rootURL === null) {
+            // we're not on DEV, so pass the rootURL as our PROD url
+            _rootURL = 'https://tree.mediaengagement.org';
+        }
+
+        return _rootURL;
+    };
+
+    // getters
+    this.getTree = function () {
+        return _Tree;
+    };
+    this.getRootURL = function () {
+        return _rootURL;
+    };
+    this.getPostURL = function () {
+        return _postURL;
+    };
+
+    // setters
+    /**
+    * Sets the parent Tree
+    */
+    this.setTree = function (Tree) {
+        // only let it be set once
+        if (_Tree === undefined) {
+            _Tree = Tree;
+        }
+        return _Tree;
+    };
+
+    this.setPostURL = function () {
+        _postURL = this.getRootURL() + '/api/v1/trees/' + this.getTree().getTreeID() + '/response-data/new';
+        return _postURL;
+    };
+
+    // save the passed history to localStorage and set the global _history to make sure everything is in sync
+    this.saveData = function (data) {
+        // TODO validate the data to be saved
+        var postURL = this.getPostURL();
+        var treeID = this.getTree().getTreeID();
+        return new Promise(function (resolve, reject) {
+
+            var request = new XMLHttpRequest();
+            // request.overrideMimeType("application/json");
+            request.open('POST', postURL);
+            request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+            // When the request loads, check whether it was successful
+            request.onload = function () {
+                if (request.status === 200) {
+                    // If successful, resolve the promise by passing back the request response
+                    resolve(request);
+                } else {
+                    // If it fails, reject the promise with a error message
+                    reject(Error('Tree data could not be saved:' + request.statusText));
+                }
+            };
+            request.onerror = function () {
+                // Also deal with the case when the entire request fails to begin with
+                // This is probably a network error, so reject the promise with an appropriate message
+                reject(Error('There was a network error.'));
+            };
+
+            // Send the request
+            request.send(JSON.stringify(data));
+        });
+    };
+
+    this.init = function () {
+        // what do we want to do here? Save that the tree loaded?
+        this.setPostURL();
+        // send our load
+        this.saveData({ "action": "loaded" }).then(this.log);
+    };
+
+    this.log = function (request) {
+        var data = JSON.parse(request.response);
+        console.log(data);
+    };
+
+    // set the rootURL
+    _setRootURL();
+
+    // if a Tree was passed, Do whatever you need to do
+    if (options.Tree) {
+        this.build(options.Tree);
+    }
+}
+
+TreeData.prototype = {
+    constructor: TreeData,
+
+    build: function build(Tree) {
+        this.setTree(Tree);
+        this.init();
+    },
+
+    /**
+    * Listen to parent Tree's emitted actions and handle accordingly
+    */
+    on: function on(action, data) {
+        switch (action) {
+            case 'ready':
+                // data will be the tree itself
+                this.build(data);
+                break;
+            case 'update':
+                // this.update(data)
+                break;
+            case 'restart':
+                // delete the history
+                break;
+            case 'start':
+                // delete the history
+                break;
+        }
+    },
+
+    /**
+    * Let our Tree know about what actions we did
+    */
+    emit: function emit(action, item, data) {
+        var Tree = this.getTree();
+        switch (action) {
+            case 'ready':
+                // tell the Tree to let all the other observers know that the TreeData class is ready
+                Tree.message(item, data);
+                break;
+            case 'saveData':
+                // tell the Tree to let all the other observers know that we saved data
+                Tree.message(item, data);
+                break;
+        }
+    }
+};
+'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/**
+* Manages localStorage of current question state
+* and previous states of the current decision tree path
+* (so people can go back to previous questions)
+*/
+function TreeHistory(options) {
+    var _Tree, _history, _historyStorageName, _currentIndex, // where in the history we're at (current state)
+    _currentIndexStorageName;
+
+    // keep an array of observers
+    this.observers = [];
+
+    /**
+    * Private functions
+    */
+    // save the passed history to localStorage and set the global _history to make sure everything is in sync
+    var _saveHistory = function _saveHistory(history) {
+        _history = history;
+        localStorage.setItem(_historyStorageName, JSON.stringify(_history));
+    };
+
+    var _saveCurrentIndex = function _saveCurrentIndex(currentIndex) {
+        _currentIndex = currentIndex;
+        localStorage.setItem(_currentIndexStorageName, JSON.stringify(_currentIndex));
+    };
+
+    // getters
+    this.getTree = function () {
+        return _Tree;
+    };
+    this.getHistory = function () {
+        return _history;
+    };
+    this.getCurrentIndex = function () {
+        return _currentIndex;
+    };
+
+    // setters
+    /**
+    * Clears the history and currentIndex to an empty state
+    */
+    this.clearHistory = function () {
+        var tree_id = void 0;
+        tree_id = this.getTree().getTreeID();
+        // create as the Tree intro state with overview and index at start.
+        var history = [{ type: 'intro', id: tree_id }, { type: 'tree', id: tree_id }];
+        var currentIndex = 0;
+
+        _saveHistory(history);
+        _saveCurrentIndex(currentIndex);
+    };
+
+    /**
+    * Sets the parent Tree
+    */
+    this.setTree = function (Tree) {
+        // only let it be set once
+        if (_Tree === undefined) {
+            _Tree = Tree;
+        }
+        return _Tree;
+    };
+
+    /**
+    * Sets variables and decides what state we'll init to
+    */
+    this.init = function () {
+        var treeID = void 0,
+            checkState = void 0;
+
+        // get the tree id
+        treeID = this.getTree().getTreeID();
+
+        // set global storage string
+        _historyStorageName = 'treeHistory__' + treeID;
+        _currentIndexStorageName = 'treeHistoryIndex__' + treeID;
+
+        // if localStorage is empty, create it
+        if (localStorage.getItem(_historyStorageName) === null) {
+            // sets a blank history and index
+            this.clearHistory();
+        }
+
+        // set from localStorage
+        this.setHistory(JSON.parse(localStorage.getItem(_historyStorageName)));
+        // set currentIndex from localStorage
+        this.setCurrentIndex(JSON.parse(localStorage.getItem(_currentIndexStorageName)));
+    };
+
+    this.setHistory = function (history) {
+        // TODO: different checks to make sure it's legit, like
+        // don't add the same state twice.
+        _saveHistory(history);
+        // notify observers
+        this.notifyObservers('historyUpdate', history);
+        return;
+    };
+
+    this.setCurrentIndex = function (index) {
+        var history = this.getHistory();
+        // Check that the index exists
+        if (index !== null && history[index] === undefined) {
+            console.error('Index not found in History.');
+            // Should we set the current index to null here?
+            return false;
+        }
+
+        // don't worry about matching that the state exists. Maybe someone wants to set the current index to the last one in the series. Who knows?
+        _saveCurrentIndex(index);
+        this.notifyObservers('historyIndexUpdate', index);
+        return;
+    };
+
+    this.setView = function (container) {};
+
+    // if a Tree was passed, build the History now
+    if (options.Tree) {
+        this.build(options.Tree);
+    }
+}
+
+TreeHistory.prototype = {
+    constructor: TreeHistory,
+
+    build: function build(Tree) {
+        var history = void 0;
+        this.setTree(Tree);
+        this.init();
+        // check the validity of the history, if it's not cool, clear history and run again
+        history = this.getHistory();
+        // if the first and second items aren't valid, reset it
+        if (history[0].type !== 'intro' || history[1].type !== 'tree') {
+            this.clearHistory();
+        }
+        this.forceCurrentState();
+    },
+
+    addHistory: function addHistory(state) {
+        // TODO: Validate state. Should be a function on the Tree
+        // check whitelist for state?
+
+        var history = this.getHistory();
+        // add the state to the history
+        history.push(state);
+        // save it
+        this.setHistory(history);
+    },
+
+    deleteHistoryAfter: function deleteHistoryAfter(index) {
+        var history = void 0;
+        // Don't let them delete the current state
+        if (index === this.getCurrentIndex()) {
+            console.error('Cannot delete current state.');
+            return false;
+        }
+
+        // don't allow them to delete history before the current index
+        if (index < this.getCurrentIndex) {
+            console.error('Cannot delete states before the current state.');
+            return false;
+        }
+
+        history = this.getHistory();
+        // ok, delete away!
+        // delete all history after the passed index
+        // splice returns the delete array elements
+        history.splice(index);
+        this.setHistory(history);
+    },
+
+    getCurrentHistoryState: function getCurrentHistoryState() {
+        var history = void 0,
+            currentIndex = void 0;
+
+        history = this.getHistory();
+        currentIndex = this.getCurrentIndex();
+
+        return history[currentIndex];
+    },
+
+    /**
+    * Let our Tree know about the state we want to change to.
+    */
+    emit: function emit(action, item, data) {
+
+        switch (action) {
+            case 'update':
+                var Tree = this.getTree();
+                Tree.update(item, data);
+                break;
+        }
+    },
+
+    /**
+    * Get messages from observers
+    */
+    message: function message(action, item, data) {
+        this.emit(action, item, data);
+    },
+
+    // tell the parent tree to update to our current state
+    forceCurrentState: function forceCurrentState() {
+        var currentIndex = void 0,
+            history = void 0;
+
+        currentIndex = this.getCurrentIndex();
+        history = this.getHistory();
+
+        if (this.currentIndex !== null && history[currentIndex] !== undefined) {
+            this.emit('update', 'state', history[currentIndex]);
+        }
+    },
+
+    /**
+    * Listen to parent Tree's emitted actions and handle accordingly
+    */
+    on: function on(action, data) {
+        switch (action) {
+            case 'ready':
+                // data will be the tree itself
+                this.build(data);
+                break;
+            case 'update':
+                this.update(data);
+                break;
+            case 'viewReady':
+                // build the view
+                // this.setView(data)
+                // get the container
+                var treeView = data;
+                var cWindow = treeView.getContentWindow();
+                var historyView = new TreeHistoryView({ TreeHistory: this, contentWindow: cWindow });
+                // add this to the observers
+                this.addObserver(historyView);
+                break;
+            case 'restart':
+                // delete the history
+                this.clearHistory();
+                break;
+            case 'start':
+                // delete the history
+                this.clearHistory();
+                break;
+        }
+
+        // notify observers of these changes
+        this.notifyObservers(action, data);
+    },
+
+    // updates the history state
+    update: function update(states) {
+        var newState = void 0,
+            oldState = void 0,
+            history = void 0,
+            findNewStateIndex = void 0,
+            findOldStateIndex = void 0,
+            stateToAdd = void 0,
+            Tree = void 0,
+            currentHistoryState = void 0;
+
+        // data contains old state and new state
+        newState = states.newState;
+        oldState = states.oldState;
+        history = this.getHistory();
+        currentHistoryState = this.getCurrentHistoryState();
+
+        // check if we're resuming where we left off. ie, the updated state will match where we're at in the state history
+        if (currentHistoryState !== undefined && newState.type === currentHistoryState.type && newState.id === currentHistoryState.id) {
+            // do nothing! we're good
+            return;
+        }
+
+        Tree = this.getTree();
+        // try to find the new state in our history
+        findNewStateIndex = this.getHistoryItemIndex(newState);
+
+        // try to find the old state in our history
+        findOldStateIndex = this.getHistoryItemIndex(oldState);
+        // this.getIndexBy(history, 'id', oldState.id)
+
+        // If we can find the new state index in our history,
+        // then we don't want to ADD it to the history, we just want to
+        // change our currentIndex to match where they are.
+        // EX. Someone clicked the "back" or "forward" buttons.
+        // They're not adding history, they're just changing where they are
+        if (findNewStateIndex !== undefined) {
+            // set the currentIndex accordingly
+            this.setCurrentIndex(findNewStateIndex);
+        }
+
+        // try to find the previous state. is it the last one in the
+        // current state tree?
+        // if not, delete any history after the previous state.
+        // They've gone rogue by going back in history and
+        // then chose a new path
+        // unless we're going from Start to the First Question. We want to keep the overview in there.
+        else if (findOldStateIndex !== undefined && findOldStateIndex !== history.length - 1) {
+                // delete anything after this point, because they've changed their state history
+                // we don't want to delete one by one because:
+                // 1. we won't allow them to do that
+                // 2. it'll be a lot slower to delete one by one
+                // make sure we're not trying to delete the intro or tree states from the history
+                if (oldState.type !== 'intro' && oldState.type !== 'tree') {
+                    this.deleteHistoryAfter(findOldStateIndex + 1);
+                }
+
+                // add our new history
+                // set it as our var to add
+                stateToAdd = newState;
+            } else {
+                // welp, they're just going forwards.
+                // Nothing to do but add the state!
+                stateToAdd = newState;
+            }
+
+        // see if there's anything to add
+        if ((typeof stateToAdd === 'undefined' ? 'undefined' : _typeof(stateToAdd)) === 'object' && stateToAdd !== undefined) {
+            this.addHistory(stateToAdd);
+            // set the new current index
+            this.setCurrentIndex(this.getHistory().length - 1);
+        }
+    },
+
+    setObservers: function setObservers(observers) {
+        for (var i = 0; i < observers.length; i++) {
+            this.addObserver(observers[i]);
+        }
+        return this.observers;
+    },
+
+    addObserver: function addObserver(observer) {
+        // no need to validate. anyone can listen
+        // we do need to check to make sure the observer hasn't already
+        // been added
+        this.observers.push(observer);
+    },
+
+    getObservers: function getObservers() {
+        return this.observers;
+    },
+
+    notifyObservers: function notifyObservers(action, data) {
+        var _this = this;
+
+        var _loop = function _loop(i) {
+            // async emit
+            setTimeout(function () {
+                _this.observers[i].on(action, data);
+            }, 0);
+        };
+
+        for (var i = 0; i < this.observers.length; i++) {
+            _loop(i);
+        }
+    },
+
+    // finds an item in the history object.
+    getHistoryItemIndex: function getHistoryItemIndex(state) {
+        var history = void 0,
+            index = void 0;
+
+        history = this.getHistory();
+        // check for tree or intro here because there will only ever be one in the history
+        // and their ID is set as the tree_id which matches each other
+        if (state.type === 'tree' || state.type === 'intro') {
+            index = this.getIndexBy(history, 'type', state.type);
+        } else {
+            index = this.getIndexBy(history, 'id', state.id);
+        }
+
+        return index;
+    },
+
+
+    /**
+    * Powers most all of the retrieval of data from the tree
+    * Searches an array for a key that equals a certain value
+    *
+    * @param objArray (ARRAY of OBJECTS)
+    * @param name (STRING) of the key you're wanting to find the matching value of
+    * @param value (MIXED) the value you want to find a match for
+    * @return INT of the index that matches or UNDEFINED if not found
+    */
+    getIndexBy: function getIndexBy(objArray, name, value) {
+        for (var i = 0; i < objArray.length; i++) {
+            if (objArray[i][name] == value) {
+                return i;
+            }
+        }
+        return undefined;
+    }
+};
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -575,402 +1521,6 @@ TreeHistoryView.prototype = {
         button.data = data;
 
         return li;
-    }
-};
-'use strict';
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-/**
-* Manages localStorage of current question state
-* and previous states of the current decision tree path
-* (so people can go back to previous questions)
-*/
-function TreeHistory(options) {
-    var _Tree, _history, _historyStorageName, _currentIndex, // where in the history we're at (current state)
-    _currentIndexStorageName;
-
-    // keep an array of observers
-    this.observers = [];
-
-    /**
-    * Private functions
-    */
-    // save the passed history to localStorage and set the global _history to make sure everything is in sync
-    var _saveHistory = function _saveHistory(history) {
-        _history = history;
-        localStorage.setItem(_historyStorageName, JSON.stringify(_history));
-    };
-
-    var _saveCurrentIndex = function _saveCurrentIndex(currentIndex) {
-        _currentIndex = currentIndex;
-        localStorage.setItem(_currentIndexStorageName, JSON.stringify(_currentIndex));
-    };
-
-    // getters
-    this.getTree = function () {
-        return _Tree;
-    };
-    this.getHistory = function () {
-        return _history;
-    };
-    this.getCurrentIndex = function () {
-        return _currentIndex;
-    };
-
-    // setters
-    /**
-    * Clears the history and currentIndex to an empty state
-    */
-    this.clearHistory = function () {
-        var tree_id = void 0;
-        tree_id = this.getTree().getTreeID();
-        // create as the Tree intro state with overview and index at start.
-        var history = [{ type: 'intro', id: tree_id }, { type: 'tree', id: tree_id }];
-        var currentIndex = 0;
-
-        _saveHistory(history);
-        _saveCurrentIndex(currentIndex);
-    };
-
-    /**
-    * Sets the parent Tree
-    */
-    this.setTree = function (Tree) {
-        // only let it be set once
-        if (_Tree === undefined) {
-            _Tree = Tree;
-        }
-        return _Tree;
-    };
-
-    /**
-    * Sets variables and decides what state we'll init to
-    */
-    this.init = function () {
-        var treeID = void 0,
-            checkState = void 0;
-
-        // get the tree id
-        treeID = this.getTree().getTreeID();
-
-        // set global storage string
-        _historyStorageName = 'treeHistory__' + treeID;
-        _currentIndexStorageName = 'treeHistoryIndex__' + treeID;
-
-        // if localStorage is empty, create it
-        if (localStorage.getItem(_historyStorageName) === null) {
-            // sets a blank history and index
-            this.clearHistory();
-        }
-
-        // set from localStorage
-        this.setHistory(JSON.parse(localStorage.getItem(_historyStorageName)));
-        // set currentIndex from localStorage
-        this.setCurrentIndex(JSON.parse(localStorage.getItem(_currentIndexStorageName)));
-    };
-
-    this.setHistory = function (history) {
-        // TODO: different checks to make sure it's legit, like
-        // don't add the same state twice.
-        _saveHistory(history);
-        // notify observers
-        this.notifyObservers('historyUpdate', history);
-        return;
-    };
-
-    this.setCurrentIndex = function (index) {
-        var history = this.getHistory();
-        // Check that the index exists
-        if (index !== null && history[index] === undefined) {
-            console.error('Index not found in History.');
-            // Should we set the current index to null here?
-            return false;
-        }
-
-        // don't worry about matching that the state exists. Maybe someone wants to set the current index to the last one in the series. Who knows?
-        _saveCurrentIndex(index);
-        this.notifyObservers('historyIndexUpdate', index);
-        return;
-    };
-
-    this.setView = function (container) {};
-
-    // if a Tree was passed, build the History now
-    if (options.Tree) {
-        this.build(options.Tree);
-    }
-}
-
-TreeHistory.prototype = {
-    constructor: TreeHistory,
-
-    build: function build(Tree) {
-        var history = void 0;
-        this.setTree(Tree);
-        this.init();
-        // check the validity of the history, if it's not cool, clear history and run again
-        history = this.getHistory();
-        // if the first and second items aren't valid, reset it
-        if (history[0].type !== 'intro' || history[1].type !== 'tree') {
-            this.clearHistory();
-        }
-        this.forceCurrentState();
-    },
-
-    addHistory: function addHistory(state) {
-        // TODO: Validate state. Should be a function on the Tree
-        // check whitelist for state?
-
-        var history = this.getHistory();
-        // add the state to the history
-        history.push(state);
-        // save it
-        this.setHistory(history);
-    },
-
-    deleteHistoryAfter: function deleteHistoryAfter(index) {
-        var history = void 0;
-        // Don't let them delete the current state
-        if (index === this.getCurrentIndex()) {
-            console.error('Cannot delete current state.');
-            return false;
-        }
-
-        // don't allow them to delete history before the current index
-        if (index < this.getCurrentIndex) {
-            console.error('Cannot delete states before the current state.');
-            return false;
-        }
-
-        history = this.getHistory();
-        // ok, delete away!
-        // delete all history after the passed index
-        // splice returns the delete array elements
-        history.splice(index);
-        this.setHistory(history);
-    },
-
-    getCurrentHistoryState: function getCurrentHistoryState() {
-        var history = void 0,
-            currentIndex = void 0;
-
-        history = this.getHistory();
-        currentIndex = this.getCurrentIndex();
-
-        return history[currentIndex];
-    },
-
-    /**
-    * Let our Tree know about the state we want to change to.
-    */
-    emit: function emit(action, item, data) {
-
-        switch (action) {
-            case 'update':
-                var Tree = this.getTree();
-                Tree.update(item, data);
-                break;
-        }
-    },
-
-    /**
-    * Get messages from observers
-    */
-    message: function message(action, item, data) {
-        this.emit(action, item, data);
-    },
-
-    // tell the parent tree to update to our current state
-    forceCurrentState: function forceCurrentState() {
-        var currentIndex = void 0,
-            history = void 0;
-
-        currentIndex = this.getCurrentIndex();
-        history = this.getHistory();
-
-        if (this.currentIndex !== null && history[currentIndex] !== undefined) {
-            this.emit('update', 'state', history[currentIndex]);
-        }
-    },
-
-    /**
-    * Listen to parent Tree's emitted actions and handle accordingly
-    */
-    on: function on(action, data) {
-        switch (action) {
-            case 'ready':
-                // data will be the tree itself
-                this.build(data);
-                break;
-            case 'update':
-                this.update(data);
-                break;
-            case 'viewReady':
-                // build the view
-                // this.setView(data)
-                // get the container
-                var treeView = data;
-                var cWindow = treeView.getContentWindow();
-                var historyView = new TreeHistoryView({ TreeHistory: this, contentWindow: cWindow });
-                // add this to the observers
-                this.addObserver(historyView);
-                break;
-            case 'restart':
-                // delete the history
-                this.clearHistory();
-                break;
-            case 'start':
-                // delete the history
-                this.clearHistory();
-                break;
-        }
-
-        // notify observers of these changes
-        this.notifyObservers(action, data);
-    },
-
-    // updates the history state
-    update: function update(states) {
-        var newState = void 0,
-            oldState = void 0,
-            history = void 0,
-            findNewStateIndex = void 0,
-            findOldStateIndex = void 0,
-            stateToAdd = void 0,
-            Tree = void 0,
-            currentHistoryState = void 0;
-
-        // data contains old state and new state
-        newState = states.newState;
-        oldState = states.oldState;
-        history = this.getHistory();
-        currentHistoryState = this.getCurrentHistoryState();
-
-        // check if we're resuming where we left off. ie, the updated state will match where we're at in the state history
-        if (currentHistoryState !== undefined && newState.type === currentHistoryState.type && newState.id === currentHistoryState.id) {
-            // do nothing! we're good
-            return;
-        }
-
-        Tree = this.getTree();
-        // try to find the new state in our history
-        findNewStateIndex = this.getHistoryItemIndex(newState);
-
-        // try to find the old state in our history
-        findOldStateIndex = this.getHistoryItemIndex(oldState);
-        // this.getIndexBy(history, 'id', oldState.id)
-
-        // If we can find the new state index in our history,
-        // then we don't want to ADD it to the history, we just want to
-        // change our currentIndex to match where they are.
-        // EX. Someone clicked the "back" or "forward" buttons.
-        // They're not adding history, they're just changing where they are
-        if (findNewStateIndex !== undefined) {
-            // set the currentIndex accordingly
-            this.setCurrentIndex(findNewStateIndex);
-        }
-
-        // try to find the previous state. is it the last one in the
-        // current state tree?
-        // if not, delete any history after the previous state.
-        // They've gone rogue by going back in history and
-        // then chose a new path
-        // unless we're going from Start to the First Question. We want to keep the overview in there.
-        else if (findOldStateIndex !== undefined && findOldStateIndex !== history.length - 1) {
-                // delete anything after this point, because they've changed their state history
-                // we don't want to delete one by one because:
-                // 1. we won't allow them to do that
-                // 2. it'll be a lot slower to delete one by one
-                // make sure we're not trying to delete the intro or tree states from the history
-                if (oldState.type !== 'intro' && oldState.type !== 'tree') {
-                    this.deleteHistoryAfter(findOldStateIndex + 1);
-                }
-
-                // add our new history
-                // set it as our var to add
-                stateToAdd = newState;
-            } else {
-                // welp, they're just going forwards.
-                // Nothing to do but add the state!
-                stateToAdd = newState;
-            }
-
-        // see if there's anything to add
-        if ((typeof stateToAdd === 'undefined' ? 'undefined' : _typeof(stateToAdd)) === 'object' && stateToAdd !== undefined) {
-            this.addHistory(stateToAdd);
-            // set the new current index
-            this.setCurrentIndex(this.getHistory().length - 1);
-        }
-    },
-
-    setObservers: function setObservers(observers) {
-        for (var i = 0; i < observers.length; i++) {
-            this.addObserver(observers[i]);
-        }
-        return this.observers;
-    },
-
-    addObserver: function addObserver(observer) {
-        // no need to validate. anyone can listen
-        // we do need to check to make sure the observer hasn't already
-        // been added
-        this.observers.push(observer);
-    },
-
-    getObservers: function getObservers() {
-        return this.observers;
-    },
-
-    notifyObservers: function notifyObservers(action, data) {
-        var _this = this;
-
-        var _loop = function _loop(i) {
-            // async emit
-            setTimeout(function () {
-                _this.observers[i].on(action, data);
-            }, 0);
-        };
-
-        for (var i = 0; i < this.observers.length; i++) {
-            _loop(i);
-        }
-    },
-
-    // finds an item in the history object.
-    getHistoryItemIndex: function getHistoryItemIndex(state) {
-        var history = void 0,
-            index = void 0;
-
-        history = this.getHistory();
-        // check for tree or intro here because there will only ever be one in the history
-        // and their ID is set as the tree_id which matches each other
-        if (state.type === 'tree' || state.type === 'intro') {
-            index = this.getIndexBy(history, 'type', state.type);
-        } else {
-            index = this.getIndexBy(history, 'id', state.id);
-        }
-
-        return index;
-    },
-
-
-    /**
-    * Powers most all of the retrieval of data from the tree
-    * Searches an array for a key that equals a certain value
-    *
-    * @param objArray (ARRAY of OBJECTS)
-    * @param name (STRING) of the key you're wanting to find the matching value of
-    * @param value (MIXED) the value you want to find a match for
-    * @return INT of the index that matches or UNDEFINED if not found
-    */
-    getIndexBy: function getIndexBy(objArray, name, value) {
-        for (var i = 0; i < objArray.length; i++) {
-            if (objArray[i][name] == value) {
-                return i;
-            }
-        }
-        return undefined;
     }
 };
 'use strict';
@@ -2079,471 +2629,87 @@ TreeView.prototype = {
 };
 'use strict';
 
-/**
-* Must have one view to initialize
-*/
-(function () {
+Handlebars.registerHelper('environment', function (options) {
+    return 'has-js';
+});
 
-    function Tree(data, observers) {
-        var _data, _state;
-
-        // keep an array of observers
-        this.observers = [];
-
-        /**
-        * Private functions
-        */
-        var _validateData = function _validateData(data) {
-            // TODO: make sure the data is valid
-            return true;
-        };
-
-        /*
-        * Private function to set Data and State on Init
-        */
-        var _setData = function _setData(data) {
-            _data = data;
-            _state = {
-                id: data.tree_id,
-                type: 'intro'
-            };
-        };
-
-        /**
-        ** Public functinos
-        **/
-
-        // getters
-        this.getData = function () {
-            return _data;
-        };
-        this.getState = function () {
-            return _state;
-        };
-
-        // setters
-        this.setState = function (stateType, stateID) {
-            var whitelist = void 0,
-                validateState = void 0,
-                oldState = void 0,
-                newState = void 0;
-
-            whitelist = ['intro', 'tree', 'start', 'question', 'end'];
-
-            // TODO: Check that start can't go straight to end?
-            // TODO: Check that the next state is valid from the question's options?
-
-            // check allowed states
-            if (!whitelist.includes(stateType)) {
-                console.error(stateType + " is not an allowed state. Allowed states are " + whitelist.toString());
-                this.emitError('invalidStateType', {
-                    stateType: stateType,
-                    stateID: stateID
-                });
-                return false;
-            }
-            // check if stateID is valid
-            if (stateID === null || stateID === '' || stateID === undefined) {
-                console.error('StateID is empty: ' + stateID);
-                // return false
-            }
-
-            // check to make sure we're not trying to set the same state again
-            if (_state.type === stateType && _state.id === stateID) {
-                return false;
-            }
-
-            // check if the stateID is a valid ID for this state
-            if (stateType === 'tree') {
-                if (stateID === this.getTreeID()) {
-                    validateState = true;
-                } else {
-                    validateState = false;
-                }
-            } else if (stateType === 'intro') {
-                // it's always fine
-                validateState = true;
+Handlebars.registerHelper('group_start', function (question_id, group_id, groups, options) {
+    // find the group
+    for (var i = 0; i < groups.length; i++) {
+        if (groups[i].group_id === group_id) {
+            // check if it's the first in the question order
+            if (groups[i].questions[0] === question_id) {
+                // pass the values we'll need in the template
+                return options.fn({ group_id: groups[i].group_id, group_title: groups[i].title });
             } else {
-                validateState = this.getDataByType(stateType, stateID);
+                return '';
+            }
+        }
+    }
+    return '';
+});
+
+Handlebars.registerHelper('group_end', function (question_id, group_id, groups, options) {
+    // find the group
+    for (var i = 0; i < groups.length; i++) {
+        if (groups[i].group_id === group_id) {
+            var questions = groups[i].questions;
+            // check if it's the last in the question order
+            if (questions[questions.length - 1] === question_id) {
+                return options.fn(this);
+            } else {
+                return '';
+            }
+        }
+    }
+    return '';
+});
+
+Handlebars.registerHelper('el_number', function (el_order) {
+
+    // for the arrow direction we could calculate the position on the tree-view and set an angle so the arrow points towards the destination...
+    return parseInt(el_order) + 1;
+});
+
+Handlebars.registerHelper('destination', function (destination_id, destination_type, option_id, question_index, options) {
+    var data = void 0,
+        destination = void 0,
+        destination_number = void 0,
+        destination_title = void 0,
+        destination_icon = void 0,
+        i = void 0;
+    // set data (either questions or ends most likely) from main data tree
+    data = options.data.root[destination_type + 's'];
+    i = 0;
+    if (destination_type === 'question') {
+        // start it at the question_index.
+        // An option will never go backwards, so we don't care
+        // about the previous ones
+        i = question_index;
+    }
+
+    // find the destination
+    for (i; i < data.length; i++) {
+        if (data[i][destination_type + '_id'] === destination_id) {
+            destination = data[i];
+            if (destination_type === 'question') {
+                destination_number = i + 1;
+                destination_title = 'Question ' + destination_number;
+                destination_icon = 'arrow';
+            } else {
+                destination_title = data[i].title;
+                destination_icon = '';
             }
 
-            if (validateState === false || validateState === undefined) {
-                console.error(stateID + " is invalid for the current state of '" + stateType + "'");
-                this.emitError('invalidState', {
-                    stateType: stateType,
-                    stateID: stateID
-                });
-                return false;
-            }
-
-            // looks valid! Set the state
-            // store the old state
-            oldState = {
-                type: _state.type,
-                id: _state.id
-
-                // set the state
-            };_state.type = stateType;
-            _state.id = stateID;
-
-            // build a new state
-            newState = {
-                type: _state.type,
-                id: _state.id
-                // emit that we've changed it
-            };this.emit('update', { newState: newState, oldState: oldState });
-        };
-
-        /***********************
-        ******** INIT  *********
-        ***********************/
-        // set the data
-        if (_validateData(data)) {
-            // start with one observer so we can
-            // alert them on ready
-            this.setObservers(observers);
-            // set the data
-            _setData(data);
-            // emit that we're ready for other code to utilize this tree
-            this.emit('ready', this);
-        } else {
-            console.error('Tree data is invalid.');
-            return false;
+            break;
         }
     }
 
-    Tree.prototype = {
-        constructor: Tree,
-
-        /**
-        * Let Observers know about different actions
-        * 'ready', 'update', 'error'
-        */
-        emit: function emit(action, data) {
-            var _this = this;
-
-            var _loop = function _loop(i) {
-                // make the alert process async
-                setTimeout(function () {
-                    _this.observers[i].on(action, data);
-                }, 0);
-            };
-
-            for (var i = 0; i < this.observers.length; i++) {
-                _loop(i);
-            }
-        },
-
-        /**
-        * Let our observers know about the error
-        */
-        emitError: function emitError(action, data) {
-            this.emit('error', {
-                action: action,
-                data: data
-            });
-        },
-
-        /**
-        * Request to update the tree o
-        */
-        update: function update(action, data) {
-            switch (action) {
-                // data will be the element clicked
-                case 'state':
-                    this.updateState(data);
-                    break;
-            }
-        },
-
-        /**
-        * How observers message the parent and each other
-        */
-        message: function message(action, data) {
-            this.emit(action, data);
-        },
-
-        /**
-        * Attempt to update a sate
-        * Validation and emitting happens with setState
-        */
-        updateState: function updateState(data) {
-            var id = void 0,
-                type = void 0;
-            switch (data.type) {
-                case 'intro':
-                    this.setState('intro', this.getTreeID());
-                    break;
-                case 'start':
-                    // emit a start
-                    this.emit('start', this);
-
-                    // go to first question
-                    var question = this.getQuestions()[0];
-                    this.setState('question', question.question_id);
-                    break;
-
-                case 'question':
-                    if (data.question_id === undefined) {
-                        id = data.id;
-                    } else {
-                        id = data.question_id;
-                    }
-                    // find the destination
-                    this.setState(data.type, id);
-                    break;
-
-                case 'option':
-                    // find the destination
-                    this.setState(data.destination_type, data.destination_id);
-                    break;
-
-                case 'end':
-                    // find the destination
-                    if (data.destination_type === undefined) {
-                        type = data.type;
-                    } else {
-                        type = data.destination_type;
-                    }
-                    if (data.destination_id === undefined) {
-                        id = data.id;
-                    } else {
-                        type = data.destination_id;
-                    }
-                    this.setState(type, id);
-                    break;
-
-                // two ways to get to the tree overview 'overview' or 'tree'
-                case 'overview':
-                    // go to tree overview
-                    this.setState('tree', this.getTreeID());
-                    break;
-                case 'tree':
-                    // go to tree overview
-                    this.setState('tree', this.getTreeID());
-                    break;
-                case 'restart':
-                    // emit a restart
-                    this.emit('restart', this);
-                    // go to first question
-                    this.setState('question', this.getQuestions()[0].question_id);
-                    break;
-            }
-        },
-
-        /**
-        * Allowed types, 'question', 'group', 'end', 'start'
-        */
-        getDataByType: function getDataByType(type, id) {
-            var typeIndex = void 0,
-                whitelist = void 0,
-                data = void 0;
-            // check allowed types
-            whitelist = ['question', 'group', 'end', 'start'];
-
-            if (!whitelist.includes(type)) {
-                console.error("Allowed getDataByType types are " + whitelist.toString());
-                return false;
-            }
-            // get the data of this type
-            data = this.getData();
-            // append 's' to get the right array
-            // 'question' becomes 'questions'
-            data = data[type + 's'];
-
-            // if there's an ID, let's get the specific one they're after
-            if (id !== undefined) {
-                // get the individual item
-                typeIndex = this.getIndexBy(data, type + '_id', id);
-                if (typeIndex !== undefined) {
-                    // found one!
-                    data = data[typeIndex];
-                } else {
-                    data = undefined;
-                }
-            }
-
-            return data;
-        },
-
-        getTreeID: function getTreeID() {
-            return this.getData().tree_id;
-        },
-
-        getQuestions: function getQuestions(id) {
-            var question = void 0;
-            if (id !== undefined) {
-                // get the individual item
-                question = this.getDataByType('question', id);
-            } else {
-                question = this.getDataByType('question');
-            }
-            return question;
-        },
-
-        getStarts: function getStarts(id) {
-            var start = void 0;
-            if (id !== undefined) {
-                // get the individual item
-                start = this.getDataByType('start', id);
-            } else {
-                start = this.getDataByType('start');
-            }
-            return start;
-        },
-
-        getEnds: function getEnds(id) {
-            var end = void 0;
-            if (id !== undefined) {
-                // get the individual item
-                end = this.getDataByType('end', id);
-            } else {
-                end = this.getDataByType('end');
-            }
-            return end;
-        },
-
-        getGroups: function getGroups(id) {
-            var group = void 0;
-            if (id !== undefined) {
-                // get the individual item
-                group = this.getDataByType('group', id);
-            } else {
-                group = this.getDataByType('group');
-            }
-            return group;
-        },
-
-        getOptions: function getOptions(question_id, option_id) {
-            var option = void 0,
-                optionIndex = void 0,
-                question = void 0;
-
-            // get the individual item
-            question = this.getQuestions(question_id);
-
-            if (option_id !== undefined) {
-                optionIndex = this.getIndexBy(question.options, 'option_id', option_id);
-                option = question.options[optionIndex];
-            } else {
-                option = question.options;
-            }
-
-            return option;
-        },
-
-        setObservers: function setObservers(observers) {
-            for (var i = 0; i < observers.length; i++) {
-                this.addObserver(observers[i]);
-            }
-            return this.observers;
-        },
-
-        addObserver: function addObserver(observer) {
-            // no need to validate. anyone can listen
-            // we do need to check to make sure the observer hasn't already
-            // been added
-            this.observers.push(observer);
-        },
-
-        getObservers: function getObservers() {
-            return this.observers;
-        },
-
-        /**
-        * Powers most all of the retrieval of data from the tree
-        * Searches an array for a key that equals a certain value
-        *
-        * @param objArray (ARRAY of OBJECTS)
-        * @param name (STRING) of the key you're wanting to find the matching value of
-        * @param value (MIXED) the value you want to find a match for
-        * @return INT of the index that matches or UNDEFINED if not found
-        */
-        getIndexBy: function getIndexBy(objArray, name, value) {
-            for (var i = 0; i < objArray.length; i++) {
-                if (objArray[i][name] == value) {
-                    return i;
-                }
-            }
-            return undefined;
-        }
-    };
-
-    function createTree(options) {
-        // required options
-        if (typeof options.slug !== 'string') {
-            console.error('Tree slug must be a string.');
-            return false;
-        }
-        // INIT
-        // Request our Tree Data
-        // create the tree
-        getTreeData(options.slug).then(buildTree.bind(options)).catch(handleTreeDataError);
-    }
-
-    function getTreeData(slug) {
-
-        return new Promise(function (resolve, reject) {
-            var baseUrl = void 0;
-            if (/https?:\/\/(?:dev\/decision-tree|localhost:3000\/decision-tree)\//.test(window.location.href)) {
-                baseUrl = 'http://dev/decision-tree';
-            } else {
-                baseUrl = 'http://enptree.wpengine.com';
-            }
-
-            var request = new XMLHttpRequest();
-            request.overrideMimeType("application/json");
-            request.open('GET', baseUrl + '/api/v1/trees/' + slug + '/compiled?minified=true', true);
-            //request.responseType = 'json';
-            // When the request loads, check whether it was successful
-            request.onload = function () {
-                if (request.status === 200) {
-                    // If successful, resolve the promise by passing back the request response
-                    resolve(request);
-                } else {
-                    // If it fails, reject the promise with a error message
-                    reject(Error('Tree could not be loaded:' + request.statusText));
-                }
-            };
-            request.onerror = function () {
-                // Also deal with the case when the entire request fails to begin with
-                // This is probably a network error, so reject the promise with an appropriate message
-                reject(Error('There was a network error.'));
-            };
-            // Send the request
-            request.send();
-        });
-    }
-
-    function buildTree(request) {
-
-        // check our response URL to make sure it's from a trusted source
-        if (!/https?:\/\/(?:dev\/decision-tree|tree\.engagingnewsproject\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
-            console.error('responseURL from an invalidated source.');
-            return false;
-        }
-
-        var data = JSON.parse(request.response);
-        var treeView = new TreeView({
-            container: this.container
-        });
-        var treeHistory = new TreeHistory({});
-        // add the observers
-        // bind history first so it will load the correct state and
-        // not cause layout to have to be repainted twice (if different states)
-        var observers = [treeHistory, treeView];
-        // build the tree
-        var tree = new Tree(data, observers);
-        // send it to our trees array for access
-        trees.push(tree);
-    }
-
-    function handleTreeDataError(err) {
-        console.error(err);
-    }
-
-    var trees = [];
-    window.Tree = Tree;
-    window.createTree = createTree;
-    window.trees = trees;
-})(window);
+    // for the arrow direction we could calculate the position on the tree-view and set an angle so the arrow points towards the destination...
+    return options.fn({
+        destination_title: destination_title,
+        destination_type: destination_type,
+        destination_icon: destination_icon,
+        option_id: option_id
+    });
+});
