@@ -443,7 +443,7 @@ function getTreeData(slug) {
 function buildTree(request) {
 
     // check our response URL to make sure it's from a trusted source
-    if(!/https?:\/\/(?:dev\/decision-tree|tree\.engagingnewsproject\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
+    if(!/https?:\/\/(?:dev\/decision-tree|tree\.mediaengagement\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
         console.error('responseURL from an invalidated source.')
         return false;
     }
@@ -457,10 +457,16 @@ function buildTree(request) {
     let treeHistory = new TreeHistory({});
     // Manages passes usage Data to CME so we can continue to get funding to continue developing this tool and create new ones
     let treeData = new TreeData({});
+    // Small postmessage package for iframe loads. Doesn't do anything if not an iframe load.
+
     // add the observers
     // bind history first so it will load the correct state and
     // not cause layout to have to be repainted twice (if different states)
     let observers = [treeHistory, treeView, treeData]
+    // if we're in an iframe, add the postMessage listener
+    if(window.self.location !== window.top.location) {
+        observers.push(new TreePostMessage({}));
+    }
     // build the tree
     let tree = new Tree(data, observers);
     // send it to our trees array for access

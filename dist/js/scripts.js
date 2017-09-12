@@ -440,7 +440,7 @@
     function buildTree(request) {
 
         // check our response URL to make sure it's from a trusted source
-        if (!/https?:\/\/(?:dev\/decision-tree|tree\.engagingnewsproject\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
+        if (!/https?:\/\/(?:dev\/decision-tree|tree\.mediaengagement\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
             console.error('responseURL from an invalidated source.');
             return false;
         }
@@ -454,10 +454,16 @@
         var treeHistory = new TreeHistory({});
         // Manages passes usage Data to CME so we can continue to get funding to continue developing this tool and create new ones
         var treeData = new TreeData({});
+        // Small postmessage package for iframe loads. Doesn't do anything if not an iframe load.
+
         // add the observers
         // bind history first so it will load the correct state and
         // not cause layout to have to be repainted twice (if different states)
         var observers = [treeHistory, treeView, treeData];
+        // if we're in an iframe, add the postMessage listener
+        if (window.self.location !== window.top.location) {
+            observers.push(new TreePostMessage({}));
+        }
         // build the tree
         var tree = new Tree(data, observers);
         // send it to our trees array for access
@@ -599,12 +605,13 @@ function TreeData(options) {
         // what do we want to do here? Save that the tree loaded?
         this.setPostURL();
         // send our load
-        this.saveData({ "action": "loaded" }).then(this.log);
+        this.saveData({ "action": "loaded" }).then(this.response);
     };
 
-    this.log = function (request) {
+    this.response = function (request) {
+        // response from the server
         var data = JSON.parse(request.response);
-        console.log(data);
+        // console.log(data)
     };
 
     // set the rootURL
@@ -1554,6 +1561,106 @@ TreeHistoryView.prototype = {
         button.data = data;
 
         return li;
+    }
+};
+'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/**
+* Sends postmessages to the parent iframe if there is one
+*/
+function TreePostMessage(options) {
+    var _Tree;
+
+    // getters
+    this.getTree = function () {
+        return _Tree;
+    };
+
+    // setters
+    /**
+    * Sets the parent Tree
+    */
+    this.setTree = function (Tree) {
+        // only let it be set once
+        if (_Tree === undefined) {
+            _Tree = Tree;
+        }
+        return _Tree;
+    };
+
+    this.init = function () {
+        // add our event listener for postmessages
+        window.addEventListener("message", this.recieveMessage.bind(this), false);
+    };
+
+    // if a Tree was passed, Do whatever you need to do
+    if (options.Tree) {
+        this.build(options.Tree);
+    }
+}
+
+TreePostMessage.prototype = {
+    constructor: TreePostMessage,
+
+    build: function build(Tree) {
+        this.setTree(Tree);
+        this.init();
+    },
+
+    /**
+    * Listen to parent Tree's emitted actions and handle accordingly
+    */
+    on: function on(action, data) {
+        switch (action) {
+            case 'ready':
+                // data will be the tree itself
+                this.build(data);
+                break;
+        }
+        // pass the message on to the parent
+        // add the action to our data to pass
+        data.action = action;
+        this.postIt(data);
+    },
+
+    // send the postmessage
+    postIt: function postIt(data) {
+        if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) !== 'object') {
+            console.error('PostMessage data is not an object');
+            return false;
+        }
+        data.tree_id = this.getTree().getTreeID();
+        console.log('postIt send', data);
+
+        // allow all domains to access this info (*)
+        parent.postMessage(JSON.stringify(data), "*");
+        // if you want to see what was sent
+        return data;
+    },
+
+    recieveMessage: function recieveMessage(event) {
+        var data = void 0;
+        // check to make sure we received a string
+        if (typeof event.data !== 'string') {
+            return false;
+        }
+        // get the data
+        data = event.data;
+
+        // see what they want to do
+        console.log('Iframe Recieved Message', data);
+        // they want us to send something... what do they want to send?
+        // if they want the bodyHeight, then send the bodyHeight!
+        /*if(data.action === 'sendBodyHeight') {
+            sendBodyHeight();
+        } else if(data.action === 'setShareURL') {
+            setShareURL(data.parentURL);
+            setCalloutURL(data.parentURL);
+        } else if(data.action === 'sendSaveSite') {
+            sendSaveSite();
+        }*/
     }
 };
 'use strict';

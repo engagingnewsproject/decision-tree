@@ -118,12 +118,13 @@ function TreeData(options) {
         this.setPostURL()
         // send our load
         this.saveData({"action": "loaded"})
-            .then(this.log);
+            .then(this.response);
     }
 
-    this.log = function(request) {
+    this.response = function(request) {
+        // response from the server
         let data = JSON.parse(request.response)
-        console.log(data)
+        // console.log(data)
     }
 
     // set the rootURL
