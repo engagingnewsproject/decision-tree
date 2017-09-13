@@ -87,16 +87,14 @@ document.onreadystatechange = function () {
 function CmeIframeTree(data) {
 
     this.iframe = data.iframe;
-    console.log(data.iframe);
     this.iframeID = data.iframe.id;
-    this.quizID = data.quizID;
-    this.abTestID = data.abTestID;
+    this.treeID = data.treeID;
     this.parentURL = data.parentURL;
     this.siteName = this.setSiteName();
     this.saveEmbedSiteComplete = false;
-    this.saveEmbedQuizComplete = false;
+    this.saveEmbedTreeComplete = false;
     this.embedSiteID = false;
-    this.embedQuizID = false;
+    this.embedTreeID = false;
 
     // load it!
     this.onLoadIframe();
@@ -118,15 +116,15 @@ CmeIframeTree.prototype = {
         this.saveEmbedSiteComplete = val;
     },
 
-    getSaveEmbedQuizComplete: function getSaveEmbedQuizComplete() {
-        return this.saveEmbedQuizComplete;
+    getSaveEmbedTreeComplete: function getSaveEmbedTreeComplete() {
+        return this.saveEmbedTreeComplete;
     },
 
-    setSaveEmbedQuizComplete: function setSaveEmbedQuizComplete(val) {
+    setSaveEmbedTreeComplete: function setSaveEmbedTreeComplete(val) {
         if (typeof val !== 'boolean') {
             return;
         }
-        this.saveEmbedQuizComplete = val;
+        this.saveEmbedTreeComplete = val;
     },
 
     setSiteName: function setSiteName(siteName) {
@@ -160,17 +158,19 @@ CmeIframeTree.prototype = {
         console.log('parent recieved message', data);
 
         // find out what we need to do with it
-        if (data.action === 'setHeight') {
-            response.setQuizHeight = this.setQuizHeight(data.height);
-        } else if (data.action === 'scrollToQuiz' || data.action === 'quizRestarted') {
-            response.scrollToQuizResponse = this.scrollToQuiz();
-        } else if (data.action === 'sendURL') {
-            // send the url of the parent (that embedded the quiz)
-            response.sendParentURLResponse = this.sendParentURL();
-        } else if (data.action === 'saveSite') {
-            // log embed
-            this.saveEmbedSite(origin, data, this.handleEmbedSiteResponse, this);
+        if (data.action === 'treeHeight') {
+            response.setTreeHeight = this.setTreeHeight(data.treeHeight);
         }
+        // anytime there's a state update, scroll to the quiz, but not on load
+        else if (data.action === 'update' && data.data.updatedBy !== 'forceCurrentState') {
+                response.scrollToQuizResponse = this.scrollToQuiz();
+            } else if (data.action === 'sendURL') {
+                // send the url of the parent (that embedded the quiz)
+                response.sendParentURLResponse = this.sendParentURL();
+            } else if (data.action === 'saveSite') {
+                // log embed
+                this.saveEmbedSite(origin, data, this.handleEmbedSiteResponse, this);
+            }
 
         // send a response sayin, yea, we got it!
         // event.source.postMessage("success!", event.origin);
@@ -227,15 +227,11 @@ CmeIframeTree.prototype = {
     /**
     * Sets the height of the iframe on the page
     */
-    setQuizHeight: function setQuizHeight(height) {
-        // Test the data
-        if (/([0-9])px/.test(height)) {
-            // set the height on the style
-            this.iframe.style.height = height;
-            return height;
-        } else {
-            return false;
-        }
+    setTreeHeight: function setTreeHeight(height) {
+        console.log(height);
+        // set the height on the style
+        this.iframe.style.height = height + 'px';
+        return height;
     },
 
     /**
@@ -273,50 +269,37 @@ CmeIframeTree.prototype = {
         head.appendChild(style);
     },
 
-    serialize: function serialize(data) {
-        var result = '';
-
-        for (var key in data) {
-            result += key + '=' + data[key] + '&';
-        }
-        result = result.slice(0, result.length - 1);
-        return result;
-    },
-
     saveEmbedSite: function saveEmbedSite(origin, data, callback, boundThis) {
         if (this.getSaveEmbedSiteComplete() === true) {
             return false;
         }
         var response;
-        var xhr = new XMLHttpRequest();
+        var request = new XMLHttpRequest();
 
-        xhr.open('POST', origin + '/wp-content/plugins/enp-quiz/database/class-enp_quiz_save_embed.php');
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+        request.open('POST', origin + '/sites/new');
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        request.onreadystatechange = function () {
+            if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
                 boundThis.setSaveEmbedSiteComplete(true);
-                response = JSON.parse(xhr.responseText);
+                response = JSON.parse(request.responseText);
                 if (response.status === 'success') {
                     response.origin = origin;
-                    response.quiz_id = data.quiz_id;
+                    response.tree_id = data.tree_id;
                     if (typeof callback == "function") {
                         callback(response, boundThis);
                     }
                 } else {
                     console.log('XHR request for saveEmbedSite successful but returned response error: ' + JSON.stringify(response));
                 }
-            } else if (xhr.status !== 200) {
-                console.log('Request failed.  Returned status of ' + xhr.status);
+            } else if (request.status !== 200) {
+                console.log('Request failed.  Returned status of ' + request.status);
             }
         };
 
         data.embed_site_url = this.parentURL;
         data.embed_site_name = this.getSiteName();
-        data.save = 'embed_site';
-        data.action = 'insert';
-        data.doing_ajax = 'true';
 
-        xhr.send(encodeURI(this.serialize(data)));
+        request.send(JSON.stringify(data));
     },
 
     /**
@@ -326,58 +309,55 @@ CmeIframeTree.prototype = {
         // set the site ID
         boundThis.embedSiteID = response.embed_site_id;
         if (0 < parseInt(boundThis.embedSiteID)) {
-            // send a request to save/update the enp_embed_quiz table
-            boundThis.saveEmbedQuiz(response, boundThis.handleEmbedQuizResponse, boundThis);
+            // send a request to save/update the enp_embed_tree table
+            boundThis.saveEmbedTree(response, boundThis.handleEmbedTreeResponse, boundThis);
             return response;
         } else {
             console.log('Could\'t locate a valid Embed Site');
         }
     },
 
-    saveEmbedQuiz: function saveEmbedQuiz(data, callback, boundThis) {
-        if (this.getSaveEmbedQuizComplete() === true) {
+    saveEmbedTree: function saveEmbedTree(data, callback, boundThis) {
+        if (this.getSaveEmbedTreeComplete() === true) {
             return false;
         }
 
         var response;
-        var xhr = new XMLHttpRequest();
+        var request = new XMLHttpRequest();
 
-        xhr.open('POST', data.origin + '/wp-content/plugins/enp-quiz/database/class-enp_quiz_save_embed.php');
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                boundThis.setSaveEmbedQuizComplete(true);
-                response = JSON.parse(xhr.responseText);
+        request.open('POST', data.origin + '/sites/' + data.embed_site_id + '/embed/new');
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        request.onreadystatechange = function () {
+            if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
+                boundThis.setSaveEmbedTreeComplete(true);
+                response = JSON.parse(request.responseText);
                 if (response.status === 'success') {
                     if (typeof callback == "function") {
                         callback(response, boundThis);
                     }
                 } else {
-                    console.log('XHR request for saveEmbedQuiz successful but returned response error: ' + JSON.stringify(response));
+                    console.log('XHR request for saveEmbedTree successful but returned response error: ' + JSON.stringify(response));
                 }
-            } else if (xhr.status !== 200) {
-                console.log('Request failed.  Returned status of ' + xhr.status);
+            } else if (request.status !== 200) {
+                console.log('Request failed.  Returned status of ' + request.status);
             }
         };
 
-        embed_quiz = {
-            'save': 'embed_quiz',
-            'embed_site_id': data.embed_site_id,
-            'quiz_id': data.quiz_id,
-            'embed_quiz_url': this.parentURL,
-            'doing_ajax': 'true'
+        embed_tree = {
+            'tree_id': data.tree_id,
+            'embed_tree_url': this.parentURL
         };
 
-        xhr.send(encodeURI(this.serialize(embed_quiz)));
+        request.send(JSON.stringify(embed_tree));
     },
 
     /**
     * What to do after we recieve a response about saving the embed site
     */
-    handleEmbedQuizResponse: function handleEmbedQuizResponse(response, boundThis) {
-        // set the embedQuizID
-        boundThis.embedQuizID = response.embed_quiz_id;
-        if (0 < parseInt(boundThis.embedQuizID)) {
+    handleEmbedTreeResponse: function handleEmbedTreeResponse(response, boundThis) {
+        // set the embedTreeID
+        boundThis.embedTreeID = response.embed_tree_id;
+        if (0 < parseInt(boundThis.embedTreeID)) {
             return response;
         } else {
             console.log('Could\'t locate a valid Embed Quiz');

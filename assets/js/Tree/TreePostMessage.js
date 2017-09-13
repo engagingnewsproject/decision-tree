@@ -45,11 +45,20 @@ TreePostMessage.prototype = {
     * Listen to parent Tree's emitted actions and handle accordingly
     */
     on: function(action, data) {
+        console.log('data', data)
         switch(action) {
             case 'ready':
                 // data will be the tree itself
                 this.build(data)
                 break
+            case 'viewHeightUpdate':
+                // make a request to get the full treeHeight
+                // wait til the height animation is finished before we set the finished height
+                setTimeout(()=>{
+                    this.getTree().message('getTreeHeight', {})
+                }, 500);
+                break;
+
         }
         // pass the message on to the parent
         // add the action to our data to pass

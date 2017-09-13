@@ -127,6 +127,9 @@ TreeView.prototype = {
             case 'update':
                 this.updateState(data)
                 break
+            // used by PostMessage to get the tree height to pass to the iframe
+            case 'getTreeHeight':
+                this.emit('treeHeight', 'treeHeight', {treeHeight: this.getTreeHeight()})
         }
     },
 
@@ -223,6 +226,10 @@ TreeView.prototype = {
     	document.head.appendChild(style)
 
     	return style.sheet
+    },
+
+    getTreeHeight: function() {
+        return this.getAbsoluteBoundingRect(this.getContainer()).height
     },
 
     /**
@@ -643,7 +650,7 @@ TreeView.prototype = {
     },
 
     /**
-    * Let our Tree know about the click.
+    * Let our Tree know about thangs.
     */
     emit: function(action, item, data) {
         let Tree = this.getTree()
@@ -659,6 +666,8 @@ TreeView.prototype = {
             case 'viewChange':
                 Tree.message(item, data)
                 break
+            case 'treeHeight':
+                Tree.message(item, data)
         }
 
     },
@@ -803,7 +812,6 @@ TreeView.prototype = {
     @param {HTMLElement} el HTML element.
     @return {Object} Absolute bounding rect for _el_.
     */
-
     getAbsoluteBoundingRect: function(el) {
         var doc  = document,
             win  = window,

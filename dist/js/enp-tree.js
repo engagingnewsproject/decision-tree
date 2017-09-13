@@ -3259,11 +3259,22 @@ TreePostMessage.prototype = {
     * Listen to parent Tree's emitted actions and handle accordingly
     */
     on: function on(action, data) {
+        var _this = this;
+
+        console.log('data', data);
         switch (action) {
             case 'ready':
                 // data will be the tree itself
                 this.build(data);
                 break;
+            case 'viewHeightUpdate':
+                // make a request to get the full treeHeight
+                // wait til the height animation is finished before we set the finished height
+                setTimeout(function () {
+                    _this.getTree().message('getTreeHeight', {});
+                }, 500);
+                break;
+
         }
         // pass the message on to the parent
         // add the action to our data to pass
@@ -3448,6 +3459,9 @@ TreeView.prototype = {
             case 'update':
                 this.updateState(data);
                 break;
+            // used by PostMessage to get the tree height to pass to the iframe
+            case 'getTreeHeight':
+                this.emit('treeHeight', 'treeHeight', { treeHeight: this.getTreeHeight() });
         }
     },
 
@@ -3544,6 +3558,10 @@ TreeView.prototype = {
         document.head.appendChild(style);
 
         return style.sheet;
+    },
+
+    getTreeHeight: function getTreeHeight() {
+        return this.getAbsoluteBoundingRect(this.getContainer()).height;
     },
 
     /**
@@ -3959,7 +3977,7 @@ TreeView.prototype = {
     },
 
     /**
-    * Let our Tree know about the click.
+    * Let our Tree know about thangs.
     */
     emit: function emit(action, item, data) {
         var Tree = this.getTree();
@@ -3975,6 +3993,8 @@ TreeView.prototype = {
             case 'viewChange':
                 Tree.message(item, data);
                 break;
+            case 'treeHeight':
+                Tree.message(item, data);
         }
     },
 
@@ -4117,7 +4137,6 @@ TreeView.prototype = {
     @param {HTMLElement} el HTML element.
     @return {Object} Absolute bounding rect for _el_.
     */
-
     getAbsoluteBoundingRect: function getAbsoluteBoundingRect(el) {
         var doc = document,
             win = window,
