@@ -25,3 +25,24 @@ When running sql `SELECT`, only interact with the `view`s:
 - `tree_end`
 
 Actually, you can interact directly with the `tree` table... But for the others, `SELECT` from the view.
+
+
+
+API Endpoints
+--------------------------
+/trees/
+/trees/1
+/trees/1/questions/
+/trees/1/questions/2
+/trees/1/questions/2/options/
+/trees/1/questions/2/options/3
+/trees/1/ends/
+/trees/1/ends/4
+/trees/1/groups/
+/trees/1/groups/5
+/trees/1/embeds/
+/trees/1/embeds/2
+
+/sites/
+sites/1
+sites/1/embeds/
