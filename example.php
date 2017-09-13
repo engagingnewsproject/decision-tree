@@ -18,7 +18,7 @@
 <body>
 <main>
     <h2>Main content block</h2>
-    <div id="enp-tree__citizen">
+    <div id="cme-tree__citizen">
         <noscript>
             <iframe width="100%" height="500px" src="api/v1/trees/citizen/iframe?js=false"></iframe>
         </noscript>
@@ -33,12 +33,12 @@
 <script src="dist/js/templates.js"></script>
 <script src="dist/js/scripts.js"></script>
 
-<!--<script src="dist/js/enp-tree.min.js"></script>-->
+<!--<script src="dist/js/cme-tree.min.js"></script>-->
 <script>
 
     var treeOptions = {
             slug: 'citizen',
-            container: document.getElementById('enp-tree__citizen')
+            container: document.getElementById('cme-tree__citizen')
     };
 
     // you can access all your trees with var trees

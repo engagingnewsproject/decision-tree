@@ -4,8 +4,8 @@
 * @since 0.0.1
 * @author jones.jeremydavid@gmail.com
 */
-namespace Enp\Template;
-use Enp\Utility as Utility;
+namespace Cme\Template;
+use Cme\Utility as Utility;
 
 class Render extends Template {
     public $data,

@@ -1,17 +1,17 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use Enp\Utility as Utility;
+use Cme\Utility as Utility;
 /**
- * @covers Enp_quiz_Save
+ * @covers Cme_quiz_Save
  */
 final class UtilityTest extends TreeTestCase
 {
     /**
-     * @covers Enp\Utility\is_id()
+     * @covers Cme\Utility\is_id()
      * @dataProvider testValidateIDProvider
      */
     public function testValidateID($id, $expected) {
-        // $enp_save = new Enp_quiz_Save();
+        // $cme_save = new Cme_quiz_Save();
         $valid = Utility\is_id($id);
         $this->evaluateAssert($valid, $expected);
     }
@@ -31,7 +31,7 @@ final class UtilityTest extends TreeTestCase
     }
 
     /**
-     * @covers Enp\Utility\is_slug()
+     * @covers Cme\Utility\is_slug()
      * @dataProvider testIsSlugProvider
      */
     public function testIsSlug($slug, $expected) {
@@ -56,11 +56,11 @@ final class UtilityTest extends TreeTestCase
     }
 
     /**
-     * @covers Enp\Utility\get_tree_slug_by_id($tree_id)
+     * @covers Cme\Utility\get_tree_slug_by_id($tree_id)
      * @dataProvider testGetTreeSlugByIdProvider
      */
     public function testGetTreeSlugById($id, $expected) {
-        // $enp_save = new Enp_quiz_Save();
+        // $cme_save = new Cme_quiz_Save();
         $tree_slug = Utility\get_tree_slug_by_id($id);
         $this->assertEquals($tree_slug, $expected);
     }
@@ -78,7 +78,7 @@ final class UtilityTest extends TreeTestCase
     }
 
     /**
-     * @covers Enp\Utility\get_tree_id_by_slug($tree_id)
+     * @covers Cme\Utility\get_tree_id_by_slug($tree_id)
      * @dataProvider testGetTreeIdBySlugProvider
      */
     public function testGetTreeIdBySlug($slug, $expected) {

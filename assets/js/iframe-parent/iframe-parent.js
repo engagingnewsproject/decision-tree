@@ -46,9 +46,9 @@ function handleCmeIframeMessage(event) {
     } else {
         // check if it exists
         exists = false;
-        for(var enp_i = 0; enp_i < cmeTreeIframes.length; enp_i++ ) {
-            if(cmeTreeIframes[enp_i].iframeID === iframe.id) {
-                thisIframe = cmeTreeIframes[enp_i];
+        for(var cme_i = 0; cme_i < cmeTreeIframes.length; cme_i++ ) {
+            if(cmeTreeIframes[cme_i].iframeID === iframe.id) {
+                thisIframe = cmeTreeIframes[cme_i];
                 exists = true;
             }
         }

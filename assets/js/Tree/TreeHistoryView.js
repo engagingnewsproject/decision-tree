@@ -164,13 +164,13 @@ TreeHistoryView.prototype = {
             navTitle;
 
         nav = document.createElement('nav')
-        nav.classList.add('enp-tree__history')
-        nav.id = 'enp-tree__history--'+this.getTreeHistory().getTree().getTreeID()
+        nav.classList.add('cme-tree__history')
+        nav.id = 'cme-tree__history--'+this.getTreeHistory().getTree().getTreeID()
         nav.tabIndex = -1
 
         navTitle = document.createElement('h3')
         navTitle.innerHTML = 'History Navigation: Go to Overview and Previously Answered Questions'
-        navTitle.classList.add('enp-tree__title--history-nav', 'enp-tree__visually-hidden')
+        navTitle.classList.add('cme-tree__title--history-nav', 'cme-tree__visually-hidden')
         nav.appendChild(navTitle)
 
         return nav;
@@ -206,7 +206,7 @@ TreeHistoryView.prototype = {
     // just the history question/end items. Not the overview btn.
     getHistoryNavItems() {
         let list = this.getList()
-        return list.getElementsByClassName('enp-tree__history-list-item--nav')
+        return list.getElementsByClassName('cme-tree__history-list-item--nav')
     },
 
     // All items, including overview button
@@ -244,14 +244,14 @@ TreeHistoryView.prototype = {
 
         // create the current position indicator
         indicator = document.createElement('div')
-        indicator.classList.add('enp-tree__history-current-indicator')
+        indicator.classList.add('cme-tree__history-current-indicator')
         container.appendChild(indicator)
         this.setIndicator(container.children[3])
 
         // create a visually hidden "go to history navigation" button
         goToHistoryNav = document.createElement('a')
         goToHistoryNav.href = '#'+container.id
-        goToHistoryNav.classList.add('enp-tree__visually-hidden', 'enp-tree__go-to-history-nav', 'enp-tree__btn')
+        goToHistoryNav.classList.add('cme-tree__visually-hidden', 'cme-tree__go-to-history-nav', 'cme-tree__btn')
         goToHistoryNav.innerHTML = 'Go to History Navigation'
         this.getContentWindow().appendChild(goToHistoryNav)
 
@@ -392,9 +392,9 @@ TreeHistoryView.prototype = {
 
         indicator = this.getIndicator()
         indicator.style.transform = 'translate3d(0,'+ progressbarHeight +'px, 0)';
-        indicator.classList.add('enp-tree__history-current-indicator--gooify')
+        indicator.classList.add('cme-tree__history-current-indicator--gooify')
         setTimeout(()=>{
-            indicator.classList.remove('enp-tree__history-current-indicator--gooify')
+            indicator.classList.remove('cme-tree__history-current-indicator--gooify')
         }, 500)
 
         cWindow = this.getContentWindow()
@@ -427,13 +427,13 @@ TreeHistoryView.prototype = {
 
     templateUl: function() {
         let ul = document.createElement('ul')
-        ul.classList.add('enp-tree__history-list')
+        ul.classList.add('cme-tree__history-list')
         return ul
     },
 
     templateProgressbar: function() {
         let progressbar = document.createElement('div')
-        progressbar.classList.add('enp-tree__history-progress')
+        progressbar.classList.add('cme-tree__history-progress')
         return progressbar
     },
 
@@ -446,9 +446,9 @@ TreeHistoryView.prototype = {
         button = document.createElement('button')
         li.appendChild(button)
 
-        li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--start')
+        li.classList.add('cme-tree__history-list-item', 'cme-tree__history-list-item--start')
 
-        button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--start')
+        button.classList.add('cme-tree__history-list-link', 'cme-tree__history-list-link--start')
         button.data = data
 
         return li
@@ -464,10 +464,10 @@ TreeHistoryView.prototype = {
         button = document.createElement('button')
         li.appendChild(button)
 
-        li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--overview')
+        li.classList.add('cme-tree__history-list-item', 'cme-tree__history-list-item--overview')
         button.setAttribute('aria-label', 'Go to Overview')
-        button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--overview')
-        button.innerHTML = '<div class="enp-tree__overview-icon"></div><div class="enp-tree__overview-icon"></div>'
+        button.classList.add('cme-tree__history-list-link', 'cme-tree__history-list-link--overview')
+        button.innerHTML = '<div class="cme-tree__overview-icon"></div><div class="cme-tree__overview-icon"></div>'
         button.data = data
 
         return li
@@ -481,9 +481,9 @@ TreeHistoryView.prototype = {
         button = document.createElement('button')
         li.appendChild(button)
         button.setAttribute('aria-label', 'Question '+(index-1))
-        li.classList.add('enp-tree__history-list-item', 'enp-tree__history-list-item--nav')
+        li.classList.add('cme-tree__history-list-item', 'cme-tree__history-list-item--nav')
 
-        button.classList.add('enp-tree__history-list-link', 'enp-tree__history-list-link--nav')
+        button.classList.add('cme-tree__history-list-link', 'cme-tree__history-list-link--nav')
         // because of the start button (hidden) and overview button before it
         // we need to subtract 1 from the index
         button.innerHTML = index - 1

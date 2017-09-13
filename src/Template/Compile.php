@@ -4,8 +4,8 @@
 * @since 0.0.1
 * @author jones.jeremydavid@gmail.com
 */
-namespace Enp\Template;
-use Enp\Utility as Utility;
+namespace Cme\Template;
+use Cme\Utility as Utility;
 
 class Compile extends Template {
     public $template,
@@ -33,11 +33,11 @@ class Compile extends Template {
         $options = array(
             'flags' => \LightnCandy\LightnCandy::FLAG_HANDLEBARS,
             'helpers' => array(
-                'environment'  => '\Enp\Template\Helpers::environment',
-                'group_start'  => '\Enp\Template\Helpers::group_start',
-                'group_end'  => '\Enp\Template\Helpers::group_end',
-                'el_number'  => '\Enp\Template\Helpers::el_number',
-                'destination'  => '\Enp\Template\Helpers::destination',
+                'environment'  => '\Cme\Template\Helpers::environment',
+                'group_start'  => '\Cme\Template\Helpers::group_start',
+                'group_end'  => '\Cme\Template\Helpers::group_end',
+                'el_number'  => '\Cme\Template\Helpers::el_number',
+                'destination'  => '\Cme\Template\Helpers::destination',
             )
         );
 

@@ -23,8 +23,8 @@ $app->group('/api', function() {
             $minified = $request->getQueryParam('minified', $default = false);
             $ext = ($minified === 'true' ? '.min' : '');
 
-            if(\Enp\Utility\is_id($tree_slug)) {
-                $tree_slug = \Enp\Utility\get_tree_slug_by_id($tree_slug);
+            if(\Cme\Utility\is_id($tree_slug)) {
+                $tree_slug = \Cme\Utility\get_tree_slug_by_id($tree_slug);
             }
 
             $response->getBody()->write(file_get_contents("data/".$tree_slug.$ext.".json"));
@@ -34,12 +34,12 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_slug}/compile', function (Request $request, Response $response) {
             $tree_slug = $request->getAttribute('tree_slug');
 
-            if(\Enp\Utility\is_id($tree_slug)) {
-                $tree_slug = \Enp\Utility\get_tree_slug_by_id($tree_slug);
+            if(\Cme\Utility\is_id($tree_slug)) {
+                $tree_slug = \Cme\Utility\get_tree_slug_by_id($tree_slug);
             }
 
             // compile it
-            $compiled = new \Enp\Database\CompileTree($tree_slug);
+            $compiled = new \Cme\Database\CompileTree($tree_slug);
 
             // return the file that got written
             $response->getBody()->write(file_get_contents("data/".$tree_slug.$ext.".json"));
@@ -51,8 +51,8 @@ $app->group('/api', function() {
             $js = $request->getQueryParam('js', $default = 'true');
 
             // check if we have a slug or an id
-            if(\Enp\Utility\is_id($tree_slug)) {
-                $tree_slug = \Enp\Utility\get_tree_slug_by_id($tree_slug);
+            if(\Cme\Utility\is_id($tree_slug)) {
+                $tree_slug = \Cme\Utility\get_tree_slug_by_id($tree_slug);
             }
             if($js === 'false') {
                 $view_path = 'no-js';
@@ -66,7 +66,7 @@ $app->group('/api', function() {
         });
 
         $this->get('/trees/', function (Request $request, Response $response) {
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $trees = $DB->get_trees();
 
             $response->getBody()->write(json_encode($trees));
@@ -75,7 +75,7 @@ $app->group('/api', function() {
 
         $this->get('/trees/{tree_id}', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $tree = $DB->get_tree($tree_id);
 
             // format into JSON
@@ -86,7 +86,7 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/starts/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
             // get all starts from that tree id
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $starts = $DB->get_starts($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($starts));
@@ -97,7 +97,7 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $start_id = $request->getAttribute('start_id');
 
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $start = $DB->get_start($start_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($start));
@@ -107,7 +107,7 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/groups/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
             // get all groups from that tree id
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $groups = $DB->get_groups($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($groups));
@@ -118,7 +118,7 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $group_id = $request->getAttribute('group_id');
 
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $group = $DB->get_group($group_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($group));
@@ -128,7 +128,7 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/questions/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
 
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $questions = $DB->get_questions($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($questions));
@@ -139,7 +139,7 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $question_id = $request->getAttribute('question_id');
 
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $question = $DB->get_question($question_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($question));
@@ -150,7 +150,7 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $question_id = $request->getAttribute('question_id');
 
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $options = $DB->get_options($question_id, ['tree_id' => $tree_id]);
             // return the JSON
             $response->getBody()->write(json_encode($options));
@@ -162,7 +162,7 @@ $app->group('/api', function() {
             $question_id = $request->getAttribute('question_id');
             $option_id = $request->getAttribute('option_id');
 
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $option = $DB->get_option($option_id, ['tree_id' => $tree_id, 'question_id' => $question_id]);
             // return the JSON
             $response->getBody()->write(json_encode($option));
@@ -172,7 +172,7 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/ends/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
 
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $ends = $DB->get_ends($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($ends));
@@ -183,7 +183,7 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $end_id = $request->getAttribute('end_id');
 
-            $DB = new \Enp\Database\DB();
+            $DB = new \Cme\Database\DB();
             $end = $DB->get_end($end_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($end));
@@ -220,7 +220,7 @@ $app->group('/api', function() {
 
             // build the response
             $savedData = ['success'=>true,
-                          'savedData' => json_decode($data)
+                          'savedData' => $data
                       ];
             // return the JSON
             $response->withStatus(200)

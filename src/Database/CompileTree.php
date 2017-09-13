@@ -6,7 +6,7 @@
 * @author jones.jeremydavid@gmail.com
 */
 
-namespace Enp\Database;
+namespace Cme\Database;
 
 class CompileTree extends DB {
     protected $DB,
@@ -16,7 +16,7 @@ class CompileTree extends DB {
         $this->DB = new DB();
         // kick off build process
         // get the tree by slug or ID
-        if(\Enp\Utility\is_slug($tree_id)) {
+        if(\Cme\Utility\is_slug($tree_id)) {
             $tree = $this->DB->get_tree_by_slug($tree_id);
             // set the real tree id
             $tree_id = $tree['tree_id'];

@@ -9,7 +9,7 @@
 <script>
 var treeOptions = {
         slug: '<?php echo $tree_slug;?>',
-        container: document.getElementById('enp-tree')
+        container: document.getElementById('cme-tree')
 };
 
 // you can access all your trees with var trees

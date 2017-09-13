@@ -6,7 +6,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Enp\\":"src"
+            "Cme\\":"src"
         },
         "files": [
             "src/utilities.php",

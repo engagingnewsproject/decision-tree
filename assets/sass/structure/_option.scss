@@ -1,15 +1,15 @@
-.enp-tree__options {
+.cme-tree__options {
     @include no-list;
     margin: 0;
     padding: 0;
 }
 
-.enp-tree__option {
+.cme-tree__option {
     line-height: 1.2;
     margin-bottom: $spacing__base/2;
 }
 
-.enp-tree__option-link {
+.cme-tree__option-link {
     display: block;
     width: 100%;
     padding: $spacing__base/2;
@@ -17,13 +17,13 @@
     transition: all .2s $easing;
 }
 
-.enp-tree__destination {
+.cme-tree__destination {
     text-transform: capitalize;
     display: flex;
     align-items: center;
 }
 
-.enp-tree__icon--arrow {
+.cme-tree__icon--arrow {
     width: 1.2rem;
     height: 1.2rem;
     position: relative;
@@ -32,22 +32,22 @@
     transform: rotate(-270deg);
 }
 
-.enp-tree__state--intro,
-.enp-tree__state--tree {
-    .enp-tree__option-link {
+.cme-tree__state--intro,
+.cme-tree__state--tree {
+    .cme-tree__option-link {
         display: flex;
         justify-content: space-between;
     }
 
-    .enp-tree__option-title {
+    .cme-tree__option-title {
         max-width: 63%;
         margin-right: $spacing__base/2;
     }
 }
 
-.enp-tree__state--question,
-.enp-tree__state--end {
-    .enp-tree__destination {
+.cme-tree__state--question,
+.cme-tree__state--end {
+    .cme-tree__destination {
         display: none;
     }
 }

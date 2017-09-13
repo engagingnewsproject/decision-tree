@@ -16,7 +16,7 @@ $mobile: 320px;
     padding-left: 0;
 }
 
-.enp-tree__visually-hidden {
+.cme-tree__visually-hidden {
     clip: rect(1px, 1px, 1px, 1px);
     position: absolute !important;
     left:-10000px;
@@ -37,17 +37,17 @@ $mobile: 320px;
     }
 }
 
-.enp-tree__no-transition {
-    .enp-tree__intro-wrapper,
-    .enp-tree__title,
-    .enp-tree__content-window,
-    .enp-tree__content-panel,
-    .enp-tree__questions,
-    .enp-tree__question,
-    .enp-tree__option-link,
-    .enp-tree__history,
-    .enp-tree__history-list-link,
-    .enp-tree__history-progress {
+.cme-tree__no-transition {
+    .cme-tree__intro-wrapper,
+    .cme-tree__title,
+    .cme-tree__content-window,
+    .cme-tree__content-panel,
+    .cme-tree__questions,
+    .cme-tree__question,
+    .cme-tree__option-link,
+    .cme-tree__history,
+    .cme-tree__history-list-link,
+    .cme-tree__history-progress {
         transition: none!important;
         animation: none!important;
     }

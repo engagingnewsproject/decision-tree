@@ -3,7 +3,7 @@ var expect = chai.expect;
 
 treeOptions = {
         slug: 'citizen',
-        container: document.getElementById('enp-tree__citizen')
+        container: document.getElementById('cme-tree__citizen')
 };
 
 var tree = new Tree(treeOptions);

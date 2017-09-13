@@ -1,9 +1,9 @@
 <?php
-namespace Enp\Template;
+namespace Cme\Template;
 /**
  * collection of helper functions for handlebars php implementation.
  * each helper here should match the JS helpers in assets/js/handlebars-helpers.js
- * Each helper has to be register in \Enp\Template\Compile.php -> compile()
+ * Each helper has to be register in \Cme\Template\Compile.php -> compile()
  */
 class Helpers {
 

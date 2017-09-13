@@ -12,7 +12,7 @@
 **/
 
 
-namespace Enp\Database;
+namespace Cme\Database;
 use PDO;
 
 class DB extends PDO {
@@ -176,7 +176,7 @@ class DB extends PDO {
 				question_id = :question_id";
 
 		// if a tree_id was passed, append it to the params and sql statement
-		if(\Enp\Utility\is_id($options['tree_id'])) {
+		if(\Cme\Utility\is_id($options['tree_id'])) {
 			$params[":tree_id"] = $tree_id;
 			$sql .= " AND tree_id = :tree_id";
 		}
@@ -196,12 +196,12 @@ class DB extends PDO {
 				option_id = :option_id";
 
 		// if a tree_id was passed, append it to the params and sql statement
-		if( \Enp\Utility\is_id($options['tree_id']) ) {
+		if( \Cme\Utility\is_id($options['tree_id']) ) {
 			$params[":tree_id"] = $tree_id;
 			$sql .= " AND tree_id = :tree_id";
 		}
 
-		if( \Enp\Utility\is_id($options['question_id']) ) {
+		if( \Cme\Utility\is_id($options['question_id']) ) {
 			$params[":question_id"] = $question_id;
 			$sql .= " AND question_id = :question_id";
 		}

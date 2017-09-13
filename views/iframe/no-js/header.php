@@ -6,7 +6,7 @@
     <title>Decision Tree - <?php echo $tree_slug;?></title>
     <link rel='stylesheet' href="<?php echo $url;?>/dist/css/base.min.css"/>
 </head>
-<body class="enp-tree__iframe">
+<body class="cme-tree__iframe">
 <main>
 
-    <div id="enp-tree">
+    <div id="cme-tree">

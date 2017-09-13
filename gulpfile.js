@@ -53,7 +53,7 @@ gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'compressImg', 'svgstore',  'h
     // Watch php file
     gulp.watch("../*/*.php").on('change', reload);
     // watch javascript files
-    gulp.watch("dist/js/enp-tree.min.js").on('change', reload);
+    gulp.watch("dist/js/cme-tree.min.js").on('change', reload);
 
     compressJS("dist/js/handlebars.runtime.js");
 });
@@ -134,10 +134,10 @@ gulp.task('concatTreeJS', function() {
            dist+'templates.js',
            dist+'scripts.js'
        ];
-    filename = 'enp-tree';
+    filename = 'cme-tree';
 
     return gulp.src(src)
-    .pipe(concat('enp-tree.js'))
+    .pipe(concat('cme-tree.js'))
     .pipe(gulp.dest(dist))
     .pipe(rename({
       suffix: '.min'

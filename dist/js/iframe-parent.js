@@ -41,9 +41,9 @@ function handleCmeIframeMessage(event) {
     } else {
         // check if it exists
         exists = false;
-        for (var enp_i = 0; enp_i < cmeTreeIframes.length; enp_i++) {
-            if (cmeTreeIframes[enp_i].iframeID === iframe.id) {
-                thisIframe = cmeTreeIframes[enp_i];
+        for (var cme_i = 0; cme_i < cmeTreeIframes.length; cme_i++) {
+            if (cmeTreeIframes[cme_i].iframeID === iframe.id) {
+                thisIframe = cmeTreeIframes[cme_i];
                 exists = true;
             }
         }
@@ -214,7 +214,7 @@ CmeIframeTree.prototype = {
         // If we are, we shouldn't send the URL because we don't want
         // to set the quiz preview URL as the share URL
         // to see what it matches: http://regexr.com/3g4rr
-        if (/https?:\/\/(?:local.quiz|(?:(?:local|dev|test)\.)?engagingnewsproject\.org|(?:engagingnews|enpdev)\.(?:staging\.)?wpengine\.com)\/enp-quiz\/quiz-preview\/\d+\b/.test(this.parentURL)) {
+        if (/https?:\/\/(?:local.quiz|(?:(?:local|dev|test)\.)?engagingnewsproject\.org|(?:engagingnews|cmedev)\.(?:staging\.)?wpengine\.com)\/cme-quiz\/quiz-preview\/\d+\b/.test(this.parentURL)) {
             // if it equals one of our site preview pages, abandon ship
             return false;
         }
@@ -309,7 +309,7 @@ CmeIframeTree.prototype = {
         // set the site ID
         boundThis.embedSiteID = response.embed_site_id;
         if (0 < parseInt(boundThis.embedSiteID)) {
-            // send a request to save/update the enp_embed_tree table
+            // send a request to save/update the cme_embed_tree table
             boundThis.saveEmbedTree(response, boundThis.handleEmbedTreeResponse, boundThis);
             return response;
         } else {

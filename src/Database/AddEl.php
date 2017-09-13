@@ -1,6 +1,6 @@
 <?php
 
-namespace Enp\Database;
+namespace Cme\Database;
 
 
 /**
