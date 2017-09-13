@@ -190,6 +190,25 @@ $app->group('/api', function() {
             return $response;
         });
 
+        $this->get('/trees/{tree_id}/embeds/', function (Request $request, Response $response) {
+            $tree_id = $request->getAttribute('tree_id');
+            // TODO: returns array of all embeds that match this tree_id
+            $embeds = [[]];
+            // return the JSON
+            $response->getBody()->write(json_encode($embeds));
+            return $response;
+        });
+
+        $this->get('/trees/{tree_id}/embeds/{embed_id}', function (Request $request, Response $response) {
+            $tree_id = $request->getAttribute('tree_id');
+            $embed_id = $request->getAttribute('embed_id');
+            // TODO: returns array of the embed with that embed_id
+            $embed = [];
+            // return the JSON
+            $response->getBody()->write(json_encode($embed));
+            return $response;
+        });
+
         // save data
         $this->post('/trees/{tree_id}/response-data/new', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
@@ -210,6 +229,83 @@ $app->group('/api', function() {
             return $response;
         });
 
+
+        // Site data
+        $this->post('/sites/new', function (Request $request, Response $response) {
+            // passed data
+            $data = $request->getParsedBody();
+            // validate it
+            // print_r($data);
+            // save it
+
+            // build the response
+            $savedData = ['success'=>true,
+                          'savedData' => json_decode($data)
+                      ];
+            // return the JSON
+            $response->withStatus(200)
+                ->withHeader("Content-Type", "application/json")
+                ->write(json_encode($data));
+            return $response;
+        });
+
+        // returns array of all the sites
+        $this->get('/sites/', function (Request $request, Response $response) {
+            $sites = [['site_id'=>1, 'feature_finished'=>'nope!']];
+
+            // return the JSON
+            $response->getBody()->write(json_encode($sites));
+            return $response;
+        });
+
+        // returns the site info for that ID
+        // @param site_id can be an encoded root url w/o the http://
+        $this->get('/sites/{site_id}', function (Request $request, Response $response) {
+            $site_id = $request->getAttribute('site_id');
+            //TODO: see if the site ID is an ID or a URL
+
+            // return the JSON
+            $response->getBody()->write(json_encode($site_id));
+            return $response;
+        });
+
+        // Returns all embeds on that site
+        $this->get('/sites/{site_id}/embeds/', function (Request $request, Response $response) {
+            $site_id = $request->getAttribute('site_id');
+
+            // return the JSON
+            $response->getBody()->write(json_encode($site_id));
+            return $response;
+        });
+
+        // Returns a specific embed on that site
+        $this->get('/sites/{site_id}/embeds/{embed_id}', function (Request $request, Response $response) {
+            $site_id = $request->getAttribute('site_id');
+            $embed_id = $request->getAttribute('embed_id');
+            // return the JSON
+            $response->getBody()->write(json_encode($site_id));
+            return $response;
+        });
+
+        // Add a new Tree Embed to a site
+        $this->post('/sites/{site_id}/embeds/new', function (Request $request, Response $response) {
+            $site_id = $request->getAttribute('site_id');
+            // passed data
+            $data = $request->getParsedBody();
+            // validate it
+            // print_r($data);
+            // save it
+
+            // build the response
+            $savedData = ['success'=>true,
+                          'savedData' => json_decode($data)
+                      ];
+            // return the JSON
+            $response->withStatus(200)
+                ->withHeader("Content-Type", "application/json")
+                ->write(json_encode($data));
+            return $response;
+        });
     });
 });
 
