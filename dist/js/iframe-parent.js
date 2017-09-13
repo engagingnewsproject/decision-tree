@@ -255,7 +255,7 @@ CmeIframeTree.prototype = {
 
     addIframeStyles: function addIframeStyles() {
         // set our styles
-        var css = '.cme-tree__iframe { -webkit-transition: all .25s ease-in-out;transition: all .25s ease-in-out; }',
+        var css = '.cme-tree__iframe { -webkit-transition: all .3s ease-in-out;transition: all .3s ease-in-out; }',
             head = document.head || document.getElementsByTagName('head')[0],
             style = document.createElement('style');
 
