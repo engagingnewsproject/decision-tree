@@ -1696,7 +1696,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
                 oldState = void 0,
                 newState = void 0;
 
-            whitelist = ['intro', 'tree', 'start', 'question', 'end'];
+            whitelist = ['intro', 'tree', 'question', 'end'];
 
             // TODO: Check that start can't go straight to end?
             // TODO: Check that the next state is valid from the question's options?
@@ -2056,7 +2056,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
             if (/https?:\/\/(?:dev\/decision-tree|localhost:3000\/decision-tree)\//.test(window.location.href)) {
                 baseUrl = 'http://dev/decision-tree';
             } else {
-                baseUrl = 'http://enptree.wpengine.com';
+                baseUrl = 'http://tree.mediaengagement.org';
             }
 
             var request = new XMLHttpRequest();
@@ -2099,13 +2099,13 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
         // Manages TreeHistory feature and TreeHistoryView
         var treeHistory = new TreeHistory({});
         // Manages passes usage Data to CME so we can continue to get funding to continue developing this tool and create new ones
-        var treeData = new TreeData({});
+        var treeInteraction = new TreeInteraction({});
         // Small postmessage package for iframe loads. Doesn't do anything if not an iframe load.
 
         // add the observers
         // bind history first so it will load the correct state and
         // not cause layout to have to be repainted twice (if different states)
-        var observers = [treeHistory, treeView, treeData];
+        var observers = [treeHistory, treeView, treeInteraction];
         // if we're in an iframe, add the postMessage listener
         if (window.self.location !== window.top.location) {
             observers.push(new TreePostMessage({}));
@@ -2125,196 +2125,6 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
     window.createTree = createTree;
     window.trees = trees;
 })(window);
-'use strict';
-
-/**
-* Manages localStorage of current question state
-* and previous states of the current decision tree path
-* (so people can go back to previous questions)
-*/
-function TreeData(options) {
-    var _Tree, _rootURL, _postURL, _userID;
-    /**
-    * Private functions
-    */
-    var _setRootURL = function _setRootURL() {
-        var scripts = void 0,
-            currentScript = void 0,
-            regex = void 0,
-            rootURL = void 0;
-        // get the current script being processed (this one)
-        scripts = document.querySelectorAll('script[src]');
-        currentScript = scripts[scripts.length - 1].src;
-
-        // regex it to see if it's one of our DEV urls
-        // If you want to see what it matches/doesn't match, go here: http://regexr.com/3g4rc
-        regex = /https?:\/\/(?:(?:localhost:3000|dev)\/decision-tree|(?:enptree)\.(?:staging\.)?wpengine\.com)\b/;
-        _rootURL = regex.exec(currentScript);
-
-        if (rootURL === null) {
-            // we're not on DEV, so pass the rootURL as our PROD url
-            _rootURL = 'https://tree.mediaengagement.org';
-        }
-
-        return _rootURL;
-    };
-
-    var _setUserID = function _setUserID() {
-        var userIDStorageName = 'treeUserID';
-        var userID = localStorage.getItem(userIDStorageName);
-        if (userID === null) {
-            userID = '';
-            for (var i = 0; i < 8; i++) {
-                userID = userID + Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-            }
-            localStorage.setItem(userIDStorageName, userID);
-        }
-
-        _userID = userID;
-
-        return _userID;
-    };
-
-    // getters
-    this.getTree = function () {
-        return _Tree;
-    };
-    this.getRootURL = function () {
-        return _rootURL;
-    };
-    this.getPostURL = function () {
-        return _postURL;
-    };
-    this.getUserID = function () {
-        return _userID;
-    };
-    this.getUserIDStorageName = function () {
-        return _userIDStorageName;
-    };
-
-    // setters
-    /**
-    * Sets the parent Tree
-    */
-    this.setTree = function (Tree) {
-        // only let it be set once
-        if (_Tree === undefined) {
-            _Tree = Tree;
-        }
-        return _Tree;
-    };
-
-    this.setPostURL = function () {
-        _postURL = this.getRootURL() + '/api/v1/trees/' + this.getTree().getTreeID() + '/response-data/new';
-        return _postURL;
-    };
-
-    // save the passed history to localStorage and set the global _history to make sure everything is in sync
-    this.saveData = function (data) {
-        // TODO validate the data to be saved
-        var postURL = this.getPostURL();
-        var treeID = this.getTree().getTreeID();
-        // combine data and our userID
-        data = Object.assign(data, { userID: this.getUserID() });
-
-        return new Promise(function (resolve, reject) {
-
-            var request = new XMLHttpRequest();
-            // request.overrideMimeType("application/json");
-            request.open('POST', postURL);
-            request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-
-            // When the request loads, check whether it was successful
-            request.onload = function () {
-                if (request.status === 200) {
-                    // If successful, resolve the promise by passing back the request response
-                    resolve(request);
-                } else {
-                    // If it fails, reject the promise with a error message
-                    reject(Error('Tree data could not be saved:' + request.statusText));
-                }
-            };
-            request.onerror = function () {
-                // Also deal with the case when the entire request fails to begin with
-                // This is probably a network error, so reject the promise with an appropriate message
-                reject(Error('There was a network error.'));
-            };
-
-            console.log(data);
-            // Send the request
-            request.send(JSON.stringify(data));
-        });
-    };
-
-    this.init = function () {
-        _setUserID();
-        // what do we want to do here? Save that the tree loaded?
-        this.setPostURL();
-        // send our load
-        this.saveData({ "action": "loaded" }).then(this.response);
-    };
-
-    this.response = function (request) {
-        // response from the server
-        var data = JSON.parse(request.response);
-        // console.log(data)
-    };
-
-    // set the rootURL
-    _setRootURL();
-
-    // if a Tree was passed, Do whatever you need to do
-    if (options.Tree) {
-        this.build(options.Tree);
-    }
-}
-
-TreeData.prototype = {
-    constructor: TreeData,
-
-    build: function build(Tree) {
-        this.setTree(Tree);
-        this.init();
-    },
-
-    /**
-    * Listen to parent Tree's emitted actions and handle accordingly
-    */
-    on: function on(action, data) {
-        switch (action) {
-            case 'ready':
-                // data will be the tree itself
-                this.build(data);
-                break;
-            case 'update':
-                this.saveData(data).then(this.log);
-                break;
-            case 'restart':
-                // delete the history
-                break;
-            case 'start':
-                // delete the history
-                break;
-        }
-    },
-
-    /**
-    * Let our Tree know about what actions we did
-    */
-    emit: function emit(action, item, data) {
-        var Tree = this.getTree();
-        switch (action) {
-            case 'ready':
-                // tell the Tree to let all the other observers know that the TreeData class is ready
-                Tree.message(item, data);
-                break;
-            case 'saveData':
-                // tell the Tree to let all the other observers know that we saved data
-                Tree.message(item, data);
-                break;
-        }
-    }
-};
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -3207,6 +3017,196 @@ TreeHistoryView.prototype = {
         button.data = data;
 
         return li;
+    }
+};
+'use strict';
+
+/**
+* Manages localStorage of current question state
+* and previous states of the current decision tree path
+* (so people can go back to previous questions)
+*/
+function TreeInteraction(options) {
+    var _Tree, _rootURL, _postURL, _userID;
+    /**
+    * Private functions
+    */
+    var _setRootURL = function _setRootURL() {
+        var scripts = void 0,
+            currentScript = void 0,
+            regex = void 0,
+            rootURL = void 0;
+        // get the current script being processed (this one)
+        scripts = document.querySelectorAll('script[src]');
+        currentScript = scripts[scripts.length - 1].src;
+
+        // regex it to see if it's one of our DEV urls
+        // If you want to see what it matches/doesn't match, go here: http://regexr.com/3g4rc
+        regex = /https?:\/\/(?:(?:localhost:3000|dev)\/decision-tree|(?:enptree)\.(?:staging\.)?wpengine\.com)\b/;
+        _rootURL = regex.exec(currentScript);
+
+        if (rootURL === null) {
+            // we're not on DEV, so pass the rootURL as our PROD url
+            _rootURL = 'https://tree.mediaengagement.org';
+        }
+
+        return _rootURL;
+    };
+
+    var _setUserID = function _setUserID() {
+        var userIDStorageName = 'treeUserID';
+        var userID = localStorage.getItem(userIDStorageName);
+        if (userID === null) {
+            userID = '';
+            for (var i = 0; i < 8; i++) {
+                userID = userID + Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+            }
+            localStorage.setItem(userIDStorageName, userID);
+        }
+
+        _userID = userID;
+
+        return _userID;
+    };
+
+    // getters
+    this.getTree = function () {
+        return _Tree;
+    };
+    this.getRootURL = function () {
+        return _rootURL;
+    };
+    this.getPostURL = function () {
+        return _postURL;
+    };
+    this.getUserID = function () {
+        return _userID;
+    };
+    this.getUserIDStorageName = function () {
+        return _userIDStorageName;
+    };
+
+    // setters
+    /**
+    * Sets the parent Tree
+    */
+    this.setTree = function (Tree) {
+        // only let it be set once
+        if (_Tree === undefined) {
+            _Tree = Tree;
+        }
+        return _Tree;
+    };
+
+    this.setPostURL = function () {
+        _postURL = this.getRootURL() + '/api/v1/trees/' + this.getTree().getTreeID() + '/interaction/new';
+        return _postURL;
+    };
+
+    // save the passed history to localStorage and set the global _history to make sure everything is in sync
+    this.saveData = function (data) {
+        // TODO validate the data to be saved
+        var postURL = this.getPostURL();
+        var treeID = this.getTree().getTreeID();
+        // combine data and our userID
+        data = Object.assign(data, { userID: this.getUserID() });
+
+        return new Promise(function (resolve, reject) {
+
+            var request = new XMLHttpRequest();
+            // request.overrideMimeType("application/json");
+            request.open('POST', postURL);
+            request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+            // When the request loads, check whether it was successful
+            request.onload = function () {
+                if (request.status === 200) {
+                    // If successful, resolve the promise by passing back the request response
+                    resolve(request);
+                } else {
+                    // If it fails, reject the promise with a error message
+                    reject(Error('Tree data could not be saved:' + request.statusText));
+                }
+            };
+            request.onerror = function () {
+                // Also deal with the case when the entire request fails to begin with
+                // This is probably a network error, so reject the promise with an appropriate message
+                reject(Error('There was a network error.'));
+            };
+
+            console.log(data);
+            // Send the request
+            request.send(JSON.stringify(data));
+        });
+    };
+
+    this.init = function () {
+        _setUserID();
+        // what do we want to do here? Save that the tree loaded?
+        this.setPostURL();
+        // send our load
+        this.saveData({ "action": "loaded" }).then(this.response);
+    };
+
+    this.response = function (request) {
+        // response from the server
+        var data = JSON.parse(request.response);
+        // console.log(data)
+    };
+
+    // set the rootURL
+    _setRootURL();
+
+    // if a Tree was passed, Do whatever you need to do
+    if (options.Tree) {
+        this.build(options.Tree);
+    }
+}
+
+TreeInteraction.prototype = {
+    constructor: TreeInteraction,
+
+    build: function build(Tree) {
+        this.setTree(Tree);
+        this.init();
+    },
+
+    /**
+    * Listen to parent Tree's emitted actions and handle accordingly
+    */
+    on: function on(action, data) {
+        switch (action) {
+            case 'ready':
+                // data will be the tree itself
+                this.build(data);
+                break;
+            case 'update':
+                this.saveData(data).then(this.log);
+                break;
+            case 'restart':
+                // delete the history
+                break;
+            case 'start':
+                // delete the history
+                break;
+        }
+    },
+
+    /**
+    * Let our Tree know about what actions we did
+    */
+    emit: function emit(action, item, data) {
+        var Tree = this.getTree();
+        switch (action) {
+            case 'ready':
+                // tell the Tree to let all the other observers know that the TreeInteraction class is ready
+                Tree.message(item, data);
+                break;
+            case 'saveData':
+                // tell the Tree to let all the other observers know that we saved data
+                Tree.message(item, data);
+                break;
+        }
     }
 };
 'use strict';

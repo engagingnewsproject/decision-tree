@@ -136,6 +136,99 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree_element_order` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `tree`.`tree_interaction_type`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tree`.`tree_interaction_type` (
+  `interaction_type_id` INT NOT NULL AUTO_INCREMENT,
+  `interaction_type` VARCHAR(45) NOT NULL DEFAULT '',
+  PRIMARY KEY (`interaction_type_id`))
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `tree`.`tree_state_type`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tree`.`tree_state_type` (
+  `state_type_id` INT NOT NULL AUTO_INCREMENT,
+  `state_type` VARCHAR(45) NOT NULL DEFAULT '',
+  PRIMARY KEY (`state_type_id`))
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `tree`.`tree_interaction`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tree`.`tree_interaction` (
+  `interaction_id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(45) NULL,
+  `tree_id` INT NULL,
+  `interaction_type_id` INT NULL,
+  `state_type_id` INT NULL,
+  `el_created_at` TIMESTAMP DEFAULT '1970-01-01 00:00:00',
+  `el_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`interaction_id`),
+  INDEX `interaction_type_id_idx` (`interaction_type_id` ASC),
+  INDEX `tree_id_idx` (`tree_id` ASC),
+  CONSTRAINT `interaction_el_type_id`
+    FOREIGN KEY (`interaction_type_id`)
+    REFERENCES `tree`.`tree_interaction_type` (`interaction_type_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `interaction_state_type_id`
+    FOREIGN KEY (`state_type_id`)
+    REFERENCES `tree`.`tree_state_type` (`state_type_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `interaction_tree_id`
+    FOREIGN KEY (`tree_id`)
+    REFERENCES `tree`.`tree` (`tree_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `tree`.`tree_state`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tree`.`tree_state` (
+  `state_id` INT NOT NULL AUTO_INCREMENT,
+  `interaction_id` INT NULL,
+  `el_id` INT NULL,
+  PRIMARY KEY (`state_id`),
+  INDEX `el_id_idx` (`el_id` ASC),
+  CONSTRAINT `state_interaction_id`
+    FOREIGN KEY (`interaction_id`)
+    REFERENCES `tree`.`tree_interaction` (`interaction_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `state_el_id`
+    FOREIGN KEY (`el_id`)
+    REFERENCES `tree`.`tree_element` (`el_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `tree`.`tree_interaction_element`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tree`.`tree_interaction_element` (
+  `interaction_el_id` INT NOT NULL AUTO_INCREMENT,
+  `interaction_id` INT NULL,
+  `el_id` INT NULL,
+  PRIMARY KEY (`interaction_el_id`),
+  INDEX `el_id_idx` (`el_id` ASC),
+  CONSTRAINT `interaction_el_interaction_id`
+    FOREIGN KEY (`interaction_id`)
+    REFERENCES `tree`.`tree_interaction` (`interaction_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `interaction_el_id`
+    FOREIGN KEY (`el_id`)
+    REFERENCES `tree`.`tree_element` (`el_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
 -- -----------------------------------------------------
 -- Trigger for setting "Created at" timestamp on tree table
 -- -----------------------------------------------------
@@ -209,6 +302,7 @@ CREATE  OR REPLACE VIEW `tree_api` (tree_id, tree_slug, title, content, created_
         tree_id, tree_slug, tree_title, tree_content, tree_created_at, tree_updated_at, tree_owner
     FROM
         tree.tree;
+
 -- -----------------------------------------------------
 -- View `tree`.`tree_question`
 -- -----------------------------------------------------
@@ -301,6 +395,203 @@ CREATE  OR REPLACE VIEW `tree_start` (start_id, tree_id, title, content, destina
         tree.tree_element_destination destination ON el.el_id = destination.el_id
     WHERE
         el_type.el_type = 'start';
+
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_interactions`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_interactions`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_interactions` (interaction_id, user_id, tree_id, interaction_type, state_type, interaction_created_at) AS
+    SELECT
+        interaction.interaction_id, interaction.user_id, interaction.tree_id, interaction_type.interaction_type, state_type.state_type, interaction.interaction_created_at
+    FROM
+        tree.tree_interaction interaction
+    INNER JOIN
+        tree.tree_interaction_type interaction_type ON interaction.interaction_type_id = interaction_type.interaction_type_id
+    INNER JOIN
+        tree.tree_state_type state_type ON interaction.state_type_id = state_type.state_type_id;
+
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_interaction_load`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_interaction_load`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_interaction_load` (interaction_id, user_id, tree_id, interaction_created_at) AS
+    SELECT
+        interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.interaction_created_at
+    FROM
+        tree.tree_interactions interactions
+    WHERE
+        interactions.interaction_type = 'load';
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_interaction_reload`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_interaction_reload`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_interaction_reload` (interaction_id, user_id, tree_id, interaction_created_at) AS
+    SELECT
+        interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.interaction_created_at
+    FROM
+        tree.tree_interactions interactions
+    WHERE
+        interactions.interaction_type = 'reload';
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_interaction_overview`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_interaction_overview`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_interaction_overview` (interaction_id, user_id, tree_id, interaction_created_at) AS
+    SELECT
+        interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.interaction_created_at
+    FROM
+        tree.tree_interactions interactions
+    WHERE
+        interactions.interaction_type = 'overview';
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_interaction_start`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_interaction_start`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_interaction_start` (interaction_id, user_id, tree_id, destination_state_type, destination_state_id, interaction_created_at) AS
+    SELECT
+        interactions.interaction_id, interactions.user_id, interactions.tree_id, el_type.el_type, state.el_id, interactions.interaction_created_at
+    FROM
+        tree.tree_interactions interactions
+    INNER JOIN
+        tree.tree_state state ON interaction.interaction_id = state.interaction_id
+    INNER JOIN
+        tree.tree_element el ON state.el_id = el.el_id
+    INNER JOIN
+        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+    WHERE
+        interaction_type.interaction_type = 'start';
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_interaction_option` interactions with questions
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_interaction_option`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_interaction_option` (interaction_id, user_id, tree_id, option_id, destination_state_type, destination_state_id, interaction_created_at) AS
+    SELECT
+        interaction.interaction_id, interaction.user_id, interaction.tree_id, el.el_id, el_type.el_type, state.el_id, interaction.interaction_created_at
+    FROM
+        tree.tree_interaction interaction
+    INNER JOIN
+        tree.tree_interaction_type interaction_type ON interaction.interaction_type_id = interaction_type.interaction_type_id
+    INNER JOIN
+        tree.tree_state state ON interaction.interaction_id = state.interaction_id
+    INNER JOIN
+        tree.tree_element el ON state.el_id = el.el_id
+    INNER JOIN
+        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+    WHERE
+        interaction_type.interaction_type = 'option';
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_interaction_overview_option` interactions with overviews and options
+-- -----------------------------------------------------
+/*DROP TABLE IF EXISTS `tree`.`tree_interaction_overview_option`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_interaction_option` (interaction_id, tree_id, user_id, option_id, state_type_id, state_type, state_id, `interaction_id`) AS*/
+
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_interaction_question`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_interaction_question`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_interaction_question` (interaction_id, user_id, tree_id, question_id, interaction_created_at) AS
+    SELECT
+        interaction.interaction_id, interaction.user_id, interaction.tree_id, state.el_id, interaction.interaction_created_at
+    FROM
+        tree.tree_interaction interaction
+    INNER JOIN
+        tree.tree_state state ON interaction.interaction_id = state.interaction_id
+    INNER JOIN
+        tree.tree_element el ON state.el_id = el.el_id
+    INNER JOIN
+        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+    WHERE
+        el_type.el_type = 'question';
+
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_interaction_end`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_interaction_end`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_interaction_end` (interaction_id, user_id, tree_id, end_id, interaction_created_at) AS
+    SELECT
+        interaction.interaction_id, interaction.user_id, interaction.tree_id, state.el_id, interaction.interaction_created_at
+    FROM
+        tree.tree_interaction interaction
+    INNER JOIN
+        tree.tree_state state ON interaction.interaction_id = state.interaction_id
+    INNER JOIN
+        tree.tree_element el ON state.el_id = el.el_id
+    INNER JOIN
+        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+    WHERE
+        el_type.el_type = 'end';
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_interaction_history`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_interaction_history`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_interaction_history` (interaction_id, user_id, tree_id, destination_state_type, destination_state_id, interaction_created_at) AS
+    SELECT
+        interaction.interaction_id, interaction.user_id, interaction.tree_id, el_type.el_type, state.el_id, interaction.interaction_created_at
+    FROM
+        tree.tree_interaction interaction
+    INNER JOIN
+        tree.tree_interaction_type interaction_type ON interaction.interaction_type_id = interaction_type.interaction_type_id
+    INNER JOIN
+        tree.tree_state state ON interaction.interaction_id = state.interaction_id
+    INNER JOIN
+        tree.tree_element el ON state.el_id = el.el_id
+    INNER JOIN
+        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+    WHERE
+        interaction_type.interaction_type = 'history';
+
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_interactions_max_date_by_user_and_tree`
+-- Subquery necessary for tree_bounce view
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_interactions_max_date_by_user_and_tree`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_interactions_max_date_by_user_and_tree` (user_id, tree_id, interaction_created_at) AS
+SELECT
+  user_id, tree_id, MAX(interaction_created_at)
+ FROM
+   tree.tree_interactions
+ GROUP BY
+   user_id, tree_id;
+
+-- -----------------------------------------------------
+-- View `tree`.`tree_state_bounce`
+-- This is the state the user left the site at
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `tree`.`tree_state_bounce`;
+USE `tree`;
+CREATE  OR REPLACE VIEW `tree_state_bounce` (interaction_id, user_id, tree_id, state_bounced, el_id, interaction_created_at) AS
+SELECT
+    interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.state_type, interactions.interaction_created_at
+  FROM
+    tree.tree_interactions interactions
+  INNER JOIN
+    tree.tree_interactions_max_date_by_user_and_tree max_date
+   ON
+     (interactions.user_id = max_date.user_id
+      AND
+      interactions.interaction_created_at = max_date.interaction_created_at);
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

@@ -210,7 +210,7 @@ $app->group('/api', function() {
         });
 
         // save data
-        $this->post('/trees/{tree_id}/response-data/new', function (Request $request, Response $response) {
+        $this->post('/trees/{tree_id}/interaction/new', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
             // passed data
             $data = $request->getParsedBody();

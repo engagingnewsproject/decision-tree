@@ -3,7 +3,7 @@
 * and previous states of the current decision tree path
 * (so people can go back to previous questions)
 */
-function TreeData(options) {
+function TreeInteraction(options) {
     var _Tree,
         _rootURL,
         _postURL,
@@ -71,7 +71,7 @@ function TreeData(options) {
     }
 
     this.setPostURL = function() {
-        _postURL = this.getRootURL()+'/api/v1/trees/'+this.getTree().getTreeID()+'/response-data/new';
+        _postURL = this.getRootURL()+'/api/v1/trees/'+this.getTree().getTreeID()+'/interaction/new';
         return _postURL
     }
 
@@ -137,8 +137,8 @@ function TreeData(options) {
 }
 
 
-TreeData.prototype = {
-    constructor: TreeData,
+TreeInteraction.prototype = {
+    constructor: TreeInteraction,
 
     build: function(Tree) {
         this.setTree(Tree)
@@ -175,7 +175,7 @@ TreeData.prototype = {
         let Tree = this.getTree()
         switch(action) {
             case 'ready':
-                // tell the Tree to let all the other observers know that the TreeData class is ready
+                // tell the Tree to let all the other observers know that the TreeInteraction class is ready
                 Tree.message(item, data)
                 break
             case 'saveData':

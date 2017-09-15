@@ -46,7 +46,7 @@ function Tree(data, observers) {
             oldState,
             newState;
 
-        whitelist = ['intro', 'tree', 'start','question','end']
+        whitelist = ['intro', 'tree', 'question', 'end']
 
         // TODO: Check that start can't go straight to end?
         // TODO: Check that the next state is valid from the question's options?
@@ -413,7 +413,7 @@ function getTreeData(slug) {
         if(/https?:\/\/(?:dev\/decision-tree|localhost:3000\/decision-tree)\//.test(window.location.href)) {
             baseUrl = 'http://dev/decision-tree'
         } else {
-            baseUrl = 'http://enptree.wpengine.com'
+            baseUrl = 'http://tree.mediaengagement.org'
         }
 
       var request = new XMLHttpRequest();
@@ -456,13 +456,13 @@ function buildTree(request) {
     // Manages TreeHistory feature and TreeHistoryView
     let treeHistory = new TreeHistory({});
     // Manages passes usage Data to CME so we can continue to get funding to continue developing this tool and create new ones
-    let treeData = new TreeData({});
+    let treeInteraction = new TreeInteraction({});
     // Small postmessage package for iframe loads. Doesn't do anything if not an iframe load.
 
     // add the observers
     // bind history first so it will load the correct state and
     // not cause layout to have to be repainted twice (if different states)
-    let observers = [treeHistory, treeView, treeData]
+    let observers = [treeHistory, treeView, treeInteraction]
     // if we're in an iframe, add the postMessage listener
     if(window.self.location !== window.top.location) {
         observers.push(new TreePostMessage({}));

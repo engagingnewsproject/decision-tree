@@ -44,5 +44,20 @@ API Endpoints
 /trees/1/embeds/2
 
 /sites/
-sites/1
-sites/1/embeds/
+/sites/1
+/sites/1/embeds/
+/sites/1/embeds/new
+/sites/1/embeds/1
+
+/interactions/new
+/interactions/1
+
+/interactions/{tree_id}
+/interactions/{tree_id}/loads/
+/interactions/{tree_id}/loads/{interaction_id}
+/interactions/{tree_id}/reloads/
+/interactions/{tree_id}/starts/
+/interactions/{tree_id}/starts/{interaction_id}
+/starts/
+/loads/
+/
