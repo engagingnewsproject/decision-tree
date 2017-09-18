@@ -38,13 +38,11 @@ function Tree(data, observers) {
     this.getData = function() { return _data }
     this.getState = function() { return _state }
 
-    // setters
-    // @param data is simply the data that was originally passed to the function
-    this.setState = function(stateType, stateID, data) {
+
+    // Function to check if a state is valid or not
+    this.validateState = function(stateType, stateID) {
         let whitelist,
-            validateState,
-            oldState,
-            newState;
+            validState;
 
         whitelist = ['intro', 'tree', 'question', 'end']
 
@@ -63,7 +61,7 @@ function Tree(data, observers) {
         // check if stateID is valid
         if(stateID === null || stateID === '' || stateID === undefined) {
             console.error('StateID is empty: '+stateID)
-            // return false
+            return false
         }
 
         // check to make sure we're not trying to set the same state again
@@ -74,26 +72,47 @@ function Tree(data, observers) {
         // check if the stateID is a valid ID for this state
         if(stateType === 'tree') {
             if(stateID === this.getTreeID()) {
-                validateState = true
+                validState = true
             } else {
-                validateState = false
+                validState = false
             }
         }
+
         else if (stateType === 'intro') {
             // it's always fine
-            validateState = true
+            validState = true
         }
         else {
-            validateState = this.getDataByType(stateType, stateID);
+            validState = this.getDataByType(stateType, stateID);
         }
 
-        if(validateState === false || validateState === undefined) {
+        if(validState === false || validState === undefined) {
             console.error(stateID + " is invalid for the current state of '"+ stateType+"'")
             this.emitError('invalidState', {
                 stateType: stateType,
                 stateID: stateID
             })
-            return false
+            validState = false
+        } else {
+            validState = true
+        }
+
+        return validState
+    }
+
+    // setters
+    // @param data is simply the data that was originally passed to the function
+    this.setState = function(stateType, stateID, data) {
+        let whitelist,
+            validState,
+            oldState,
+            newState;
+
+        validState = this.validateState(stateType, stateID)
+
+        if(validState !== true) {
+            console.log(validState)
+            return false;
         }
 
         // looks valid! Set the state

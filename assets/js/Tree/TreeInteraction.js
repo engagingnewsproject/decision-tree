@@ -75,11 +75,22 @@ function TreeInteraction(options) {
         return _postURL
     }
 
-    // save the passed history to localStorage and set the global _history to make sure everything is in sync
-    this.saveData = function(data) {
-        // TODO validate the data to be saved
-        let postURL = this.getPostURL()
-        let treeID =  this.getTree().getTreeID()
+    // passes the data to the server
+    this.saveInteraction = function(data) {
+        let validState,
+            Tree,
+            postUrl,
+            treeID;
+
+        Tree = this.getTree()
+        // Validate that it's a legit state
+        validState = Tree.validateState(data.newState.id, data.newState.type)
+        if(validState !== true) {
+            return false
+        }
+
+        postURL = this.getPostURL()
+        treeID =  Tree.getTreeID()
         // combine data and our userID
         data = Object.assign(data, {userID: this.getUserID()})
 
@@ -117,7 +128,7 @@ function TreeInteraction(options) {
         // what do we want to do here? Save that the tree loaded?
         this.setPostURL()
         // send our load
-        this.saveData({"action": "loaded"})
+        this.saveInteraction({"action": "loaded"})
             .then(this.response);
     }
 
@@ -155,14 +166,8 @@ TreeInteraction.prototype = {
                 this.build(data)
                 break
             case 'update':
-                this.saveData(data)
+                this.saveInteraction(data)
                     .then(this.log);
-                break
-            case 'restart':
-                // delete the history
-                break
-            case 'start':
-                // delete the history
                 break
         }
 
@@ -178,7 +183,7 @@ TreeInteraction.prototype = {
                 // tell the Tree to let all the other observers know that the TreeInteraction class is ready
                 Tree.message(item, data)
                 break
-            case 'saveData':
+            case 'saveInteraction':
                 // tell the Tree to let all the other observers know that we saved data
                 Tree.message(item, data)
                 break
