@@ -13,29 +13,47 @@
 
 
 namespace Cme\Database;
+use Cme\Utility as Utility;
 use PDO;
 
 class DB extends PDO {
 	public $tables,
-			  $views;
+		   $views,
+		   $errors = array();
+
 	public function __construct() {
 		// Table names for dynamic reference
 		$this->tables = [
-						 'tree'=>'tree',
-						 'tree_element'=>'tree_element',
-						 'tree_element_order'=>'tree_element_order',
-						 'tree_element_container'=>'tree_element_container',
-						 'tree_element_destination'=>'tree_element_destination',
-						 'tree_element_type'=>'tree_element_type'
+						 'tree'						=> 'tree',
+						 'tree_element'				=> 'tree_element',
+						 'tree_element_order'		=> 'tree_element_order',
+						 'tree_element_container'	=> 'tree_element_container',
+						 'tree_element_destination'	=> 'tree_element_destination',
+						 'tree_element_type'		=> 'tree_element_type',
+						 'tree_interaction'			=> 'tree_interaction',
+						 'tree_interaction_type'	=> 'tree_interaction_type',
+						 'tree_interaction_element'	=> 'tree_interaction_element',
+						 'tree_state'				=> 'tree_state',
+						 'tree_state_type'			=> 'tree_state_type',
 						];
 
 		$this->views = [
-						'tree' 			=> 'tree_api',
-						'tree_start'	=> 'tree_start',
-						'tree_group'	=> 'tree_group',
-						'tree_question'	=> 'tree_question',
-						'tree_option'	=> 'tree_option',
-						'tree_end'		=> 'tree_end'
+						'tree' 						=> 'tree_api',
+						'tree_start'				=> 'tree_start',
+						'tree_group'				=> 'tree_group',
+						'tree_question'				=> 'tree_question',
+						'tree_option'				=> 'tree_option',
+						'tree_end'					=> 'tree_end',
+						'tree_start_bounce'			=> 'tree_start_bounce',
+						'tree_interactions'			=> 'tree_interactions',
+						'tree_interaction_end'		=> 'tree_interaction_end',
+						'tree_interaction_history'	=> 'tree_interaction_history',
+						'tree_interaction_load'		=> 'tree_interaction_load',
+						'tree_interaction_option'	=> 'tree_interaction_option',
+						'tree_interaction_question'	=> 'tree_interaction_question',
+						'tree_interaction_reload'	=> 'tree_interaction_reload',
+						'tree_interaction_start'	=> 'tree_interaction_start',
+						'tree_interactions_max_date_by_user_and_tree'	=> 'tree_interactions_max_date_by_user_and_tree' // SORRY!
 					   ];
 		// check if a connection already exists
 		try {
@@ -230,15 +248,88 @@ class DB extends PDO {
 		return $sql;
 	}
 
+	public function get_interaction_types() {
+		// Do a select query to see if we get a returned row
+		$sql = "SELECT * from ".$this->tables['tree_interaction_type'];
+		// return the found interaction types
+		return $this->fetch_all($sql);
+	}
+
+	public function get_interaction_type($interaction_type) {
+		if(Utility\is_id($interaction_type)) {
+			return $this->get_interaction_type_by_id($interaction_type);
+		} else {
+			return $this->get_interaction_type_by_slug($interaction_type);
+		}
+	}
+
+	public function get_interaction_type_by_id($interaction_type_id) {
+		// Do a select query to see if we get a returned row
+		$params = [":interaction_type_id" => $interaction_type_id];
+		$sql = "SELECT * from ".$this->tables['tree_interaction_type']." WHERE
+				interaction_type_id = :interaction_type_id";
+		// return the found interaction type row
+		return $this->fetch_one($sql, $params);
+	}
+
+	public function get_interaction_type_by_slug($interaction_type) {
+		// Do a select query to see if we get a returned row
+		$params = [":interaction_type" => $interaction_type];
+		$sql = "SELECT * from ".$this->tables['tree_interaction_type']." WHERE
+				interaction_type = :interaction_type";
+		// return the found interaction type row
+		return $this->fetch_one($sql, $params);
+	}
+
+	public function get_state_types() {
+		// Do a select query to see if we get a returned row
+		$sql = "SELECT * from ".$this->tables['tree_state_type'];
+		// return the found state types
+		return $this->fetch_all($sql);
+	}
+
+	public function get_state_type($state_type) {
+		if(Utility\is_id($state_type)) {
+			return $this->get_state_type_by_id($state_type);
+		} else {
+			return $this->get_state_type_by_slug($state_type);
+		}
+	}
+
+	public function get_state_type_by_id($state_type_id) {
+		// Do a select query to see if we get a returned row
+		$params = [":state_type_id" => $state_type_id];
+		$sql = "SELECT * from ".$this->tables['tree_state_type']." WHERE
+				state_type_id = :state_type_id";
+		// return the found state type row
+		return $this->fetch_one($sql, $params);
+	}
+
+	public function get_state_type_by_slug($state_type) {
+		// Do a select query to see if we get a returned row
+		$params = [":state_type" => $state_type];
+		$sql = "SELECT * from ".$this->tables['tree_state_type']." WHERE
+				state_type = :state_type";
+		// return the found interaction type row
+		return $this->fetch_one($sql, $params);
+	}
+
 	// Validation
 
 	// Make sure the tree_id exists
-	protected function validate_tree_id($tree_id) {
+	public function validate_tree_id($tree_id) {
+		$is_valid = false;
+		// if we can find that tree id, it's valid
+		if($this->get_tree($tree_id) !== false) {
+			$is_valid = true;
+		}
 
+		return $is_valid;
 	}
 
-	// Make sure the id is what it's supposed to be
-	protected function validate_el_type_id($tree_id, $el_type_id, $el_type) {
+	// Make sure the id is what it's supposed to be ( ie, that el_id 2 is a 'question')
+	public function validate_el_type_id($tree_id, $el_type_id, $el_type) {
+	//	var_dump('hi!');
 		$is_valid = false;
 
 		// Query the $el_type_id
@@ -259,10 +350,31 @@ class DB extends PDO {
 	}
 
 	// Must be of el_type = 'question' or 'end'
-	protected function validate_destination_id() {
+	public function validate_destination_id() {
 
 	}
 
+	// Make sure the interaction type exists
+	public function validate_interaction_type($interaction_type) {
+		$is_valid = false;
 
+		// if we can find that tree id, it's valid
+		if($this->get_interaction_type($interaction_type) !== false) {
+			$is_valid = true;
+		}
 
+		return $is_valid;
+	}
+
+	// Make sure the state type exists
+	public function validate_state_type($state_type) {
+		$is_valid = false;
+
+		// if we can find that tree id, it's valid
+		if($this->get_state_type($state_type) !== false) {
+			$is_valid = true;
+		}
+
+		return $is_valid;
+	}
 }

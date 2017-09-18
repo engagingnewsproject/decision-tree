@@ -64,11 +64,6 @@ function Tree(data, observers) {
             return false
         }
 
-        // check to make sure we're not trying to set the same state again
-        if(_state.type === stateType && _state.id === stateID) {
-            return false;
-        }
-
         // check if the stateID is a valid ID for this state
         if(stateType === 'tree') {
             if(stateID === this.getTreeID()) {
@@ -82,8 +77,8 @@ function Tree(data, observers) {
             // it's always fine
             validState = true
         }
-        else {
-            validState = this.getDataByType(stateType, stateID);
+        else if(this.getDataByType(stateType, stateID) !== undefined) {
+            validState = true
         }
 
         if(validState === false || validState === undefined) {
@@ -93,8 +88,6 @@ function Tree(data, observers) {
                 stateID: stateID
             })
             validState = false
-        } else {
-            validState = true
         }
 
         return validState
@@ -107,6 +100,11 @@ function Tree(data, observers) {
             validState,
             oldState,
             newState;
+
+        // check to make sure we're not trying to set the same state again
+        if(_state.type === stateType && _state.id === stateID) {
+            return false;
+        }
 
         validState = this.validateState(stateType, stateID)
 

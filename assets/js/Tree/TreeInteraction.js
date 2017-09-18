@@ -71,28 +71,42 @@ function TreeInteraction(options) {
     }
 
     this.setPostURL = function() {
-        _postURL = this.getRootURL()+'/api/v1/trees/'+this.getTree().getTreeID()+'/interaction/new';
+        _postURL = this.getRootURL()+'/api/v1/interactions/new';
         return _postURL
     }
 
     // passes the data to the server
     this.saveInteraction = function(data) {
-        let validState,
+        let whitelist,
+            validState,
             Tree,
-            postUrl,
+            postURL,
             treeID;
 
         Tree = this.getTree()
         // Validate that it's a legit state
-        validState = Tree.validateState(data.newState.id, data.newState.type)
+        validState = Tree.validateState(data.destination.type, data.destination.id)
+
         if(validState !== true) {
-            return false
+            console.error('Invalid Tree State');
+            return new Promise(function(resolve, reject) {});
         }
+
+
+        // validate interaction type
+        whitelist = ['load', 'reload', 'start', 'restart', 'overview', 'option', 'history']
+
+        // check allowed interaction types
+        if(!whitelist.includes(data.interaction.type)) {
+            console.error(data.interaction.type + " is not an allowed interaction. Allowed interactions are "+whitelist.toString())
+        }
+
 
         postURL = this.getPostURL()
         treeID =  Tree.getTreeID()
+
         // combine data and our userID
-        data = Object.assign(data, {userID: this.getUserID()})
+        data = Object.assign(data, {user_id: this.getUserID(), tree_id: Tree.getTreeID()})
 
         return new Promise(function(resolve, reject) {
 
@@ -124,18 +138,26 @@ function TreeInteraction(options) {
     }
 
     this.init = function() {
+
         _setUserID()
         // what do we want to do here? Save that the tree loaded?
         this.setPostURL()
         // send our load
-        this.saveInteraction({"action": "loaded"})
+
+        let data = {}
+        data.interaction = {
+            type: 'load',
+            id: this.getTree().getTreeID()
+        }
+        data.destination = this.getTree().getState()
+        this.saveInteraction(data)
             .then(this.response);
     }
 
     this.response = function(request) {
         // response from the server
         let data = JSON.parse(request.response)
-        // console.log(data)
+        console.log('response', data)
     }
 
     // set the rootURL
@@ -160,13 +182,15 @@ TreeInteraction.prototype = {
     * Listen to parent Tree's emitted actions and handle accordingly
     */
     on: function(action, data) {
+        let interaction;
         switch(action) {
             case 'ready':
                 // data will be the tree itself
                 this.build(data)
                 break
             case 'update':
-                this.saveInteraction(data)
+                interaction = this.convertUpdateToInteraction(data)
+                this.saveInteraction(interaction)
                     .then(this.log);
                 break
         }
@@ -188,5 +212,36 @@ TreeInteraction.prototype = {
                 Tree.message(item, data)
                 break
         }
+    },
+
+    convertUpdateToInteraction: function(update) {
+        console.log(update)
+        let data = {}
+        let interactionType = update.data.type
+        let interactionID = false
+        let observer = update.data.observer
+
+        data.interaction = {}
+
+        if(interactionType === 'option') {
+            // pass the option_id
+            interactionID = update.data.option_id
+        }
+        // check if it's a history click
+        else if(observer === 'TreeHistoryView') {
+            interactionType = 'history'
+        }
+        // if the observer is 'TreeHistory' then it's a forceUpdateCurrentState so it's a reload
+        else if(observer === 'TreeHistory') {
+            interactionType = 'reload'
+        }
+
+        data.interaction.type = interactionType
+        data.interaction.id = interactionID
+        data.destination = update.newState
+
+        return data;
     }
+
+
 }

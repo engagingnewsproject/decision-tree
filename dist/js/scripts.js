@@ -67,11 +67,6 @@
                 return false;
             }
 
-            // check to make sure we're not trying to set the same state again
-            if (_state.type === stateType && _state.id === stateID) {
-                return false;
-            }
-
             // check if the stateID is a valid ID for this state
             if (stateType === 'tree') {
                 if (stateID === this.getTreeID()) {
@@ -82,8 +77,8 @@
             } else if (stateType === 'intro') {
                 // it's always fine
                 validState = true;
-            } else {
-                validState = this.getDataByType(stateType, stateID);
+            } else if (this.getDataByType(stateType, stateID) !== undefined) {
+                validState = true;
             }
 
             if (validState === false || validState === undefined) {
@@ -93,8 +88,6 @@
                     stateID: stateID
                 });
                 validState = false;
-            } else {
-                validState = true;
             }
 
             return validState;
@@ -107,6 +100,11 @@
                 validState = void 0,
                 oldState = void 0,
                 newState = void 0;
+
+            // check to make sure we're not trying to set the same state again
+            if (_state.type === stateType && _state.id === stateID) {
+                return false;
+            }
 
             validState = this.validateState(stateType, stateID);
 
@@ -1470,28 +1468,40 @@ function TreeInteraction(options) {
     };
 
     this.setPostURL = function () {
-        _postURL = this.getRootURL() + '/api/v1/trees/' + this.getTree().getTreeID() + '/interaction/new';
+        _postURL = this.getRootURL() + '/api/v1/interactions/new';
         return _postURL;
     };
 
     // passes the data to the server
     this.saveInteraction = function (data) {
-        var validState = void 0,
+        var whitelist = void 0,
+            validState = void 0,
             Tree = void 0,
-            postUrl = void 0,
+            postURL = void 0,
             treeID = void 0;
 
         Tree = this.getTree();
         // Validate that it's a legit state
-        validState = Tree.validateState(data.newState.id, data.newState.type);
+        validState = Tree.validateState(data.destination.type, data.destination.id);
+
         if (validState !== true) {
-            return false;
+            console.error('Invalid Tree State');
+            return new Promise(function (resolve, reject) {});
+        }
+
+        // validate interaction type
+        whitelist = ['load', 'reload', 'start', 'restart', 'overview', 'option', 'history'];
+
+        // check allowed interaction types
+        if (!whitelist.includes(data.interaction.type)) {
+            console.error(data.interaction.type + " is not an allowed interaction. Allowed interactions are " + whitelist.toString());
         }
 
         postURL = this.getPostURL();
         treeID = Tree.getTreeID();
+
         // combine data and our userID
-        data = Object.assign(data, { userID: this.getUserID() });
+        data = Object.assign(data, { user_id: this.getUserID(), tree_id: Tree.getTreeID() });
 
         return new Promise(function (resolve, reject) {
 
@@ -1523,17 +1533,25 @@ function TreeInteraction(options) {
     };
 
     this.init = function () {
+
         _setUserID();
         // what do we want to do here? Save that the tree loaded?
         this.setPostURL();
         // send our load
-        this.saveInteraction({ "action": "loaded" }).then(this.response);
+
+        var data = {};
+        data.interaction = {
+            type: 'load',
+            id: this.getTree().getTreeID()
+        };
+        data.destination = this.getTree().getState();
+        this.saveInteraction(data).then(this.response);
     };
 
     this.response = function (request) {
         // response from the server
         var data = JSON.parse(request.response);
-        // console.log(data)
+        console.log('response', data);
     };
 
     // set the rootURL
@@ -1557,13 +1575,15 @@ TreeInteraction.prototype = {
     * Listen to parent Tree's emitted actions and handle accordingly
     */
     on: function on(action, data) {
+        var interaction = void 0;
         switch (action) {
             case 'ready':
                 // data will be the tree itself
                 this.build(data);
                 break;
             case 'update':
-                this.saveInteraction(data).then(this.log);
+                interaction = this.convertUpdateToInteraction(data);
+                this.saveInteraction(interaction).then(this.log);
                 break;
         }
     },
@@ -1583,7 +1603,37 @@ TreeInteraction.prototype = {
                 Tree.message(item, data);
                 break;
         }
+    },
+
+    convertUpdateToInteraction: function convertUpdateToInteraction(update) {
+        console.log(update);
+        var data = {};
+        var interactionType = update.data.type;
+        var interactionID = false;
+        var observer = update.data.observer;
+
+        data.interaction = {};
+
+        if (interactionType === 'option') {
+            // pass the option_id
+            interactionID = update.data.option_id;
+        }
+        // check if it's a history click
+        else if (observer === 'TreeHistoryView') {
+                interactionType = 'history';
+            }
+            // if the observer is 'TreeHistory' then it's a forceUpdateCurrentState so it's a reload
+            else if (observer === 'TreeHistory') {
+                    interactionType = 'reload';
+                }
+
+        data.interaction.type = interactionType;
+        data.interaction.id = interactionID;
+        data.destination = update.newState;
+
+        return data;
     }
+
 };
 'use strict';
 

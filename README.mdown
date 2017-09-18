@@ -51,6 +51,9 @@ API Endpoints
 
 /interactions/new
 /interactions/1
+/interactions/types/
+/interactions/types/1
+/interactions/types/load
 
 /interactions/{tree_id}
 /interactions/{tree_id}/loads/
@@ -58,6 +61,6 @@ API Endpoints
 /interactions/{tree_id}/reloads/
 /interactions/{tree_id}/starts/
 /interactions/{tree_id}/starts/{interaction_id}
-/starts/
-/loads/
-/
+
+/states/types/2
+/states/types/question

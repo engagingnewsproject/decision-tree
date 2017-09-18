@@ -209,27 +209,6 @@ $app->group('/api', function() {
             return $response;
         });
 
-        // save data
-        $this->post('/trees/{tree_id}/interaction/new', function (Request $request, Response $response) {
-            $tree_id = $request->getAttribute('tree_id');
-            // passed data
-            $data = $request->getParsedBody();
-            // validate it
-            // print_r($data);
-            // save it
-
-            // build the response
-            $savedData = ['success'=>true,
-                          'savedData' => $data
-                      ];
-            // return the JSON
-            $response->withStatus(200)
-                ->withHeader("Content-Type", "application/json")
-                ->write(json_encode($data));
-            return $response;
-        });
-
-
         // Site data
         $this->post('/sites/new', function (Request $request, Response $response) {
             // passed data
@@ -304,6 +283,56 @@ $app->group('/api', function() {
             $response->withStatus(200)
                 ->withHeader("Content-Type", "application/json")
                 ->write(json_encode($data));
+            return $response;
+        });
+
+        // save interactions
+        $this->post('/interactions/new', function (Request $request, Response $response) {
+            // passed data
+            $data = $request->getParsedBody();
+
+            // try to save it
+            $interaction = new \Cme\Database\SaveInteraction();
+            $save = $interaction->save($data);
+
+            // return the JSON
+            $response->withStatus(200)
+                ->withHeader("Content-Type", "application/json")
+                ->write(json_encode($save));
+            return $response;
+        });
+
+        $this->get('/interactions/types/', function (Request $request, Response $response) {
+            $DB = new \Cme\Database\DB();
+            $interaction_types = $DB->get_interaction_types();
+
+            $response->getBody()->write(json_encode($interaction_types));
+            return $response;
+        });
+
+        $this->get('/interactions/types/{type_id}', function (Request $request, Response $response) {
+            $type_id = $request->getAttribute('type_id');
+            $DB = new \Cme\Database\DB();
+            $interaction_type = $DB->get_interaction_type($type_id);
+
+            $response->getBody()->write(json_encode($interaction_type));
+            return $response;
+        });
+
+        $this->get('/states/types/', function (Request $request, Response $response) {
+            $DB = new \Cme\Database\DB();
+            $state_types = $DB->get_state_types();
+
+            $response->getBody()->write(json_encode($state_types));
+            return $response;
+        });
+
+        $this->get('/states/types/{type_id}', function (Request $request, Response $response) {
+            $type_id = $request->getAttribute('type_id');
+            $DB = new \Cme\Database\DB();
+            $state_type = $DB->get_state_type($type_id);
+
+            $response->getBody()->write(json_encode($state_type));
             return $response;
         });
     });

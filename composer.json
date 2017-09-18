@@ -12,6 +12,7 @@
             "src/utilities.php",
             "src/Database/DB.php",
             "src/Database/CompileTree.php",
+            "src/Database/Interaction/SaveInteraction.php",
             "tree-config.php",
             "tree-db.php"
         ]
