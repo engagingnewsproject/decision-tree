@@ -2066,7 +2066,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
             if (/https?:\/\/(?:dev\/decision-tree|localhost:3000\/decision-tree)\//.test(window.location.href)) {
                 baseUrl = 'http://dev/decision-tree';
             } else {
-                baseUrl = 'http://tree.mediaengagement.org';
+                baseUrl = 'https://tree.mediaengagement.org';
             }
 
             var request = new XMLHttpRequest();
