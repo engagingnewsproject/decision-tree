@@ -40,6 +40,18 @@ API Endpoints
 /trees/1/ends/4
 /trees/1/groups/
 /trees/1/groups/5
+
+/interactions/new
+/interactions/1
+/interactions/types/
+/interactions/types/1
+/interactions/types/load
+
+/states/types/2
+/states/types/question
+
+Roadmap
+--------------------------
 /trees/1/embeds/
 /trees/1/embeds/2
 
@@ -49,18 +61,9 @@ API Endpoints
 /sites/1/embeds/new
 /sites/1/embeds/1
 
-/interactions/new
-/interactions/1
-/interactions/types/
-/interactions/types/1
-/interactions/types/load
-
 /interactions/{tree_id}
 /interactions/{tree_id}/loads/
 /interactions/{tree_id}/loads/{interaction_id}
 /interactions/{tree_id}/reloads/
 /interactions/{tree_id}/starts/
 /interactions/{tree_id}/starts/{interaction_id}
-
-/states/types/2
-/states/types/question
