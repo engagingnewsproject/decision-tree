@@ -164,15 +164,13 @@ class SaveInteraction extends DB {
                                             tree_id,
                                             user_id,
                                             interaction_type_id,
-                                            state_type_id,
-                                            interaction_created_at
+                                            state_type_id
                                         )
                                         VALUES(
                                             :tree_id,
                                             :user_id,
                                             :interaction_type_id,
-                                            :state_type_id,
-                                            NOW()
+                                            :state_type_id
                                         )';
         // insert the mc_option into the database
         $stmt = $this->DB->query($sql, $params);
@@ -187,7 +185,7 @@ class SaveInteraction extends DB {
                         ];
 
             // if it's one that has a state_id with it, then let's save that too
-            $interactions = ['option', 'history'];
+            $interactions = ['option', 'history', 'start'];
             if(in_array($interaction_type['interaction_type'], $interactions) && $destination_type['state_type'] !== 'overview') {
                 $this->insertState($inserted_interaction_id, $destination_id);
             }

@@ -10,10 +10,6 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema tree
 -- -----------------------------------------------------
-
--- -----------------------------------------------------
--- Schema tree
--- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `tree` DEFAULT CHARACTER SET utf8 ;
 USE `tree` ;
 
@@ -25,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree` (
   `tree_slug` VARCHAR(255) NOT NULL DEFAULT '',
   `tree_content` VARCHAR(512) NOT NULL DEFAULT '',
   `tree_title` VARCHAR(255) NOT NULL DEFAULT '',
-  `tree_created_at` TIMESTAMP DEFAULT '1970-01-01 00:00:00',
+  `tree_created_at` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
   `tree_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `tree_deleted` TINYINT DEFAULT 0,
   `tree_owner` INT NULL,
@@ -57,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree_element` (
   `el_content` VARCHAR(512) NOT NULL DEFAULT '',
   `el_created_by` INT NULL,
   `el_updated_by` INT NULL,
-  `el_created_at` TIMESTAMP DEFAULT '1970-01-01 00:00:00',
+  `el_created_at` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
   `el_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`el_id`),
   INDEX `el_type_id_idx` (`el_type_id` ASC),
@@ -164,8 +160,8 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree_interaction` (
   `tree_id` INT NULL,
   `interaction_type_id` INT NULL,
   `state_type_id` INT NULL,
-  `el_created_at` TIMESTAMP DEFAULT '1970-01-01 00:00:00',
-  `el_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `interaction_created_at` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
+  `interaction_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`interaction_id`),
   INDEX `interaction_type_id_idx` (`interaction_type_id` ASC),
   INDEX `tree_id_idx` (`tree_id` ASC),
@@ -238,7 +234,7 @@ CREATE TRIGGER tree_insert_trigger
 BEFORE INSERT ON `tree`.`tree`
 FOR EACH ROW
 BEGIN
-IF NEW.tree_created_at = '1970-01-01 00:00:00' THEN
+IF NEW.tree_created_at = '1970-01-01 06:00:00' THEN
 SET NEW.tree_created_at = NOW();
 END IF;
 END;//
@@ -253,8 +249,23 @@ CREATE TRIGGER tree_element_insert_trigger
 BEFORE INSERT ON `tree`.`tree_element`
 FOR EACH ROW
 BEGIN
-IF NEW.el_created_at = '1970-01-01 00:00:00' THEN
+IF NEW.el_created_at = '1970-01-01 06:00:00' THEN
 SET NEW.el_created_at = NOW();
+END IF;
+END;//
+DELIMITER ;
+
+-- -----------------------------------------------------
+-- Trigger for setting "Created at" timestamp on tree table
+-- -----------------------------------------------------
+DELIMITER //
+DROP TRIGGER IF EXISTS tree_insert_trigger//
+CREATE TRIGGER tree_insert_trigger
+BEFORE INSERT ON `tree`.`tree_interaction`
+FOR EACH ROW
+BEGIN
+IF NEW.interaction_created_at = '1970-01-01 06:00:00' THEN
+SET NEW.interaction_created_at = NOW();
 END IF;
 END;//
 DELIMITER ;
