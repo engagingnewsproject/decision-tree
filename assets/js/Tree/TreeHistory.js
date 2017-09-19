@@ -79,6 +79,10 @@ function TreeHistory(options) {
         if(localStorage.getItem(_historyStorageName) === null) {
             // sets a blank history and index
             this.clearHistory();
+            this.emit('historyCreate', 'historyCreate', {})
+        } else {
+            // the history has been created before, so emit a reload
+            this.emit('historyReload', 'historyReload', {})
         }
 
         // set from localStorage
@@ -136,6 +140,9 @@ TreeHistory.prototype = {
             this.clearHistory()
         }
         this.forceCurrentState()
+        // let everyone know the treeHistory is ready
+        // emit that we've finished building the History
+        this.emit('ready', 'historyReady', this)
     },
 
     addHistory: function(state) {
@@ -185,11 +192,19 @@ TreeHistory.prototype = {
     * Let our Tree know about the state we want to change to.
     */
     emit: function(action, item, data) {
-
+        let Tree = this.getTree()
         switch(action) {
+            case 'ready':
+                Tree.message(item, data);
+                break
             case 'update':
-                let Tree = this.getTree()
                 Tree.update(item, data);
+                break
+            case 'historyCreate':
+                Tree.message(item, data);
+                break
+            case 'historyReload':
+                Tree.message(item, data);
                 break
         }
     },

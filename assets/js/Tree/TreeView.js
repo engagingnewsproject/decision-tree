@@ -587,7 +587,7 @@ TreeView.prototype = {
             // now continue on with checking if we found one or not.
             if(el.nodeName === 'A' && el.data !== undefined) {
                 // check for el.data
-                // if we're in the tree view, don't switch the state (unless they click the start button), just go to that question on the page
+                // if we're in the overview state, don't switch the state (unless they click the start button), just go to that question on the page
                 if(this.getTree().getState().type !== 'overview' || (this.getTree().getState().type === 'overview' && el.data.type === 'start') ) {
                     event.preventDefault()
                     this.emit('update', 'state', Object.assign(el.data, extraData))
@@ -595,8 +595,10 @@ TreeView.prototype = {
                     // in tree state
                     event.preventDefault()
                     // focus that question/end state to show them where it is
-                    el = this.getDestination(el.data.destination_id)
-                    el.focus()
+                    let destinationEl = this.getDestination(el.data.destination_id)
+                    destinationEl.focus()
+                    // emit that it happened to the other observers (like TreeInteraction so we can save the interaction)
+                    this.emit('overviewOptionInteraction', 'overviewOptionInteraction', el.data)
                 }
             }
 
@@ -668,6 +670,12 @@ TreeView.prototype = {
                 break
             case 'treeHeight':
                 Tree.message(item, data)
+                break
+            case 'overviewOptionInteraction':
+                // item = overviewOptionInteraction
+                // data = option_id clicked and resulting destination data
+                Tree.message(item, data)
+                break
         }
 
     },

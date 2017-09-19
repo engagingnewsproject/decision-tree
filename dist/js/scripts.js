@@ -574,6 +574,10 @@ function TreeHistory(options) {
         if (localStorage.getItem(_historyStorageName) === null) {
             // sets a blank history and index
             this.clearHistory();
+            this.emit('historyCreate', 'historyCreate', {});
+        } else {
+            // the history has been created before, so emit a reload
+            this.emit('historyReload', 'historyReload', {});
         }
 
         // set from localStorage
@@ -628,6 +632,9 @@ TreeHistory.prototype = {
             this.clearHistory();
         }
         this.forceCurrentState();
+        // let everyone know the treeHistory is ready
+        // emit that we've finished building the History
+        this.emit('ready', 'historyReady', this);
     },
 
     addHistory: function addHistory(state) {
@@ -677,11 +684,19 @@ TreeHistory.prototype = {
     * Let our Tree know about the state we want to change to.
     */
     emit: function emit(action, item, data) {
-
+        var Tree = this.getTree();
         switch (action) {
+            case 'ready':
+                Tree.message(item, data);
+                break;
             case 'update':
-                var Tree = this.getTree();
                 Tree.update(item, data);
+                break;
+            case 'historyCreate':
+                Tree.message(item, data);
+                break;
+            case 'historyReload':
+                Tree.message(item, data);
                 break;
         }
     },
@@ -1467,6 +1482,14 @@ function TreeInteraction(options) {
         return _postURL;
     };
 
+    this.init = function () {
+        // set the userID
+        _setUserID();
+
+        // set the post URL
+        this.setPostURL();
+    };
+
     // passes the data to the server
     this.saveInteraction = function (data) {
         var whitelist = void 0,
@@ -1527,22 +1550,6 @@ function TreeInteraction(options) {
         });
     };
 
-    this.init = function () {
-
-        _setUserID();
-        // what do we want to do here? Save that the tree loaded?
-        this.setPostURL();
-        // send our load
-
-        var data = {};
-        data.interaction = {
-            type: 'load',
-            id: this.getTree().getTreeID()
-        };
-        data.destination = this.getTree().getState();
-        this.saveInteraction(data).then(this.response);
-    };
-
     this.response = function (request) {
         // response from the server
         var data = JSON.parse(request.response);
@@ -1576,9 +1583,26 @@ TreeInteraction.prototype = {
                 // data will be the tree itself
                 this.build(data);
                 break;
+            case 'historyCreate':
+                // history loaded for the first time, so it's our first load
+                this.saveLoad('load');
+                break;
+            case 'historyReload':
+                // save the reload
+                this.saveLoad('reload');
+                break;
             case 'update':
+                // if the update is from the TreeHistory,
+                // ignore it, BC we're already saving their update (forceCurrentState) from the reload/load
+                if (data.data.observer === 'TreeHistory') {
+                    break;
+                }
                 interaction = this.convertUpdateToInteraction(data);
-                this.saveInteraction(interaction).then(this.log);
+                this.saveInteraction(interaction).then(this.response);
+                break;
+            case 'overviewOptionInteraction':
+                interaction = this.convertOverviewOptionToInteraction(data);
+                this.saveInteraction(interaction).then(this.response);
                 break;
         }
     },
@@ -1600,12 +1624,46 @@ TreeInteraction.prototype = {
         }
     },
 
+    /**
+    * Saves load or reload from the TreeHistory
+    * @param loadType (STRING) 'load' or 'reload'
+    */
+    saveLoad: function saveLoad(loadType) {
+        var Tree = void 0,
+            data = void 0;
+
+        Tree = this.getTree();
+        // build our data
+        data = {};
+
+        // set the interaction
+        data.interaction = {
+            type: loadType,
+            id: this.getTree().getTreeID()
+
+            // set the destination (whatever we loaded to)
+        };data.destination = this.getTree().getState();
+
+        // save the interaction
+        this.saveInteraction(data).then(this.response);
+    },
+
+    /**
+     * Takes the data structure from an update state response
+     * and convertes it into the data structure we need to
+     * save it on the server.
+     */
     convertUpdateToInteraction: function convertUpdateToInteraction(update) {
+        var data = void 0,
+            interactionType = void 0,
+            interactionID = void 0,
+            observer = void 0;
+
         console.log(update);
-        var data = {};
-        var interactionType = update.data.type;
-        var interactionID = false;
-        var observer = update.data.observer;
+        data = {};
+        interactionType = update.data.type;
+        interactionID = false;
+        observer = update.data.observer;
 
         data.interaction = {};
 
@@ -1617,16 +1675,35 @@ TreeInteraction.prototype = {
         else if (observer === 'TreeHistoryView') {
                 interactionType = 'history';
             }
-            // if the observer is 'TreeHistory' then it's a forceUpdateCurrentState so it's a reload
-            else if (observer === 'TreeHistory') {
-                    interactionType = 'reload';
-                }
 
         data.interaction.type = interactionType;
         data.interaction.id = interactionID;
         data.destination = update.newState;
 
         return data;
+    },
+
+    /**
+     * Takes the data structure from the option.data of an
+     * overviewOptionInteraction and convertes it into the
+     * data structure we need to save it on the server.
+     * @param data should be the option_el.data
+     */
+    convertOverviewOptionToInteraction: function convertOverviewOptionToInteraction(data) {
+        var interactionData = void 0;
+
+        // build data
+        interactionData = {
+            interaction: {
+                id: data.option_id,
+                type: data.type // 'option'
+            }
+
+            // add the destination (NOT THE QUESTION DESTINATION CUZ WE'RE STILL IN THE OVERVIEW STATE)
+            // the current tree state will be type: 'overview', id: treeID
+        };interactionData.destination = this.getTree().getState();
+
+        return interactionData;
     }
 
 };
@@ -2335,7 +2412,7 @@ TreeView.prototype = {
             // now continue on with checking if we found one or not.
             if (el.nodeName === 'A' && el.data !== undefined) {
                 // check for el.data
-                // if we're in the tree view, don't switch the state (unless they click the start button), just go to that question on the page
+                // if we're in the overview state, don't switch the state (unless they click the start button), just go to that question on the page
                 if (this.getTree().getState().type !== 'overview' || this.getTree().getState().type === 'overview' && el.data.type === 'start') {
                     event.preventDefault();
                     this.emit('update', 'state', Object.assign(el.data, extraData));
@@ -2343,8 +2420,10 @@ TreeView.prototype = {
                     // in tree state
                     event.preventDefault();
                     // focus that question/end state to show them where it is
-                    el = this.getDestination(el.data.destination_id);
-                    el.focus();
+                    var destinationEl = this.getDestination(el.data.destination_id);
+                    destinationEl.focus();
+                    // emit that it happened to the other observers (like TreeInteraction so we can save the interaction)
+                    this.emit('overviewOptionInteraction', 'overviewOptionInteraction', el.data);
                 }
             }
 
@@ -2416,6 +2495,12 @@ TreeView.prototype = {
                 break;
             case 'treeHeight':
                 Tree.message(item, data);
+                break;
+            case 'overviewOptionInteraction':
+                // item = overviewOptionInteraction
+                // data = option_id clicked and resulting destination data
+                Tree.message(item, data);
+                break;
         }
     },
 

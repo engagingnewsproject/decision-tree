@@ -75,6 +75,14 @@ function TreeInteraction(options) {
         return _postURL
     }
 
+    this.init = function() {
+        // set the userID
+        _setUserID()
+
+        // set the post URL
+        this.setPostURL()
+    }
+
     // passes the data to the server
     this.saveInteraction = function(data) {
         let whitelist,
@@ -137,23 +145,6 @@ function TreeInteraction(options) {
         })
     }
 
-    this.init = function() {
-
-        _setUserID()
-        // what do we want to do here? Save that the tree loaded?
-        this.setPostURL()
-        // send our load
-
-        let data = {}
-        data.interaction = {
-            type: 'load',
-            id: this.getTree().getTreeID()
-        }
-        data.destination = this.getTree().getState()
-        this.saveInteraction(data)
-            .then(this.response);
-    }
-
     this.response = function(request) {
         // response from the server
         let data = JSON.parse(request.response)
@@ -188,10 +179,28 @@ TreeInteraction.prototype = {
                 // data will be the tree itself
                 this.build(data)
                 break
+            case 'historyCreate':
+                // history loaded for the first time, so it's our first load
+                this.saveLoad('load')
+                break
+            case 'historyReload':
+                // save the reload
+                this.saveLoad('reload')
+                break
             case 'update':
+                // if the update is from the TreeHistory,
+                // ignore it, BC we're already saving their update (forceCurrentState) from the reload/load
+                if(data.data.observer === 'TreeHistory') {
+                    break
+                }
                 interaction = this.convertUpdateToInteraction(data)
                 this.saveInteraction(interaction)
-                    .then(this.log);
+                    .then(this.response);
+                break
+            case 'overviewOptionInteraction':
+                interaction = this.convertOverviewOptionToInteraction(data)
+                this.saveInteraction(interaction)
+                    .then(this.response);
                 break
         }
 
@@ -214,12 +223,49 @@ TreeInteraction.prototype = {
         }
     },
 
+
+    /**
+    * Saves load or reload from the TreeHistory
+    * @param loadType (STRING) 'load' or 'reload'
+    */
+    saveLoad: function(loadType) {
+        let Tree,
+            data;
+
+        Tree = this.getTree()
+        // build our data
+        data = {}
+
+        // set the interaction
+        data.interaction = {
+            type: loadType,
+            id: this.getTree().getTreeID()
+        }
+
+        // set the destination (whatever we loaded to)
+        data.destination = this.getTree().getState()
+
+        // save the interaction
+        this.saveInteraction(data)
+            .then(this.response);
+    },
+
+    /**
+     * Takes the data structure from an update state response
+     * and convertes it into the data structure we need to
+     * save it on the server.
+     */
     convertUpdateToInteraction: function(update) {
+        let data,
+            interactionType,
+            interactionID,
+            observer;
+
         console.log(update)
-        let data = {}
-        let interactionType = update.data.type
-        let interactionID = false
-        let observer = update.data.observer
+        data = {}
+        interactionType = update.data.type
+        interactionID = false
+        observer = update.data.observer
 
         data.interaction = {}
 
@@ -231,16 +277,38 @@ TreeInteraction.prototype = {
         else if(observer === 'TreeHistoryView') {
             interactionType = 'history'
         }
-        // if the observer is 'TreeHistory' then it's a forceUpdateCurrentState so it's a reload
-        else if(observer === 'TreeHistory') {
-            interactionType = 'reload'
-        }
+
 
         data.interaction.type = interactionType
         data.interaction.id = interactionID
         data.destination = update.newState
 
         return data;
+    },
+
+
+    /**
+     * Takes the data structure from the option.data of an
+     * overviewOptionInteraction and convertes it into the
+     * data structure we need to save it on the server.
+     * @param data should be the option_el.data
+     */
+    convertOverviewOptionToInteraction: function(data) {
+        let interactionData;
+
+        // build data
+        interactionData = {
+            interaction: {
+                id: data.option_id,
+                type: data.type // 'option'
+            }
+        }
+
+        // add the destination (NOT THE QUESTION DESTINATION CUZ WE'RE STILL IN THE OVERVIEW STATE)
+        // the current tree state will be type: 'overview', id: treeID
+        interactionData.destination = this.getTree().getState()
+
+        return interactionData;
     }
 
 
