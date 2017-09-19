@@ -589,12 +589,13 @@ SELECT
 -- This is the state the user left the site at
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`tree_state_bounce`;
-USE `tree`;
-CREATE  OR REPLACE VIEW `tree_state_bounce` (interaction_id, user_id, tree_id, state_bounced, el_id, interaction_created_at) AS
+CREATE  OR REPLACE VIEW `tree_state_bounce` (interaction_id, tree_id, state_bounced, el_id, interaction_created_at) AS
 SELECT
-    interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.state_type, interactions.interaction_created_at
+    interactions.interaction_id, interactions.tree_id, interactions.state_type, state.el_id, interactions.interaction_created_at
   FROM
     tree.tree_interactions interactions
+  LEFT JOIN
+    tree.tree_state state ON interactions.interaction_id = state.interaction_id
   INNER JOIN
     tree.tree_interactions_max_date_by_user_and_tree max_date
    ON
