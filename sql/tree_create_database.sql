@@ -421,7 +421,9 @@ CREATE  OR REPLACE VIEW `tree_interactions` (interaction_id, user_id, tree_id, i
     INNER JOIN
         tree.tree_interaction_type interaction_type ON interaction.interaction_type_id = interaction_type.interaction_type_id
     INNER JOIN
-        tree.tree_state_type state_type ON interaction.state_type_id = state_type.state_type_id;
+        tree.tree_state_type state_type ON interaction.state_type_id = state_type.state_type_id
+    ORDER BY
+        interaction.interaction_id;
 
 
 -- -----------------------------------------------------
@@ -435,7 +437,9 @@ CREATE  OR REPLACE VIEW `tree_interaction_load` (interaction_id, user_id, tree_i
     FROM
         tree.tree_interactions interactions
     WHERE
-        interactions.interaction_type = 'load';
+        interactions.interaction_type = 'load'
+    ORDER BY
+        interactions.interaction_id;
 
 -- -----------------------------------------------------
 -- View `tree`.`tree_interaction_reload`
@@ -448,7 +452,9 @@ CREATE  OR REPLACE VIEW `tree_interaction_reload` (interaction_id, user_id, tree
     FROM
         tree.tree_interactions interactions
     WHERE
-        interactions.interaction_type = 'reload';
+        interactions.interaction_type = 'reload'
+    ORDER BY
+        interactions.interaction_id;
 
 -- -----------------------------------------------------
 -- View `tree`.`tree_interaction_overview`
@@ -461,7 +467,9 @@ CREATE  OR REPLACE VIEW `tree_interaction_overview` (interaction_id, user_id, tr
     FROM
         tree.tree_interactions interactions
     WHERE
-        interactions.interaction_type = 'overview';
+        interactions.interaction_type = 'overview'
+    ORDER BY
+        interactions.interaction_id;
 
 -- -----------------------------------------------------
 -- View `tree`.`tree_interaction_start`
@@ -470,17 +478,15 @@ DROP TABLE IF EXISTS `tree`.`tree_interaction_start`;
 USE `tree`;
 CREATE  OR REPLACE VIEW `tree_interaction_start` (interaction_id, user_id, tree_id, destination_state_type, destination_state_id, interaction_created_at) AS
     SELECT
-        interactions.interaction_id, interactions.user_id, interactions.tree_id, el_type.el_type, state.el_id, interactions.interaction_created_at
+        interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.state_type, state.el_id, interactions.interaction_created_at
     FROM
         tree.tree_interactions interactions
     INNER JOIN
-        tree.tree_state state ON interaction.interaction_id = state.interaction_id
-    INNER JOIN
-        tree.tree_element el ON state.el_id = el.el_id
-    INNER JOIN
-        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+        tree.tree_state state ON interactions.interaction_id = state.interaction_id
     WHERE
-        interaction_type.interaction_type = 'start';
+        interactions.interaction_type = 'start'
+    ORDER BY
+        interactions.interaction_id;
 
 -- -----------------------------------------------------
 -- View `tree`.`tree_interaction_option` interactions with questions
@@ -489,19 +495,17 @@ DROP TABLE IF EXISTS `tree`.`tree_interaction_option`;
 USE `tree`;
 CREATE  OR REPLACE VIEW `tree_interaction_option` (interaction_id, user_id, tree_id, option_id, destination_state_type, destination_state_id, interaction_created_at) AS
     SELECT
-        interaction.interaction_id, interaction.user_id, interaction.tree_id, interaction_el.el_id, state_type.state_type, state.el_id, interaction.interaction_created_at
+        interactions.interaction_id, interactions.user_id, interactions.tree_id, interaction_el.el_id, interactions.state_type, state.el_id, interactions.interaction_created_at
     FROM
-        tree.tree_interaction interaction
-    INNER JOIN
-        tree.tree_interaction_type interaction_type ON interaction.interaction_type_id = interaction_type.interaction_type_id
+        tree.tree_interactions interactions
     LEFT JOIN
-        tree.tree_state state ON interaction.interaction_id = state.interaction_id
+        tree.tree_state state ON interactions.interaction_id = state.interaction_id
     INNER JOIN
-        tree.tree_state_type state_type ON interaction.state_type_id = state_type.state_type_id
-    INNER JOIN
-        tree.tree_interaction_element interaction_el ON interaction.interaction_id = interaction_el.interaction_id
+        tree.tree_interaction_element interaction_el ON interactions.interaction_id = interaction_el.interaction_id
     WHERE
-        interaction_type.interaction_type = 'option';
+        interactions.interaction_type = 'option'
+    ORDER BY
+        interactions.interaction_id;
 
 -- -----------------------------------------------------
 -- View `tree`.`tree_interaction_overview_option` interactions with overviews and options
@@ -518,17 +522,15 @@ DROP TABLE IF EXISTS `tree`.`tree_interaction_question`;
 USE `tree`;
 CREATE  OR REPLACE VIEW `tree_interaction_question` (interaction_id, user_id, tree_id, question_id, interaction_created_at) AS
     SELECT
-        interaction.interaction_id, interaction.user_id, interaction.tree_id, state.el_id, interaction.interaction_created_at
+        interactions.interaction_id, interactions.user_id, interactions.tree_id, state.el_id, interactions.interaction_created_at
     FROM
-        tree.tree_interaction interaction
+        tree.tree_interactions interactions
     INNER JOIN
-        tree.tree_state state ON interaction.interaction_id = state.interaction_id
-    INNER JOIN
-        tree.tree_element el ON state.el_id = el.el_id
-    INNER JOIN
-        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+        tree.tree_state state ON interactions.interaction_id = state.interaction_id
     WHERE
-        el_type.el_type = 'question';
+        interactions.state_type = 'question'
+    ORDER BY
+        interactions.interaction_id;
 
 
 -- -----------------------------------------------------
@@ -538,17 +540,15 @@ DROP TABLE IF EXISTS `tree`.`tree_interaction_end`;
 USE `tree`;
 CREATE  OR REPLACE VIEW `tree_interaction_end` (interaction_id, user_id, tree_id, end_id, interaction_created_at) AS
     SELECT
-        interaction.interaction_id, interaction.user_id, interaction.tree_id, state.el_id, interaction.interaction_created_at
+        interactions.interaction_id, interactions.user_id, interactions.tree_id, state.el_id, interactions.interaction_created_at
     FROM
-        tree.tree_interaction interaction
+        tree.tree_interactions interactions
     INNER JOIN
-        tree.tree_state state ON interaction.interaction_id = state.interaction_id
-    INNER JOIN
-        tree.tree_element el ON state.el_id = el.el_id
-    INNER JOIN
-        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+        tree.tree_state state ON interactions.interaction_id = state.interaction_id
     WHERE
-        el_type.el_type = 'end';
+        interactions.state_type = 'end'
+    ORDER BY
+        interactions.interaction_id;
 
 -- -----------------------------------------------------
 -- View `tree`.`tree_interaction_history`
@@ -557,17 +557,15 @@ DROP TABLE IF EXISTS `tree`.`tree_interaction_history`;
 USE `tree`;
 CREATE  OR REPLACE VIEW `tree_interaction_history` (interaction_id, user_id, tree_id, destination_state_type, destination_state_id, interaction_created_at) AS
     SELECT
-        interaction.interaction_id, interaction.user_id, interaction.tree_id, state_type.state_type, state.el_id, interaction.interaction_created_at
+        interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.state_type, state.el_id, interactions.interaction_created_at
     FROM
-        tree.tree_interaction interaction
-    INNER JOIN
-        tree.tree_interaction_type interaction_type ON interaction.interaction_type_id = interaction_type.interaction_type_id
+        tree.tree_interactions interactions
     LEFT JOIN
-        tree.tree_state state ON interaction.interaction_id = state.interaction_id
-    INNER JOIN
-        tree.tree_state_type state_type ON interaction.state_type_id = state_type.state_type_id
+        tree.tree_state state ON interactions.interaction_id = state.interaction_id
     WHERE
-        interaction_type.interaction_type = 'history';
+        interactions.interaction_type = 'history'
+    ORDER BY
+        interactions.interaction_id;
 
 
 -- -----------------------------------------------------
@@ -601,7 +599,9 @@ SELECT
    ON
      (interactions.user_id = max_date.user_id
       AND
-      interactions.interaction_created_at = max_date.interaction_created_at);
+      interactions.interaction_created_at = max_date.interaction_created_at)
+  ORDER BY 
+    interactions.interaction_id;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
