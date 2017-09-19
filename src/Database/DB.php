@@ -195,7 +195,7 @@ class DB extends PDO {
 
 		// if a tree_id was passed, append it to the params and sql statement
 		if(\Cme\Utility\is_id($options['tree_id'])) {
-			$params[":tree_id"] = $tree_id;
+			$params[":tree_id"] = $options['tree_id'];
 			$sql .= " AND tree_id = :tree_id";
 		}
 
@@ -215,12 +215,12 @@ class DB extends PDO {
 
 		// if a tree_id was passed, append it to the params and sql statement
 		if( \Cme\Utility\is_id($options['tree_id']) ) {
-			$params[":tree_id"] = $tree_id;
+			$params[":tree_id"] = $options['tree_id'];
 			$sql .= " AND tree_id = :tree_id";
 		}
 
 		if( \Cme\Utility\is_id($options['question_id']) ) {
-			$params[":question_id"] = $question_id;
+			$params[":question_id"] = $options['question_id'];
 			$sql .= " AND question_id = :question_id";
 		}
 
