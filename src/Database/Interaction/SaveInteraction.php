@@ -189,55 +189,13 @@ class SaveInteraction extends DB {
             // if it's one that has a state_id with it, then let's save that too
             $interactions = ['option', 'history'];
             if(in_array($interaction_type['interaction_type'], $interactions)) {
-                // save the state too
-                $params = [
-                            ':interaction_id'  => $inserted_interaction_id,
-                            ':el_id'           => $destination_id
-                          ];
-                // write our SQL statement
-                $sql = 'INSERT INTO '.$this->DB->tables['tree_state'].' (
-                                                    interaction_id,
-                                                    el_id
-                                                )
-                                                VALUES(
-                                                    :interaction_id,
-                                                    :el_id
-                                                )';
-                // insert the mc_option into the database
-                $stmt = $this->DB->query($sql, $params);
-
-                if($stmt === false) {
-                    // handle errors
-                    $this->errors[] = 'Insert state failed.';
-                    return false;
-                }
+                $this->insertState($inserted_interaction_id, $destination_id);
             }
 
             // if we interacted with an option, save the interaction_id to the elment_interactions
             $interactions = ['option'];
             if(in_array($interaction_type['interaction_type'], $interactions)) {
-                // save the interaction
-                $params = [
-                            ':interaction_id'  => $inserted_interaction_id,
-                            ':el_id'           => $interaction_id
-                          ];
-                // write our SQL statement
-                $sql = 'INSERT INTO '.$this->DB->tables['tree_interaction_element'].' (
-                                                    interaction_id,
-                                                    el_id
-                                                )
-                                                VALUES(
-                                                    :interaction_id,
-                                                    :el_id
-                                                )';
-                // insert the mc_option into the database
-                $stmt = $this->DB->query($sql, $params);
-
-                if($stmt === false) {
-                    // handle errors
-                    $this->errors[] = 'Insert interaction element failed.';
-                    return false;
-                }
+                $this->insertInteractionElement($inserted_interaction_id, $interaction_id);
             }
         } else {
             // handle errors
@@ -250,6 +208,94 @@ class SaveInteraction extends DB {
         }
 
         return $response;
+    }
+
+    /**
+    * Saves a state related to an interaction_id. Example:
+    * Clicking an option will bring you to a new question state. We want to know
+    * what the resulting state (or destination) of this interaction on the option brought someone to.
+    * This insertion will allow us to track that.
+    *
+    * @param $interaction_id (STRING/INT) ID from the `tree_interaction` table
+    * @param $state_id (STRING/INT) from the el_id of the resulting state (usually a question_id)
+    * @return (MIXED) false on error, (STRING) of the inserted row on success
+    */
+    private function insertState($interaction_id, $state_id) {
+        /**************************************
+        **         WARNING!!!!!!             **
+        **                                   **
+        **   NO VALIDATION OCCURS HERE.      **
+        **   ONLY CALL FROM $this->insert()  **
+        ***************************************/
+        // save the state too
+        $params = [
+                    ':interaction_id'  => $interaction_id,
+                    ':el_id'           => $state_id
+                  ];
+        // write our SQL statement
+        $sql = 'INSERT INTO '.$this->DB->tables['tree_state'].' (
+                                            interaction_id,
+                                            el_id
+                                        )
+                                        VALUES(
+                                            :interaction_id,
+                                            :el_id
+                                        )';
+        // insert the mc_option into the database
+        $stmt = $this->DB->query($sql, $params);
+
+        if($stmt !== false) {
+            // return the inserted ID
+            return $this->DB->lastInsertId();
+        } else {
+            // handle errors
+            $this->errors[] = 'Insert state failed.';
+            return false;
+        }
+    }
+
+    /**
+    * Saves the element interacted with (like a click) related to an interaction_id. Example:
+    * Clicking an option will bring you to a new question state. We want to know
+    * what element (option) was clicked on. This insertion will allow us to track that.
+    *
+    * @param $interaction_id (STRING/INT) ID from the `tree_interaction` table
+    * @param $el_id (STRING/INT) of the element interacted with (usually an option_id)
+    * @return (MIXED) false on error, (STRING) of the inserted row on success
+    */
+    private function insertInteractionElement($interaction_id, $el_id) {
+        /**************************************
+        **         WARNING!!!!!!             **
+        **                                   **
+        **   NO VALIDATION OCCURS HERE.      **
+        **   ONLY CALL FROM $this->insert()  **
+        ***************************************/
+
+        // save the interaction
+        $params = [
+                    ':interaction_id'  => $interaction_id,
+                    ':el_id'           => $el_id
+                  ];
+        // write our SQL statement
+        $sql = 'INSERT INTO '.$this->DB->tables['tree_interaction_element'].' (
+                                            interaction_id,
+                                            el_id
+                                        )
+                                        VALUES(
+                                            :interaction_id,
+                                            :el_id
+                                        )';
+        // insert the mc_option into the database
+        $stmt = $this->DB->query($sql, $params);
+
+        if($stmt !== false) {
+            // return the inserted ID
+            return $this->DB->lastInsertId();
+        } else {
+            // handle errors
+            $this->errors[] = 'Insert interaction element failed.';
+            return false;
+        }
     }
 
     protected function update($data) {
