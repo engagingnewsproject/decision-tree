@@ -138,7 +138,6 @@ function TreeInteraction(options) {
               reject(Error('There was a network error.'));
           };
 
-          console.log(data)
           // Send the request
           request.send(JSON.stringify(data));
         })
@@ -147,7 +146,6 @@ function TreeInteraction(options) {
     this.response = function(request) {
         // response from the server
         let data = JSON.parse(request.response)
-        console.log('response', data)
     }
 
     // set the rootURL
@@ -260,7 +258,6 @@ TreeInteraction.prototype = {
             interactionID,
             observer;
 
-        console.log(update)
         data = {}
         interactionType = update.data.type
         interactionID = false
