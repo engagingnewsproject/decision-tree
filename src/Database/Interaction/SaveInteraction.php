@@ -188,7 +188,7 @@ class SaveInteraction extends DB {
 
             // if it's one that has a state_id with it, then let's save that too
             $interactions = ['option', 'history'];
-            if(in_array($interaction_type['interaction_type'], $interactions)) {
+            if(in_array($interaction_type['interaction_type'], $interactions) && $destination_type['state_type'] !== 'overview') {
                 $this->insertState($inserted_interaction_id, $destination_id);
             }
 

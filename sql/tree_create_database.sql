@@ -546,7 +546,7 @@ DROP TABLE IF EXISTS `tree`.`tree_interaction_history`;
 USE `tree`;
 CREATE  OR REPLACE VIEW `tree_interaction_history` (interaction_id, user_id, tree_id, destination_state_type, destination_state_id, interaction_created_at) AS
     SELECT
-        interaction.interaction_id, interaction.user_id, interaction.tree_id, el_type.el_type, state.el_id, interaction.interaction_created_at
+        interaction.interaction_id, interaction.user_id, interaction.tree_id, state_type.state_type, state.el_id, interaction.interaction_created_at
     FROM
         tree.tree_interaction interaction
     INNER JOIN
@@ -554,9 +554,7 @@ CREATE  OR REPLACE VIEW `tree_interaction_history` (interaction_id, user_id, tre
     INNER JOIN
         tree.tree_state state ON interaction.interaction_id = state.interaction_id
     INNER JOIN
-        tree.tree_element el ON state.el_id = el.el_id
-    INNER JOIN
-        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+        tree.tree_state_type state_type ON interaction.state_type_id = state_type.state_type_id
     WHERE
         interaction_type.interaction_type = 'history';
 
