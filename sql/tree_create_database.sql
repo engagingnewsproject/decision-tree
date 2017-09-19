@@ -483,7 +483,7 @@ CREATE  OR REPLACE VIEW `tree_interaction_option` (interaction_id, user_id, tree
         tree.tree_interaction interaction
     INNER JOIN
         tree.tree_interaction_type interaction_type ON interaction.interaction_type_id = interaction_type.interaction_type_id
-    INNER JOIN
+    LEFT JOIN
         tree.tree_state state ON interaction.interaction_id = state.interaction_id
     INNER JOIN
         tree.tree_state_type state_type ON interaction.state_type_id = state_type.state_type_id
@@ -551,7 +551,7 @@ CREATE  OR REPLACE VIEW `tree_interaction_history` (interaction_id, user_id, tre
         tree.tree_interaction interaction
     INNER JOIN
         tree.tree_interaction_type interaction_type ON interaction.interaction_type_id = interaction_type.interaction_type_id
-    INNER JOIN
+    LEFT JOIN
         tree.tree_state state ON interaction.interaction_id = state.interaction_id
     INNER JOIN
         tree.tree_state_type state_type ON interaction.state_type_id = state_type.state_type_id
