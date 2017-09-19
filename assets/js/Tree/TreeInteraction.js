@@ -21,11 +21,10 @@ function TreeInteraction(options) {
         currentScript = scripts[ scripts.length - 1 ].src
 
         // regex it to see if it's one of our DEV urls
-        // If you want to see what it matches/doesn't match, go here: http://regexr.com/3g4rc
         regex = /https?:\/\/(?:(?:localhost:3000|dev)\/decision-tree|(?:enptree)\.(?:staging\.)?wpengine\.com)\b/
         _rootURL = regex.exec(currentScript)
 
-        if(rootURL === null) {
+        if(_rootURL === null) {
             // we're not on DEV, so pass the rootURL as our PROD url
             _rootURL = 'https://tree.mediaengagement.org'
         }
