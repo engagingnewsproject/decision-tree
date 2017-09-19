@@ -44,7 +44,7 @@ function Tree(data, observers) {
         let whitelist,
             validState;
 
-        whitelist = ['intro', 'tree', 'question', 'end']
+        whitelist = ['intro', 'overview', 'question', 'end']
 
         // TODO: Check that start can't go straight to end?
         // TODO: Check that the next state is valid from the question's options?
@@ -65,7 +65,7 @@ function Tree(data, observers) {
         }
 
         // check if the stateID is a valid ID for this state
-        if(stateType === 'tree') {
+        if(stateType === 'overview') {
             if(stateID === this.getTreeID()) {
                 validState = true
             } else {
@@ -246,14 +246,9 @@ Tree.prototype = {
                 this.setState(type, id, data);
                 break
 
-            // two ways to get to the tree overview 'overview' or 'tree'
             case 'overview':
                 // go to tree overview
-                this.setState('tree', this.getTreeID(), data);
-                break
-            case 'tree':
-                // go to tree overview
-                this.setState('tree', this.getTreeID(), data);
+                this.setState('overview', this.getTreeID(), data);
                 break
             case 'restart':
                 // emit a restart

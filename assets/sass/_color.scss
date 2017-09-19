@@ -30,7 +30,7 @@
         box-shadow: 0 5px 20px rgba(0,0,0,.15);
     }
 }
-.cme-tree__state--tree,
+.cme-tree__state--overview,
 .cme-tree__state--intro {
     .cme-tree__title--tree {
         border-bottom: 1px solid rgba(0,0,0,.05);
@@ -177,7 +177,7 @@
 }
 
 .cme-tree__state--end,
-.cme-tree__state--tree {
+.cme-tree__state--overview {
     .cme-tree__history-list-link {
         background: lighten($tree_background, 3);
 
@@ -196,7 +196,7 @@
     }
 }
 
-.cme-tree__state--tree {
+.cme-tree__state--overview {
     .cme-tree__question,
     .cme-tree__end {
         &:focus {

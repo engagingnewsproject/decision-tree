@@ -42,7 +42,7 @@ function TreeHistory(options) {
         // create as the Tree intro state with overview and index at start.
         let history = [
             {type: 'intro', id: tree_id},
-            {type: 'tree', id: tree_id}
+            {type: 'overview', id: tree_id}
         ];
         let currentIndex = 0;
 
@@ -132,7 +132,7 @@ TreeHistory.prototype = {
         // check the validity of the history, if it's not cool, clear history and run again
         history = this.getHistory()
         // if the first and second items aren't valid, reset it
-        if(history[0].type !== 'intro' || history[1].type !== 'tree' ) {
+        if(history[0].type !== 'intro' || history[1].type !== 'overview' ) {
             this.clearHistory()
         }
         this.forceCurrentState()
@@ -306,7 +306,7 @@ TreeHistory.prototype = {
             // 1. we won't allow them to do that
             // 2. it'll be a lot slower to delete one by one
             // make sure we're not trying to delete the intro or tree states from the history
-            if(oldState.type !== 'intro' && oldState.type !== 'tree') {
+            if(oldState.type !== 'intro' && oldState.type !== 'overview') {
                 this.deleteHistoryAfter(findOldStateIndex + 1)
             }
 
@@ -362,7 +362,7 @@ TreeHistory.prototype = {
         history = this.getHistory()
         // check for tree or intro here because there will only ever be one in the history
         // and their ID is set as the tree_id which matches each other
-        if(state.type === 'tree' || state.type === 'intro') {
+        if(state.type === 'overview' || state.type === 'intro') {
             index = this.getIndexBy(history, 'type', state.type)
         } else {
             index = this.getIndexBy(history, 'id', state.id)

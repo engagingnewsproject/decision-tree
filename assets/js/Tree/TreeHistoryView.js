@@ -266,7 +266,7 @@ TreeHistoryView.prototype = {
                 item  = this.templateStartBtn(history[i])
             }
             else if(i === 1) {
-                if(history[i].type !== 'tree') {
+                if(history[i].type !== 'overview') {
                     console.error('Second history item should be of type "tree"')
                 }
                 item = this.templateOverviewBtn(history[i])

@@ -1693,7 +1693,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
             var whitelist = void 0,
                 validState = void 0;
 
-            whitelist = ['intro', 'tree', 'question', 'end'];
+            whitelist = ['intro', 'overview', 'question', 'end'];
 
             // TODO: Check that start can't go straight to end?
             // TODO: Check that the next state is valid from the question's options?
@@ -1714,7 +1714,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
             }
 
             // check if the stateID is a valid ID for this state
-            if (stateType === 'tree') {
+            if (stateType === 'overview') {
                 if (stateID === this.getTreeID()) {
                     validState = true;
                 } else {
@@ -1896,14 +1896,9 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
                     this.setState(type, id, data);
                     break;
 
-                // two ways to get to the tree overview 'overview' or 'tree'
                 case 'overview':
                     // go to tree overview
-                    this.setState('tree', this.getTreeID(), data);
-                    break;
-                case 'tree':
-                    // go to tree overview
-                    this.setState('tree', this.getTreeID(), data);
+                    this.setState('overview', this.getTreeID(), data);
                     break;
                 case 'restart':
                     // emit a restart
@@ -2189,7 +2184,7 @@ function TreeHistory(options) {
         var tree_id = void 0;
         tree_id = this.getTree().getTreeID();
         // create as the Tree intro state with overview and index at start.
-        var history = [{ type: 'intro', id: tree_id }, { type: 'tree', id: tree_id }];
+        var history = [{ type: 'intro', id: tree_id }, { type: 'overview', id: tree_id }];
         var currentIndex = 0;
 
         _saveHistory(history);
@@ -2275,7 +2270,7 @@ TreeHistory.prototype = {
         // check the validity of the history, if it's not cool, clear history and run again
         history = this.getHistory();
         // if the first and second items aren't valid, reset it
-        if (history[0].type !== 'intro' || history[1].type !== 'tree') {
+        if (history[0].type !== 'intro' || history[1].type !== 'overview') {
             this.clearHistory();
         }
         this.forceCurrentState();
@@ -2448,7 +2443,7 @@ TreeHistory.prototype = {
                 // 1. we won't allow them to do that
                 // 2. it'll be a lot slower to delete one by one
                 // make sure we're not trying to delete the intro or tree states from the history
-                if (oldState.type !== 'intro' && oldState.type !== 'tree') {
+                if (oldState.type !== 'intro' && oldState.type !== 'overview') {
                     this.deleteHistoryAfter(findOldStateIndex + 1);
                 }
 
@@ -2510,7 +2505,7 @@ TreeHistory.prototype = {
         history = this.getHistory();
         // check for tree or intro here because there will only ever be one in the history
         // and their ID is set as the tree_id which matches each other
-        if (state.type === 'tree' || state.type === 'intro') {
+        if (state.type === 'overview' || state.type === 'intro') {
             index = this.getIndexBy(history, 'type', state.type);
         } else {
             index = this.getIndexBy(history, 'id', state.id);
@@ -2814,7 +2809,7 @@ TreeHistoryView.prototype = {
                 }
                 item = this.templateStartBtn(history[i]);
             } else if (i === 1) {
-                if (history[i].type !== 'tree') {
+                if (history[i].type !== 'overview') {
                     console.error('Second history item should be of type "tree"');
                 }
                 item = this.templateOverviewBtn(history[i]);
@@ -3464,7 +3459,7 @@ function TreeView(options) {
         var el = void 0,
             elId = void 0;
 
-        if (state.type === 'tree') {
+        if (state.type === 'overview') {
             elId = 'cme-tree--' + state.id;
         } else {
             elId = 'cme-tree__el--' + state.id;
@@ -3669,8 +3664,8 @@ TreeView.prototype = {
         // data.newState.id
         newStateSuccess = this.setState(data.newState);
 
-        // delay the updateViewHeight if we're switching to/from the 'tree' since there's a lot that happens height/transform wise in that time
-        if (oldState.type === 'tree' || newState.type === 'tree') {
+        // delay the updateViewHeight if we're switching to/from the 'overview' since there's a lot that happens height/transform wise in that time
+        if (oldState.type === 'overview' || newState.type === 'overview') {
             setTimeout(function () {
                 _this.updateViewHeight(newState);
             }, this.animationLength);
@@ -3713,7 +3708,7 @@ TreeView.prototype = {
             }, this.animationLength);
         } else {
             // if it's the first ever load, we need to remove focus
-            if (state.type !== 'tree') {
+            if (state.type !== 'overview') {
                 // if init is true && state= doesn't equal tree/overview, then remove all focus as a starting point
                 this.removeAllFocusable();
             }
@@ -3824,7 +3819,7 @@ TreeView.prototype = {
             this.checkForGroupsCalc();
         }
         // if the state type is tree, set a height on the window and distribute the groups accordingly
-        else if (state.type === 'tree') {
+        else if (state.type === 'overview') {
                 // kicks off the process for calculating necesary group data if necessary
                 this.checkForGroupsCalc();
                 // get the groups height
@@ -3900,7 +3895,7 @@ TreeView.prototype = {
             newFocusedEl = void 0;
 
         // intro & old tree get everything removed
-        if (newState.type === 'intro' || oldState.type === 'tree') {
+        if (newState.type === 'intro' || oldState.type === 'overview') {
             // remove focus from everything
             this.removeAllFocusable();
         }
@@ -3914,7 +3909,7 @@ TreeView.prototype = {
         }
 
         // we need to add all focusable if in tree state
-        if (newState.type === 'tree') {
+        if (newState.type === 'overview') {
             // remove focus from everything
             this.addAllFocusable();
         }
@@ -3987,7 +3982,7 @@ TreeView.prototype = {
             if (el.nodeName === 'A' && el.data !== undefined) {
                 // check for el.data
                 // if we're in the tree view, don't switch the state (unless they click the start button), just go to that question on the page
-                if (this.getTree().getState().type !== 'tree' || this.getTree().getState().type === 'tree' && el.data.type === 'start') {
+                if (this.getTree().getState().type !== 'overview' || this.getTree().getState().type === 'overview' && el.data.type === 'start') {
                     event.preventDefault();
                     this.emit('update', 'state', Object.assign(el.data, extraData));
                 } else {
@@ -4279,7 +4274,7 @@ TreeView.prototype = {
         groupsOffsetLeft = treeEl.data.groupsOffsetLeft;
 
         for (var i = 0; i < groups.length; i++) {
-            this.addStylesheetRule('.cme-tree__state--tree #' + groups[i].id + ', .cme-tree__state--intro #' + groups[i].id, [['transform', 'translate3d(' + groupsOffsetLeft + 'px,' + groups[i].data.offsetTop + 'px, 0)']]);
+            this.addStylesheetRule('.cme-tree__state--overview #' + groups[i].id + ', .cme-tree__state--intro #' + groups[i].id, [['transform', 'translate3d(' + groupsOffsetLeft + 'px,' + groups[i].data.offsetTop + 'px, 0)']]);
         }
     },
 

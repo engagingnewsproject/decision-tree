@@ -188,7 +188,7 @@ html {
     }
 }
 
-.cme-tree__state--tree {
+.cme-tree__state--overview {
 
     .cme-tree__content-wrapper {
         overflow: scroll;
@@ -214,7 +214,7 @@ html {
 
 // overview of whole tree
 .cme-tree__state--intro,
-.cme-tree__state--tree {
+.cme-tree__state--overview {
     .cme-tree__content-window {
         transform: scale(0.65) translate3d(0,0,0);
         transform-origin: top left;
@@ -246,7 +246,7 @@ html {
     }
 }
 
-.cme-tree__state--tree.cme-tree__state--animate-out--end {
+.cme-tree__state--overview.cme-tree__state--animate-out--end {
     .cme-tree__content-window {
         animation: animateToTree 0.5s $easing;
 

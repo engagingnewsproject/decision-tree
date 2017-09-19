@@ -59,7 +59,7 @@ function TreeView(options) {
         let el,
             elId;
 
-        if(state.type === 'tree') {
+        if(state.type === 'overview') {
             elId = 'cme-tree--'+state.id
         } else {
             elId = 'cme-tree__el--'+state.id
@@ -265,8 +265,8 @@ TreeView.prototype = {
         // data.newState.id
         newStateSuccess = this.setState(data.newState)
 
-        // delay the updateViewHeight if we're switching to/from the 'tree' since there's a lot that happens height/transform wise in that time
-        if(oldState.type === 'tree' || newState.type === 'tree') {
+        // delay the updateViewHeight if we're switching to/from the 'overview' since there's a lot that happens height/transform wise in that time
+        if(oldState.type === 'overview' || newState.type === 'overview') {
             setTimeout(()=>{
                 this.updateViewHeight(newState)
             }, this.animationLength)
@@ -309,7 +309,7 @@ TreeView.prototype = {
             }, this.animationLength)
         } else {
             // if it's the first ever load, we need to remove focus
-            if(state.type !== 'tree') {
+            if(state.type !== 'overview') {
                 // if init is true && state= doesn't equal tree/overview, then remove all focus as a starting point
                 this.removeAllFocusable()
             }
@@ -424,7 +424,7 @@ TreeView.prototype = {
             this.checkForGroupsCalc()
         }
         // if the state type is tree, set a height on the window and distribute the groups accordingly
-        else if(state.type === 'tree') {
+        else if(state.type === 'overview') {
             // kicks off the process for calculating necesary group data if necessary
             this.checkForGroupsCalc()
             // get the groups height
@@ -499,7 +499,7 @@ TreeView.prototype = {
             newFocusedEl;
 
         // intro & old tree get everything removed
-        if(newState.type === 'intro' || oldState.type === 'tree') {
+        if(newState.type === 'intro' || oldState.type === 'overview') {
             // remove focus from everything
             this.removeAllFocusable()
         }
@@ -513,7 +513,7 @@ TreeView.prototype = {
         }
 
         // we need to add all focusable if in tree state
-        if(newState.type === 'tree') {
+        if(newState.type === 'overview') {
             // remove focus from everything
             this.addAllFocusable()
         }
@@ -588,7 +588,7 @@ TreeView.prototype = {
             if(el.nodeName === 'A' && el.data !== undefined) {
                 // check for el.data
                 // if we're in the tree view, don't switch the state (unless they click the start button), just go to that question on the page
-                if(this.getTree().getState().type !== 'tree' || (this.getTree().getState().type === 'tree' && el.data.type === 'start') ) {
+                if(this.getTree().getState().type !== 'overview' || (this.getTree().getState().type === 'overview' && el.data.type === 'start') ) {
                     event.preventDefault()
                     this.emit('update', 'state', Object.assign(el.data, extraData))
                 } else {
@@ -884,7 +884,7 @@ TreeView.prototype = {
         groupsOffsetLeft = treeEl.data.groupsOffsetLeft
 
         for(let i = 0; i < groups.length; i++) {
-            this.addStylesheetRule('.cme-tree__state--tree #'+groups[i].id+', .cme-tree__state--intro #'+groups[i].id, [['transform', 'translate3d('+groupsOffsetLeft+'px,'+ groups[i].data.offsetTop+'px, 0)']])
+            this.addStylesheetRule('.cme-tree__state--overview #'+groups[i].id+', .cme-tree__state--intro #'+groups[i].id, [['transform', 'translate3d('+groupsOffsetLeft+'px,'+ groups[i].data.offsetTop+'px, 0)']])
         }
     },
 
