@@ -3,12 +3,6 @@ function CmeIframeTree(data) {
     this.iframe = data.iframe
     this.iframeID = data.iframe.id
     this.treeID = data.treeID
-    this.parentURL = data.parentURL
-    this.siteName = this.setSiteName()
-    this.saveEmbedSiteComplete = false
-    this.saveEmbedTreeComplete = false
-    this.embedSiteID = false
-    this.embedTreeID = false
 
     // load it!
     this.onLoadIframe()
@@ -19,45 +13,19 @@ function CmeIframeTree(data) {
 CmeIframeTree.prototype = {
     constructor: CmeIframeTree,
 
-    getSaveEmbedSiteComplete: function(){
-        return this.saveEmbedSiteComplete
-    },
-
-    setSaveEmbedSiteComplete: function(val){
-        if (typeof val !== 'boolean') {
-            return
-        }
-        this.saveEmbedSiteComplete = val
-    },
-
-    getSaveEmbedTreeComplete: function(){
-        return this.saveEmbedTreeComplete
-    },
-
-    setSaveEmbedTreeComplete: function(val){
-        if (typeof val !== 'boolean') {
-            return
-        }
-        this.saveEmbedTreeComplete = val
-    },
-
-    setSiteName: function(siteName) {
-        siteName = this.getFBSiteNameMeta()
-        // see if there's a Facebook OG:SiteName attribute, if not, return the current URL
-        if(siteName && typeof siteName === 'string') {
-            this.siteName = siteName
-        } else {
-            this.siteName = this.parentURL
-        }
-        return this.siteName
-    },
-
     getSiteName: function() {
-        return this.siteName
+        let siteName = this.getFBSiteNameMeta()
+        // see if there's a Facebook OG:SiteName attribute, if not, return the current URL
+        if(!siteName) {
+            siteName = document.title
+        } else {
+            siteName = ''
+        }
+        return siteName
     },
 
     getFBSiteNameMeta: function() {
-        var siteName = document.querySelector('meta[property="og:site_name"]');
+        let siteName = document.querySelector('meta[property="og:site_name"]');
         if(siteName) {
             return siteName.content;
         } else {
@@ -79,12 +47,12 @@ CmeIframeTree.prototype = {
         else if(data.action === 'update' && data.data.updatedBy !== 'forceCurrentState') {
              response.scrollToQuizResponse = this.scrollToQuiz();
         }
-        else if(data.action === 'sendURL') {
-            // send the url of the parent (that embedded the quiz)
-            response.sendParentURLResponse = this.sendParentURL();
-        } else if(data.action === 'saveSite') {
-            // log embed
-            this.saveEmbedSite(origin, data, this.handleEmbedSiteResponse, this);
+        else if(data.action === 'getParentSiteName') {
+            this.sendSiteName();
+        } else if(data.action === 'getParentPath') {
+            this.sendPath();
+        } else if(data.action === 'getParentHost') {
+            this.sendHost();
         }
 
         // send a response sayin, yea, we got it!
@@ -98,10 +66,10 @@ CmeIframeTree.prototype = {
         this.addIframeStyles();
         // call the quiz and get its height
         this.getQuizHeight();
-        // call the quiz and send the URL of the page its embedded on
-        this.sendParentURL();
-        // call the quiz and send the URL of the page its embedded on
-        this.sendSaveSite();
+        // call the tree and send the host the page its embedded on
+        this.sendHost();
+        // call the tree and send the host the page its embedded on
+        this.sendPath();
     },
 
     getQuizHeight: function() {
@@ -111,31 +79,36 @@ CmeIframeTree.prototype = {
         this.iframe.contentWindow.postMessage(request, this.iframe.src);
     },
 
-    sendSaveSite: function() {
+    /**
+    * Send location.host of the current page (the parent page)
+    */
+    sendSiteName: function() {
         var request;
+
         // send a postMessage to get the correct height
-        request = '{"status":"request","action":"sendSaveSite"}';
+        request = '{"action":"setParentSiteName","siteName":"'+this.getSiteName()+'"}';
         this.iframe.contentWindow.postMessage(request, this.iframe.src);
     },
 
     /**
-    * Send the full URL and path of the current page (the parent page)
-    * so it can be appended in the Share URLs
+    * Send location.path of the current page (the parent page)
     */
-    sendParentURL: function() {
+    sendPath: function() {
         var request;
 
-        // first, check to make sure we're not on the quiz preview page.
-        // If we are, we shouldn't send the URL because we don't want
-        // to set the quiz preview URL as the share URL
-        // to see what it matches: http://regexr.com/3g4rr
-        if(/https?:\/\/(?:local.quiz|(?:(?:local|dev|test)\.)?engagingnewsproject\.org|(?:engagingnews|cmedev)\.(?:staging\.)?wpengine\.com)\/cme-quiz\/quiz-preview\/\d+\b/.test(this.parentURL)) {
-            // if it equals one of our site preview pages, abandon ship
-            return false;
-        }
+        // send a postMessage to get the correct height
+        request = '{"action":"setParentPath","path":"'+window.self.location.pathname+'"}';
+        this.iframe.contentWindow.postMessage(request, this.iframe.src);
+    },
+
+    /**
+    * Send location.host of the current page (the parent page)
+    */
+    sendHost: function() {
+        var request;
 
         // send a postMessage to get the correct height
-        request = '{"status":"request","action":"setShareURL","parentURL":"'+this.parentURL+'"}';
+        request = '{"action":"setParentHost","host":"'+window.self.location.host+'"}';
         this.iframe.contentWindow.postMessage(request, this.iframe.src);
     },
 
@@ -183,104 +156,5 @@ CmeIframeTree.prototype = {
         }
 
         head.appendChild(style);
-    },
-
-    saveEmbedSite: function(origin, data, callback, boundThis) {
-         if(this.getSaveEmbedSiteComplete() === true) {
-             return false;
-         }
-         var response;
-         var request = new XMLHttpRequest();
-
-         request.open('POST', origin+'/sites/new');
-         request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-         request.onreadystatechange = function () {
-             if(request.readyState === XMLHttpRequest.DONE && request.status === 200) {
-                  boundThis.setSaveEmbedSiteComplete(true);
-                  response = JSON.parse(request.responseText);
-                  if(response.status === 'success') {
-                      response.origin = origin;
-                      response.tree_id = data.tree_id;
-                      if (typeof callback == "function") {
-                          callback(response, boundThis);
-                      }
-                  } else {
-                      console.log('XHR request for saveEmbedSite successful but returned response error: '+JSON.stringify(response));
-                  }
-
-              } else if (request.status !== 200) {
-                  console.log('Request failed.  Returned status of ' + request.status);
-              }
-         };
-
-
-         data.embed_site_url = this.parentURL;
-         data.embed_site_name = this.getSiteName();
-
-
-         request.send(JSON.stringify(data));
-     },
-
-     /**
-     * What to do after we recieve a response about saving the embed site
-     */
-     handleEmbedSiteResponse: function(response, boundThis) {
-         // set the site ID
-         boundThis.embedSiteID = response.embed_site_id;
-         if(0 < parseInt(boundThis.embedSiteID) ) {
-             // send a request to save/update the cme_embed_tree table
-             boundThis.saveEmbedTree(response, boundThis.handleEmbedTreeResponse, boundThis);
-             return response;
-         } else {
-             console.log('Could\'t locate a valid Embed Site');
-         }
-     },
-
-    saveEmbedTree: function(data, callback, boundThis) {
-          if(this.getSaveEmbedTreeComplete() === true) {
-              return false;
-          }
-
-          var response;
-          var request = new XMLHttpRequest();
-
-          request.open('POST', data.origin+'/sites/'+data.embed_site_id+'/embed/new');
-          request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-          request.onreadystatechange = function () {
-              if(request.readyState === XMLHttpRequest.DONE && request.status === 200) {
-                  boundThis.setSaveEmbedTreeComplete(true);
-                  response = JSON.parse(request.responseText);
-                  if(response.status === 'success') {
-                      if (typeof callback == "function") {
-                          callback(response, boundThis);
-                      }
-                  } else {
-                      console.log('XHR request for saveEmbedTree successful but returned response error: '+JSON.stringify(response));
-                  }
-
-              } else if (request.status !== 200) {
-                  console.log('Request failed.  Returned status of ' + request.status);
-              }
-          };
-
-          embed_tree = {
-              'tree_id': data.tree_id,
-              'embed_tree_url': this.parentURL,
-          };
-
-          request.send(JSON.stringify(embed_tree));
-     },
-
-    /**
-    * What to do after we recieve a response about saving the embed site
-    */
-    handleEmbedTreeResponse: function(response, boundThis) {
-      // set the embedTreeID
-        boundThis.embedTreeID = response.embed_tree_id;
-        if(0 < parseInt(boundThis.embedTreeID) ) {
-            return response;
-        } else {
-            console.log('Could\'t locate a valid Embed Quiz');
-        }
     }
 }

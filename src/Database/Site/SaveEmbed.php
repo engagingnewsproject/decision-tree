@@ -48,7 +48,11 @@ class SaveEmbed extends DB {
         }
 
         if(!isset($embed['path'])) {
-            $this->errors[] = 'No Site Path sent.';
+            $this->errors[] = 'No Embed Path sent.';
+        }
+
+        if(empty($embed['path'])) {
+            $this->errors[] = 'Embed Path is empty.';
         }
 
         if(!isset($embed['is_iframe'])) {

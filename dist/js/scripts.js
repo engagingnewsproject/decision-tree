@@ -1406,7 +1406,7 @@ TreeHistoryView.prototype = {
 * (so people can go back to previous questions)
 */
 function TreeInteraction(options) {
-    var _Tree, _rootURL, _postURL, _siteName, _isIframe, _userID;
+    var _Tree, _rootURL, _postURL, _siteName, _host, _path, _isIframe, _userID;
     /**
     * Private functions
     */
@@ -1463,6 +1463,12 @@ function TreeInteraction(options) {
     this.getSiteName = function () {
         return _siteName;
     };
+    this.getHost = function () {
+        return _host;
+    };
+    this.getPath = function () {
+        return _path;
+    };
     this.getUserID = function () {
         return _userID;
     };
@@ -1487,12 +1493,57 @@ function TreeInteraction(options) {
         return _postURL;
     };
 
-    var _setSiteName = function _setSiteName() {
-        var siteName = document.querySelector('meta[property="og:site_name"]');
-        if (!siteName) {
-            siteName = document.title;
+    this.setSiteName = function (siteName) {
+        if (_siteName === undefined) {
+            if (this.getIsIframe() === false) {
+                _siteName = document.querySelector('meta[property="og:site_name"]');
+                if (!_siteName) {
+                    _siteName = document.title;
+                }
+            }
+            // if no siteName was passed, ask for it
+            else if (siteName === undefined) {
+                    this.emit('getParentSiteName', 'getParentSiteName', {});
+                } else {
+                    //
+                    _siteName = siteName;
+                    console.log('recieved siteName', _siteName);
+                }
         }
-        _siteName = siteName;
+    };
+
+    this.setPath = function (path) {
+        // only let it get set once
+        if (_path === undefined) {
+            if (this.getIsIframe() === false) {
+                _path = window.self.location.pathname;
+            }
+            // if no path was passed, ask for it
+            else if (path === undefined) {
+                    this.emit('getParentPath', 'getParentPath', {});
+                } else {
+                    // should get set from a postmessage
+                    _path = path;
+                    console.log('recieved path', _path);
+                }
+        }
+    };
+
+    this.setHost = function (host) {
+        // only let it get set once
+        if (_host === undefined) {
+            if (this.getIsIframe() === false) {
+                _host = window.self.location.host;
+            }
+            // if no siteName was passed, ask for it
+            else if (host === undefined) {
+                    this.emit('getParentHost', 'getParentHost', {});
+                } else {
+                    // should get set from a postmessage
+                    _host = host;
+                    console.log('recieved host', _host);
+                }
+        }
     };
 
     var _setIsIframe = function _setIsIframe() {
@@ -1508,16 +1559,22 @@ function TreeInteraction(options) {
     this.init = function () {
         // set the userID
         _setUserID();
-        // set the site URL
-        _setSiteName();
         // set if it's an iframe or not
         _setIsIframe();
+        // set the path
+        this.setPath();
+        // set the host
+        this.setHost();
+        // set the site Name
+        this.setSiteName();
         // set the post URL
         this.setPostURL();
     };
 
     // passes the data to the server
     this.saveInteraction = function (data) {
+        var _this = this;
+
         var whitelist = void 0,
             validState = void 0,
             Tree = void 0,
@@ -1550,12 +1607,22 @@ function TreeInteraction(options) {
             tree_id: Tree.getTreeID(),
             site: {
                 name: this.getSiteName(),
-                host: window.top.location.host,
-                path: window.top.location.pathname,
+                host: this.getHost(),
+                path: this.getPath(),
                 is_iframe: this.getIsIframe()
             }
-
         });
+
+        if (data.site.name === undefined || data.site.host === undefined || data.site.path === undefined) {
+            // chill for a sec and see if we can get it in a bit
+            console.log('waiting for something...');
+            setTimeout(function () {
+                _this.saveInteraction(data).then(_this.response);
+            }, 100);
+            return new Promise(function (resolve, reject) {});
+        }
+
+        console.log('SaveInteraction sending', data);
 
         return new Promise(function (resolve, reject) {
 
@@ -1618,6 +1685,24 @@ TreeInteraction.prototype = {
                 // data will be the tree itself
                 this.build(data);
                 break;
+            case 'setParentSiteName':
+                console.log('SiteName', this.getSiteName());
+                // set the parent site name
+                this.setSiteName(data.siteName);
+                console.log('After Set SiteName', this.getSiteName());
+                break;
+            case 'setParentHost':
+                console.log('Host', this.getHost());
+                // set the parent host
+                this.setHost(data.host);
+                console.log('After Set Host', this.getHost());
+                break;
+            case 'setParentPath':
+                console.log('Site Path', this.getPath());
+                // set the parent path
+                this.setPath(data.path);
+                console.log('After Set Site Path', this.getPath());
+                break;
             case 'historyCreate':
                 // history loaded for the first time, so it's our first load
                 this.saveLoad('load');
@@ -1654,6 +1739,18 @@ TreeInteraction.prototype = {
                 break;
             case 'saveInteraction':
                 // tell the Tree to let all the other observers know that we saved data
+                Tree.message(item, data);
+                break;
+            case 'getParentSiteName':
+                // ask for the parent site name
+                Tree.message(item, data);
+                break;
+            case 'getParentHost':
+                // ask for the parent host
+                Tree.message(item, data);
+                break;
+            case 'getParentPath':
+                // ask for the parent path
                 Tree.message(item, data);
                 break;
         }
@@ -1836,20 +1933,15 @@ TreePostMessage.prototype = {
             return false;
         }
         // get the data
-        data = event.data;
+        data = JSON.parse(event.data);
+
+        // send the data out to all the observers
+        if (data.action !== undefined) {
+            this.getTree().message(data.action, data);
+        }
 
         // see what they want to do
         console.log('Iframe Recieved Message', data);
-        // they want us to send something... what do they want to send?
-        // if they want the bodyHeight, then send the bodyHeight!
-        /*if(data.action === 'sendBodyHeight') {
-            sendBodyHeight();
-        } else if(data.action === 'setShareURL') {
-            setShareURL(data.parentURL);
-            setCalloutURL(data.parentURL);
-        } else if(data.action === 'sendSaveSite') {
-            sendSaveSite();
-        }*/
     }
 };
 'use strict';

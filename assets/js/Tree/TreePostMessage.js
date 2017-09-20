@@ -88,19 +88,15 @@ TreePostMessage.prototype = {
             return false;
         }
         // get the data
-        data = event.data;
+        data = JSON.parse(event.data);
+
+
+        // send the data out to all the observers
+        if(data.action !== undefined) {
+            this.getTree().message(data.action, data)
+        }
 
         // see what they want to do
         console.log('Iframe Recieved Message', data)
-        // they want us to send something... what do they want to send?
-        // if they want the bodyHeight, then send the bodyHeight!
-        /*if(data.action === 'sendBodyHeight') {
-            sendBodyHeight();
-        } else if(data.action === 'setShareURL') {
-            setShareURL(data.parentURL);
-            setCalloutURL(data.parentURL);
-        } else if(data.action === 'sendSaveSite') {
-            sendSaveSite();
-        }*/
     }
 }
