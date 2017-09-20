@@ -30,9 +30,11 @@ class DB extends PDO {
 						 'tree_element_container'	=> 'tree_element_container',
 						 'tree_element_destination'	=> 'tree_element_destination',
 						 'tree_element_type'		=> 'tree_element_type',
+						 'tree_embed'				=> 'tree_embed',
 						 'tree_interaction'			=> 'tree_interaction',
 						 'tree_interaction_type'	=> 'tree_interaction_type',
 						 'tree_interaction_element'	=> 'tree_interaction_element',
+						 'tree_site'				=> 'tree_site',
 						 'tree_state'				=> 'tree_state',
 						 'tree_state_type'			=> 'tree_state_type',
 						];
@@ -314,6 +316,92 @@ class DB extends PDO {
 		return $this->fetch_one($sql, $params);
 	}
 
+	public function get_site($site) {
+		if(Utility\is_id($site)) {
+			return $this->get_site_by_id($site);
+		} else {
+			return $this->get_site_by_host($site);
+		}
+	}
+
+	public function get_site_by_id($site_id) {
+		// Do a select query to see if we get a returned row
+		$params = [":site_id" => $site_id];
+		$sql = "SELECT * from ".$this->tables['tree_site']." WHERE
+				site_id = :site_id";
+		// return the found state type row
+		return $this->fetch_one($sql, $params);
+	}
+
+	public function get_site_by_host($site_host) {
+		// Do a select query to see if we get a returned row
+		$params = [":site_host" => $site_host];
+		$sql = "SELECT * from ".$this->tables['tree_site']." WHERE
+				site_host = :site_host";
+		// return the found interaction type row
+		return $this->fetch_one($sql, $params);
+	}
+
+	public function get_embeds_by_site($site_id) {
+		$params = [":site_id" => $site_id];
+		$sql = "SELECT * from ".$this->tables['tree_embed']." WHERE
+				site_id = :site_id";
+		// return the found state type row
+		return $this->fetch_all($sql, $params);
+	}
+
+	public function get_embed($embed, $options) {
+		if(Utility\is_id($embed, $options)) {
+			return $this->get_embed_by_id($embed);
+		} else {
+			return $this->get_embed_by_path($embed, $options);
+		}
+	}
+
+	public function get_embed_by_id($embed_id, $options) {
+		// Do a select query to see if we get a returned row
+		$params = [":embed_id" => $embed_id];
+		$sql = "SELECT * from ".$this->tables['tree_embed']." WHERE
+				embed_id = :embed_id";
+
+		// if a tree_id was passed, append it to the params and sql statement
+		if(\Cme\Utility\is_id($options['tree_id'])) {
+			$params[":tree_id"] = $options['tree_id'];
+			$sql .= " AND tree_id = :tree_id";
+		}
+
+		// if a tree_id was passed, append it to the params and sql statement
+		if(\Cme\Utility\is_id($options['site_id'])) {
+			$params[":site_id"] = $options['site_id'];
+			$sql .= " AND site_id = :site_id";
+		}
+		// return the found state type row
+		return $this->fetch_one($sql, $params);
+	}
+
+	public function get_embed_by_path($embed_path, $options) {
+		// Do a select query to see if we get a returned row
+		$params = [
+					":embed_path" => $embed_path,
+				  ];
+		$sql = "SELECT * from ".$this->tables['tree_embed']." WHERE
+				embed_path = :embed_path";
+
+		// if a tree_id was passed, append it to the params and sql statement
+		if(\Cme\Utility\is_id($options['tree_id'])) {
+			$params[":tree_id"] = $options['tree_id'];
+			$sql .= " AND tree_id = :tree_id";
+		}
+
+		// if a tree_id was passed, append it to the params and sql statement
+		if(\Cme\Utility\is_id($options['site_id'])) {
+			$params[":site_id"] = $options['site_id'];
+			$sql .= " AND site_id = :site_id";
+		}
+		// return the found interaction type row
+		return $this->fetch_one($sql, $params);
+	}
+
 	// Validation
 
 	// Make sure the tree_id exists
@@ -377,4 +465,27 @@ class DB extends PDO {
 
 		return $is_valid;
 	}
+
+	// Make sure the site exists
+	public function validate_site($site) {
+		$is_valid = false;
+		// if we can find that site, it's valid
+		if($this->get_site($site) !== false) {
+			$is_valid = true;
+		}
+
+		return $is_valid;
+	}
+
+	// Make sure the embed exists
+	public function validate_embed($embed) {
+		$is_valid = false;
+		// if we can find that embed, it's valid
+		if($this->get_embed($embed) !== false) {
+			$is_valid = true;
+		}
+
+		return $is_valid;
+	}
+
 }

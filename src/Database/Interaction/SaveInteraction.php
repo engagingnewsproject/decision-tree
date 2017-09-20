@@ -76,6 +76,10 @@ class SaveInteraction extends DB {
             $this->errors[] = 'No tree id.';
         }
 
+        if(!isset($data['site']['embed_id'])) {
+            $this->errors[] = 'No embed id.';
+        }
+
         // if we have any errors, return false. Passes first round of being the correct data structure
         if(!empty($this->errors)) {
             return $is_valid;
@@ -88,12 +92,18 @@ class SaveInteraction extends DB {
         $interaction_id = $data['interaction']['id'];
         $destination_type = $data['destination']['type'];
         $destination_id = $data['destination']['id'];
+        $embed_id = $data['site']['embed_id'];
 
         // check that it's a valid Tree
         if($this->DB->validate_tree_id($tree_id) === false) {
             $this->errors[] = 'Invalid tree_id.';
             // return here because the next ones will get messed up if this isn't valid
             return false;
+        }
+
+        // check that it's a valid Embed ID
+        if($this->DB->validate_embed($embed_id) === false) {
+            $this->errors[] = 'Invalid embed_id.';
         }
 
         // check that it's a valid interaction type
@@ -151,11 +161,13 @@ class SaveInteraction extends DB {
         $interaction_id = $data['interaction']['id'];
         $destination_type = $this->DB->get_state_type($data['destination']['type']);
         $destination_id = $data['destination']['id'];
+        $embed_id = $data['site']['embed_id'];
 
         // Get our Parameters ready
         $params = [
                     ':tree_id'              => $tree_id,
                     ':user_id'              => $user_id,
+                    ':embed_id'             => $embed_id,
                     ':interaction_type_id'  => $interaction_type['interaction_type_id'],
                     ':state_type_id'        => $destination_type['state_type_id'],
                   ];
@@ -163,12 +175,14 @@ class SaveInteraction extends DB {
         $sql = 'INSERT INTO '.$this->DB->tables['tree_interaction'].' (
                                             tree_id,
                                             user_id,
+                                            embed_id,
                                             interaction_type_id,
                                             state_type_id
                                         )
                                         VALUES(
                                             :tree_id,
                                             :user_id,
+                                            :embed_id,
                                             :interaction_type_id,
                                             :state_type_id
                                         )';
@@ -180,6 +194,7 @@ class SaveInteraction extends DB {
             $inserted_interaction_id = $this->DB->lastInsertId();
 
             $response = [
+                            'interaction_id'   => $inserted_interaction_id,
                             'status'           => 'success',
                             'action'           => 'insertInteraction'
                         ];
@@ -198,6 +213,7 @@ class SaveInteraction extends DB {
         } else {
             // handle errors
             $this->errors[] = 'Insert interaction failed.';
+            $this->errors['status'] = 'error';
         }
 
 

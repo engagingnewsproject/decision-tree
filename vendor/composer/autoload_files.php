@@ -11,6 +11,8 @@ return array(
     '7da0dd2d2834a45b99ab7501637cf889' => $baseDir . '/src/Database/DB.php',
     'b5763a759063aa47341bfed6cf732fc1' => $baseDir . '/src/Database/CompileTree.php',
     'de0b3c462629f935d5f1d2ba22f1ded9' => $baseDir . '/src/Database/Interaction/SaveInteraction.php',
+    '770941bba48759cccf7d3369a2791b87' => $baseDir . '/src/Database/Site/SaveSite.php',
+    '399b26b1d2fcc1a95f9c6a104fbac3b7' => $baseDir . '/src/Database/Site/SaveEmbed.php',
     '303ca7f391c1c38f523e86b12dda9249' => $baseDir . '/tree-config.php',
     'c88700f927f8d5638bed72bf95409ede' => $baseDir . '/tree-db.php',
 );

@@ -142,6 +142,15 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree_interaction_type` (
   PRIMARY KEY (`interaction_type_id`))
 ENGINE = InnoDB;
 
+INSERT INTO `tree`.`tree_interaction_type` (`interaction_type_id`, `interaction_type`) VALUES
+(1, 'load'),
+(2, 'reload'),
+(3, 'start'),
+(4, 'overview'),
+(5, 'option'),
+(6, 'history'),
+(7, 'restart');
+
 -- -----------------------------------------------------
 -- Table `tree`.`tree_state_type`
 -- -----------------------------------------------------
@@ -151,12 +160,60 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree_state_type` (
   PRIMARY KEY (`state_type_id`))
 ENGINE = InnoDB;
 
+INSERT INTO `tree`.`tree_state_type` (`state_type_id`, `state_type`) VALUES
+(1, 'intro'),
+(2, 'question'),
+(3, 'end'),
+(4, 'overview');
+
+-- -----------------------------------------------------
+-- Table `tree`.`tree_site`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tree`.`tree_site` (
+  `site_id` INT NOT NULL AUTO_INCREMENT,
+  `site_name` VARCHAR(255) NOT NULL DEFAULT '',
+  `site_host` VARCHAR(255) NOT NULL DEFAULT '',
+  `site_created_at` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
+  `site_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `site_is_dev` BOOLEAN DEFAULT 0,
+  PRIMARY KEY (`site_id`),
+  CONSTRAINT `treeSite_site_host` UNIQUE(`site_host`))
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `tree`.`tree_embed`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tree`.`tree_embed` (
+  `embed_id` INT NOT NULL AUTO_INCREMENT,
+  `site_id` INT NULL,
+  `tree_id` INT NULL,
+  `embed_path` VARCHAR(255) NOT NULL DEFAULT '',
+  `embed_created_at` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
+  `embed_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `embed_is_iframe` BOOLEAN DEFAULT 0,
+  `embed_is_dev` BOOLEAN DEFAULT 0,
+  PRIMARY KEY (`embed_id`),
+  CONSTRAINT `embed_site_id`
+    FOREIGN KEY (`site_id`)
+    REFERENCES `tree`.`tree_site` (`site_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `embed_tree_id`
+    FOREIGN KEY (`tree_id`)
+    REFERENCES `tree`.`tree` (`tree_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `treeEmbed_unique`
+    UNIQUE(`site_id`, `tree_id`, `embed_path`))
+ENGINE = InnoDB;
+
 -- -----------------------------------------------------
 -- Table `tree`.`tree_interaction`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tree`.`tree_interaction` (
   `interaction_id` INT NOT NULL AUTO_INCREMENT,
   `user_id` varchar(45) NULL,
+  `embed_id` INT NULL,
   `tree_id` INT NULL,
   `interaction_type_id` INT NULL,
   `state_type_id` INT NULL,
@@ -178,6 +235,11 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree_interaction` (
   CONSTRAINT `interaction_tree_id`
     FOREIGN KEY (`tree_id`)
     REFERENCES `tree`.`tree` (`tree_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `interaction_embed_id`
+    FOREIGN KEY (`embed_id`)
+    REFERENCES `tree`.`tree_embed` (`embed_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -225,6 +287,7 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree_interaction_element` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+
 -- -----------------------------------------------------
 -- Trigger for setting "Created at" timestamp on tree table
 -- -----------------------------------------------------
@@ -259,13 +322,43 @@ DELIMITER ;
 -- Trigger for setting "Created at" timestamp on tree table
 -- -----------------------------------------------------
 DELIMITER //
-DROP TRIGGER IF EXISTS tree_insert_trigger//
-CREATE TRIGGER tree_insert_trigger
+DROP TRIGGER IF EXISTS tree_interaction_trigger//
+CREATE TRIGGER tree_interaction_trigger
 BEFORE INSERT ON `tree`.`tree_interaction`
 FOR EACH ROW
 BEGIN
 IF NEW.interaction_created_at = '1970-01-01 06:00:00' THEN
 SET NEW.interaction_created_at = NOW();
+END IF;
+END;//
+DELIMITER ;
+
+-- -----------------------------------------------------
+-- Trigger for setting "Created at" timestamp on site table
+-- -----------------------------------------------------
+DELIMITER //
+DROP TRIGGER IF EXISTS tree_site_trigger//
+CREATE TRIGGER tree_site_trigger
+BEFORE INSERT ON `tree`.`tree_site`
+FOR EACH ROW
+BEGIN
+IF NEW.site_created_at = '1970-01-01 06:00:00' THEN
+SET NEW.site_created_at = NOW();
+END IF;
+END;//
+DELIMITER ;
+
+-- -----------------------------------------------------
+-- Trigger for setting "Created at" timestamp on embed table
+-- -----------------------------------------------------
+DELIMITER //
+DROP TRIGGER IF EXISTS tree_embed_trigger//
+CREATE TRIGGER tree_embed_trigger
+BEFORE INSERT ON `tree`.`tree_embed`
+FOR EACH ROW
+BEGIN
+IF NEW.embed_created_at = '1970-01-01 06:00:00' THEN
+SET NEW.embed_created_at = NOW();
 END IF;
 END;//
 DELIMITER ;
@@ -600,7 +693,7 @@ SELECT
      (interactions.user_id = max_date.user_id
       AND
       interactions.interaction_created_at = max_date.interaction_created_at)
-  ORDER BY 
+  ORDER BY
     interactions.interaction_id;
 
 SET SQL_MODE=@OLD_SQL_MODE;

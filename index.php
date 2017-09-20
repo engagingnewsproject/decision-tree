@@ -241,19 +241,23 @@ $app->group('/api', function() {
         // @param site_id can be an encoded root url w/o the http://
         $this->get('/sites/{site_id}', function (Request $request, Response $response) {
             $site_id = $request->getAttribute('site_id');
-            //TODO: see if the site ID is an ID or a URL
 
+            $DB = new \Cme\Database\DB();
+            //TODO: see if the site ID is an ID or a URL
+            $site = $DB->get_site($site_id);
             // return the JSON
-            $response->getBody()->write(json_encode($site_id));
+            $response->getBody()->write(json_encode($site));
             return $response;
         });
 
         // Returns all embeds on that site
         $this->get('/sites/{site_id}/embeds/', function (Request $request, Response $response) {
             $site_id = $request->getAttribute('site_id');
-
+            $DB = new \Cme\Database\DB();
+            //TODO: see if the site ID is an ID or a URL
+            $embeds = $DB->get_embeds_by_site($site_id);
             // return the JSON
-            $response->getBody()->write(json_encode($site_id));
+            $response->getBody()->write(json_encode($embeds));
             return $response;
         });
 
@@ -261,8 +265,11 @@ $app->group('/api', function() {
         $this->get('/sites/{site_id}/embeds/{embed_id}', function (Request $request, Response $response) {
             $site_id = $request->getAttribute('site_id');
             $embed_id = $request->getAttribute('embed_id');
+
+            $DB = new \Cme\Database\DB();
+            $embed = $DB->get_embed($embed_id, ['site_id'=>$site_id]);
             // return the JSON
-            $response->getBody()->write(json_encode($site_id));
+            $response->getBody()->write(json_encode($embed));
             return $response;
         });
 
@@ -291,14 +298,46 @@ $app->group('/api', function() {
             // passed data
             $data = $request->getParsedBody();
 
-            // try to save it
-            $interaction = new \Cme\Database\SaveInteraction();
-            $save = $interaction->save($data);
+            // set empty errors array. This whole "check for errors then move on" thing
+            // could probably be structured better
+            $errors = [];
+
+            $site = new \Cme\Database\SaveSite();
+            // get the site_id. It will either save a new one or return an existing one
+            $site_response = $site->save($data['site']);
+            if(isset($site_response['status']) && $site_response['status'] === 'success') {
+                $data['site']['site_id'] = $site_response['site_id'];
+                $data['site']['tree_id'] = $data['tree_id'];
+            } else {
+                $errors = $site_response;
+            }
+            // no errors? get the embed
+            if(empty($errors)) {
+                // add the tree_id into the site attribute cuz we'll need it
+                // try to get the embed
+                $embed = new \Cme\Database\SaveEmbed();
+                $embed_response = $embed->save($data['site']);
+
+                if(isset($embed_response['status']) && $embed_response['status'] === 'success') {
+                    $data['site']['embed_id'] = $embed_response['embed_id'];
+                } else {
+                    $errors = $embed_response;
+                }
+            }
+
+            // no errors? save the interaction
+            if(empty($errors)) {
+                // try to save it
+                $interaction = new \Cme\Database\SaveInteraction();
+                $the_response = $interaction->save($data);
+            } else {
+                $the_response = $errors;
+            }
 
             // return the JSON
             $response->withStatus(200)
                 ->withHeader("Content-Type", "application/json")
-                ->write(json_encode($save));
+                ->write(json_encode($data));
             return $response;
         });
 

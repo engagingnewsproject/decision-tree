@@ -3052,7 +3052,7 @@ TreeHistoryView.prototype = {
 * (so people can go back to previous questions)
 */
 function TreeInteraction(options) {
-    var _Tree, _rootURL, _postURL, _userID;
+    var _Tree, _rootURL, _postURL, _siteName, _isIframe, _userID;
     /**
     * Private functions
     */
@@ -3097,11 +3097,17 @@ function TreeInteraction(options) {
     this.getTree = function () {
         return _Tree;
     };
+    this.getIsIframe = function () {
+        return _isIframe;
+    };
     this.getRootURL = function () {
         return _rootURL;
     };
     this.getPostURL = function () {
         return _postURL;
+    };
+    this.getSiteName = function () {
+        return _siteName;
     };
     this.getUserID = function () {
         return _userID;
@@ -3127,10 +3133,31 @@ function TreeInteraction(options) {
         return _postURL;
     };
 
+    var _setSiteName = function _setSiteName() {
+        var siteName = document.querySelector('meta[property="og:site_name"]');
+        if (!siteName) {
+            siteName = document.title;
+        }
+        _siteName = siteName;
+    };
+
+    var _setIsIframe = function _setIsIframe() {
+        _isIframe = false;
+
+        // if we're in an iframe, set _isIframe to true
+        if (window.self.location !== window.top.location) {
+            _isIframe = true;
+        }
+        return _isIframe;
+    };
+
     this.init = function () {
         // set the userID
         _setUserID();
-
+        // set the site URL
+        _setSiteName();
+        // set if it's an iframe or not
+        _setIsIframe();
         // set the post URL
         this.setPostURL();
     };
@@ -3164,7 +3191,17 @@ function TreeInteraction(options) {
         treeID = Tree.getTreeID();
 
         // combine data and our userID
-        data = Object.assign(data, { user_id: this.getUserID(), tree_id: Tree.getTreeID() });
+        data = Object.assign(data, {
+            user_id: this.getUserID(),
+            tree_id: Tree.getTreeID(),
+            site: {
+                name: this.getSiteName(),
+                host: window.top.location.host,
+                path: window.top.location.pathname,
+                is_iframe: this.getIsIframe()
+            }
+
+        });
 
         return new Promise(function (resolve, reject) {
 
@@ -3197,6 +3234,7 @@ function TreeInteraction(options) {
     this.response = function (request) {
         // response from the server
         var data = JSON.parse(request.response);
+        console.log(data);
     };
 
     // set the rootURL
