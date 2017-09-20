@@ -16,8 +16,15 @@
 <body>
 <main>
     <h2>Main content block</h2>
-    <script src="http://dev/decision-tree/dist/js/iframe-parent.js"></script>
-    <iframe width="100%" height="500px" style="border: none;" id="cme-tree__1" class="cme-tree__iframe" src="http://dev/decision-tree/api/v1/trees/citizen/iframe"></iframe>
+    <?php
+        if($_SERVER['HTTP_HOST'] !== 'localhost:3000' && $_SERVER['HTTP_HOST'] !== 'dev' ) {
+            $site = 'https://tree.mediaengagement.org';
+        } else {
+            $site = 'http://dev/decision-tree';
+        }
+    ?>
+    <script src="<?php echo $site;?>/dist/js/iframe-parent.js"></script>
+    <iframe width="100%" height="500px" style="border: none;" id="cme-tree__1" class="cme-tree__iframe" src="<?php echo $site;?>/api/v1/trees/citizen/iframe"></iframe>
 
 </main>
 <footer>
