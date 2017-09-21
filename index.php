@@ -1,6 +1,7 @@
 <?php
 // allow all sites to access this file
 header('Access-Control-Allow-Origin: *');
+
 require 'vendor/autoload.php';
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
@@ -12,6 +13,17 @@ $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
 
 $app = new \Slim\App(["settings" => $config]);
+
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+    return $response;
+});
+
+$app->add(function ($req, $res, $next) {
+    $response = $next($req, $res);
+    return $response
+            ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS');
+});
 
 // register views
 $container = $app->getContainer();

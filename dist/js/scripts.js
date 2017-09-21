@@ -1496,8 +1496,10 @@ function TreeInteraction(options) {
     this.setSiteName = function (siteName) {
         if (_siteName === undefined) {
             if (this.getIsIframe() === false) {
-                _siteName = document.querySelector('meta[property="og:site_name"]');
-                if (!_siteName) {
+                var fbOG = document.querySelector('meta[property="og:site_name"]');
+                if (fbOG) {
+                    _siteName = fbOG.content;
+                } else {
                     _siteName = document.title;
                 }
             }

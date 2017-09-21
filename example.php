@@ -28,7 +28,7 @@
     <h2>Footer</h2>
 </footer>
 
-<!-- For fine-tuned support if you already have handlebars.runtime on your site -->
+<!-- For fine-tuned support if you already have handlebars.runtime on your site>-->
 <script src="dist/js/handlebars.runtime.js"></script>
 <script src="dist/js/templates.js"></script>
 <script src="dist/js/scripts.js"></script>
