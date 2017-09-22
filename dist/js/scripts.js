@@ -2317,6 +2317,8 @@ TreeView.prototype = {
     },
 
     updateViewHeight: function updateViewHeight(state) {
+        var _this2 = this;
+
         var activeEl = void 0,
             cPanel = void 0,
             cWindow = void 0,
@@ -2354,16 +2356,17 @@ TreeView.prototype = {
             cWindowHeight = activeEl.data.bounds.offsetHeight;
 
             // do an async check to see if we need to recalculate the positions
-            /*
+
             // This doesn't seem necessary since I had tried to use this to fix
-            setTimeout(() =>{
-                console.log('resize check')
-                 // check the position of the first end state
-                if(this.checkEndPositionAccuracy() !== true) {
+            setTimeout(function () {
+                console.log('resize check');
+
+                // check the position of the first end state
+                if (_this2.checkEndPositionAccuracy() !== true) {
                     // pass true to force the resize
-                    this.resize(true)
+                    _this2.resize(true);
                 }
-            }, 200)*/
+            }, 200);
 
             setTimeout(function () {
                 // this is generally wrong on iOS safari when transitioning a long distance
@@ -2372,7 +2375,7 @@ TreeView.prototype = {
                 // console.log('cwindowScrollTop', cWindow.scrollTop)
                 // in order to fix this, set it to scrollTop = 0 at the end of the transition time
                 cWindow.scrollTop = 0;
-            }, this.animationLength);
+            }, this.animationLength + 100);
         } else if (state.type === 'intro') {
             // kicks off the process for calculating necesary group data if necessary
             this.checkForGroupsCalc();
@@ -2572,7 +2575,7 @@ TreeView.prototype = {
 
     // pass forceResize = true to skip any validation
     resize: function resize(forceResize) {
-        var _this2 = this;
+        var _this3 = this;
 
         // iOS fires a resize event when you switch scroll direction vertically (like, scrolling up and then back down) when the url address bar expands/retracts. We don't actually need to do this costly resize on each of those, so we'll do our questionAccuracty check.
         if (forceResize !== true) {
@@ -2592,14 +2595,14 @@ TreeView.prototype = {
         if (!this.resizeTimeout) {
             this.resizeTimeout = setTimeout(function () {
                 // update the question and end sizes
-                _this2.calculateQuestionsSize();
-                _this2.calculateEndsSize();
+                _this3.calculateQuestionsSize();
+                _this3.calculateEndsSize();
                 // update the group sizes
-                _this2.calculateGroups();
+                _this3.calculateGroups();
                 // update the heights
-                _this2.updateViewHeight(_this2.getTree().getState());
+                _this3.updateViewHeight(_this3.getTree().getState());
                 // update the windowWidth var to match what we just set it to
-                _this2.windowWidth = window.innerWidth;
+                _this3.windowWidth = window.innerWidth;
             }, 450);
         }
     },

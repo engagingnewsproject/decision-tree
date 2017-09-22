@@ -397,7 +397,7 @@ TreeView.prototype = {
             cWindowHeight = activeEl.data.bounds.offsetHeight
 
             // do an async check to see if we need to recalculate the positions
-            /*
+
             // This doesn't seem necessary since I had tried to use this to fix
             setTimeout(() =>{
                 console.log('resize check')
@@ -407,7 +407,7 @@ TreeView.prototype = {
                     // pass true to force the resize
                     this.resize(true)
                 }
-            }, 200)*/
+            }, 200)
 
             setTimeout(()=> {
                 // this is generally wrong on iOS safari when transitioning a long distance
@@ -416,7 +416,7 @@ TreeView.prototype = {
                 // console.log('cwindowScrollTop', cWindow.scrollTop)
                 // in order to fix this, set it to scrollTop = 0 at the end of the transition time
                 cWindow.scrollTop = 0
-            }, this.animationLength)
+            }, this.animationLength  + 100)
         }
 
         else if(state.type === 'intro') {
