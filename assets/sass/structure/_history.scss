@@ -19,8 +19,6 @@
     margin-bottom: $spacing__base;
 }
 
-
-
 .cme-tree__history-list-item--nav {
     transform: translate3d(0,0,0);
     z-index: 2;
@@ -197,9 +195,9 @@
     }
 }
 
+
 .cme-tree__state--end {
     .cme-tree__history-list-item:nth-last-child(2) {
-        animation: pulseIt 1.6s .5s ease infinite;
 
         &:after {
             content: '';
@@ -214,17 +212,7 @@
         }
     }
 }
-@keyframes pulseIt {
-  0% {
-    transform: scale(1.075);
-  }
-  60% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(1.075);
-  }
-}
+
 
 
 @keyframes pulse {

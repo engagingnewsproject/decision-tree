@@ -30,7 +30,7 @@ const declare = require('gulp-declare');
 
 
 // Static Server + watching scss/html files
-gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'compressImg', 'svgstore',  'handlebars', 'concatTreeJS'], function() {
+gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'compressImg', 'svgstore', 'handlebars'], function() {
 
     browserSync({
         proxy: localhost
