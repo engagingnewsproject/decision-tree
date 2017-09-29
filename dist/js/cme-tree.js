@@ -4632,6 +4632,7 @@ TreeView.prototype = {
                     }
                     // ok, they're in different columns, figure out what direction it needs to go
                     arrow = this.getDestinationIcon(options[o].data.option_id);
+
                     arrowPosition = this.getAbsoluteBoundingRect(arrow);
                     destinationPosition = this.getAbsoluteBoundingRect(destination);
 
@@ -4699,7 +4700,9 @@ TreeView.prototype = {
         svg.style.transform = 'rotateX(-180deg)';
     },
     templateArrow: function templateArrow(svg, iconName) {
-        svg.children[0].setAttribute('xlink:href', '#icon-' + iconName);
+        // Use childNodes for IE Edge
+        svg.childNodes[0].setAttribute('xlink:href', '#icon-' + iconName);
+
         return svg;
     },
     findAncestor: function findAncestor(el, theNodeName) {
