@@ -30,7 +30,7 @@ const declare = require('gulp-declare');
 
 
 // Static Server + watching scss/html files
-gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'compressImg', 'svgstore', 'handlebars'], function() {
+gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'TreeLoaderJS', 'compressImg', 'svgstore', 'handlebars'], function() {
 
     browserSync({
         proxy: localhost
@@ -40,6 +40,7 @@ gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'compressImg', 'svgstore', 'ha
     // Watch SCSS file for change to pass on to sass compiler,
     gulp.watch('assets/js/iframe-parent/*.js', ['iframeJS']);
     gulp.watch('assets/js/Tree/*.js', ['TreeJS']);
+    gulp.watch('assets/js/TreeLoader/*.js', ['TreeLoaderJS']);
     // run img compression when images added to directory
     gulp.watch('assets/img/*.*', ['compressImg']);
     // run SVG when svg files added
@@ -95,6 +96,22 @@ gulp.task('TreeJS', function() {
         .pipe(concat('scripts.js'))
         .pipe(gulp.dest(jsDest))
         .pipe(rename('scripts.min.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest(jsDest));
+});
+
+gulp.task('TreeLoaderJS', function() {
+    var jsFiles = 'assets/js/TreeLoader/*.js',
+    jsDest = 'dist/js';
+
+    return gulp.src(jsFiles)
+        .pipe(plumber())
+        .pipe(babel({
+            presets: ['es2015']
+        }))
+        .pipe(concat('TreeLoader.js'))
+        .pipe(gulp.dest(jsDest))
+        .pipe(rename('TreeLoader.min.js'))
         .pipe(uglify())
         .pipe(gulp.dest(jsDest));
 });

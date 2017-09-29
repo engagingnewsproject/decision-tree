@@ -1427,7 +1427,7 @@ function TreeInteraction(options) {
             // we're not on DEV, so pass the rootURL as our PROD url
             _rootURL = 'https://tree.mediaengagement.org';
         }
-
+        console.log(_rootURL);
         return _rootURL;
     };
 
