@@ -82,6 +82,9 @@ gulp.task('svgstore', function () {
 
 gulp.task('sass', function () {
     processSASS('base');
+    processSASS('structure-color');
+    processSASS('structure-typography');
+    processSASS('structure');
 });
 
 gulp.task('TreeJS', function() {
