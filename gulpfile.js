@@ -90,9 +90,7 @@ gulp.task('TreeJS', function() {
 
     return gulp.src(jsFiles)
         .pipe(plumber())
-        .pipe(babel({
-            presets: ['es2015']
-        }))
+        .pipe(babel())
         .pipe(concat('scripts.js'))
         .pipe(gulp.dest(jsDest))
         .pipe(rename('scripts.min.js'))
