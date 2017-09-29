@@ -3,22 +3,86 @@
 (function () {
 
     function TreeLoader() {
+        var _rootURL, _treeSlug, _treeStyle, _loaderScript, _treeContainer;
+
+        /**
+        * Private functions
+        */
+        var _setRootURL = function _setRootURL(url) {
+            // regex it to see if it's one of our DEV urls
+            var regex = /https?:\/\/(?:(?:localhost:3000|dev)\/decision-tree|(?:enptree)\.(?:staging\.)?wpengine\.com)\b/;
+            _rootURL = regex.exec(url);
+
+            if (_rootURL === null) {
+                // we're not on DEV, so pass the rootURL as our PROD url
+                _rootURL = 'https://tree.mediaengagement.org';
+            }
+
+            return _rootURL;
+        };
+
+        var _setTreeSlug = function _setTreeSlug(slug) {
+
+            // Get Tree Slug
+            if (slug === null || slug === '') {
+                console.error('No tree specified. Add "?tree=slug-of-tree" to your URL, like this: https://tree.mediaengagement.org/dist/js/TreeLoader.min.js?tree=citizen');
+            } else {
+                _treeSlug = slug;
+            }
+            return _treeSlug;
+        };
+
+        var _setTreeStyle = function _setTreeStyle(style) {
+            // Get Style
+            if (style === null || style === '') {
+                _treeStyle = 'base';
+            } else {
+                _treeStyle = style;
+            }
+            return _treeStyle;
+        };
+
+        var _setLoaderScript = function _setLoaderScript(script) {
+            // Set the script
+            _loaderScript = script;
+
+            return _loaderScript;
+        };
+
+        this.getRootURL = function () {
+            return _rootURL;
+        };
+        this.getTreeSlug = function () {
+            return _treeSlug;
+        };
+        this.getTreeStyle = function () {
+            return _treeStyle;
+        };
+        this.getLoaderScript = function () {
+            return _loaderScript;
+        };
+        this.getTreeContainer = function () {
+            return _treeContainer;
+        };
+
+        // INIT
         // Get Root Domain
         // get the current script being processed (this one)
         var scripts = document.querySelectorAll('script[src]');
-        var treeLoaderScript = scripts[scripts.length - 1];
 
-        this.rootURL = this.getRootURL(treeLoaderScript.src);
-        this.treeSlug = this.getTreeSlug(treeLoaderScript.src);
-        this.treeStyle = this.getTreeStyle(treeLoaderScript.src);
+        _setLoaderScript(scripts[scripts.length - 1]);
+        _setRootURL(this.getLoaderScript().src);
+        _setTreeSlug(this.getParameterByName('tree', this.getLoaderScript().src));
+        _setTreeStyle(this.getParameterByName('style', this.getLoaderScript().src));
 
-        this.createTreeContainer(this.treeSlug, treeLoaderScript);
+        // create our tree container
+        _treeContainer = this.createTreeContainer(this.getTreeSlug(), this.getLoaderScript());
 
         var resources = [{
-            src: this.rootURL + '/dist/js/cme-tree.min.js',
+            src: this.getRootURL() + '/dist/js/cme-tree.min.js',
             type: 'js'
         }, {
-            src: this.rootURL + '/dist/css/' + this.treeStyle + '.min.css',
+            src: this.getRootURL() + '/dist/css/' + this.getTreeStyle() + '.min.css',
             type: 'css'
         }];
 
@@ -36,37 +100,6 @@
             if (!results) return null;
             if (!results[2]) return '';
             return decodeURIComponent(results[2].replace(/\+/g, " "));
-        },
-
-        getRootURL: function getRootURL(url) {
-            // regex it to see if it's one of our DEV urls
-            var regex = /https?:\/\/(?:(?:localhost:3000|dev)\/decision-tree|(?:enptree)\.(?:staging\.)?wpengine\.com)\b/;
-            var rootURL = regex.exec(url);
-
-            if (rootURL === null) {
-                // we're not on DEV, so pass the rootURL as our PROD url
-                rootURL = 'https://tree.mediaengagement.org';
-            }
-
-            return rootURL;
-        },
-
-        getTreeSlug: function getTreeSlug(src) {
-            // Get Tree Slug
-            var treeSlug = this.getParameterByName('tree', src);
-            if (treeSlug === null || treeSlug === '') {
-                console.error('No tree specified. Add "?tree=slug-of-tree" to your URL, like this: https://tree.mediaengagement.org/dist/js/TreeLoader.min.js?tree=citizen');
-            }
-            return treeSlug;
-        },
-
-        getTreeStyle: function getTreeStyle(src) {
-            // Get Style
-            var treeStyle = this.getParameterByName('style', src);
-            if (treeStyle === null || treeStyle === '') {
-                treeStyle = 'base';
-            }
-            return treeStyle;
         },
 
         createTreeContainer: function createTreeContainer(treeSlug, insertItAfter) {
@@ -139,8 +172,8 @@
 
         runCreateTree: function runCreateTree() {
             var treeOptions = {
-                slug: this.treeSlug,
-                container: document.getElementById('cme-tree__' + this.treeSlug)
+                slug: this.getTreeSlug(),
+                container: this.getTreeContainer()
             };
             window.createTree(treeOptions);
         }
