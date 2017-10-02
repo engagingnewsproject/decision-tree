@@ -3,7 +3,6 @@
     top: $spacing__base;
     z-index: 999;
     margin: 0;
-    transform: translate3d(0,0,0);
     transform-origin: top left;
     transition: all .4s $easing;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -20,7 +19,6 @@
 }
 
 .cme-tree__history-list-item--nav {
-    transform: translate3d(0,0,0);
     z-index: 2;
     animation: enterHistoryItem .6s $easing;
 
@@ -153,6 +151,7 @@
     }
 }
 
+
 .cme-tree__history-current-indicator {
     width: $spacing__base * 1.1;
     height: $spacing__base * 1.1;
@@ -161,7 +160,6 @@
     left: 0;
     right: 0;
     margin: auto;
-    transform: translate3d(0,0,0);
     transition: transform .6s $easing;
     border-radius: 50%;
     z-index: 1;

@@ -207,8 +207,6 @@ function cssImportantify(filename) {
     .pipe(plumber())
     // add !important tags
     .pipe(cssVip())
-    // minify it again, as cssVip removes that
-    .pipe(csso())
     // rename to add .min
     .pipe(rename({
       basename: filename+'-important',
