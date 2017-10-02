@@ -14,6 +14,7 @@ const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const reload  = browserSync.reload;
 const csso = require('gulp-csso');
+const cssVip = require('gulp-css-vip'); // adds !important tags to all CSS lines
 const uglify = require('gulp-uglify');
 const rename = require("gulp-rename");
 const imagemin = require('gulp-imagemin');
@@ -28,6 +29,12 @@ const handlebars = require('gulp-handlebars');
 const wrap = require('gulp-wrap');
 const declare = require('gulp-declare');
 
+const cssFiles = [
+                  'base',
+                  'structure-color',
+                  'structure-typography',
+                  'structure'
+                ];
 
 // Static Server + watching scss/html files
 gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'TreeLoaderJS', 'compressImg', 'svgstore', 'handlebars'], function() {
@@ -81,10 +88,10 @@ gulp.task('svgstore', function () {
 
 
 gulp.task('sass', function () {
-    processSASS('base');
-    processSASS('structure-color');
-    processSASS('structure-typography');
-    processSASS('structure');
+  for(let i = 0; i < cssFiles.length; i++) {
+    processSASS(cssFiles[i]);
+    cssImportantify(cssFiles[i])
+  }
 });
 
 gulp.task('TreeJS', function() {
@@ -191,6 +198,24 @@ function processSASS(filename) {
       }))
       // Outputs CSS files in the css folder
       .pipe(gulp.dest('dist/css/'));
+}
+
+function cssImportantify(filename) {
+
+  return gulp.src('dist/css/'+filename+'.min.css')
+    // catch errors
+    .pipe(plumber())
+    // add !important tags
+    .pipe(cssVip())
+    // minify it again, as cssVip removes that
+    .pipe(csso())
+    // rename to add .min
+    .pipe(rename({
+      basename: filename+'-important',
+      suffix: '.min'
+    }))
+    // Outputs CSS files in the css folder
+    .pipe(gulp.dest('dist/css/'));
 }
 
 gulp.task('handlebars', function(){
