@@ -237,7 +237,7 @@ function cssCleanSlate(filename) {
     // concatenate clean slate with the '-important' files
     .pipe(concat(filename+'-clean-slate.css'))
     // minify the CSS
-    // .pipe(csso())
+    .pipe(csso())
     // rename to add .min
     .pipe(rename({
       suffix: '.min'
