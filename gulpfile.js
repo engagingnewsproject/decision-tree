@@ -24,6 +24,7 @@ const path = require('path');
 const concat = require("gulp-concat");
 const babel = require("gulp-babel");
 const plumber = require('gulp-plumber');
+const insert = require('gulp-insert');
 // Handlebars and dependencies
 const handlebars = require('gulp-handlebars');
 const wrap = require('gulp-wrap');
@@ -57,7 +58,7 @@ gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'TreeLoaderJS', 'compressImg',
     // compile js
     gulp.watch(["dist/js/scripts.js", "dist/js/handlebars.runtime.js", "dist/js/templates.js"], ['concatTreeJS']);
     // Watch our CSS file and reload when it's done compiling
-    gulp.watch("dist/css/*.css").on('change', reload);
+    gulp.watch("dist/css/structure-typography-important.*").on('change', reload);
     // Watch php file
     gulp.watch("../*/*.php").on('change', reload);
     // watch javascript files
@@ -91,6 +92,7 @@ gulp.task('sass', function () {
   for(let i = 0; i < cssFiles.length; i++) {
     processSASS(cssFiles[i]);
     cssImportantify(cssFiles[i])
+    cssCleanSlate(cssFiles[i])
   }
 });
 
@@ -205,11 +207,39 @@ function cssImportantify(filename) {
   return gulp.src('dist/css/'+filename+'.min.css')
     // catch errors
     .pipe(plumber())
+    // wrap our file in an .cme-tree__loader-container {}
+    // before processing it with sass to increase specificty
+    .pipe(insert.wrap('.cme-tree__loader-container {', '}'))
+    // process it with sass
+    .pipe(sass({
+        errLogToConsole: true
+      }))
+    // adds prefixes to whatever needs to get done
+    .pipe(autoprefixer())
     // add !important tags
     .pipe(cssVip())
+    // minify the CSS
+    .pipe(csso())
     // rename to add .min
     .pipe(rename({
       basename: filename+'-important',
+      suffix: '.min'
+    }))
+    // Outputs CSS files in the css folder
+    .pipe(gulp.dest('dist/css/'));
+}
+
+function cssCleanSlate(filename) {
+
+  return gulp.src(['assets/css/clean-slate.css','dist/css/'+filename+'-important.min.css'])
+    // catch errors
+    .pipe(plumber())
+    // concatenate clean slate with the '-important' files
+    .pipe(concat(filename+'-clean-slate.css'))
+    // minify the CSS
+    // .pipe(csso())
+    // rename to add .min
+    .pipe(rename({
       suffix: '.min'
     }))
     // Outputs CSS files in the css folder

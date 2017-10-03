@@ -1300,7 +1300,7 @@ TreeHistoryView.prototype = {
         progressbar.style.height = progressbarHeight + 'px';
 
         indicator = this.getIndicator();
-        indicator.style.transform = 'translate3d(0,' + progressbarHeight + 'px, 0)';
+        this.setTransform(indicator, 'translate3d(0,' + progressbarHeight + 'px, 0)');
         indicator.classList.add('cme-tree__history-current-indicator--gooify');
         setTimeout(function () {
             indicator.classList.remove('cme-tree__history-current-indicator--gooify');
@@ -1328,7 +1328,7 @@ TreeHistoryView.prototype = {
             }
         }
 
-        container.style.transform = 'translate3d(0,' + containerMoveUp + 'px,0)';
+        this.setTransform(container, 'translate3d(0,' + containerMoveUp + 'px,0)');
     },
 
     templateUl: function templateUl() {
@@ -1396,6 +1396,10 @@ TreeHistoryView.prototype = {
         button.data = data;
 
         return li;
+    },
+
+    setTransform: function setTransform(element, transform) {
+        element.setAttribute('style', 'transform: ' + transform + ' !important;');
     }
 };
 'use strict';
@@ -2395,8 +2399,6 @@ TreeView.prototype = {
                     cWindowHeight = groupsHeight;
                 }
 
-                cWindow.style.height = cWindowHeight + 'px';
-
                 // reset the transform origin
                 cPanelTransform = '';
             } else {
@@ -2404,9 +2406,10 @@ TreeView.prototype = {
             }
 
         // set the transforms
-        cWindow.style.height = cWindowHeight + 'px';
-        cPanel.style.transform = cPanelTransform;
-
+        // cWindow.style.height = cWindowHeight+'px'
+        // cPanel.style.transform = cPanelTransform
+        cWindow.setAttribute('style', 'height: ' + cWindowHeight + 'px !important;');
+        this.setTransform(cPanel, cPanelTransform);
         // emit to let everyone know we finished updating the height
         this.emit('viewChange', 'viewHeightUpdate', { cWindowHeight: cWindowHeight, questionOffsetTop: questionOffsetTop });
     },
@@ -2419,14 +2422,6 @@ TreeView.prototype = {
         if (!classes.contains('cme-tree__state--' + state.type)) {
             classes.add('cme-tree__state--' + state.type);
         }
-    },
-
-    setTransform: function setTransform(el, prop) {
-        el.style.webkitTransform = prop;
-        el.style.MozTransform = prop;
-        el.style.msTransform = prop;
-        el.style.OTransform = prop;
-        el.style.transform = prop;
     },
 
     removeContainerState: function removeContainerState(state) {
@@ -2844,7 +2839,7 @@ TreeView.prototype = {
         groupsOffsetLeft = treeEl.data.groupsOffsetLeft;
 
         for (var i = 0; i < groups.length; i++) {
-            this.addStylesheetRule('.cme-tree__state--overview #' + groups[i].id + ', .cme-tree__state--intro #' + groups[i].id, [['transform', 'translate3d(' + groupsOffsetLeft + 'px,' + groups[i].data.offsetTop + 'px, 0)']]);
+            this.addStylesheetRule('.cme-tree__state--overview #' + groups[i].id + ', .cme-tree__state--intro #' + groups[i].id, [['transform', 'translate3d(' + groupsOffsetLeft + 'px,' + groups[i].data.offsetTop + 'px, 0) !important']]);
         }
     },
 
@@ -3015,11 +3010,11 @@ TreeView.prototype = {
                     else if (arrowAngleNormalized < 10 || 350 < arrowAngleNormalized) {
                             // straight to the right (since we start with a down arrow)
                             this.templateArrow(arrow, 'arrow');
-                            arrow.style.transform = 'rotate(180deg)';
+                            this.setTransform(arrow, 'rotate(180deg)');
                         } else if (170 < arrowAngleNormalized && arrowAngleNormalized < 190) {
                             // straight to the left (since we start with a down arrow)
                             this.templateArrow(arrow, 'arrow');
-                            arrow.style.transform = 'rotate(-180deg)';
+                            this.setTransform(arrow, 'rotate(-180deg)');
                         }
                         // down and to the right
                         else if (270 < arrowAngleNormalized && arrowAngleNormalized < 280) {
@@ -3030,7 +3025,7 @@ TreeView.prototype = {
                                 this.templateArrowDownLeft(arrow);
                             } else {
                                 this.templateArrow(arrow, 'arrow');
-                                arrow.style.transform = 'rotate(' + arrowAngle + 'deg)';
+                                this.setTransform(arrow, 'rotate(' + arrowAngle + 'deg)');
                             }
                 }
             }
@@ -3039,19 +3034,19 @@ TreeView.prototype = {
 
     templateArrowUpRight: function templateArrowUpRight(svg) {
         this.templateArrow(svg, 'arrow-turn');
-        svg.style.transform = 'rotateX(-180deg)';
+        this.setTransform(svg, 'rotateX(-180deg)');
     },
     templateArrowUpLeft: function templateArrowUpLeft(svg) {
         this.templateArrow(svg, 'arrow-turn');
-        svg.style.transform = 'rotate(180deg)';
+        this.setTransform(svg, 'rotateX(180deg)');
     },
     templateArrowDownRight: function templateArrowDownRight(svg) {
         this.templateArrow(svg, 'arrow-turn');
-        svg.style.transform = 'rotate(0deg)';
+        this.setTransform(svg, 'rotateX(0deg)');
     },
     templateArrowDownLeft: function templateArrowDownLeft(svg) {
         this.templateArrow(svg, 'arrow-turn');
-        svg.style.transform = 'rotateX(-180deg)';
+        this.setTransform(svg, 'rotateX(-180deg)');
     },
     templateArrow: function templateArrow(svg, iconName) {
         // Use childNodes for IE Edge
@@ -3068,6 +3063,11 @@ TreeView.prototype = {
         }
 
         return el;
+    },
+
+
+    setTransform: function setTransform(element, transform) {
+        element.setAttribute('style', 'transform: ' + transform + ' !important;');
     }
 };
 'use strict';

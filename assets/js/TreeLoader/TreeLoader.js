@@ -110,6 +110,7 @@
         let treeContainer = document.createElement('div')
         // set the ID
         treeContainer.id = 'cme-tree__'+treeSlug
+        treeContainer.classList.add('cme-tree__loader-container')
         // insert the container after this
         insertItAfter.parentNode.insertBefore(treeContainer, insertItAfter.nextSibling)
 

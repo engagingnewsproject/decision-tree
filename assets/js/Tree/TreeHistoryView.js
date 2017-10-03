@@ -391,7 +391,7 @@ TreeHistoryView.prototype = {
         progressbar.style.height = progressbarHeight +'px'
 
         indicator = this.getIndicator()
-        indicator.style.transform = 'translate3d(0,'+ progressbarHeight +'px, 0)';
+        this.setTransform(indicator, 'translate3d(0,'+ progressbarHeight +'px, 0)')
         indicator.classList.add('cme-tree__history-current-indicator--gooify')
         setTimeout(()=>{
             indicator.classList.remove('cme-tree__history-current-indicator--gooify')
@@ -421,8 +421,7 @@ TreeHistoryView.prototype = {
 
         }
 
-        container.style.transform = 'translate3d(0,'+ containerMoveUp +'px,0)'
-
+        this.setTransform(container,'translate3d(0,'+ containerMoveUp +'px,0)')
     },
 
     templateUl: function() {
@@ -490,5 +489,9 @@ TreeHistoryView.prototype = {
         button.data = data
 
         return li
+    },
+
+    setTransform: function(element, transform) {
+        element.setAttribute('style', 'transform: '+transform+' !important;')
     }
 }
