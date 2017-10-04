@@ -6,7 +6,8 @@
         _treeSlug,
         _treeStyle,
         _loaderScript,
-        _treeContainer;
+        _treeContainer,
+        _cssPriority;
 
     /**
     * Private functions
@@ -46,6 +47,17 @@
         return _treeStyle
     }
 
+    var _setCSSPriority = function(style) {
+        // Test string for a match where we'll need to set !important
+        let re = /.+(important|clean-slate)$/
+        if(re.test(style)) {
+            _cssPriority = 'important'
+        } else {
+            _cssPriority = ''
+        }
+        return _cssPriority
+    }
+
     var _setLoaderScript = function(script) {
         // Set the script
         _loaderScript = script
@@ -57,6 +69,7 @@
     this.getRootURL = function() { return _rootURL}
     this.getTreeSlug = function() { return _treeSlug}
     this.getTreeStyle = function() { return _treeStyle}
+    this.getCSSPriority = function() { return _cssPriority}
     this.getLoaderScript = function() { return _loaderScript}
     this.getTreeContainer = function() { return _treeContainer}
 
@@ -73,6 +86,7 @@
     _setRootURL(this.getLoaderScript().src)
     _setTreeSlug(this.getParameterByName('tree', this.getLoaderScript().src))
     _setTreeStyle(this.getParameterByName('style', this.getLoaderScript().src))
+    _setCSSPriority(this.getTreeStyle())
 
     // create our tree container
     _treeContainer = this.createTreeContainer(this.getTreeSlug(), this.getLoaderScript())
@@ -181,7 +195,8 @@
     runCreateTree: function() {
         var treeOptions = {
             slug: this.getTreeSlug(),
-            container: this.getTreeContainer()
+            container: this.getTreeContainer(),
+            cssPriority: this.getCSSPriority()
         }
         window.createTree(treeOptions);
     }

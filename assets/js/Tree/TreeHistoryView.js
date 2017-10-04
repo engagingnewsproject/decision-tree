@@ -6,7 +6,8 @@ function TreeHistoryView(options) {
         _list,
         _resumeBtn,
         _progressbar,
-        _indicator;
+        _indicator,
+        _cssPriority;
 
     if(typeof options.contentWindow !== 'object') {
         console.error('Tree History View container must be a valid object. Try `container: document.getElementById(your-id)`.')
@@ -26,6 +27,7 @@ function TreeHistoryView(options) {
     this.getProgressbar = function() { return _progressbar}
     this.getIndicator = function() { return _indicator}
     this.getTreeHistory = function() { return _TreeHistory}
+    this.getCSSPriority = function() { return _cssPriority}
 
     // setters
     this.setContentWindow = function(contentWindow) {
@@ -86,12 +88,25 @@ function TreeHistoryView(options) {
         return _indicator
     }
 
+    this.setCSSPriority = function(cssPriority) {
+        // only let it be set once
+        if(_cssPriority === undefined && (cssPriority === 'important' || cssPriority === '!important')) {
+            _cssPriority =  cssPriority
+        } else {
+            _cssPriority = ''
+        }
+        return _cssPriority
+    }
+
     var _setTreeHistory = function(TreeHistory) {
         _TreeHistory = TreeHistory
     }
 
+
+
     _setTreeHistory(options.TreeHistory)
     this.setContentWindow(options.contentWindow)
+    this.setCSSPriority(options.cssPriority)
     this.setContainer()
     this.templateRender(this.getTreeHistory().getHistory(), this.getTreeHistory().getCurrentIndex())
     // add click listener on container
@@ -492,6 +507,6 @@ TreeHistoryView.prototype = {
     },
 
     setTransform: function(element, transform) {
-        element.setAttribute('style', 'transform: '+transform+' !important;')
+        element.setAttribute('style', 'transform: '+ transform + this.getCSSPriority()+';')
     }
 }

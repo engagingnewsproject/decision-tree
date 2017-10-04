@@ -4,7 +4,8 @@ function TreeView(options) {
         _treeEl,
         _contentWindow,
         _contentPane,
-        _activeEl;
+        _activeEl,
+        _cssPriority;
 
     if(typeof options.container !== 'object') {
         console.error('Tree container must be a valid object. Try `container: document.getElementById(your-id)`.')
@@ -18,6 +19,7 @@ function TreeView(options) {
     this.getActiveEl = function() { return _activeEl}
     this.getContentWindow = function() { return _contentWindow}
     this.getContentPane = function() { return _contentPane}
+    this.getCSSPriority = function() { return _cssPriority}
 
     // setters
     this.setTree = function(Tree) {
@@ -52,6 +54,16 @@ function TreeView(options) {
             _contentPane =  _contentWindow.firstElementChild
         }
         return _contentPane
+    }
+
+    this.setCSSPriority = function(cssPriority) {
+        // only let it be set once
+        if(_cssPriority === undefined && (cssPriority === 'important' || cssPriority === '!important')) {
+            _cssPriority =  '!important'
+        } else {
+            _cssPriority = ''
+        }
+        return _cssPriority
     }
 
     // Pass a state for it to set to be active
@@ -97,6 +109,9 @@ function TreeView(options) {
     this.windowWidth = window.innerWidth
     // set the el
     _container = options.container;
+    // set the priority
+    this.setCSSPriority(options.cssPriority);
+
     // attach event listeners to the tree element with
     // bound `this` so we get our reference to this element
     _container.addEventListener("click", this.click.bind(this));
@@ -109,6 +124,8 @@ function TreeView(options) {
     if(options.Tree) {
         this.build(options.Tree)
     }
+
+
 
 }
 
@@ -447,7 +464,7 @@ TreeView.prototype = {
         // set the transforms
         // cWindow.style.height = cWindowHeight+'px'
         // cPanel.style.transform = cPanelTransform
-        cWindow.setAttribute('style', 'height: '+cWindowHeight+'px !important;');
+        cWindow.setAttribute('style', 'height: '+cWindowHeight+'px'+this.getCSSPriority()+';');
         this.setTransform(cPanel, cPanelTransform)
         // emit to let everyone know we finished updating the height
         this.emit('viewChange', 'viewHeightUpdate', {cWindowHeight: cWindowHeight, questionOffsetTop: questionOffsetTop })
@@ -873,16 +890,18 @@ TreeView.prototype = {
         let groups,
             groupStyles,
             groupsOffsetLeft,
-            treeEl;
+            treeEl,
+            cssPriority;
 
         // get the groups
         groups = this.getGroups()
         // get the treeEl for our groupsOffsetLeft data
         treeEl = this.getTreeEl()
         groupsOffsetLeft = treeEl.data.groupsOffsetLeft
+        cssPriority = this.getCSSPriority()
 
         for(let i = 0; i < groups.length; i++) {
-            this.addStylesheetRule('.cme-tree__state--overview #'+groups[i].id+', .cme-tree__state--intro #'+groups[i].id, [['transform', 'translate3d('+groupsOffsetLeft+'px,'+ groups[i].data.offsetTop+'px, 0) !important']])
+            this.addStylesheetRule('.cme-tree__state--overview #'+groups[i].id+', .cme-tree__state--intro #'+groups[i].id, [['transform', 'translate3d('+groupsOffsetLeft+'px,'+ groups[i].data.offsetTop+'px, 0)'+cssPriority+'']])
         }
     },
 
@@ -1126,6 +1145,6 @@ TreeView.prototype = {
     },
 
     setTransform: function(element, transform) {
-        element.setAttribute('style', 'transform: '+transform+' !important;')
+        element.setAttribute('style', 'transform: '+ transform + this.getCSSPriority()+';')
     }
 }

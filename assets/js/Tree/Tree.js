@@ -461,9 +461,16 @@ function buildTree(request) {
     }
 
     let data = JSON.parse(request.response);
+
+    let cssPriority = ''
+    if(this.cssPriority) {
+        cssPriority = this.cssPriority
+    }
+
     // the TreeView needs a container to display into
     let treeView = new TreeView({
         container: this.container,
+        cssPriority: cssPriority
     });
     // Manages TreeHistory feature and TreeHistoryView
     let treeHistory = new TreeHistory({});

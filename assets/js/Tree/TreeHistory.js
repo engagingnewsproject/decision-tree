@@ -250,7 +250,11 @@ TreeHistory.prototype = {
                 // get the container
                 let treeView = data
                 let cWindow = treeView.getContentWindow()
-                let historyView = new TreeHistoryView({TreeHistory: this, contentWindow: cWindow})
+                let historyView = new TreeHistoryView({
+                    TreeHistory: this,
+                    contentWindow: cWindow,
+                    cssPriority: treeView.getCSSPriority()
+                })
                 // add this to the observers
                 this.addObserver(historyView)
                 break
