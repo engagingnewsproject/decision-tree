@@ -45,6 +45,8 @@ gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'TreeLoaderJS', 'compressImg',
     });
     // Watch SCSS file for change to pass on to sass compiler,
     gulp.watch(['assets/sass/*.{scss,sass}','assets/sass/*/*.{scss,sass}'], ['sass']);
+    gulp.watch(['dist/css/'+cssFiles[cssFiles.length - 1].toString()+'.min.css'], ['sassImportantify']);
+    gulp.watch(['dist/css/'+cssFiles[cssFiles.length - 1].toString()+'-important.min.css'], ['sassCleanSlate']);
     // Watch SCSS file for change to pass on to sass compiler,
     gulp.watch('assets/js/iframe-parent/*.js', ['iframeJS']);
     gulp.watch('assets/js/Tree/*.js', ['TreeJS']);
@@ -91,8 +93,18 @@ gulp.task('svgstore', function () {
 gulp.task('sass', function () {
   for(let i = 0; i < cssFiles.length; i++) {
     processSASS(cssFiles[i]);
-    cssImportantify(cssFiles[i])
-    cssCleanSlate(cssFiles[i])
+  }
+});
+
+gulp.task('sassImportantify', function () {
+  for(let i = 0; i < cssFiles.length; i++) {
+    cssImportantify(cssFiles[i]);
+  }
+});
+
+gulp.task('sassCleanSlate', function () {
+  for(let i = 0; i < cssFiles.length; i++) {
+    cssCleanSlate(cssFiles[i]);
   }
 });
 
