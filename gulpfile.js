@@ -3,7 +3,7 @@
 */
 // Set this for browserSync to know where your
 // url normally is.
-var localhost = "dev/decision-tree";
+var localhost = "https://decision-tree.dev";
 
 /*
 * NPM Packages
