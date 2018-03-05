@@ -129,7 +129,7 @@ gulp.task('TreeLoaderJS', function() {
     return gulp.src(jsFiles)
         .pipe(plumber())
         .pipe(babel({
-            presets: ['es2015']
+            presets: ['env']
         }))
         .pipe(concat('TreeLoader.js'))
         .pipe(gulp.dest(jsDest))
@@ -145,7 +145,7 @@ gulp.task('iframeJS', function() {
     return gulp.src(jsFiles)
         .pipe(plumber())
         .pipe(babel({
-            presets: ['es2015']
+            presets: ['env']
         }))
         .pipe(concat('iframe-parent.js'))
         .pipe(gulp.dest(jsDest))
