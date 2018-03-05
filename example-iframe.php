@@ -20,7 +20,7 @@
         if($_SERVER['HTTP_HOST'] !== 'localhost:3000' && $_SERVER['HTTP_HOST'] !== 'dev' ) {
             $site = 'https://tree.mediaengagement.org';
         } else {
-            $site = 'http://dev/decision-tree';
+            $site = 'https://decision-tree.dev';
         }
     ?>
     <script src="<?php echo $site;?>/dist/js/iframe-parent.js"></script>

@@ -418,7 +418,7 @@
         return new Promise(function (resolve, reject) {
             var baseUrl = void 0;
             if (/https?:\/\/(?:dev\/decision-tree|localhost:3000\/decision-tree)\//.test(window.location.href)) {
-                baseUrl = 'http://dev/decision-tree';
+                baseUrl = 'https://decision-tree.dev';
             } else {
                 baseUrl = 'https://tree.mediaengagement.org';
             }

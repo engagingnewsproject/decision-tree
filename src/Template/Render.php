@@ -35,7 +35,7 @@ class Render extends Template {
     protected function set_data($tree_slug) {
         $data = false;
 
-        $body = file_get_contents(TREE_URL."/data/$tree_slug.min.json");
+        $body = file_get_contents(TREE_PATH."/data/$tree_slug.min.json");
         // decode it if it's not empty
         if(!empty($body)) {
             $data = json_decode($body, true);
