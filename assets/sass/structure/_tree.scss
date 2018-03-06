@@ -172,12 +172,15 @@ html {
     box-sizing: content-box;
     padding: $spacing__base*0.6 $spacing__base * 0.8 $spacing__base;
     position: relative; // !important!!!! need this to make offsetTop in JS calculate correctly
-    transition: all .4s $easing;
+    transition: height .4s $easing, transform .4s $easing, padding .4s $easing;
     transform: translate3d(0,0,0);
     will-change: transform;
     transform-origin: top left;
 
-
+    // target safari-only, as transition: transform brings up a weird bug where questions disappear in overview mode: https://trello.com/c/ANHUfi6T/48-safari-disappearing-boxes-bug
+    @include safari-only {
+        transition: height .4s $easing, padding .4s $easing;
+    }
 
     @include breakpoint($mobile-large) {
         padding-top: $spacing__base * 1;

@@ -10,6 +10,15 @@ $mobile: 320px;
     }
 }
 
+/* Targets Safari 9+ versions
+*  Code from https://browserstrangeness.bitbucket.io/css_hacks.html#safari
+*/
+@mixin safari-only() {
+    @supports (-webkit-marquee-repetition:infinite) and (object-fit:fill) {
+        @content;
+    }
+}
+
 @mixin no-list {
     list-style: none;
     margin-left: 0;
