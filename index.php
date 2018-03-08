@@ -6,7 +6,7 @@ require 'vendor/autoload.php';
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-
+use \Cme\Database as Database;
 
 $config = [];
 $config['displayErrorDetails'] = true;
@@ -54,7 +54,7 @@ $app->group('/api', function() {
             }
 
             // compile it
-            $compiled = new \Cme\Database\CompileTree($tree_slug);
+            $compiled = new Database\CompileTree($tree_slug);
 
             // return the file that got written
             $response->getBody()->write(file_get_contents("data/".$tree_slug.$ext.".json"));
@@ -81,7 +81,7 @@ $app->group('/api', function() {
         });
 
         $this->get('/trees/', function (Request $request, Response $response) {
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $trees = $DB->get_trees();
 
             $response->getBody()->write(json_encode($trees));
@@ -90,7 +90,7 @@ $app->group('/api', function() {
 
         $this->get('/trees/{tree_id}', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $tree = $DB->get_tree($tree_id);
 
             // format into JSON
@@ -101,7 +101,7 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/starts/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
             // get all starts from that tree id
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $starts = $DB->get_starts($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($starts));
@@ -112,7 +112,7 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $start_id = $request->getAttribute('start_id');
 
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $start = $DB->get_start($start_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($start));
@@ -122,7 +122,7 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/groups/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
             // get all groups from that tree id
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $groups = $DB->get_groups($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($groups));
@@ -133,7 +133,7 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $group_id = $request->getAttribute('group_id');
 
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $group = $DB->get_group($group_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($group));
@@ -143,7 +143,7 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/questions/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
 
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $questions = $DB->get_questions($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($questions));
@@ -154,7 +154,7 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $question_id = $request->getAttribute('question_id');
 
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $question = $DB->get_question($question_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($question));
@@ -165,7 +165,7 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $question_id = $request->getAttribute('question_id');
 
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $options = $DB->get_options($question_id, ['tree_id' => $tree_id]);
             // return the JSON
             $response->getBody()->write(json_encode($options));
@@ -177,7 +177,7 @@ $app->group('/api', function() {
             $question_id = $request->getAttribute('question_id');
             $option_id = $request->getAttribute('option_id');
 
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $option = $DB->get_option($option_id, ['tree_id' => $tree_id, 'question_id' => $question_id]);
             // return the JSON
             $response->getBody()->write(json_encode($option));
@@ -187,7 +187,7 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/ends/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
 
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $ends = $DB->get_ends($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($ends));
@@ -198,7 +198,7 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $end_id = $request->getAttribute('end_id');
 
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $end = $DB->get_end($end_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($end));
@@ -257,7 +257,7 @@ $app->group('/api', function() {
         $this->get('/sites/{site_id}', function (Request $request, Response $response) {
             $site_id = $request->getAttribute('site_id');
 
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             //TODO: see if the site ID is an ID or a URL
             $site = $DB->get_site($site_id);
             // return the JSON
@@ -268,7 +268,7 @@ $app->group('/api', function() {
         // Returns all embeds on that site
         $this->get('/sites/{site_id}/embeds/', function (Request $request, Response $response) {
             $site_id = $request->getAttribute('site_id');
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             //TODO: see if the site ID is an ID or a URL
             $embeds = $DB->get_embeds_by_site($site_id);
             // return the JSON
@@ -281,7 +281,7 @@ $app->group('/api', function() {
             $site_id = $request->getAttribute('site_id');
             $embed_id = $request->getAttribute('embed_id');
 
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $embed = $DB->get_embed($embed_id, ['site_id'=>$site_id]);
             // return the JSON
             $response->getBody()->write(json_encode($embed));
@@ -317,7 +317,7 @@ $app->group('/api', function() {
             // could probably be structured better
             $errors = [];
 
-            $site = new \Cme\Database\SaveSite();
+            $site = new Database\SaveSite();
             // get the site_id. It will either save a new one or return an existing one
             $site_response = $site->save($data['site']);
             if(isset($site_response['status']) && $site_response['status'] === 'success') {
@@ -330,7 +330,7 @@ $app->group('/api', function() {
             if(empty($errors)) {
                 // add the tree_id into the site attribute cuz we'll need it
                 // try to get the embed
-                $embed = new \Cme\Database\SaveEmbed();
+                $embed = new Database\SaveEmbed();
                 $embed_response = $embed->save($data['site']);
 
                 if(isset($embed_response['status']) && $embed_response['status'] === 'success') {
@@ -343,7 +343,7 @@ $app->group('/api', function() {
             // no errors? save the interaction
             if(empty($errors)) {
                 // try to save it
-                $interaction = new \Cme\Database\SaveInteraction();
+                $interaction = new Database\SaveInteraction();
                 $the_response = $interaction->save($data);
             } else {
                 $the_response = $errors;
@@ -357,7 +357,7 @@ $app->group('/api', function() {
         });
 
         $this->get('/interactions/types/', function (Request $request, Response $response) {
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $interaction_types = $DB->get_interaction_types();
 
             $response->getBody()->write(json_encode($interaction_types));
@@ -366,7 +366,7 @@ $app->group('/api', function() {
 
         $this->get('/interactions/types/{type_id}', function (Request $request, Response $response) {
             $type_id = $request->getAttribute('type_id');
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $interaction_type = $DB->get_interaction_type($type_id);
 
             $response->getBody()->write(json_encode($interaction_type));
@@ -374,7 +374,7 @@ $app->group('/api', function() {
         });
 
         $this->get('/states/types/', function (Request $request, Response $response) {
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $state_types = $DB->get_state_types();
 
             $response->getBody()->write(json_encode($state_types));
@@ -383,7 +383,7 @@ $app->group('/api', function() {
 
         $this->get('/states/types/{type_id}', function (Request $request, Response $response) {
             $type_id = $request->getAttribute('type_id');
-            $DB = new \Cme\Database\DB();
+            $DB = new Database\DB();
             $state_type = $DB->get_state_type($type_id);
 
             $response->getBody()->write(json_encode($state_type));
