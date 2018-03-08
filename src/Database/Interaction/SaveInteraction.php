@@ -102,7 +102,7 @@ class SaveInteraction extends DB {
         }
 
         // check that it's a valid Embed ID
-        if($this->DB->validate_embed($embed_id) === false) {
+        if($this->DB->validate_embed($embed_id, $data) === false) {
             $this->errors[] = 'Invalid embed_id.';
         }
 

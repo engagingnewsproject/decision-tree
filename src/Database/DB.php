@@ -351,8 +351,8 @@ class DB extends PDO {
 	}
 
 	public function get_embed($embed, $options) {
-		if(Utility\is_id($embed, $options)) {
-			return $this->get_embed_by_id($embed);
+		if(Utility\is_id($embed)) {
+			return $this->get_embed_by_id($embed, $options);
 		} else {
 			return $this->get_embed_by_path($embed, $options);
 		}
@@ -365,13 +365,13 @@ class DB extends PDO {
 				embed_id = :embed_id";
 
 		// if a tree_id was passed, append it to the params and sql statement
-		if(\Cme\Utility\is_id($options['tree_id'])) {
+		if(isset($options['tree_id']) && \Cme\Utility\is_id($options['tree_id'])) {
 			$params[":tree_id"] = $options['tree_id'];
 			$sql .= " AND tree_id = :tree_id";
 		}
 
-		// if a tree_id was passed, append it to the params and sql statement
-		if(\Cme\Utility\is_id($options['site_id'])) {
+		// if a site_id was passed, append it to the params and sql statement
+		if(isset($options['site_id']) && \Cme\Utility\is_id($options['site_id'])) {
 			$params[":site_id"] = $options['site_id'];
 			$sql .= " AND site_id = :site_id";
 		}
@@ -388,13 +388,13 @@ class DB extends PDO {
 				embed_path = :embed_path";
 
 		// if a tree_id was passed, append it to the params and sql statement
-		if(\Cme\Utility\is_id($options['tree_id'])) {
+		if(isset($options['tree_id']) && \Cme\Utility\is_id($options['tree_id'])) {
 			$params[":tree_id"] = $options['tree_id'];
 			$sql .= " AND tree_id = :tree_id";
 		}
 
 		// if a tree_id was passed, append it to the params and sql statement
-		if(\Cme\Utility\is_id($options['site_id'])) {
+		if(isset($options['site_id']) && \Cme\Utility\is_id($options['site_id'])) {
 			$params[":site_id"] = $options['site_id'];
 			$sql .= " AND site_id = :site_id";
 		}
@@ -478,10 +478,10 @@ class DB extends PDO {
 	}
 
 	// Make sure the embed exists
-	public function validate_embed($embed) {
+	public function validate_embed($embed, $options) {
 		$is_valid = false;
 		// if we can find that embed, it's valid
-		if($this->get_embed($embed) !== false) {
+		if($this->get_embed($embed, $options) !== false) {
 			$is_valid = true;
 		}
 
