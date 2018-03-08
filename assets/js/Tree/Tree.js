@@ -413,16 +413,16 @@ function createTree(options) {
     // INIT
     // Request our Tree Data
     // create the tree
-    getTreeData(options.slug)
-        .then(buildTree.bind(options))
-        .catch(handleTreeDataError);
+    return getTreeData(options.slug)
+           .then(buildTree.bind(options))
+           .catch(handleTreeDataError);
 }
 
 function getTreeData(slug) {
 
     return new Promise(function(resolve, reject) {
         let baseUrl;
-        if(/https?:\/\/(?:dev\/decision-tree|localhost:3000\/decision-tree)\//.test(window.location.href)) {
+        if(/https?:\/\/(?:localhost:3000|decision-tree.dev)\//.test(window.location.href)) {
             baseUrl = 'https://decision-tree.dev'
         } else {
             baseUrl = 'https://tree.mediaengagement.org'
@@ -455,7 +455,7 @@ function getTreeData(slug) {
 function buildTree(request) {
 
     // check our response URL to make sure it's from a trusted source
-    if(!/https?:\/\/(?:dev\/decision-tree|tree\.mediaengagement\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
+    if(!/https?:\/\/(?:decision-tree\.dev|tree\.mediaengagement\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
         console.error('responseURL from an invalidated source.')
         return false;
     }
@@ -490,6 +490,8 @@ function buildTree(request) {
     let tree = new Tree(data, observers);
     // send it to our trees array for access
     trees.push(tree);
+    // return the tree we just created
+    return tree;
 }
 
 function handleTreeDataError(err) {

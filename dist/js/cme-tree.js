@@ -2056,14 +2056,14 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
         // INIT
         // Request our Tree Data
         // create the tree
-        getTreeData(options.slug).then(buildTree.bind(options)).catch(handleTreeDataError);
+        return getTreeData(options.slug).then(buildTree.bind(options)).catch(handleTreeDataError);
     }
 
     function getTreeData(slug) {
 
         return new Promise(function (resolve, reject) {
             var baseUrl = void 0;
-            if (/https?:\/\/(?:dev\/decision-tree|localhost:3000\/decision-tree)\//.test(window.location.href)) {
+            if (/https?:\/\/(?:localhost:3000|decision-tree.dev)\//.test(window.location.href)) {
                 baseUrl = 'https://decision-tree.dev';
             } else {
                 baseUrl = 'https://tree.mediaengagement.org';
@@ -2096,7 +2096,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
     function buildTree(request) {
 
         // check our response URL to make sure it's from a trusted source
-        if (!/https?:\/\/(?:dev\/decision-tree|tree\.mediaengagement\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
+        if (!/https?:\/\/(?:decision-tree\.dev|tree\.mediaengagement\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
             console.error('responseURL from an invalidated source.');
             return false;
         }
@@ -2131,6 +2131,8 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
         var tree = new Tree(data, observers);
         // send it to our trees array for access
         trees.push(tree);
+        // return the tree we just created
+        return tree;
     }
 
     function handleTreeDataError(err) {
@@ -3095,14 +3097,14 @@ function TreeInteraction(options) {
         currentScript = scripts[scripts.length - 1].src;
 
         // regex it to see if it's one of our DEV urls
-        regex = /https?:\/\/(?:(?:localhost:3000|dev)\/decision-tree|(?:enptree)\.(?:staging\.)?wpengine\.com)\b/;
+        regex = /https?:\/\/(?:(?:localhost:3000|decision-tree.dev)|(?:enptree)\.(?:staging\.)?wpengine\.com)\b/;
         _rootURL = regex.exec(currentScript);
 
         if (_rootURL === null) {
             // we're not on DEV, so pass the rootURL as our PROD url
             _rootURL = 'https://tree.mediaengagement.org';
         }
-        console.log(_rootURL);
+
         return _rootURL;
     };
 
