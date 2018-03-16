@@ -1,20 +1,29 @@
 var assert = chai.assert;
 var expect = chai.expect;
 
-treeOptions = {
-        slug: 'citizen',
-        container: document.getElementById('cme-tree__citizen')
-};
 
-var tree = new Tree(treeOptions);
+// set a global var
+var tree;
+
 describe('Tree', function() {
 
-    before(function(done) {
-        // set a quick timeout to make sure our tree is set-up before we test it
-        setTimeout(function(){
-              // complete the async before
-              return done();
-        }, 100);
+    before(function() {
+        // clear localStorage
+        localStorage.clear();
+
+        treeOptions = {
+            slug: 'citizen',
+            container: document.getElementById('cme-tree__citizen')
+        };
+        // will create var trees and add this tree to the array
+        return createTree(treeOptions).then(function(newTree) {
+            tree = newTree;
+            let treeData = tree.getData();
+            // clear localstorage for this tree
+            localStorage.removeItem('treeUserID');
+            localStorage.removeItem('treeHistory__'+treeData.tree_id);
+            localStorage.removeItem('treeHistoryIndex__'+treeData.tree_id);
+        });
     });
 
     after(function() {
@@ -89,13 +98,12 @@ describe('Tree', function() {
 
     describe('setState', function() {
 
-        it('should initialize as the state of "start"', function() {
-            expect('start').to.equal(tree.getState());
+        it('should initialize as the state type of "intro"', function() {
+            expect('intro').to.equal(tree.getState().type);
         });
 
-        it('should initialize as the stateID of the first start_id', function() {
-            var starts = tree.getDataByType('start');
-            expect(tree.getStateID()).to.equal(starts[0].start_id);
+        it('should initialize as the state id of the tree id', function() {
+            expect(tree.getState().id).to.equal(tree.getTreeID());
         });
 
         it('should set the question_id to first question\'s question_id', function() {
@@ -103,7 +111,7 @@ describe('Tree', function() {
             var question_id = questions[0].question_id;
             tree.setState('question', question_id);
 
-            expect(question_id).to.equal(tree.getStateID());
+            expect(question_id).to.equal(tree.getState().id);
         });
 
         it('should set the state to "question"', function() {
@@ -111,15 +119,7 @@ describe('Tree', function() {
             var question_id = questions[0].question_id;
             tree.setState('question', question_id);
 
-            expect('question').to.equal(tree.getState());
-        });
-
-        it('should set the question_id to first question\'s question_id', function() {
-            var questions = tree.getDataByType('question');
-            var question_id = questions[0].question_id;
-            tree.setState('question', question_id);
-
-            expect(question_id).to.equal(tree.getStateID());
+            expect('question').to.equal(tree.getState().type);
         });
 
         it('should set the state to "end"', function() {
@@ -127,7 +127,7 @@ describe('Tree', function() {
             var end_id = ends[0].end_id;
             tree.setState('end', end_id);
 
-            expect('end').to.equal(tree.getState());
+            expect('end').to.equal(tree.getState().type);
         });
 
         it('should set the end_id to first end\'s end_id', function() {
@@ -135,23 +135,19 @@ describe('Tree', function() {
             var end_id = ends[0].end_id;
             tree.setState('end', end_id);
 
-            expect(end_id).to.equal(tree.getStateID());
+            expect(end_id).to.equal(tree.getState().id);
         });
 
-        it('should set the state to "start"', function() {
-            var starts = tree.getDataByType('start');
-            var start_id = starts[0].start_id;
-            tree.setState('start', start_id);
+        it('should set the state to "intro"', function() {
+            tree.setState('intro', tree.getTreeID());
 
-            expect('start').to.equal(tree.getState());
+            expect('intro').to.equal(tree.getState().type);
         });
 
-        it('should set the start_id to first start\'s start_id', function() {
-            var starts = tree.getDataByType('start');
-            var start_id = starts[0].start_id;
-            tree.setState('start', start_id);
+        it('should set the state id to the tree id', function() {
+            tree.setState('intro', tree.getTreeID());
 
-            expect(start_id).to.equal(tree.getStateID());
+            expect(tree.getTreeID()).to.equal(tree.getState().id);
         });
 
         it('should not set the state to "foo"', function() {
