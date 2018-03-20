@@ -17,10 +17,6 @@ const csso = require('gulp-csso');
 const cssVip = require('gulp-css-vip'); // adds !important tags to all CSS lines
 const uglify = require('gulp-uglify');
 const rename = require("gulp-rename");
-const imagemin = require('gulp-imagemin');
-const svgstore = require('gulp-svgstore');
-const svgmin = require('gulp-svgmin');
-const path = require('path');
 const concat = require("gulp-concat");
 const babel = require("gulp-babel");
 const plumber = require('gulp-plumber');
@@ -38,7 +34,7 @@ const cssFiles = [
                 ];
 
 // Static Server + watching scss/html files
-gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'TreeLoaderJS', 'compressImg', 'svgstore', 'handlebars'], function() {
+gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'TreeLoaderJS', 'handlebars'], function() {
 
     browserSync({
         proxy: localhost
@@ -47,14 +43,10 @@ gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'TreeLoaderJS', 'compressImg',
     gulp.watch(['assets/sass/*.{scss,sass}','assets/sass/*/*.{scss,sass}'], ['sass']);
     gulp.watch(['dist/css/'+cssFiles[cssFiles.length - 1].toString()+'.min.css'], ['sassImportantify']);
     gulp.watch(['dist/css/'+cssFiles[cssFiles.length - 1].toString()+'-important.min.css'], ['sassCleanSlate']);
-    // Watch SCSS file for change to pass on to sass compiler,
+    // Watch JS file for change to pass on to sass compiler,
     gulp.watch('assets/js/iframe-parent/*.js', ['iframeJS']);
     gulp.watch('assets/js/Tree/*.js', ['TreeJS']);
     gulp.watch('assets/js/TreeLoader/*.js', ['TreeLoaderJS']);
-    // run img compression when images added to directory
-    gulp.watch('assets/img/*.*', ['compressImg']);
-    // run SVG when svg files added
-    gulp.watch('assets/svg/*.svg', ['svgstore']);
     // compile templates
     gulp.watch('templates/*.hbs', ['handlebars']);
     // compile js
@@ -68,26 +60,6 @@ gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'TreeLoaderJS', 'compressImg',
 
     compressJS("dist/js/handlebars.runtime.js");
 });
-
-gulp.task('svgstore', function () {
-    return gulp
-        .src('assets/svg/*.svg')
-        .pipe(plumber())
-        .pipe(svgmin(function (file) {
-            var prefix = path.basename(file.relative, path.extname(file.relative));
-            return {
-                plugins: [{
-                    cleanupIDs: {
-                        prefix: prefix + '-',
-                        minify: true
-                    }
-                }]
-            };
-        }))
-        .pipe(svgstore({ inlineSvg: true }))
-        .pipe(gulp.dest('dist/svg/'));
-});
-
 
 
 gulp.task('sass', function () {
@@ -185,13 +157,6 @@ gulp.task('concatTreeJS', function() {
     .pipe(gulp.dest(dist));
 });
 
-gulp.task('compressImg', function() {
-    return gulp.src('assets/img/*')
-            .pipe(plumber())
-            .pipe(imagemin())
-            .pipe(gulp.dest('dist/img'));
-});
-
 
 function processSASS(filename) {
     return gulp.src('assets/sass/output/'+filename+'.{scss,sass}')
@@ -275,20 +240,6 @@ gulp.task('handlebars', function(){
       .pipe(uglify())
       .pipe(gulp.dest('dist/js/'));
 });
-
-/*gulp.task('templates', function(){
-  gulp.src('templates/*.hbs')
-    .pipe(handlebars({
-      handlebars: require('handlebars')
-    }))
-    .pipe(wrap('Handlebars.template(<%= contents %>)'))
-    .pipe(declare({
-      namespace: 'TreeTemplates',
-      noRedeclare: true, // Avoid duplicate declarations
-    }))
-    .pipe(concat('templates.js'))
-    .pipe(gulp.dest('dist/js/'));
-});*/
 
 // Creating a default task
 gulp.task('default', ['serve']);
