@@ -75,18 +75,35 @@ class DB extends PDO {
         }
 	}
 
+	/**
+	 * Execute a query from PDO and binds the parameters.
+	 * All PDO statements should run through this.
+	 *
+	 * @param $sql STRING of the SQL statement you want to run
+	 * @param $params ARRAY of the parameters you want to use on the PDO statement
+	 * @return MIXED the results from our PDO query
+	 */
 	public function query($sql, $params = null) {
 		$stmt = $this->prepare($sql);
         $stmt->execute($params);
         return $stmt;
     }
 
+    /**
+	 * Gets all the results from a view based on the tree ID, such as all
+	 * questions by tree ID or all interactions by tree ID
+	 *
+	 * @param $view The string of the view you want to use for the query
+	 * @param $tree_id MIXED (STRING/INT) The tree_id you want results for
+	 * @param $options ARRAY of defaults you can add to the SQL statement, like an orderby option
+	 * @return MIXED ARRAY from the PDO query on success, ??? if error
+	 */
 	public function fetch_all_by_tree($view, $tree_id, $options = array()) {
 		$default_options = array('orderby'=>false);
 		$options = array_merge($default_options, $options);
 		// TODO: validate options
 		$params = [":tree_id" => $tree_id];
-		$sql = "SELECT * from ".$view." WHERE
+		$sql = "SELECT * from ".$this->views[$view]." WHERE
 				tree_id = :tree_id";
 
 		$sql .= $this->get_orderby($options['orderby']);
@@ -94,6 +111,14 @@ class DB extends PDO {
 		return $this->fetch_all($sql, $params);
 	}
 
+	/**
+	 * Gets one row from a view based on the element type and element id
+	 *
+	 * @param $el_type The string of the type you want ('question','option', etc)
+	 * @param $el_id ARRAY of defaults you can add to the SQL statement, like an orderby option
+	 * @param $tree_id MIXED (STRING/INT) (Optional) The tree_id you want results for
+	 * @return MIXED Object from the PDO query on success, ??? if error
+	 */
 	public function fetch_one_by_view($el_type, $el_id, $tree_id = false) {
 		$params = [":${el_type}_id" => $el_id];
 
@@ -145,7 +170,7 @@ class DB extends PDO {
 	}
 
 	public function get_starts($tree_id) {
-		return $this->fetch_all_by_tree($this->views['tree_start'], $tree_id);
+		return $this->fetch_all_by_tree('tree_start', $tree_id);
 	}
 
 	public function get_start($start_id, $tree_id = false) {
@@ -153,7 +178,7 @@ class DB extends PDO {
 	}
 
 	public function get_groups($tree_id) {
-		return $this->fetch_all_by_tree($this->views['tree_group'], $tree_id);
+		return $this->fetch_all_by_tree('tree_group', $tree_id);
 	}
 
 	public function get_group($group_id, $tree_id = false) {
@@ -163,7 +188,7 @@ class DB extends PDO {
 	public function get_questions($tree_id, $options = array()) {
 		$default_options = array('orderby'=>'order');
 		$options = array_merge($default_options, $options);
-		return $this->fetch_all_by_tree($this->views['tree_question'], $tree_id, $options);
+		return $this->fetch_all_by_tree('tree_question', $tree_id, $options);
 	}
 
 	public function get_question($question_id, $tree_id = false) {
@@ -230,7 +255,7 @@ class DB extends PDO {
 	}
 
 	public function get_ends($tree_id) {
-		return $this->fetch_all_by_tree($this->views['tree_end'], $tree_id);
+		return $this->fetch_all_by_tree('tree_end', $tree_id);
 	}
 
 	public function get_end($end_id, $tree_id = false) {
