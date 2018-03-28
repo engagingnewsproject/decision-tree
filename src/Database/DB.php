@@ -123,7 +123,7 @@ class DB extends PDO {
         // Do a select query to see if we get a returned row
         $sql = "SELECT * from ".$this->views['tree'];
         // return the found tree row
-        return $this->fetch_one($sql);
+        return $this->fetch_all($sql);
 	}
 
 	public function get_tree($tree_id) {
