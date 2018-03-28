@@ -2,7 +2,7 @@
 use PHPUnit\Framework\TestCase;
 use Cme\Utility as Utility;
 /**
- * @covers Cme_quiz_Save
+ * @covers Cme\Utility
  */
 final class UtilityTest extends TreeTestCase
 {
@@ -11,7 +11,6 @@ final class UtilityTest extends TreeTestCase
      * @dataProvider testValidateIDProvider
      */
     public function testValidateID($id, $expected) {
-        // $cme_save = new Cme_quiz_Save();
         $valid = Utility\is_id($id);
         $this->evaluateAssert($valid, $expected);
     }
