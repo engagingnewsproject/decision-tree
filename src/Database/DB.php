@@ -432,8 +432,11 @@ class DB extends PDO {
 	// Make sure the tree_id exists
 	public function validate_tree_id($tree_id) {
 		$is_valid = false;
-		// if we can find that tree id, it's valid
-		if($this->get_tree($tree_id) !== false) {
+
+		// try to get the tree by id
+		$tree = $this->get_tree($tree_id);
+		// see if the tree_id exists in the returned results and if that tree_id equals the passed tree_id
+		if(isset($tree['tree_id']) && $tree['tree_id'] == $tree_id) {
 			$is_valid = true;
 		}
 

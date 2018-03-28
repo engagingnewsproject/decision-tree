@@ -130,5 +130,20 @@ final class DBTest extends TreeTestCase
         ];
     }
 
+    /**
+     * @covers Cme\Database\validate_tree_id()
+     * @dataProvider testValidateTreeIDProvider
+     */
+    public function testValidateTreeID($tree_id, $expected) {
+        $this->evaluateAssert($this->db->validate_tree_id($tree_id), $expected);
+    }
+
+    public function testValidateTreeIDProvider() {
+        return [
+                'valid_tree'=>[1, true],
+                'invalid_tree'=>[123124143423423, false],
+                'invalid_tree_slug' => ['hitherestres', false]
+        ];
+    }
 
 }
