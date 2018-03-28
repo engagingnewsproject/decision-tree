@@ -10,10 +10,12 @@ namespace Cme\Utility;
 * Build the data URL to get the JSON data
 *
 * @return String
-*/
+
 function get_data_url($slug) {
     return get_server_url()."/data/$slug.json";
 }
+*/
+
 
 /**
 * Checks to see if it's a slug or not
@@ -71,7 +73,7 @@ function get_tree_slug_by_id($tree_id) {
         return false;
     }
     // use the id to get the slug. Switch to $tree_id bc that's what it is
-    $DB = new \ENP\Database\DB();
+    $DB = new \Cme\Database\DB();
     $tree = $DB->get_tree($tree_id);
     // return the tree slug
     return $tree['tree_slug'];
@@ -83,13 +85,14 @@ function get_tree_id_by_slug($tree_slug) {
         return false;
     }
     // use the id to get the slug. Switch to $tree_id bc that's what it is
-    $DB = new \ENP\Database\DB();
+    $DB = new \Cme\Database\DB();
     $tree = $DB->get_tree_by_slug($tree_slug);
     // return the tree slug
     return $tree['tree_id'];
 }
 
 // really bare curl implementation to consume our own api
+/*
 function get_endpoint($path) {
     // Get cURL resource
     $curl = curl_init();
@@ -105,3 +108,4 @@ function get_endpoint($path) {
 
     return $response;
 }
+*/
