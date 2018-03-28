@@ -445,20 +445,37 @@ class DB extends PDO {
 
 	// Make sure the id is what it's supposed to be ( ie, that el_id 2 is a 'question')
 	public function validate_el_type_id($tree_id, $el_type_id, $el_type) {
-	//	var_dump('hi!');
+
 		$is_valid = false;
 
 		// Query the $el_type_id
-		$whitelist = ['question', 'option', 'end', 'container'];
+		$whitelist = ['question', 'option', 'end', 'start', 'group'];
 		if(!in_array($el_type, $whitelist)) {
-			return $is_valid;
+			return false;
 		}
 
-		$function = 'get_'.$el_type;
+		if($el_type === 'option') {
+			return $this->validate_option_id($el_type_id);
+		}
 
+		// dynamically validate
+		$function = 'get_'.$el_type;
 		$el_data = $this->$function($el_type_id, $tree_id);
 
-		if($el_data !== false) {
+		if(isset($el_data[$el_type.'_id']) && (int)$el_data[$el_type.'_id'] === (int)$el_type_id) {
+			$is_valid = true;
+		}
+
+		return $is_valid;
+	}
+
+	// check if it's a valid option_id
+	public function validate_option_id($option_id) {
+		$is_valid = false;
+		// try to find the option
+		$option = $this->get_option($option_id);
+
+		if(isset($option['option_id']) && (int) $option['option_id'] === (int) $option_id) {
 			$is_valid = true;
 		}
 
