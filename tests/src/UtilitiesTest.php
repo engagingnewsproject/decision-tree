@@ -8,14 +8,14 @@ final class UtilityTest extends TreeTestCase
 {
     /**
      * @covers Cme\Utility\is_id()
-     * @dataProvider testValidateIDProvider
+     * @dataProvider validateIdProvider
      */
-    public function testValidateID($id, $expected) {
+    public function testValidateId($id, $expected) {
         $valid = Utility\is_id($id);
         $this->evaluateAssert($valid, $expected);
     }
 
-    public function testValidateIDProvider() {
+    public function validateIdProvider() {
         return [
                 'valid-1'=>['123456789', true],
                 'valid-2'=>[1, true],
@@ -31,14 +31,14 @@ final class UtilityTest extends TreeTestCase
 
     /**
      * @covers Cme\Utility\is_slug()
-     * @dataProvider testIsSlugProvider
+     * @dataProvider isSlugProvider
      */
     public function testIsSlug($slug, $expected) {
         $valid = Utility\is_slug($slug);
         $this->evaluateAssert($valid, $expected);
     }
 
-    public function testIsSlugProvider() {
+    public function isSlugProvider() {
         return [
                 'valid-1'=>['yes', true],
                 'valid-2'=>['wut-up-dawg', true],
@@ -56,7 +56,7 @@ final class UtilityTest extends TreeTestCase
 
     /**
      * @covers Cme\Utility\get_tree_slug_by_id($tree_id)
-     * @dataProvider testGetTreeSlugByIdProvider
+     * @dataProvider getTreeSlugByIdProvider
      */
     public function testGetTreeSlugById($id, $expected) {
         // $cme_save = new Cme_quiz_Save();
@@ -64,34 +64,34 @@ final class UtilityTest extends TreeTestCase
         $this->assertEquals($tree_slug, $expected);
     }
 
-    public function testGetTreeSlugByIdProvider() {
+    public function getTreeSlugByIdProvider() {
         return [
-                'valid-1'=>[1, 'citizen'],
-                'valid-2'=>['1', 'citizen'],
-                'invalid-1'=>['alwiheawra848aasdlkfnalsdkfnadf', null],
-                'invalid-2'=>['0', null],
-                'invalid-4'=>['', false],
-                'invalid-5'=>[true, false],
-                'invalid-6'=>[false, false]
+                'integer'           =>[1, 'citizen'],
+                'integer-as-string' =>['1', 'citizen'],
+                'invalid-string'    =>['alwiheawra848aasdlkfnalsdkfnadf', null],
+                'invalid-zero'      =>['0', null],
+                'invalid-empty'     =>['', false],
+                'invalid-bool-true' =>[true, false],
+                'invalid-bool-false'=>[false, false]
         ];
     }
 
     /**
      * @covers Cme\Utility\get_tree_id_by_slug($tree_id)
-     * @dataProvider testGetTreeIdBySlugProvider
+     * @dataProvider getTreeIdBySlugProvider
      */
     public function testGetTreeIdBySlug($slug, $expected) {
         $tree_id = Utility\get_tree_id_by_slug($slug);
         $this->assertEquals($tree_id, $expected);
     }
 
-    public function testGetTreeIdBySlugProvider() {
+    public function getTreeIdBySlugProvider() {
         return [
-                'valid-1'=>['citizen', '1'],
-                'invalid-1'=>['alwiheawra848aasdlkfnalsdkfnadf', null],
-                'invalid-4'=>['', false],
-                'invalid-5'=>[true, false],
-                'invalid-6'=>[false, false]
+                'valid-slug'        =>['citizen', '1'],
+                'invalid-slug'      =>['alwiheawra848aasdlkfnalsdkfnadf', null],
+                'invalid-empty'     =>['', false],
+                'invalid-bool-true' =>[true, false],
+                'invalid-bool-false'=>[false, false]
         ];
     }
 }

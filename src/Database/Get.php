@@ -30,7 +30,7 @@ class Get extends DB {
     }
 
     /**
-     * Gets one tree from the database
+     * Gets one tree from the database by id
      *
      * @param $tree_id INT
      * @return ARRAY/OBJECT of the TREE
@@ -44,6 +44,12 @@ class Get extends DB {
         return $this->fetch_one($sql, $params);
     }
 
+    /**
+     * Gets one tree from the database by slug
+     *
+     * @param $tree_slug STRING
+     * @return ARRAY/OBJECT of the TREE
+     */
     public function get_tree_by_slug($tree_slug) {
         // Do a select query to see if we get a returned row
         $params = [":tree_slug" => $tree_slug];
@@ -53,32 +59,79 @@ class Get extends DB {
         return $this->fetch_one($sql, $params);
     }
 
+    /**
+     * Gets all starts from the database by tree_id
+     *
+     * @param $tree_id INT
+     * @return ARRAY
+     */
     public function get_starts($tree_id) {
         return $this->fetch_all_by_tree('tree_start', $tree_id);
     }
 
+    /**
+     * Get a start from the database by id
+     *
+     * @param $start_id INT
+     * @param $tree_id INT (Optional)
+     * @return ARRAY of TREE ARRAYS
+     */
     public function get_start($start_id, $tree_id = false) {
         return $this->fetch_one_by_view('start', $start_id, $tree_id);
     }
 
+    /**
+     * Gets all groups from the database by tree_id
+     *
+     * @param $tree_id INT
+     * @return ARRAY
+     */
     public function get_groups($tree_id) {
         return $this->fetch_all_by_tree('tree_group', $tree_id);
     }
 
+    /**
+     * Get a group from the database by group_id
+     *
+     * @param $group_id INT
+     * @param $tree_id INT (Optional)
+     * @return ARRAY of TREE ARRAYS
+     */
     public function get_group($group_id, $tree_id = false) {
         return $this->fetch_one_by_view('group', $group_id, $tree_id);
     }
 
+    /**
+     * Gets all questions from the database by tree_id
+     *
+     * @param $tree_id INT
+     * @param $options ARRAY (Optional) sets orderby paramater in SQL statement
+     * @return ARRAY
+     */
     public function get_questions($tree_id, $options = array()) {
         $default_options = array('orderby'=>'order');
         $options = array_merge($default_options, $options);
         return $this->fetch_all_by_tree('tree_question', $tree_id, $options);
     }
 
+    /**
+     * Get a question from the database by question_id
+     *
+     * @param $question_id INT
+     * @param $tree_id INT (Optional)
+     * @return ARRAY of TREE ARRAYS
+     */
     public function get_question($question_id, $tree_id = false) {
         return $this->fetch_one_by_view('question', $question_id, $tree_id);
     }
 
+     /**
+     * Gets all questions from the database by group_id
+     *
+     * @param $group_id INT
+     * @param $tree_id INT (optional)
+     * @return ARRAY of Question IDs
+     */
     public function get_questions_by_group($group_id, $tree_id = false) {
         $params = [":group_id" => $group_id];
         $sql = "SELECT question_id from ".$this->views['tree_question']." WHERE

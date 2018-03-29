@@ -14,13 +14,13 @@ final class ValidateTest extends DBTestCase
     }
     /**
      * @covers Cme\Database\validate_tree_id()
-     * @dataProvider testValidateTreeIDProvider
+     * @dataProvider validateTreeIdProvider
      */
-    public function testValidateTreeID($tree_id, $expected) {
+    public function testValidateTreeId($tree_id, $expected) {
         $this->evaluateAssert($this->validate->validate_tree_id($tree_id), $expected);
     }
 
-    public function testValidateTreeIDProvider() {
+    public function validateTreeIdProvider() {
         return [
                 'valid_tree'=>[1, true],
                 'invalid_tree'=>[123124143423423, false],
@@ -30,13 +30,13 @@ final class ValidateTest extends DBTestCase
 
     /**
      * @covers Cme\Database\validate_el_type_id()
-     * @dataProvider testValidateElTypeIDProvider
+     * @dataProvider validateElTypeIdProvider
      */
-    public function testValidateElTypeID($el_type, $el_type_id, $tree_id, $expected) {
+    public function testValidateElTypeId($el_type, $el_type_id, $tree_id, $expected) {
         $this->evaluateAssert($this->validate->validate_el_type_id($el_type, $el_type_id, $tree_id), $expected);
     }
 
-    public function testValidateElTypeIDProvider() {
+    public function validateElTypeIdProvider() {
 
         $provider =  [
                 'invalid_type'=> ['blarg', 2, 1, false],
@@ -58,13 +58,13 @@ final class ValidateTest extends DBTestCase
 
     /**
      * @covers Cme\Database\validate_option_id()
-     * @dataProvider testValidateOptionIDProvider
+     * @dataProvider validateOptionIdProvider
      */
-    public function testValidateOptionID($option_id, $tree_id, $expected) {
+    public function testValidateOptionId($option_id, $tree_id, $expected) {
         $this->evaluateAssert($this->validate->validate_option_id($option_id, $tree_id), $expected);
     }
 
-    public function testValidateOptionIDProvider() {
+    public function validateOptionIdProvider() {
         $option_id = $this->getOneDynamic('option', 1)['option_id'];
         return  [
             'valid'                 => [$option_id, false, true],
@@ -77,13 +77,13 @@ final class ValidateTest extends DBTestCase
 
     /**
      * @covers Cme\Database\validate_question_id()
-     * @dataProvider testValidateQuestionIDProvider
+     * @dataProvider validateQuestionIdProvider
      */
-    public function testValidateQuestionID($question_id, $tree_id, $expected) {
+    public function testValidateQuestionId($question_id, $tree_id, $expected) {
         $this->evaluateAssert($this->validate->validate_question_id($question_id, $tree_id), $expected);
     }
 
-    public function testValidateQuestionIDProvider() {
+    public function validateQuestionIdProvider() {
         $question_id = $this->getOneDynamic('question', 1)['question_id'];
         return  [
             'valid'                 => [$question_id, false, true],
@@ -96,13 +96,13 @@ final class ValidateTest extends DBTestCase
 
     /**
      * @covers Cme\Database\validate_end_id()
-     * @dataProvider testValidateEndIDProvider
+     * @dataProvider validateEndIdProvider
      */
-    public function testValidateEndID($end_id, $tree_id, $expected) {
+    public function testValidateEndId($end_id, $tree_id, $expected) {
         $this->evaluateAssert($this->validate->validate_end_id($end_id, $tree_id), $expected);
     }
 
-    public function testValidateEndIDProvider() {
+    public function validateEndIdProvider() {
         $end_id = $this->getOneDynamic('end', 1)['end_id'];
         $question_id = $this->getOneDynamic('question', 1)['question_id'];
         return  [
@@ -117,13 +117,13 @@ final class ValidateTest extends DBTestCase
 
     /**
      * @covers Cme\Database\validate_group_id()
-     * @dataProvider testValidateGroupIDProvider
+     * @dataProvider validateGroupIdProvider
      */
-    public function testValidateGroupID($group_id, $tree_id, $expected) {
+    public function testValidateGroupId($group_id, $tree_id, $expected) {
         $this->evaluateAssert($this->validate->validate_group_id($group_id, $tree_id), $expected);
     }
 
-    public function testValidateGroupIDProvider() {
+    public function validateGroupIdProvider() {
         $group_id = $this->getOneDynamic('group', 1)['group_id'];
         $question_id = $this->getOneDynamic('question', 1)['question_id'];
         return  [
@@ -137,13 +137,13 @@ final class ValidateTest extends DBTestCase
 
     /**
      * @covers Cme\Database\validate_start_id()
-     * @dataProvider testValidateStartIDProvider
+     * @dataProvider validateStartIdProvider
      */
-    public function testValidateStartID($start_id, $tree_id, $expected) {
+    public function testValidateStartId($start_id, $tree_id, $expected) {
         $this->evaluateAssert($this->validate->validate_start_id($start_id, $tree_id), $expected);
     }
 
-    public function testValidateStartIDProvider() {
+    public function validateStartIdProvider() {
         $start_id = $this->getOneDynamic('start', 1)['start_id'];
         $question_id = $this->getOneDynamic('question', 1)['question_id'];
         return  [
@@ -157,13 +157,13 @@ final class ValidateTest extends DBTestCase
 
     /**
      * @covers Cme\Database\validate_destination_id()
-     * @dataProvider testValidateDestinationIDProvider
+     * @dataProvider validateDestinationIdProvider
      */
-    public function testValidateDestinationID($destination_id, $options, $expected) {
+    public function testValidateDestinationId($destination_id, $options, $expected) {
         $this->evaluateAssert($this->validate->validate_destination_id($destination_id, $options), $expected);
     }
 
-    public function testValidateDestinationIDProvider() {
+    public function validateDestinationIdProvider() {
         $start_id = $this->getOneDynamic('start', 1)['start_id'];
         $end_id = $this->getOneDynamic('end', 1)['end_id'];
         $question_id = $this->getOneDynamic('question', 1)['question_id'];
@@ -183,13 +183,13 @@ final class ValidateTest extends DBTestCase
 
     /**
      * @covers Cme\Database\validate_interaction_type()
-     * @dataProvider testValidateInteractionTypeProvider
+     * @dataProvider validateInteractionTypeProvider
      */
     public function testValidateInteractionType($interaction_type, $expected) {
         $this->evaluateAssert($this->validate->validate_interaction_type($interaction_type), $expected);
     }
 
-    public function testValidateInteractionTypeProvider() {
+    public function validateInteractionTypeProvider() {
         $interaction_types = ['load', 'reload', 'start', 'overview', 'option', 'history', 'restart'];
 
         $provider = [
@@ -207,13 +207,13 @@ final class ValidateTest extends DBTestCase
 
     /**
      * @covers Cme\Database\validate_state_type()
-     * @dataProvider testValidateStateTypeProvider
+     * @dataProvider validateStateTypeProvider
      */
     public function testValidateStateType($state_type, $expected) {
         $this->evaluateAssert($this->validate->validate_state_type($state_type), $expected);
     }
 
-    public function testValidateStateTypeProvider() {
+    public function validateStateTypeProvider() {
         $state_types = ['intro', 'question', 'end', 'overview'];
 
         $provider = [
