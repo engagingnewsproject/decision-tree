@@ -52,26 +52,31 @@ final class GetTest extends DBTestCase
     }
 
     /**
+     * Gets all trees, loops 5 of them to test get_tree by id and get_tree_by_slug for each
+     * and makes sure it matches
+     *
      * @covers Cme\Database\get_trees()
      * @covers Cme\Database\get_tree()
-     * @dataProvider testGetTreesProvider
+     * @covers Cme\Database\get_tree_by_slug()
      */
     public function testGetTrees() {
         // get all trees
         $trees = $this->get->get_trees();
+        $i = 0;
+        // loop 5 of them and test each
         foreach($trees as $tree) {
             // get one tree off of the tree_id
             $getTree = $this->get->get_tree($tree['tree_id']);
             // the tree_ids should match
-            $this->assertEquals($tree['tree_id'], $getTree['tree_id']);
+            $this->assertEquals($tree, $getTree);
+            // get tree by slug
+            $getTreeBySlug = $this->get->get_tree_by_slug($tree['tree_slug']);
+            // the tree_ids should match
+            $this->assertEquals($tree, $getTreeBySlug);
+            if(5 < $i++) {
+                break;
+            }
         }
-    }
-
-    public function testGetTreesProvider() {
-        return [
-                'valid-question'=>['question', 1],
-                'valid-group'=>['group', 1],
-        ];
     }
 
     /**
