@@ -117,12 +117,12 @@ class SaveInteraction extends DB {
 		}
 
         // if it's an option interaction, check that it's a valid option_id
-        if($interaction_type === 'question' && $this->DB->validate_el_type_id($tree_id, $interaction_id, $interaction_type) === false) {
+        if($interaction_type === 'question' && $this->DB->validate_el_type_id($interaction_type, $interaction_id, $tree_id) === false) {
             $this->errors[] = 'Invalid interaction id.';
         }
 
         // if it's a question or end destination, check that it's a valid id for that type
-        if(($destination_type === 'question' || $destination_type === 'end') && $this->DB->validate_el_type_id($tree_id, $destination_id, $destination_type) === false) {
+        if(($destination_type === 'question' || $destination_type === 'end') && $this->DB->validate_el_type_id($destination_type, $destination_id, $tree_id) === false) {
             $this->errors[] = 'Invalid destination id.';
         }
 

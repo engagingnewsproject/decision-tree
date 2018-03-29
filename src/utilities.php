@@ -92,7 +92,6 @@ function get_tree_id_by_slug($tree_slug) {
 }
 
 // really bare curl implementation to consume our own api
-/*
 function get_endpoint($path) {
     // Get cURL resource
     $curl = curl_init();
@@ -108,4 +107,3 @@ function get_endpoint($path) {
 
     return $response;
 }
-*/

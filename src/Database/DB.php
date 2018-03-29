@@ -216,6 +216,11 @@ class DB extends PDO {
 		$default_options = array('tree_id'=>false, 'orderby'=>'order');
 		$options = array_merge($default_options, $options);
 
+		// validate the question_id
+		if($this->validate_question_id($question_id) === false) {
+			return false;
+		}
+
 		$params = [":question_id" => $question_id];
 		$sql = "SELECT * from ".$this->views['tree_option']." WHERE
 				question_id = :question_id";
@@ -444,7 +449,16 @@ class DB extends PDO {
 	}
 
 	// Make sure the id is what it's supposed to be ( ie, that el_id 2 is a 'question')
-	public function validate_el_type_id($tree_id, $el_type_id, $el_type) {
+	/**
+	 * Validates that an ID is an ID of a certain type. IE if you need to know that
+	 * ID #2 is a question, use this.
+	 *
+	 * @param $el_type STRING of the element type (ex: question, option, end, etc)
+	 * @param $el_type_id INT
+	 * @param $tree_id INT (OPTIONAL) strict mode if you want to validate by tree id as well
+	 * @return BOOLEAN
+	 */
+	public function validate_el_type_id($el_type, $el_type_id, $tree_id = false) {
 
 		$is_valid = false;
 
@@ -454,13 +468,14 @@ class DB extends PDO {
 			return false;
 		}
 
+		// get the element
 		if($el_type === 'option') {
-			return $this->validate_option_id($el_type_id);
-		}
-
-		// dynamically validate
+			$el_data = $this->get_option($el_type_id, ['tree_id' => $tree_id]);
+		} else {
+			// dynamically get the element
 		$function = 'get_'.$el_type;
-		$el_data = $this->$function($el_type_id, $tree_id);
+			$el_data = $this->$function($el_type_id, $tree_id);
+		}
 
 		if(isset($el_data[$el_type.'_id']) && (int)$el_data[$el_type.'_id'] === (int)$el_type_id) {
 			$is_valid = true;
@@ -470,16 +485,24 @@ class DB extends PDO {
 	}
 
 	// check if it's a valid option_id
-	public function validate_option_id($option_id) {
-		$is_valid = false;
-		// try to find the option
-		$option = $this->get_option($option_id);
+	public function validate_option_id($option_id, $tree_id = false) {
+		return $this->validate_el_type_id('option', $option_id, $tree_id);
+	}
 
-		if(isset($option['option_id']) && (int) $option['option_id'] === (int) $option_id) {
-			$is_valid = true;
-		}
+	public function validate_question_id($question_id, $tree_id = false) {
+		return $this->validate_el_type_id('question', $question_id, $tree_id);
+	}
 
-		return $is_valid;
+	public function validate_group_id($group_id, $tree_id = false) {
+		return $this->validate_el_type_id('group', $group_id, $tree_id);
+	}
+
+	public function validate_end_id($end_id, $tree_id = false) {
+		return $this->validate_el_type_id('end', $end_id, $tree_id);
+	}
+
+	public function validate_start_id($start_id, $tree_id = false) {
+		return $this->validate_el_type_id('start', $start_id, $tree_id);
 	}
 
 	// Must be of el_type = 'question' or 'end'

@@ -23,8 +23,10 @@ final class DBTest extends TreeTestCase
     * @return ARRAY of first result from get_$el_typeS vs get_$el_type($el_id)
     */
     public function getAllDynamic($el_type, $tree_id) {
+        $db = new Database\DB();
         $get_all_function = 'get_'.$el_type.'s';
-        return $this->db->$get_all_function($tree_id);
+
+        return $db->$get_all_function($tree_id);
     }
 
     /**
@@ -34,19 +36,29 @@ final class DBTest extends TreeTestCase
     * @return ARRAY of first result from get_$el_typeS vs get_$el_type($el_id)
     */
     public function getOneDynamic($el_type, $tree_id, $el_id = false) {
+        $db = new Database\DB();
+
+        if($el_type === 'option') {
+            return $this->getOneOptionDynamic($tree_id);
+        }
+
         if($el_id === false) {
             // let's find one
             $el_id = $this->getAllDynamic($el_type, $tree_id)[0][$el_type.'_id'];
         }
         $get_one_function = 'get_'.$el_type;
-        return $this->db->$get_one_function($el_id);
+        return $db->$get_one_function($el_id);
     }
 
     /**
-    *
+    * Gets an option row from a tree
     */
     public function getOneOptionDynamic($tree_id) {
+        $db = new Database\DB();
 
+        $question = $this->getOneDynamic('question', $tree_id);
+        $options = $db->get_options($question['question_id']);
+        return $options[0];
     }
     /**
      * @covers Cme\Database\fetch_all_by_tree()
@@ -138,10 +150,9 @@ final class DBTest extends TreeTestCase
      * @covers Cme\Database\get_questions()
      * @covers Cme\Database\get_options()
      * @covers Cme\Database\get_option()
-     * @dataProvider testGetOptionsProvider
      */
-    public function testGetOptions($tree_id) {
-
+    public function testGetOptions() {
+        $tree_id = 1;
         $questions = $this->db->get_questions($tree_id);
         $question_id = $questions[0]['question_id'];
 
@@ -151,12 +162,12 @@ final class DBTest extends TreeTestCase
             $this->assertEquals($option, $this->db->get_option($option['option_id']));
            ;
         }
-    }
 
-    public function testGetOptionsProvider() {
-        return [
-                'tree_one'=>[1],
-        ];
+        // do one failure test for get_options
+        $this->assertFalse($this->db->get_options(999999999999999999));
+
+        // do one failure test for get_option
+        $this->assertFalse($this->db->get_option(999999999999999999));
     }
 
     /**
@@ -177,48 +188,128 @@ final class DBTest extends TreeTestCase
 
     /**
      * @covers Cme\Database\validate_el_type_id()
-     * @covers Cme\Database\validate_option_id()
      * @dataProvider testValidateElTypeIDProvider
      */
-    public function testValidateElTypeID($tree_id, $el_type, $expected) {
-        if($el_type === 'option') {
-            $question = $this->getOneDynamic('question', $tree_id);
-            $options = $this->db->get_options($question['question_id']);
-            $result = $options[0];
-            $el_type_id = $options[0]['option_id'];
-        }
-        elseif($el_type === 'blarg') {
-            // set the ID from a question
-            $question = $this->getOneDynamic('question', $tree_id);
-            $el_type_id = $question['question_id'];
-        }
-        elseif($el_type === 'invalid_question_id') {
-            $el_type = 'question';
-            $el_type_id = $tree_id;
-        }
-        elseif($el_type === 'false_id') {
-            $el_type = 'question';
-            $el_type_id = false;
-        }
-        else {
-            $result = $this->getOneDynamic($el_type, $tree_id);
-            $el_type_id = $result[$el_type.'_id'];
-        }
-
-        $this->evaluateAssert($this->db->validate_el_type_id($tree_id, $el_type_id, $el_type), $expected);
+    public function testValidateElTypeID($el_type, $el_type_id, $tree_id, $expected) {
+        $this->evaluateAssert($this->db->validate_el_type_id($el_type, $el_type_id, $tree_id), $expected);
     }
 
     public function testValidateElTypeIDProvider() {
-        return [
-                'valid_question'=>[1, 'question', true],
-                'valid_option'=>[1, 'option', true],
-                'valid_group' => [1, 'group', true],
-                'valid_start' => [1, 'start', true],
-                'valid_end' => [1, 'end', true],
-                'invalid_type'=> [1, 'blarg', false],
-                'invalid_id'=> [1, 'invalid_question_id', false],
-                'invalid_false_id'=> [1, 'false_id', false],
+
+        $provider =  [
+                'invalid_type'=> ['blarg', 2, 1, false],
+                'invalid_question_id'=> ['question', 1, false, false]
+        ];
+
+        $types = ['option', 'question', 'group', 'end', 'start'];
+        $tree_id = 1;
+        // loops through each type and gets a valid id for that type
+        foreach($types as $type) {
+            $valid_el_id = $this->getOneDynamic($type, $tree_id)[$type.'_id'];
+            $provider['valid_'.$type.'_with_tree'] = [$type, $valid_el_id, $tree_id, true];
+            $provider['valid_'.$type.'_without_tree'] = [$type, $valid_el_id, false, true];
+            $provider['invalid_tree_with_valid_'.$type] = [$type, $valid_el_id, 999999999999999999, false];
+        }
+
+        return $provider;
+    }
+
+    /**
+     * @covers Cme\Database\validate_option_id()
+     * @dataProvider testValidateOptionIDProvider
+     */
+    public function testValidateOptionID($option_id, $tree_id, $expected) {
+        $this->evaluateAssert($this->db->validate_option_id($option_id, $tree_id), $expected);
+    }
+
+    public function testValidateOptionIDProvider() {
+        $option_id = $this->getOneDynamic('option', 1)['option_id'];
+        return  [
+            'valid'                 => [$option_id, false, true],
+            'valid_with_tree_id'    => [$option_id, 1, true],
+            'valid_option_with_invalid_tree_id' => [$option_id, 99999999999, false],
+            'invalid'               => [9999999999999, false, false],
+            'invalid_with_tree_id'  => [9999999999999, 1, false]
         ];
     }
 
+    /**
+     * @covers Cme\Database\validate_question_id()
+     * @dataProvider testValidateQuestionIDProvider
+     */
+    public function testValidateQuestionID($question_id, $tree_id, $expected) {
+        $this->evaluateAssert($this->db->validate_question_id($question_id, $tree_id), $expected);
+    }
+
+    public function testValidateQuestionIDProvider() {
+        $question_id = $this->getOneDynamic('question', 1)['question_id'];
+        return  [
+            'valid'                 => [$question_id, false, true],
+            'valid_with_tree_id'    => [$question_id, 1, true],
+            'valid_question_with_invalid_tree_id' => [$question_id, 99999999999, false],
+            'invalid'               => [9999999999999, false, false],
+            'invalid_with_tree_id'  => [9999999999999, 1, false]
+        ];
+    }
+
+    /**
+     * @covers Cme\Database\validate_end_id()
+     * @dataProvider testValidateEndIDProvider
+     */
+    public function testValidateEndID($end_id, $tree_id, $expected) {
+        $this->evaluateAssert($this->db->validate_end_id($end_id, $tree_id), $expected);
+    }
+
+    public function testValidateEndIDProvider() {
+        $end_id = $this->getOneDynamic('end', 1)['end_id'];
+        $question_id = $this->getOneDynamic('question', 1)['question_id'];
+        return  [
+            'valid'                 => [$end_id, false, true],
+            'valid_with_tree_id'    => [$end_id, 1, true],
+            'valid_end_with_invalid_tree_id' => [$end_id, 99999999999, false],
+            'invalid'               => [$question_id, false, false],
+            'invalid_with_tree_id'  => [9999999999999, 1, false]
+        ];
+    }
+
+
+    /**
+     * @covers Cme\Database\validate_group_id()
+     * @dataProvider testValidateGroupIDProvider
+     */
+    public function testValidateGroupID($group_id, $tree_id, $expected) {
+        $this->evaluateAssert($this->db->validate_group_id($group_id, $tree_id), $expected);
+    }
+
+    public function testValidateGroupIDProvider() {
+        $group_id = $this->getOneDynamic('group', 1)['group_id'];
+        $question_id = $this->getOneDynamic('question', 1)['question_id'];
+        return  [
+            'valid'                 => [$group_id, false, true],
+            'valid_with_tree_id'    => [$group_id, 1, true],
+            'valid_group_with_invalid_tree_id' => [$group_id, 99999999999, false],
+            'invalid'               => [$question_id, false, false],
+            'invalid_with_tree_id'  => [9999999999999, 1, false]
+        ];
+    }
+
+    /**
+     * @covers Cme\Database\validate_start_id()
+     * @dataProvider testValidateStartIDProvider
+     */
+    public function testValidateStartID($start_id, $tree_id, $expected) {
+        $this->evaluateAssert($this->db->validate_start_id($start_id, $tree_id), $expected);
+    }
+
+    public function testValidateStartIDProvider() {
+        $start_id = $this->getOneDynamic('start', 1)['start_id'];
+        $question_id = $this->getOneDynamic('question', 1)['question_id'];
+        return  [
+            'valid'                 => [$start_id, false, true],
+            'valid_with_tree_id'    => [$start_id, 1, true],
+            'valid_start_with_invalid_tree_id' => [$start_id, 99999999999, false],
+            'invalid'               => [$question_id, false, false],
+            'invalid_with_tree_id'  => [9999999999999, 1, false]
+        ];
+    }
 }
