@@ -312,4 +312,30 @@ final class DBTest extends TreeTestCase
             'invalid_with_tree_id'  => [9999999999999, 1, false]
         ];
     }
+
+    /**
+     * @covers Cme\Database\validate_destination_id()
+     * @dataProvider testValidateDestinationIDProvider
+     */
+    public function testValidateDestinationID($destination_id, $options, $expected) {
+        $this->evaluateAssert($this->db->validate_destination_id($destination_id, $options), $expected);
+    }
+
+    public function testValidateDestinationIDProvider() {
+        $start_id = $this->getOneDynamic('start', 1)['start_id'];
+        $end_id = $this->getOneDynamic('end', 1)['end_id'];
+        $question_id = $this->getOneDynamic('question', 1)['question_id'];
+
+        return  [
+            'end_id'             => [$end_id, ['el_type' => 'end'], true],
+            'end_id_with_tree'   => [$end_id, ['el_type' => 'end', 'tree_id'=>1], true],
+            'end_id_no_options'  => [$end_id, [], true],
+            'question_id'             => [$question_id, ['el_type' => 'question'], true],
+            'question_id_with_tree'   => [$question_id, ['el_type' => 'question', 'tree_id'=>1], true],
+            'question_id_no_options'  => [$question_id, [], true],
+            'invalid_id'               => [$start_id, ['el_type' => 'question'], false],
+            'invalid_end_id_with_tree'   => [$start_id, ['el_type' => 'end', 'tree_id'=>1], false],
+            'invalid_end_id_no_options'  => [$start_id, [], false],
+        ];
+    }
 }

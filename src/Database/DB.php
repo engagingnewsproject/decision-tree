@@ -506,8 +506,34 @@ class DB extends PDO {
 	}
 
 	// Must be of el_type = 'question' or 'end'
-	public function validate_destination_id() {
+	public function validate_destination_id($id, $options = []) {
+		// see if there's a desired type
+		$el_type = false;
+		$tree_id = false;
+		$whitelist = ['end', 'question'];
 
+		if( isset($options['el_type']) && in_array($options['el_type'], $whitelist) ) {
+			$el_type = $options['el_type'];
+		}
+
+		if( isset($options['tree_id']) && Utility\is_id($options['tree_id'])) {
+			$tree_id = $options['tree_id'];
+		}
+
+		if($el_type === false) {
+			// try to get this destination by both question and end
+			foreach($whitelist as $el_type) {
+				$is_valid = $this->validate_el_type_id($el_type, $id, $tree_id);
+				if($is_valid === true) {
+					break;
+				}
+			}
+		} else {
+			// get it only by the passed ID
+			$is_valid = $this->validate_el_type_id($el_type, $id, $tree_id);
+		}
+
+		return $is_valid;
 	}
 
 	// Make sure the interaction type exists
