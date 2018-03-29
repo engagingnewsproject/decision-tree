@@ -73,8 +73,8 @@ function get_tree_slug_by_id($tree_id) {
         return false;
     }
     // use the id to get the slug. Switch to $tree_id bc that's what it is
-    $DB = new \Cme\Database\DB();
-    $tree = $DB->get_tree($tree_id);
+    $get = new \Cme\Database\Get();
+    $tree = $get->get_tree($tree_id);
     // return the tree slug
     return $tree['tree_slug'];
 }
@@ -85,8 +85,8 @@ function get_tree_id_by_slug($tree_slug) {
         return false;
     }
     // use the id to get the slug. Switch to $tree_id bc that's what it is
-    $DB = new \Cme\Database\DB();
-    $tree = $DB->get_tree_by_slug($tree_slug);
+    $get = new \Cme\Database\Get();
+    $tree = $get->get_tree_by_slug($tree_slug);
     // return the tree slug
     return $tree['tree_id'];
 }

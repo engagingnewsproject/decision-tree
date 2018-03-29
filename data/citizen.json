@@ -832,8 +832,8 @@
                     "title": "False",
                     "content": "",
                     "order": "0",
-                    "destination_id": "91",
-                    "destination_type": "question"
+                    "destination_id": "6",
+                    "destination_type": "end"
                 },
                 {
                     "option_id": "99",
@@ -944,7 +944,7 @@
             "question_id": "70",
             "tree_id": "1",
             "group_id": null,
-            "title": "I am willing to perform either military or civilian service for the United States if required by law. (NOTE: If your religious teachings and beliefs prohibit you from performing military service, you must be willing to perform non-military service.)",
+            "title": "I am willing to perform either military or civilian service for the United States if required by law. (NOTE: If your religious teachings OR beliefs prohibit you from performing military service, you must be willing to perform non-military service.)",
             "content": "",
             "order": "27",
             "description": "",
@@ -1044,23 +1044,23 @@
         {
             "end_id": "6",
             "tree_id": "1",
-            "title": "Not Eligible",
+            "title": "May Not Be Eligible",
             "content": "You will get rejected from US Citizenship if you apply right now."
         }
     ],
     "stats": {
-        "total_paths": 4210,
-        "longest_path": 31,
+        "total_paths": 3442,
+        "longest_path": 30,
         "path_ends": {
             "5": {
                 "title": "Eligible",
-                "count": 640,
-                "percentage": 15.2
+                "count": 512,
+                "percentage": 14.88
             },
             "6": {
-                "title": "Not Eligible",
-                "count": 3570,
-                "percentage": 84.8
+                "title": "May Not Be Eligible",
+                "count": 2930,
+                "percentage": 85.12
             }
         }
     }

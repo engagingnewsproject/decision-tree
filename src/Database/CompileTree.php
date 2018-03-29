@@ -9,19 +9,19 @@
 namespace Cme\Database;
 
 class CompileTree extends DB {
-    protected $DB,
+    protected $Get,
               $compiled;
 
     public function __construct($tree_id) {
-        $this->DB = new DB();
+        $this->Get = new Get();
         // kick off build process
         // get the tree by slug or ID
         if(\Cme\Utility\is_slug($tree_id)) {
-            $tree = $this->DB->get_tree_by_slug($tree_id);
+            $tree = $this->Get->get_tree_by_slug($tree_id);
             // set the real tree id
             $tree_id = $tree['tree_id'];
         } else {
-            $tree = $this->DB->get_tree($tree_id);
+            $tree = $this->Get->get_tree($tree_id);
         }
 
         $this->compiled = $tree;
@@ -46,16 +46,16 @@ class CompileTree extends DB {
     }
 
     protected function compile_starts($tree_id) {
-        return $this->DB->get_starts($tree_id);
+        return $this->Get->get_starts($tree_id);
     }
 
     protected function compile_groups($tree_id) {
-        $groups = $this->DB->get_groups($tree_id);
+        $groups = $this->Get->get_groups($tree_id);
         $i = 0;
 
         foreach($groups as $group) {
 
-            $groups[$i]['questions'] = $this->DB->get_questions_by_group($group['group_id']);
+            $groups[$i]['questions'] = $this->Get->get_questions_by_group($group['group_id']);
             $i++;
         }
 
@@ -66,7 +66,7 @@ class CompileTree extends DB {
 
 
     protected function compile_questions($tree_id) {
-        $questions = $this->DB->get_questions($tree_id);
+        $questions = $this->Get->get_questions($tree_id);
         $i = 0;
 
         foreach($questions as $question) {
@@ -82,11 +82,11 @@ class CompileTree extends DB {
     }
 
     protected function compile_options($question_id) {
-        return $this->DB->get_options($question_id);
+        return $this->Get->get_options($question_id);
     }
 
     protected function compile_ends($tree_id) {
-        return $this->DB->get_ends($tree_id);
+        return $this->Get->get_ends($tree_id);
     }
 
     /**
@@ -100,7 +100,7 @@ class CompileTree extends DB {
 
         // add the first question as a new array item in that array
         $paths[$path_i][] = 'Question '.$questions[0]['question_id'];
-        $paths = $this->process_paths($paths, $path_i, $this->DB->get_options($questions[0]['question_id']));
+        $paths = $this->process_paths($paths, $path_i, $this->Get->get_options($questions[0]['question_id']));
         return ['total_paths'=>count($paths),'longest_path'=>$this->largest_array_count($paths), 'path_ends'=>$this->path_end_numbers($paths)];
         /*
         return $paths;*/
@@ -134,7 +134,7 @@ class CompileTree extends DB {
             // now recursively process ITS paths if it's a question
             if($option['destination_type'] === 'question') {
 
-                $paths = $this->process_paths($paths, $path_i, $this->DB->get_options($option['destination_id']));
+                $paths = $this->process_paths($paths, $path_i, $this->Get->get_options($option['destination_id']));
             }
 
             $option_i++;

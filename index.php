@@ -81,8 +81,8 @@ $app->group('/api', function() {
         });
 
         $this->get('/trees/', function (Request $request, Response $response) {
-            $DB = new Database\DB();
-            $trees = $DB->get_trees();
+            $Get = new Database\Get();
+            $trees = $Get->get_trees();
 
             $response->getBody()->write(json_encode($trees));
             return $response;
@@ -90,8 +90,8 @@ $app->group('/api', function() {
 
         $this->get('/trees/{tree_id}', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
-            $DB = new Database\DB();
-            $tree = $DB->get_tree($tree_id);
+            $Get = new Database\Get();
+            $tree = $Get->get_tree($tree_id);
 
             // format into JSON
             $response->getBody()->write(json_encode($tree));
@@ -101,8 +101,8 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/starts/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
             // get all starts from that tree id
-            $DB = new Database\DB();
-            $starts = $DB->get_starts($tree_id);
+            $Get = new Database\Get();
+            $starts = $Get->get_starts($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($starts));
             return $response;
@@ -112,8 +112,8 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $start_id = $request->getAttribute('start_id');
 
-            $DB = new Database\DB();
-            $start = $DB->get_start($start_id, $tree_id);
+            $Get = new Database\Get();
+            $start = $Get->get_start($start_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($start));
             return $response;
@@ -122,8 +122,8 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/groups/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
             // get all groups from that tree id
-            $DB = new Database\DB();
-            $groups = $DB->get_groups($tree_id);
+            $Get = new Database\Get();
+            $groups = $Get->get_groups($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($groups));
             return $response;
@@ -133,8 +133,8 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $group_id = $request->getAttribute('group_id');
 
-            $DB = new Database\DB();
-            $group = $DB->get_group($group_id, $tree_id);
+            $Get = new Database\Get();
+            $group = $Get->get_group($group_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($group));
             return $response;
@@ -143,8 +143,8 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/questions/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
 
-            $DB = new Database\DB();
-            $questions = $DB->get_questions($tree_id);
+            $Get = new Database\Get();
+            $questions = $Get->get_questions($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($questions));
             return $response;
@@ -154,8 +154,8 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $question_id = $request->getAttribute('question_id');
 
-            $DB = new Database\DB();
-            $question = $DB->get_question($question_id, $tree_id);
+            $Get = new Database\Get();
+            $question = $Get->get_question($question_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($question));
             return $response;
@@ -165,8 +165,8 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $question_id = $request->getAttribute('question_id');
 
-            $DB = new Database\DB();
-            $options = $DB->get_options($question_id, ['tree_id' => $tree_id]);
+            $Get = new Database\Get();
+            $options = $Get->get_options($question_id, ['tree_id' => $tree_id]);
             // return the JSON
             $response->getBody()->write(json_encode($options));
             return $response;
@@ -177,8 +177,8 @@ $app->group('/api', function() {
             $question_id = $request->getAttribute('question_id');
             $option_id = $request->getAttribute('option_id');
 
-            $DB = new Database\DB();
-            $option = $DB->get_option($option_id, ['tree_id' => $tree_id, 'question_id' => $question_id]);
+            $Get = new Database\Get();
+            $option = $Get->get_option($option_id, ['tree_id' => $tree_id, 'question_id' => $question_id]);
             // return the JSON
             $response->getBody()->write(json_encode($option));
             return $response;
@@ -187,8 +187,8 @@ $app->group('/api', function() {
         $this->get('/trees/{tree_id}/ends/', function (Request $request, Response $response) {
             $tree_id = $request->getAttribute('tree_id');
 
-            $DB = new Database\DB();
-            $ends = $DB->get_ends($tree_id);
+            $Get = new Database\Get();
+            $ends = $Get->get_ends($tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($ends));
             return $response;
@@ -198,8 +198,8 @@ $app->group('/api', function() {
             $tree_id = $request->getAttribute('tree_id');
             $end_id = $request->getAttribute('end_id');
 
-            $DB = new Database\DB();
-            $end = $DB->get_end($end_id, $tree_id);
+            $Get = new Database\Get();
+            $end = $Get->get_end($end_id, $tree_id);
             // return the JSON
             $response->getBody()->write(json_encode($end));
             return $response;
@@ -257,9 +257,9 @@ $app->group('/api', function() {
         $this->get('/sites/{site_id}', function (Request $request, Response $response) {
             $site_id = $request->getAttribute('site_id');
 
-            $DB = new Database\DB();
+            $Get = new Database\Get();
             //TODO: see if the site ID is an ID or a URL
-            $site = $DB->get_site($site_id);
+            $site = $Get->get_site($site_id);
             // return the JSON
             $response->getBody()->write(json_encode($site));
             return $response;
@@ -268,9 +268,9 @@ $app->group('/api', function() {
         // Returns all embeds on that site
         $this->get('/sites/{site_id}/embeds/', function (Request $request, Response $response) {
             $site_id = $request->getAttribute('site_id');
-            $DB = new Database\DB();
+            $Get = new Database\Get();
             //TODO: see if the site ID is an ID or a URL
-            $embeds = $DB->get_embeds_by_site($site_id);
+            $embeds = $Get->get_embeds_by_site($site_id);
             // return the JSON
             $response->getBody()->write(json_encode($embeds));
             return $response;
@@ -281,8 +281,8 @@ $app->group('/api', function() {
             $site_id = $request->getAttribute('site_id');
             $embed_id = $request->getAttribute('embed_id');
 
-            $DB = new Database\DB();
-            $embed = $DB->get_embed($embed_id, ['site_id'=>$site_id]);
+            $Get = new Database\Get();
+            $embed = $Get->get_embed($embed_id, ['site_id'=>$site_id]);
             // return the JSON
             $response->getBody()->write(json_encode($embed));
             return $response;
@@ -357,8 +357,8 @@ $app->group('/api', function() {
         });
 
         $this->get('/interactions/types/', function (Request $request, Response $response) {
-            $DB = new Database\DB();
-            $interaction_types = $DB->get_interaction_types();
+            $Get = new Database\Get();
+            $interaction_types = $Get->get_interaction_types();
 
             $response->getBody()->write(json_encode($interaction_types));
             return $response;
@@ -366,16 +366,16 @@ $app->group('/api', function() {
 
         $this->get('/interactions/types/{type_id}', function (Request $request, Response $response) {
             $type_id = $request->getAttribute('type_id');
-            $DB = new Database\DB();
-            $interaction_type = $DB->get_interaction_type($type_id);
+            $Get = new Database\Get();
+            $interaction_type = $Get->get_interaction_type($type_id);
 
             $response->getBody()->write(json_encode($interaction_type));
             return $response;
         });
 
         $this->get('/states/types/', function (Request $request, Response $response) {
-            $DB = new Database\DB();
-            $state_types = $DB->get_state_types();
+            $Get = new Database\Get();
+            $state_types = $Get->get_state_types();
 
             $response->getBody()->write(json_encode($state_types));
             return $response;
@@ -383,8 +383,8 @@ $app->group('/api', function() {
 
         $this->get('/states/types/{type_id}', function (Request $request, Response $response) {
             $type_id = $request->getAttribute('type_id');
-            $DB = new Database\DB();
-            $state_type = $DB->get_state_type($type_id);
+            $Get = new Database\Get();
+            $state_type = $Get->get_state_type($type_id);
 
             $response->getBody()->write(json_encode($state_type));
             return $response;
