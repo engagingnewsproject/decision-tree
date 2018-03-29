@@ -505,26 +505,37 @@ class DB extends PDO {
 		return $this->validate_el_type_id('start', $start_id, $tree_id);
 	}
 
-	// Must be of el_type = 'question' or 'end'
+	/**
+	 * Validates that an ID is a valid destination ID by checking if it's
+	 * a question or end ID
+	 *
+	 * @param $id INT
+	 * @param $options ARRAY (optional) Faster check if these are provided ['el_type' => 'question', 'tree_id'=>1]
+	 * @return BOOLEAN
+	 */
 	public function validate_destination_id($id, $options = []) {
 		// see if there's a desired type
 		$el_type = false;
 		$tree_id = false;
 		$whitelist = ['end', 'question'];
 
+		// check for a passed type
 		if( isset($options['el_type']) && in_array($options['el_type'], $whitelist) ) {
 			$el_type = $options['el_type'];
 		}
 
+		// check for a passed tree ID
 		if( isset($options['tree_id']) && Utility\is_id($options['tree_id'])) {
 			$tree_id = $options['tree_id'];
 		}
 
+		// if no $el_type was passed, check all possible destination types (question and end)
 		if($el_type === false) {
 			// try to get this destination by both question and end
 			foreach($whitelist as $el_type) {
 				$is_valid = $this->validate_el_type_id($el_type, $id, $tree_id);
 				if($is_valid === true) {
+					// if we have a valid destination ID, break out and return
 					break;
 				}
 			}
@@ -536,12 +547,18 @@ class DB extends PDO {
 		return $is_valid;
 	}
 
-	// Make sure the interaction type exists
+	/**
+	 * Validates interaction type, such as 'load', 'start', 'option', etc
+	 *
+	 * @param $interaction_type STRING
+	 * @return BOOLEAN
+	 */
 	public function validate_interaction_type($interaction_type) {
 		$is_valid = false;
 
 		// if we can find that tree id, it's valid
-		if($this->get_interaction_type($interaction_type) !== false) {
+		$get_type = $this->get_interaction_type($interaction_type);
+		if(isset($get_type['interaction_type']) && $get_type['interaction_type'] === $interaction_type) {
 			$is_valid = true;
 		}
 

@@ -338,4 +338,28 @@ final class DBTest extends TreeTestCase
             'invalid_end_id_no_options'  => [$start_id, [], false],
         ];
     }
+
+    /**
+     * @covers Cme\Database\validate_interaction_type()
+     * @dataProvider testValidateInteractionTypeProvider
+     */
+    public function testValidateInteractionType($interaction_type, $expected) {
+        $this->evaluateAssert($this->db->validate_interaction_type($interaction_type), $expected);
+    }
+
+    public function testValidateInteractionTypeProvider() {
+        $interaction_types = ['load', 'reload', 'start', 'overview', 'option', 'history', 'restart'];
+
+        $provider = [
+            'invalid_empty'   => ['', false],
+            'invalid_type'    => ['adfasdfasdfa', false],
+            'invalid_format'  => [123, false]
+        ];
+
+        foreach($interaction_types as $type) {
+            $provider[$type] = [$type, true];
+        }
+
+        return $provider;
+    }
 }
