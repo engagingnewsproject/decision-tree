@@ -37,22 +37,37 @@ final class GetTest extends DBTestCase
      * @dataProvider testFetchOneByViewProvider
      */
     public function testFetchOneByView($el_type, $tree_id) {
-        // get all questions for tree 1
-        $get_function = 'get_'.$el_type.'s';
-        $els = $this->get->$get_function($tree_id);
-        // pick the first one
-        if(isset($els[0]["${el_type}_id"])) {
-            $el_id = $els[0]["${el_type}_id"];
-        } else {
-            // force it to fail
-            $this->assertEquals(true, false);
-        }
+        $el = $this->getOneDynamic($el_type, $tree_id);
+        $el_id = $el[$el_type.'_id'];
 
         $result = $this->get->fetch_one_by_view($el_type, $el_id, $tree_id);
         $this->assertEquals($el_id, $result["${el_type}_id"]);
     }
 
     public function testFetchOneByViewProvider() {
+        return [
+                'valid-question'=>['question', 1],
+                'valid-group'=>['group', 1],
+        ];
+    }
+
+    /**
+     * @covers Cme\Database\get_trees()
+     * @covers Cme\Database\get_tree()
+     * @dataProvider testGetTreesProvider
+     */
+    public function testGetTrees() {
+        // get all trees
+        $trees = $this->get->get_trees();
+        foreach($trees as $tree) {
+            // get one tree off of the tree_id
+            $getTree = $this->get->get_tree($tree['tree_id']);
+            // the tree_ids should match
+            $this->assertEquals($tree['tree_id'], $getTree['tree_id']);
+        }
+    }
+
+    public function testGetTreesProvider() {
         return [
                 'valid-question'=>['question', 1],
                 'valid-group'=>['group', 1],
@@ -105,9 +120,9 @@ final class GetTest extends DBTestCase
      */
     public function testGetOptions() {
         $tree_id = 1;
-        $questions = $this->get->get_questions($tree_id);
-        $question_id = $questions[0]['question_id'];
 
+        $question = $this->getOneDynamic('question', $tree_id);
+        $question_id = $question['question_id'];
         $options = $this->get->get_options($question_id);
 
         foreach($options as $option) {

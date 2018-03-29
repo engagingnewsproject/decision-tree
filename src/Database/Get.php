@@ -17,6 +17,11 @@ class Get extends DB {
         parent::__construct();
     }
 
+    /**
+     * Gets all trees from the database
+     *
+     * @return ARRAY of TREE ARRAYS
+     */
     public function get_trees() {
         // Do a select query to see if we get a returned row
         $sql = "SELECT * from ".$this->views['tree'];
@@ -24,6 +29,12 @@ class Get extends DB {
         return $this->fetch_all($sql);
     }
 
+    /**
+     * Gets one tree from the database
+     *
+     * @param $tree_id INT
+     * @return ARRAY/OBJECT of the TREE
+     */
     public function get_tree($tree_id) {
         // Do a select query to see if we get a returned row
         $params = [":tree_id" => $tree_id];
