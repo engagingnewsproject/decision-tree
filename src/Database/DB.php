@@ -556,9 +556,9 @@ class DB extends PDO {
 	public function validate_interaction_type($interaction_type) {
 		$is_valid = false;
 
-		// if we can find that tree id, it's valid
-		$get_type = $this->get_interaction_type($interaction_type);
-		if(isset($get_type['interaction_type']) && $get_type['interaction_type'] === $interaction_type) {
+		// if we can find that interaction type and it matches the passed one, it's valid
+		$get_interaction = $this->get_interaction_type($interaction_type);
+		if(isset($get_interaction['interaction_type']) && $get_interaction['interaction_type'] === $interaction_type) {
 			$is_valid = true;
 		}
 
@@ -569,8 +569,9 @@ class DB extends PDO {
 	public function validate_state_type($state_type) {
 		$is_valid = false;
 
-		// if we can find that tree id, it's valid
-		if($this->get_state_type($state_type) !== false) {
+		// if we can find that state type and it matches the passed one, it's valid
+		$get_state = $this->get_state_type($state_type);
+		if(isset($get_state['state_type']) && $get_state['state_type'] === $state_type) {
 			$is_valid = true;
 		}
 

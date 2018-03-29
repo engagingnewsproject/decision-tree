@@ -362,4 +362,28 @@ final class DBTest extends TreeTestCase
 
         return $provider;
     }
+
+    /**
+     * @covers Cme\Database\validate_state_type()
+     * @dataProvider testValidateStateTypeProvider
+     */
+    public function testValidateStateType($state_type, $expected) {
+        $this->evaluateAssert($this->db->validate_state_type($state_type), $expected);
+    }
+
+    public function testValidateStateTypeProvider() {
+        $state_types = ['intro', 'question', 'end', 'overview'];
+
+        $provider = [
+            'invalid_empty'   => ['', false],
+            'invalid_type'    => ['adfasdfasdfa', false],
+            'invalid_format'  => [123, false]
+        ];
+
+        foreach($state_types as $type) {
+            $provider[$type] = [$type, true];
+        }
+
+        return $provider;
+    }
 }
