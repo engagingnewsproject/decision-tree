@@ -13,11 +13,11 @@ final class ValidateTest extends DBTestCase
         $this->validate = new Database\Validate();
     }
     /**
-     * @covers Cme\Database\validate_tree_id()
+     * @covers Cme\Database\treeId()
      * @dataProvider validateTreeIdProvider
      */
     public function testValidateTreeId($tree_id, $expected) {
-        $this->evaluateAssert($this->validate->validate_tree_id($tree_id), $expected);
+        $this->evaluateAssert($this->validate->treeId($tree_id), $expected);
     }
 
     public function validateTreeIdProvider() {
@@ -29,11 +29,11 @@ final class ValidateTest extends DBTestCase
     }
 
     /**
-     * @covers Cme\Database\validate_el_type_id()
+     * @covers Cme\Database\elTypeID()
      * @dataProvider validateElTypeIdProvider
      */
     public function testValidateElTypeId($el_type, $el_type_id, $tree_id, $expected) {
-        $this->evaluateAssert($this->validate->validate_el_type_id($el_type, $el_type_id, $tree_id), $expected);
+        $this->evaluateAssert($this->validate->elTypeID($el_type, $el_type_id, $tree_id), $expected);
     }
 
     public function validateElTypeIdProvider() {
@@ -57,11 +57,11 @@ final class ValidateTest extends DBTestCase
     }
 
     /**
-     * @covers Cme\Database\validate_option_id()
+     * @covers Cme\Database\optionID()
      * @dataProvider validateOptionIdProvider
      */
     public function testValidateOptionId($option_id, $tree_id, $expected) {
-        $this->evaluateAssert($this->validate->validate_option_id($option_id, $tree_id), $expected);
+        $this->evaluateAssert($this->validate->optionID($option_id, $tree_id), $expected);
     }
 
     public function validateOptionIdProvider() {
@@ -76,11 +76,11 @@ final class ValidateTest extends DBTestCase
     }
 
     /**
-     * @covers Cme\Database\validate_question_id()
+     * @covers Cme\Database\questionID()
      * @dataProvider validateQuestionIdProvider
      */
     public function testValidateQuestionId($question_id, $tree_id, $expected) {
-        $this->evaluateAssert($this->validate->validate_question_id($question_id, $tree_id), $expected);
+        $this->evaluateAssert($this->validate->questionID($question_id, $tree_id), $expected);
     }
 
     public function validateQuestionIdProvider() {
@@ -95,11 +95,11 @@ final class ValidateTest extends DBTestCase
     }
 
     /**
-     * @covers Cme\Database\validate_end_id()
+     * @covers Cme\Database\endID()
      * @dataProvider validateEndIdProvider
      */
     public function testValidateEndId($end_id, $tree_id, $expected) {
-        $this->evaluateAssert($this->validate->validate_end_id($end_id, $tree_id), $expected);
+        $this->evaluateAssert($this->validate->endID($end_id, $tree_id), $expected);
     }
 
     public function validateEndIdProvider() {
@@ -116,11 +116,11 @@ final class ValidateTest extends DBTestCase
 
 
     /**
-     * @covers Cme\Database\validate_group_id()
+     * @covers Cme\Database\groupID()
      * @dataProvider validateGroupIdProvider
      */
     public function testValidateGroupId($group_id, $tree_id, $expected) {
-        $this->evaluateAssert($this->validate->validate_group_id($group_id, $tree_id), $expected);
+        $this->evaluateAssert($this->validate->groupID($group_id, $tree_id), $expected);
     }
 
     public function validateGroupIdProvider() {
@@ -136,11 +136,11 @@ final class ValidateTest extends DBTestCase
     }
 
     /**
-     * @covers Cme\Database\validate_start_id()
+     * @covers Cme\Database\startID()
      * @dataProvider validateStartIdProvider
      */
     public function testValidateStartId($start_id, $tree_id, $expected) {
-        $this->evaluateAssert($this->validate->validate_start_id($start_id, $tree_id), $expected);
+        $this->evaluateAssert($this->validate->startID($start_id, $tree_id), $expected);
     }
 
     public function validateStartIdProvider() {
@@ -156,11 +156,11 @@ final class ValidateTest extends DBTestCase
     }
 
     /**
-     * @covers Cme\Database\validate_destination_id()
+     * @covers Cme\Database\destinationID()
      * @dataProvider validateDestinationIdProvider
      */
     public function testValidateDestinationId($destination_id, $options, $expected) {
-        $this->evaluateAssert($this->validate->validate_destination_id($destination_id, $options), $expected);
+        $this->evaluateAssert($this->validate->destinationID($destination_id, $options), $expected);
     }
 
     public function validateDestinationIdProvider() {
@@ -182,11 +182,11 @@ final class ValidateTest extends DBTestCase
     }
 
     /**
-     * @covers Cme\Database\validate_interaction_type()
+     * @covers Cme\Database\interactionType()
      * @dataProvider validateInteractionTypeProvider
      */
     public function testValidateInteractionType($interaction_type, $expected) {
-        $this->evaluateAssert($this->validate->validate_interaction_type($interaction_type), $expected);
+        $this->evaluateAssert($this->validate->interactionType($interaction_type), $expected);
     }
 
     public function validateInteractionTypeProvider() {
@@ -206,11 +206,11 @@ final class ValidateTest extends DBTestCase
     }
 
     /**
-     * @covers Cme\Database\validate_state_type()
+     * @covers Cme\Database\stateType()
      * @dataProvider validateStateTypeProvider
      */
     public function testValidateStateType($state_type, $expected) {
-        $this->evaluateAssert($this->validate->validate_state_type($state_type), $expected);
+        $this->evaluateAssert($this->validate->stateType($state_type), $expected);
     }
 
     public function validateStateTypeProvider() {

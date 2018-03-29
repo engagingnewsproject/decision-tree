@@ -68,20 +68,21 @@ class SaveEmbed extends DB {
         if(filter_var('http://example.com'.$embed['path'], FILTER_VALIDATE_URL) === false) {
             $this->errors[] = 'Invalid path.';
         }
-
+        // open the validator
+        $validate = new Validate();
         // check that the site exists
-        $site = $this->DB->get_site($embed['site_id']);
+        $site = $this->DB->getSite($embed['site_id']);
         if($site === false) {
             $this->errors[] = 'Site doesn\'t exist.';
         }
 
         // check that it doesn't already exist
-        if($this->DB->get_site($embed['path']) !== false) {
+        if($this->DB->getSite($embed['path']) !== false) {
             $this->errors[] = 'Site already exists.';
         }
 
         // check that it's a valid Tree
-        if($this->DB->validate_tree_id($embed['tree_id']) === false) {
+        if($validate->treeId($embed['tree_id']) === false) {
             $this->errors[] = 'Invalid tree_id.';
         }
 
@@ -123,7 +124,7 @@ class SaveEmbed extends DB {
             return $this->errors;
         }
         // check if it exists already
-        $embed_check = $this->DB->get_embed($embed['path'],
+        $embed_check = $this->DB->getEmbed($embed['path'],
                                         ['site_id' => $embed['site_id'],
                                          'tree_id' => $embed['tree_id']
                                         ]);

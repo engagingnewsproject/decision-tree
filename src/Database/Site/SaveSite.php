@@ -90,7 +90,7 @@ class SaveSite extends DB {
         }
 
         // check if it exists already
-        $site_check = $this->DB->get_site($site['host']);
+        $site_check = $this->DB->getSite($site['host']);
         if($site_check !== false) {
             $response = [
                             'site_id'   => $site_check['site_id'],

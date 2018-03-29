@@ -55,12 +55,12 @@ final class UtilityTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Utility\get_tree_slug_by_id($tree_id)
+     * @covers Cme\Utility\getTreeSlugById($tree_id)
      * @dataProvider getTreeSlugByIdProvider
      */
     public function testGetTreeSlugById($id, $expected) {
         // $cme_save = new Cme_quiz_Save();
-        $tree_slug = Utility\get_tree_slug_by_id($id);
+        $tree_slug = Utility\getTreeSlugById($id);
         $this->assertEquals($tree_slug, $expected);
     }
 
@@ -77,11 +77,11 @@ final class UtilityTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Utility\get_tree_id_by_slug($tree_id)
+     * @covers Cme\Utility\getTree_idBySlug($tree_id)
      * @dataProvider getTreeIdBySlugProvider
      */
     public function testGetTreeIdBySlug($slug, $expected) {
-        $tree_id = Utility\get_tree_id_by_slug($slug);
+        $tree_id = Utility\getTree_idBySlug($slug);
         $this->assertEquals($tree_id, $expected);
     }
 

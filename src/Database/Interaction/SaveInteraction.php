@@ -94,35 +94,37 @@ class SaveInteraction extends DB {
         $destination_id = $data['destination']['id'];
         $embed_id = $data['site']['embed_id'];
 
+        // open the validator
+        $validate = new Validate();
         // check that it's a valid Tree
-        if($this->DB->validate_tree_id($tree_id) === false) {
+        if($validate->treeId($tree_id) === false) {
             $this->errors[] = 'Invalid tree_id.';
             // return here because the next ones will get messed up if this isn't valid
             return false;
         }
 
         // check that it's a valid Embed ID
-        if($this->DB->validate_embed($embed_id, $data) === false) {
+        if($validate->embed($embed_id, $data) === false) {
             $this->errors[] = 'Invalid embed_id.';
         }
 
         // check that it's a valid interaction type
-        if($this->DB->validate_interaction_type($interaction_type) === false) {
+        if($validate->interactionType($interaction_type) === false) {
             $this->errors[] = 'Invalid interaction type.';
 		}
 
         // check that it's a valid destination type
-        if($this->DB->validate_state_type($destination_type) === false) {
+        if($validate->stateType($destination_type) === false) {
             $this->errors[] = 'Invalid destination type.';
 		}
 
         // if it's an option interaction, check that it's a valid option_id
-        if($interaction_type === 'question' && $this->DB->validate_el_type_id($interaction_type, $interaction_id, $tree_id) === false) {
+        if($interaction_type === 'question' && $validate->elTypeID($interaction_type, $interaction_id, $tree_id) === false) {
             $this->errors[] = 'Invalid interaction id.';
         }
 
         // if it's a question or end destination, check that it's a valid id for that type
-        if(($destination_type === 'question' || $destination_type === 'end') && $this->DB->validate_el_type_id($destination_type, $destination_id, $tree_id) === false) {
+        if(($destination_type === 'question' || $destination_type === 'end') && $validate->elTypeID($destination_type, $destination_id, $tree_id) === false) {
             $this->errors[] = 'Invalid destination id.';
         }
 
@@ -157,9 +159,9 @@ class SaveInteraction extends DB {
 
         $tree_id = $data['tree_id'];
         $user_id = $data['user_id'];
-        $interaction_type = $this->DB->get_interaction_type($data['interaction']['type']);
+        $interaction_type = $this->DB->getInteractionType($data['interaction']['type']);
         $interaction_id = $data['interaction']['id'];
-        $destination_type = $this->DB->get_state_type($data['destination']['type']);
+        $destination_type = $this->DB->getStateType($data['destination']['type']);
         $destination_id = $data['destination']['id'];
         $embed_id = $data['site']['embed_id'];
 

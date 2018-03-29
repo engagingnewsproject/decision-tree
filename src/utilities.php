@@ -67,32 +67,32 @@ function is_id($string) {
     return $is_id;
 }
 
-function get_tree_slug_by_id($tree_id) {
+function getTreeSlugById($tree_id) {
     // test if it's a valid ID or not
     if(!is_id($tree_id)) {
         return false;
     }
     // use the id to get the slug. Switch to $tree_id bc that's what it is
-    $get = new \Cme\Database\Get();
-    $tree = $get->get_tree($tree_id);
+    $db = new \Cme\Database\DB();
+    $tree = $db->getTree($tree_id);
     // return the tree slug
     return $tree['tree_slug'];
 }
 
-function get_tree_id_by_slug($tree_slug) {
+function getTree_idBySlug($tree_slug) {
     // test if it's a valid ID or not
     if(!is_slug($tree_slug)) {
         return false;
     }
     // use the id to get the slug. Switch to $tree_id bc that's what it is
-    $get = new \Cme\Database\Get();
-    $tree = $get->get_tree_by_slug($tree_slug);
+    $db = new \Cme\Database\DB();
+    $tree = $db->getTreeBySlug($tree_slug);
     // return the tree slug
     return $tree['tree_id'];
 }
 
 // really bare curl implementation to consume our own api
-function get_endpoint($path) {
+function getEndpoint($path) {
     // Get cURL resource
     $curl = curl_init();
     // Set options
