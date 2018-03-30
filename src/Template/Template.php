@@ -28,7 +28,7 @@ class Template
     }
 
     protected function set_template_name($template_name) {
-        if(!Utility\is_slug($template_name)) {
+        if(!Utility\isSlug($template_name)) {
             return false;
         }
 

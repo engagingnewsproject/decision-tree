@@ -25,37 +25,37 @@ class DB extends PDO {
 		// Table names for dynamic reference
 		$this->tables = [
 						 'tree'						=> 'tree',
-						 'tree_element'				=> 'tree_element',
-						 'tree_element_order'		=> 'tree_element_order',
-						 'tree_element_container'	=> 'tree_element_container',
-						 'tree_element_destination'	=> 'tree_element_destination',
-						 'tree_element_type'		=> 'tree_element_type',
-						 'tree_embed'				=> 'tree_embed',
-						 'tree_interaction'			=> 'tree_interaction',
-						 'tree_interaction_type'	=> 'tree_interaction_type',
-						 'tree_interaction_element'	=> 'tree_interaction_element',
-						 'tree_site'				=> 'tree_site',
-						 'tree_state'				=> 'tree_state',
-						 'tree_state_type'			=> 'tree_state_type',
+						 'treeElement'				=> 'treeElement',
+						 'treeElementOrder'		=> 'treeElementOrder',
+						 'treeElementContainer'	=> 'treeElementContainer',
+						 'treeElementDestination'	=> 'treeElementDestination',
+						 'treeElementType'		=> 'treeElementType',
+						 'treeEmbed'				=> 'treeEmbed',
+						 'treeInteraction'			=> 'treeInteraction',
+						 'treeInteractionType'	=> 'treeInteractionType',
+						 'treeInteractionElement'	=> 'treeInteractionElement',
+						 'treeSite'				=> 'treeSite',
+						 'treeState'				=> 'treeState',
+						 'treeStateType'			=> 'treeStateType',
 						];
 
 		$this->views = [
-						'tree' 						=> 'tree_api',
-						'tree_start'				=> 'tree_start',
-						'tree_group'				=> 'tree_group',
-						'tree_question'				=> 'tree_question',
-						'tree_option'				=> 'tree_option',
-						'tree_end'					=> 'tree_end',
-						'tree_start_bounce'			=> 'tree_start_bounce',
-						'tree_interactions'			=> 'tree_interactions',
-						'tree_interaction_end'		=> 'tree_interaction_end',
-						'tree_interaction_history'	=> 'tree_interaction_history',
-						'tree_interaction_load'		=> 'tree_interaction_load',
-						'tree_interaction_option'	=> 'tree_interaction_option',
-						'tree_interaction_question'	=> 'tree_interaction_question',
-						'tree_interaction_reload'	=> 'tree_interaction_reload',
-						'tree_interaction_start'	=> 'tree_interaction_start',
-						'tree_interactions_max_date_by_user_and_tree'	=> 'tree_interactions_max_date_by_user_and_tree' // SORRY!
+						'tree' 						=> 'treeapi',
+						'treeStart'					=> 'treestart',
+						'treeGroup'					=> 'treegroup',
+						'treeQuestion'				=> 'treequestion',
+						'treeOption'				=> 'treeoption',
+						'treeEnd'					=> 'treeend',
+						'treeStartBounce'			=> 'treestartbounce',
+						'treeInteractions'			=> 'treeinteractions',
+						'treeInteractionEnd'		=> 'treeinteractionend',
+						'treeInteractionHistory'	=> 'treeInteractionHistory',
+						'treeInteractionLoad'		=> 'treeinteractionload',
+						'treeInteractionOption'		=> 'treeInteractionOption',
+						'treeInteractionQuestion'	=> 'treeInteractionQuestion',
+						'treeInteractionReload'		=> 'treeInteractionReload',
+						'treeInteractionStart'		=> 'treeinteractionstart',
+						'treeInteractionsMaxDateByUserAndTree'	=> 'treeinteractionsmaxdatebyuserandtree' // SORRY!
 					   ];
 		// check if a connection already exists
 		try {
@@ -94,17 +94,17 @@ class DB extends PDO {
 	 * questions by tree ID or all interactions by tree ID
 	 *
 	 * @param $view The string of the view you want to use for the query
-	 * @param $tree_id MIXED (STRING/INT) The tree_id you want results for
+	 * @param $treeID MIXED (STRING/INT) The treeID you want results for
 	 * @param $options ARRAY of defaults you can add to the SQL statement, like an orderby option
 	 * @return MIXED ARRAY from the PDO query on success, ??? if error
 	 */
-	public function fetchAllByTree($view, $tree_id, $options = array()) {
-		$default_options = array('orderby'=>false);
-		$options = array_merge($default_options, $options);
+	public function fetchAllByTree($view, $treeID, $options = array()) {
+		$default = array('orderby'=>false);
+		$options = array_merge($default, $options);
 		// TODO: validate options
-		$params = [":tree_id" => $tree_id];
+		$params = [":treeID" => $treeID];
 		$sql = "SELECT * from ".$this->views[$view]." WHERE
-				tree_id = :tree_id";
+				treeID = :treeID";
 
 		$sql .= $this->getOrderby($options['orderby']);
 
@@ -127,21 +127,22 @@ class DB extends PDO {
 	/**
 	 * Gets one row from a view based on the element type and element id
 	 *
-	 * @param $el_type The string of the type you want ('question','option', etc)
-	 * @param $el_id ARRAY of defaults you can add to the SQL statement, like an orderby option
-	 * @param $tree_id MIXED (STRING/INT) (Optional) The tree_id you want results for
+	 * @param $elType The string of the type you want ('question','option', etc)
+	 * @param $elID ARRAY of defaults you can add to the SQL statement, like an orderby option
+	 * @param $treeID MIXED (STRING/INT) (Optional) The treeID you want results for
 	 * @return MIXED Object from the PDO query on success, ??? if error
 	 */
-	public function fetchOneByView($el_type, $el_id, $tree_id = false) {
-		$params = [":${el_type}_id" => $el_id];
+	public function fetchOneByView($elType, $elID, $treeID = false) {
+		$params = [":${elType}ID" => $elID];
+		$ucfirstType = ucfirst($elType);
 
-		$sql = "SELECT * from ".$this->views["tree_${el_type}"]." WHERE
-				".$el_type."_id = :".$el_type."_id";
+		$sql = "SELECT * from ".$this->views["tree${ucfirstType}"]." WHERE
+				".$elType."ID = :".$elType."ID";
 
-		// if a tree_id was passed, append it to the params and sql statement
-		if($tree_id !== false) {
-			$params[":tree_id"] = $tree_id;
-			$sql .= " AND tree_id = :tree_id";
+		// if a treeID was passed, append it to the params and sql statement
+		if($treeID !== false) {
+			$params[":treeID"] = $treeID;
+			$sql .= " AND treeID = :treeID";
 		}
 
 		return $this->fetchOne($sql, $params);
@@ -172,14 +173,14 @@ class DB extends PDO {
     /**
      * Gets one tree from the database by id
      *
-     * @param $tree_id INT
+     * @param $treeID INT
      * @return ARRAY/OBJECT of the TREE
      */
-    public function getTree($tree_id) {
+    public function getTree($treeID) {
         // Do a select query to see if we get a returned row
-        $params = [":tree_id" => $tree_id];
+        $params = [":treeID" => $treeID];
         $sql = "SELECT * from ".$this->views['tree']." WHERE
-                tree_id = :tree_id";
+                treeID = :treeID";
         // return the found tree row
         return $this->fetchOne($sql, $params);
     }
@@ -187,100 +188,100 @@ class DB extends PDO {
     /**
      * Gets one tree from the database by slug
      *
-     * @param $tree_slug STRING
+     * @param $treeSlug STRING
      * @return ARRAY/OBJECT of the TREE
      */
-    public function getTreeBySlug($tree_slug) {
+    public function getTreeBySlug($treeSlug) {
         // Do a select query to see if we get a returned row
-        $params = [":tree_slug" => $tree_slug];
+        $params = [":treeSlug" => $treeSlug];
         $sql = "SELECT * from ".$this->views['tree']." WHERE
-                tree_slug = :tree_slug";
+                treeSlug = :treeSlug";
         // return the found tree row
         return $this->fetchOne($sql, $params);
     }
 
     /**
-     * Gets all starts from the database by tree_id
+     * Gets all starts from the database by treeID
      *
-     * @param $tree_id INT
+     * @param $treeID INT
      * @return ARRAY
      */
-    public function getStarts($tree_id) {
-        return $this->fetchAllByTree('tree_start', $tree_id);
+    public function getStarts($treeID) {
+        return $this->fetchAllByTree('treeStart', $treeID);
     }
 
     /**
      * Get a start from the database by id
      *
-     * @param $start_id INT
-     * @param $tree_id INT (Optional)
+     * @param $startID INT
+     * @param $treeID INT (Optional)
      * @return ARRAY of TREE ARRAYS
      */
-    public function getStart($start_id, $tree_id = false) {
-        return $this->fetchOneByView('start', $start_id, $tree_id);
+    public function getStart($startID, $treeID = false) {
+        return $this->fetchOneByView('start', $startID, $treeID);
     }
 
     /**
-     * Gets all groups from the database by tree_id
+     * Gets all groups from the database by treeID
      *
-     * @param $tree_id INT
+     * @param $treeID INT
      * @return ARRAY
      */
-    public function getGroups($tree_id) {
-        return $this->fetchAllByTree('tree_group', $tree_id);
+    public function getGroups($treeID) {
+        return $this->fetchAllByTree('treeGroup', $treeID);
     }
 
     /**
-     * Get a group from the database by group_id
+     * Get a group from the database by groupID
      *
-     * @param $group_id INT
-     * @param $tree_id INT (Optional)
+     * @param $groupID INT
+     * @param $treeID INT (Optional)
      * @return ARRAY of TREE ARRAYS
      */
-    public function getGroup($group_id, $tree_id = false) {
-        return $this->fetchOneByView('group', $group_id, $tree_id);
+    public function getGroup($groupID, $treeID = false) {
+        return $this->fetchOneByView('group', $groupID, $treeID);
     }
 
     /**
-     * Gets all questions from the database by tree_id
+     * Gets all questions from the database by treeID
      *
-     * @param $tree_id INT
+     * @param $treeID INT
      * @param $options ARRAY (Optional) sets orderby paramater in SQL statement
      * @return ARRAY
      */
-    public function getQuestions($tree_id, $options = array()) {
-        $default_options = array('orderby'=>'order');
-        $options = array_merge($default_options, $options);
-        return $this->fetchAllByTree('tree_question', $tree_id, $options);
+    public function getQuestions($treeID, $options = array()) {
+        $default = array('orderby'=>'order');
+        $options = array_merge($default, $options);
+        return $this->fetchAllByTree('treeQuestion', $treeID, $options);
     }
 
     /**
-     * Get a question from the database by question_id
+     * Get a question from the database by questionID
      *
-     * @param $question_id INT
-     * @param $tree_id INT (Optional)
+     * @param $questionID INT
+     * @param $treeID INT (Optional)
      * @return ARRAY of TREE ARRAYS
      */
-    public function getQuestion($question_id, $tree_id = false) {
-        return $this->fetchOneByView('question', $question_id, $tree_id);
+    public function getQuestion($questionID, $treeID = false) {
+        return $this->fetchOneByView('question', $questionID, $treeID);
     }
 
      /**
-     * Gets all questions from the database by group_id
+     * Gets all questions from the database by groupID
      *
-     * @param $group_id INT
-     * @param $tree_id INT (optional)
+     * @param $groupID INT
+     * @param $treeID INT (optional)
      * @return ARRAY of Question IDs
      */
-    public function getQuestionsByGroup($group_id, $tree_id = false) {
-        $params = [":group_id" => $group_id];
-        $sql = "SELECT question_id from ".$this->views['tree_question']." WHERE
-                group_id = :group_id";
+    public function getQuestionsByGroup($groupID, $treeID = false) {
+        $params = [":groupID" => $groupID];
+        $sql = "SELECT questionID from ".$this->views['treeQuestion']." WHERE
+                groupID = :groupID";
 
-        // if a tree_id was passed, append it to the params and sql statement
-        if($tree_id !== false) {
-            $params[":tree_id"] = $tree_id;
-            $sql .= " AND tree_id = :tree_id";
+        // if a treeID was passed, append it to the params and sql statement
+        if($treeID !== false) {
+            $params[":treeID"] = $treeID;
+            $sql .= " AND treeID = :treeID";
         }
 
         $sql .= " ORDER BY `order`";
@@ -289,24 +290,24 @@ class DB extends PDO {
         return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
     }
 
-    public function getOptions($question_id, $options = array()) {
-        $default_options = array('tree_id'=>false, 'orderby'=>'order');
-        $options = array_merge($default_options, $options);
+    public function getOptions($questionID, $options = array()) {
+        $default = array('treeID'=>false, 'orderby'=>'order');
+        $options = array_merge($default, $options);
 
-        // validate the question_id
+        // validate the questionID
         $validate = new Validate();
-        if($validate->questionID($question_id) === false) {
+        if($validate->questionID($questionID) === false) {
             return false;
         }
 
-        $params = [":question_id" => $question_id];
-        $sql = "SELECT * from ".$this->views['tree_option']." WHERE
-                question_id = :question_id";
+        $params = [":questionID" => $questionID];
+        $sql = "SELECT * from ".$this->views['treeOption']." WHERE
+                questionID = :questionID";
 
-        // if a tree_id was passed, append it to the params and sql statement
-        if(Utility\is_id($options['tree_id'])) {
-            $params[":tree_id"] = $options['tree_id'];
-            $sql .= " AND tree_id = :tree_id";
+        // if a treeID was passed, append it to the params and sql statement
+        if(Utility\isID($options['treeID'])) {
+            $params[":treeID"] = $options['treeID'];
+            $sql .= " AND treeID = :treeID";
         }
 
         $sql .= $this->getOrderby($options['orderby']);
@@ -314,161 +315,161 @@ class DB extends PDO {
         return $this->fetchAll($sql, $params);
     }
 
-    public function getOption($option_id, $options = array()) {
-        $default_options = array('tree_id'=>false, 'question_id'=>false);
-        $options = array_merge($default_options, $options);
+    public function getOption($optionID, $options = array()) {
+        $default = array('treeID'=>false, 'questionID'=>false);
+        $options = array_merge($default, $options);
 
-        $params = [":option_id" => $option_id];
+        $params = [":optionID" => $optionID];
 
-        $sql = "SELECT * from ".$this->views["tree_option"]." WHERE
-                option_id = :option_id";
+        $sql = "SELECT * from ".$this->views["treeOption"]." WHERE
+                optionID = :optionID";
 
-        // if a tree_id was passed, append it to the params and sql statement
-        if( Utility\is_id($options['tree_id']) ) {
-            $params[":tree_id"] = $options['tree_id'];
-            $sql .= " AND tree_id = :tree_id";
+        // if a treeID was passed, append it to the params and sql statement
+        if( Utility\isID($options['treeID']) ) {
+            $params[":treeID"] = $options['treeID'];
+            $sql .= " AND treeID = :treeID";
         }
 
-        if( Utility\is_id($options['question_id']) ) {
-            $params[":question_id"] = $options['question_id'];
-            $sql .= " AND question_id = :question_id";
+        if( Utility\isID($options['questionID']) ) {
+            $params[":questionID"] = $options['questionID'];
+            $sql .= " AND questionID = :questionID";
         }
 
         return $this->fetchOne($sql, $params);
     }
 
-    public function getEnds($tree_id) {
-        return $this->fetchAllByTree('tree_end', $tree_id);
+    public function getEnds($treeID) {
+        return $this->fetchAllByTree('treeEnd', $treeID);
     }
 
-    public function getEnd($end_id, $tree_id = false) {
-        return $this->fetchOneByView('end', $end_id, $tree_id);
+    public function getEnd($endID, $treeID = false) {
+        return $this->fetchOneByView('end', $endID, $treeID);
     }
 
     public function getInteractionTypes() {
         // Do a select query to see if we get a returned row
-        $sql = "SELECT * from ".$this->tables['tree_interaction_type'];
+        $sql = "SELECT * from ".$this->tables['treeInteractionType'];
         // return the found interaction types
         return $this->fetchAll($sql);
     }
 
-    public function getInteractionType($interaction_type) {
-        if(Utility\is_id($interaction_type)) {
-            return $this->getInteractionTypeById($interaction_type);
+    public function getInteractionType($interactionType) {
+        if(Utility\isID($interactionType)) {
+            return $this->getInteractionTypeByID($interactionType);
         } else {
-            return $this->getInteractionTypeBySlug($interaction_type);
+            return $this->getInteractionTypeBySlug($interactionType);
         }
     }
 
-    public function getInteractionTypeById($interaction_type_id) {
+    public function getInteractionTypeByID($interactionTypeID) {
         // Do a select query to see if we get a returned row
-        $params = [":interaction_type_id" => $interaction_type_id];
-        $sql = "SELECT * from ".$this->tables['tree_interaction_type']." WHERE
-                interaction_type_id = :interaction_type_id";
+        $params = [":interactionTypeID" => $interactionTypeID];
+        $sql = "SELECT * from ".$this->tables['treeInteractionType']." WHERE
+                interactionTypeID = :interactionTypeID";
         // return the found interaction type row
         return $this->fetchOne($sql, $params);
     }
 
-    public function getInteractionTypeBySlug($interaction_type) {
+    public function getInteractionTypeBySlug($interactionType) {
         // Do a select query to see if we get a returned row
-        $params = [":interaction_type" => $interaction_type];
-        $sql = "SELECT * from ".$this->tables['tree_interaction_type']." WHERE
-                interaction_type = :interaction_type";
+        $params = [":interactionType" => $interactionType];
+        $sql = "SELECT * from ".$this->tables['treeInteractionType']." WHERE
+                interactionType = :interactionType";
         // return the found interaction type row
         return $this->fetchOne($sql, $params);
     }
 
     public function getStateTypes() {
         // Do a select query to see if we get a returned row
-        $sql = "SELECT * from ".$this->tables['tree_state_type'];
+        $sql = "SELECT * from ".$this->tables['treeStateType'];
         // return the found state types
         return $this->fetchAll($sql);
     }
 
-    public function getStateType($state_type) {
-        if(Utility\is_id($state_type)) {
-            return $this->getStateTypeById($state_type);
+    public function getStateType($stateType) {
+        if(Utility\isID($stateType)) {
+            return $this->getStateTypeByID($stateType);
         } else {
-            return $this->getStateTypeBySlug($state_type);
+            return $this->getStateTypeBySlug($stateType);
         }
     }
 
-    public function getStateTypeById($state_type_id) {
+    public function getStateTypeByID($stateTypeID) {
         // Do a select query to see if we get a returned row
-        $params = [":state_type_id" => $state_type_id];
-        $sql = "SELECT * from ".$this->tables['tree_state_type']." WHERE
-                state_type_id = :state_type_id";
+        $params = [":stateTypeID" => $stateTypeID];
+        $sql = "SELECT * from ".$this->tables['treeStateType']." WHERE
+                stateTypeID = :stateTypeID";
         // return the found state type row
         return $this->fetchOne($sql, $params);
     }
 
-    public function getStateTypeBySlug($state_type) {
+    public function getStateTypeBySlug($stateType) {
         // Do a select query to see if we get a returned row
-        $params = [":state_type" => $state_type];
-        $sql = "SELECT * from ".$this->tables['tree_state_type']." WHERE
-                state_type = :state_type";
+        $params = [":stateType" => $stateType];
+        $sql = "SELECT * from ".$this->tables['treeStateType']." WHERE
+                stateType = :stateType";
         // return the found interaction type row
         return $this->fetchOne($sql, $params);
     }
 
     public function getSite($site) {
-        if(Utility\is_id($site)) {
-            return $this->getSiteById($site);
+        if(Utility\isID($site)) {
+            return $this->getSiteByID($site);
         } else {
             return $this->getSiteByHost($site);
         }
     }
 
-    public function getSiteById($site_id) {
+    public function getSiteByID($siteID) {
         // Do a select query to see if we get a returned row
-        $params = [":site_id" => $site_id];
-        $sql = "SELECT * from ".$this->tables['tree_site']." WHERE
-                site_id = :site_id";
+        $params = [":siteID" => $siteID];
+        $sql = "SELECT * from ".$this->tables['treeSite']." WHERE
+                siteID = :siteID";
         // return the found state type row
         return $this->fetchOne($sql, $params);
     }
 
-    public function getSiteByHost($site_host) {
+    public function getSiteByHost($siteHost) {
         // Do a select query to see if we get a returned row
-        $params = [":site_host" => $site_host];
-        $sql = "SELECT * from ".$this->tables['tree_site']." WHERE
-                site_host = :site_host";
+        $params = [":siteHost" => $siteHost];
+        $sql = "SELECT * from ".$this->tables['treeSite']." WHERE
+                siteHost = :siteHost";
         // return the found interaction type row
         return $this->fetchOne($sql, $params);
     }
 
-    public function getEmbedsBySite($site_id) {
-        $params = [":site_id" => $site_id];
-        $sql = "SELECT * from ".$this->tables['tree_embed']." WHERE
-                site_id = :site_id";
+    public function getEmbedsBySite($siteID) {
+        $params = [":siteID" => $siteID];
+        $sql = "SELECT * from ".$this->tables['treeEmbed']." WHERE
+                siteID = :siteID";
         // return the found state type row
         return $this->fetchAll($sql, $params);
     }
 
     public function getEmbed($embed, $options) {
-        if(Utility\is_id($embed)) {
-            return $this->getEmbedById($embed, $options);
+        if(Utility\isID($embed)) {
+            return $this->getEmbedByID($embed, $options);
         } else {
             return $this->getEmbedByPath($embed, $options);
         }
     }
 
-    public function getEmbedById($embed_id, $options) {
+    public function getEmbedByID($embedID, $options) {
         // Do a select query to see if we get a returned row
-        $params = [":embed_id" => $embed_id];
-        $sql = "SELECT * from ".$this->tables['tree_embed']." WHERE
-                embed_id = :embed_id";
+        $params = [":embedID" => $embedID];
+        $sql = "SELECT * from ".$this->tables['treeEmbed']." WHERE
+                embedID = :embedID";
 
-        // if a tree_id was passed, append it to the params and sql statement
-        if(isset($options['tree_id']) && Utility\is_id($options['tree_id'])) {
-            $params[":tree_id"] = $options['tree_id'];
-            $sql .= " AND tree_id = :tree_id";
+        // if a treeID was passed, append it to the params and sql statement
+        if(isset($options['treeID']) && Utility\isID($options['treeID'])) {
+            $params[":treeID"] = $options['treeID'];
+            $sql .= " AND treeID = :treeID";
         }
 
-        // if a site_id was passed, append it to the params and sql statement
-        if(isset($options['site_id']) && Utility\is_id($options['site_id'])) {
-            $params[":site_id"] = $options['site_id'];
-            $sql .= " AND site_id = :site_id";
+        // if a siteID was passed, append it to the params and sql statement
+        if(isset($options['siteID']) && Utility\isID($options['siteID'])) {
+            $params[":siteID"] = $options['siteID'];
+            $sql .= " AND siteID = :siteID";
         }
         // return the found state type row
         return $this->fetchOne($sql, $params);
@@ -479,19 +480,19 @@ class DB extends PDO {
         $params = [
                     ":embed_path" => $embed_path,
                   ];
-        $sql = "SELECT * from ".$this->tables['tree_embed']." WHERE
+        $sql = "SELECT * from ".$this->tables['treeEmbed']." WHERE
                 embed_path = :embed_path";
 
-        // if a tree_id was passed, append it to the params and sql statement
-        if(isset($options['tree_id']) && Utility\is_id($options['tree_id'])) {
-            $params[":tree_id"] = $options['tree_id'];
-            $sql .= " AND tree_id = :tree_id";
+        // if a treeID was passed, append it to the params and sql statement
+        if(isset($options['treeID']) && Utility\isID($options['treeID'])) {
+            $params[":treeID"] = $options['treeID'];
+            $sql .= " AND treeID = :treeID";
         }
 
-        // if a tree_id was passed, append it to the params and sql statement
-        if(isset($options['site_id']) && Utility\is_id($options['site_id'])) {
-            $params[":site_id"] = $options['site_id'];
-            $sql .= " AND site_id = :site_id";
+        // if a treeID was passed, append it to the params and sql statement
+        if(isset($options['siteID']) && Utility\isID($options['siteID'])) {
+            $params[":siteID"] = $options['siteID'];
+            $sql .= " AND siteID = :siteID";
         }
         // return the found interaction type row
         return $this->fetchOne($sql, $params);

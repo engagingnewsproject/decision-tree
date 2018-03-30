@@ -82,7 +82,7 @@ class SaveEmbed extends DB {
         }
 
         // check that it's a valid Tree
-        if($validate->treeId($embed['tree_id']) === false) {
+        if($validate->treeID($embed['tree_id']) === false) {
             $this->errors[] = 'Invalid tree_id.';
         }
 

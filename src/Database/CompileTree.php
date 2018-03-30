@@ -12,31 +12,31 @@ class CompileTree extends DB {
     protected $db,
               $compiled;
 
-    public function __construct($tree_id) {
+    public function __construct($treeID) {
         $this->db = new DB();
         // kick off build process
         // get the tree by slug or ID
-        if(\Cme\Utility\is_slug($tree_id)) {
-            $tree = $this->db->getTreeBySlug($tree_id);
+        if(\Cme\Utility\isSlug($treeID)) {
+            $tree = $this->db->getTreeBySlug($treeID);
             // set the real tree id
-            $tree_id = $tree['tree_id'];
+            $treeID = $tree['treeID'];
         } else {
-            $tree = $this->db->getTree($tree_id);
+            $tree = $this->db->getTree($treeID);
         }
 
         $this->compiled = $tree;
-        $this->compiled['starts'] = $this->compile_starts($tree_id);
-        $this->compiled['groups'] = $this->compile_groups($tree_id);
-        $this->compiled['questions'] = $this->compile_questions($tree_id);
-        $this->compiled['ends'] = $this->compile_ends($tree_id);
+        $this->compiled['starts'] = $this->compile_starts($treeID);
+        $this->compiled['groups'] = $this->compile_groups($treeID);
+        $this->compiled['questions'] = $this->compile_questions($treeID);
+        $this->compiled['ends'] = $this->compile_ends($treeID);
         // figure out total paths and longest path
         $this->compiled['stats'] = $this->compute_paths($this->compiled['questions']);
         // encode to JSON
         $pretty_json = json_encode($this->compiled, JSON_PRETTY_PRINT);
         $minified_json = json_encode($this->compiled);
         // write to file
-        $this->write_file($tree['tree_slug'], $pretty_json);
-        $this->write_file($tree['tree_slug'].'.min', $minified_json);
+        $this->write_file($tree['treeSlug'], $pretty_json);
+        $this->write_file($tree['treeSlug'].'.min', $minified_json);
         // return the json, if they need it
         return $pretty_json;
     }
@@ -45,17 +45,17 @@ class CompileTree extends DB {
         file_put_contents(TREE_PATH.'/data/'.$filename.'.json', $contents);
     }
 
-    protected function compile_starts($tree_id) {
-        return $this->db->getStarts($tree_id);
+    protected function compile_starts($treeID) {
+        return $this->db->getStarts($treeID);
     }
 
-    protected function compile_groups($tree_id) {
-        $groups = $this->db->getGroups($tree_id);
+    protected function compile_groups($treeID) {
+        $groups = $this->db->getGroups($treeID);
         $i = 0;
 
         foreach($groups as $group) {
 
-            $groups[$i]['questions'] = $this->db->getQuestionsByGroup($group['group_id']);
+            $groups[$i]['questions'] = $this->db->getQuestionsByGroup($group['groupID']);
             $i++;
         }
 
@@ -65,14 +65,14 @@ class CompileTree extends DB {
     }
 
 
-    protected function compile_questions($tree_id) {
-        $questions = $this->db->getQuestions($tree_id);
+    protected function compile_questions($treeID) {
+        $questions = $this->db->getQuestions($treeID);
         $i = 0;
 
         foreach($questions as $question) {
             $questions[$i]['content'] = addslashes($questions[$i]['content']);
-            $questions[$i]['description'] = addslashes($questions[$i]['description']);
-            $questions[$i]['options'] = $this->compile_options($question['question_id']);
+            $questions[$i]['description'] = ( isset($questions[$i]['description']) ? addslashes($questions[$i]['description']) : '');
+            $questions[$i]['options'] = $this->compile_options($question['questionID']);
             $i++;
         }
 
@@ -81,12 +81,12 @@ class CompileTree extends DB {
 
     }
 
-    protected function compile_options($question_id) {
-        return $this->db->getOptions($question_id);
+    protected function compile_options($questionID) {
+        return $this->db->getOptions($questionID);
     }
 
-    protected function compile_ends($tree_id) {
-        return $this->db->getEnds($tree_id);
+    protected function compile_ends($treeID) {
+        return $this->db->getEnds($treeID);
     }
 
     /**
@@ -99,8 +99,8 @@ class CompileTree extends DB {
         $path_i = 0;
 
         // add the first question as a new array item in that array
-        $paths[$path_i][] = 'Question '.$questions[0]['question_id'];
-        $paths = $this->process_paths($paths, $path_i, $this->db->getOptions($questions[0]['question_id']));
+        $paths[$path_i][] = 'Question '.$questions[0]['questionID'];
+        $paths = $this->process_paths($paths, $path_i, $this->db->getOptions($questions[0]['questionID']));
         return ['total_paths'=>count($paths),'longest_path'=>$this->largest_array_count($paths), 'path_ends'=>$this->path_end_numbers($paths)];
         /*
         return $paths;*/
@@ -129,12 +129,12 @@ class CompileTree extends DB {
                 $paths[$path_i] = $cloned_path;
             }
             // add the destination to the path
-            $paths[$path_i][] = $option['destination_type'] . ' '. $option['destination_id'];
+            $paths[$path_i][] = $option['destinationType'] . ' '. $option['destinationID'];
 
             // now recursively process ITS paths if it's a question
-            if($option['destination_type'] === 'question') {
+            if($option['destinationType'] === 'question') {
 
-                $paths = $this->process_paths($paths, $path_i, $this->db->getOptions($option['destination_id']));
+                $paths = $this->process_paths($paths, $path_i, $this->db->getOptions($option['destinationID']));
             }
 
             $option_i++;
@@ -158,17 +158,17 @@ class CompileTree extends DB {
         $ends = $this->compiled['ends'];
         $path_ends = [];
         foreach($ends as $end) {
-            $path_ends[$end['end_id']] = ['title'=>$end['title']];
+            $path_ends[$end['endID']] = ['title'=>$end['title']];
             $path_count = 0;
             foreach($paths as $path) {
                 $path_end = array_pop($path);
-                if($path_end === 'end '.$end['end_id']) {
+                if($path_end === 'end '.$end['endID']) {
                     $path_count++;
                 }
             }
             // add it to the count
-            $path_ends[$end['end_id']]['count'] = $path_count;
-            $path_ends[$end['end_id']]['percentage'] = round($path_count/count($paths) * 100, 2);
+            $path_ends[$end['endID']]['count'] = $path_count;
+            $path_ends[$end['endID']]['percentage'] = round($path_count/count($paths) * 100, 2);
         }
         return $path_ends;
     }

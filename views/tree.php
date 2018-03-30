@@ -2,11 +2,11 @@
     $helpers = array(            'environment' => function($options) {
         return 'no-js';
     },
-            'group_start' => function($question_id, $group_id, $groups, $options) {
+            'group_start' => function($questionID, $groupID, $groups, $options) {
         foreach($groups as $group) {
-            if($group['group_id'] === $group_id) {
+            if($group['group_id'] === $groupID) {
                 // check if it's the first in the question order
-                if($group['questions'][0] === $question_id) {
+                if($group['questions'][0] === $questionID) {
                     // set the context of the values we'll need
                     return $options['fn'](["group_id"=>$group['group_id'], "group_title"=>$group['title']]);
                 } else {
@@ -16,12 +16,12 @@
         }
         return '';
     },
-            'group_end' => function($question_id, $group_id, $groups, $options) {
+            'group_end' => function($questionID, $groupID, $groups, $options) {
         foreach($groups as $group) {
-            if($group['group_id'] === $group_id) {
+            if($group['group_id'] === $groupID) {
                 // check if it's the first in the question order
                 $last_question = array_values(array_slice($group['questions'], -1))[0];
-                if($last_question === $question_id) {
+                if($last_question === $questionID) {
                     return $options['fn']();
                 } else {
                     return '';
@@ -33,7 +33,7 @@
             'el_number' => function($order) {
         return $order + 1;
     },
-            'destination' => function($destination_id, $destination_type, $option_id, $question_index, $options) {
+            'destination' => function($destinationID, $destination_type, $optionID, $question_index, $options) {
         return '';
     },
 );
@@ -63,7 +63,7 @@
         'partialid' => 0,
         'runtime' => '\LightnCandy\Runtime',
     );
-    
+
     $inary=is_array($in);
     return '<section id="cme-tree--'.LR::raw($cx, (($inary && isset($in['tree_id'])) ? $in['tree_id'] : null)).'" class="cme-tree cme-tree--'.LR::raw($cx, LR::hbch($cx, 'environment', array(array(),array()), 'raw', $in)).'">
     <svg style="visibility: hidden; position:absolute; height: 0; width: 0;"><symbol id="icon-arrow" viewBox="0 0 24 24"><title>arrow</title><path d="M20.744 12.669c0 0 0 0 0 0 0.006-0.006 0.006-0.006 0.006-0.006s0 0 0 0 0.006-0.006 0.006-0.006c0 0 0.006-0.006 0.006-0.006s0 0 0 0 0.006-0.006 0.006-0.006c0 0 0 0 0 0 0.063-0.075 0.112-0.156 0.15-0.244 0 0 0 0 0-0.006 0 0 0-0.006 0-0.006s0-0.006 0-0.006c0 0 0 0 0 0 0.038-0.094 0.063-0.194 0.069-0.3 0 0 0 0 0 0s0-0.006 0-0.006c0 0 0-0.006 0-0.006s0-0.006 0-0.006c0 0 0-0.006 0-0.006s0 0 0-0.006c0-0.025 0-0.050 0-0.075 0 0 0 0 0-0.006 0 0 0-0.006 0-0.006s0-0.006 0-0.006c0 0 0-0.006 0-0.006s0-0.006 0-0.006c0 0 0 0 0 0-0.006-0.106-0.031-0.206-0.069-0.3 0 0 0 0 0-0.006 0 0 0 0 0-0.006 0 0 0-0.006-0.006-0.006 0 0 0 0 0 0-0.038-0.094-0.094-0.175-0.156-0.256 0 0 0 0 0 0s-0.006-0.006-0.006-0.006c0 0 0 0 0 0s-0.006-0.006-0.006-0.006-0.006-0.006-0.006-0.006 0 0 0-0.006c-0.012-0.012-0.025-0.025-0.037-0.037l-6-6c-0.387-0.387-1.025-0.387-1.413 0s-0.387 1.025 0 1.413l4.294 4.294h-13.581c-0.55 0-1 0.45-1 1s0.45 1 1 1h13.587l-4.294 4.294c-0.387 0.387-0.387 1.025 0 1.413 0.194 0.194 0.45 0.294 0.706 0.294s0.513-0.1 0.706-0.294l5.994-5.994c0.019-0.025 0.031-0.044 0.044-0.056z"></path></symbol><symbol id="icon-arrow-turn" viewBox="0 0 24 24"><title>arrow</title><path d="M18.984 15l-6 6-1.406-1.406 3.609-3.609h-11.203v-12h2.016v10.031h9.188l-3.609-3.609 1.406-1.406z"></path></symbol></svg>

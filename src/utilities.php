@@ -24,8 +24,8 @@ function get_data_url($slug) {
 * @param $string (STRING)
 * @return  BOOLEAN
 */
-function is_slug($string) {
-    $is_slug = false;
+function isSlug($string) {
+    $isSlug = false;
     // check for disallowed characters and strings that starts or ends in a dash (-)
     // if matches === 1, then it's a slug
     preg_match('/[^a-z0-9-]+|^-|-$/', $string, $matches);
@@ -34,10 +34,10 @@ function is_slug($string) {
     // if there's a match, it's not a slug
     // also make sure $string !== boolean
     if(is_bool($string) === false && is_int($string) !== true && !empty($string) && empty($matches)) {
-        $is_slug = true;
+        $isSlug = true;
     }
 
-    return $is_slug;
+    return $isSlug;
 }
 
 /**
@@ -48,8 +48,8 @@ function is_slug($string) {
 * @param $string (MIXED String/Integer)
 * @return BOOLEAN
 */
-function is_id($string) {
-    $is_id = false;
+function isID($string) {
+    $isID = false;
 
     // make sure it's a valid string
     if(is_bool($string) === false && !empty($string)) {
@@ -60,35 +60,35 @@ function is_id($string) {
         preg_match('/[^0-9]/', $string, $matches);
         // if preg_match returns false (0) & it's not null/empty then it's an ID
         if(empty($matches)) {
-            $is_id = true;
+            $isID = true;
         }
     }
 
-    return $is_id;
+    return $isID;
 }
 
-function getTreeSlugById($tree_id) {
+function getTreeSlugById($treeID) {
     // test if it's a valid ID or not
-    if(!is_id($tree_id)) {
+    if(!isID($treeID)) {
         return false;
     }
-    // use the id to get the slug. Switch to $tree_id bc that's what it is
+    // use the id to get the slug. Switch to $treeID bc that's what it is
     $db = new \Cme\Database\DB();
-    $tree = $db->getTree($tree_id);
+    $tree = $db->getTree($treeID);
     // return the tree slug
-    return $tree['tree_slug'];
+    return $tree['treeSlug'];
 }
 
-function getTree_idBySlug($tree_slug) {
+function getTreeIDBySlug($treeSlug) {
     // test if it's a valid ID or not
-    if(!is_slug($tree_slug)) {
+    if(!isSlug($treeSlug)) {
         return false;
     }
-    // use the id to get the slug. Switch to $tree_id bc that's what it is
+    // use the id to get the slug. Switch to $treeID bc that's what it is
     $db = new \Cme\Database\DB();
-    $tree = $db->getTreeBySlug($tree_slug);
+    $tree = $db->getTreeBySlug($treeSlug);
     // return the tree slug
-    return $tree['tree_id'];
+    return $tree['treeID'];
 }
 
 // really bare curl implementation to consume our own api

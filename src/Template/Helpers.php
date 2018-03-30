@@ -21,11 +21,11 @@ class Helpers {
     /**
     * Find out if this question starts a group
     */
-    public static function group_start($question_id, $group_id, $groups, $options) {
+    public static function group_start($questionID, $groupID, $groups, $options) {
         foreach($groups as $group) {
-            if($group['group_id'] === $group_id) {
+            if($group['group_id'] === $groupID) {
                 // check if it's the first in the question order
-                if($group['questions'][0] === $question_id) {
+                if($group['questions'][0] === $questionID) {
                     // set the context of the values we'll need
                     return $options['fn'](["group_id"=>$group['group_id'], "group_title"=>$group['title']]);
                 } else {
@@ -39,12 +39,12 @@ class Helpers {
     /**
     * Find out if this question ends a group
     */
-    public static function group_end($question_id, $group_id, $groups, $options) {
+    public static function group_end($questionID, $groupID, $groups, $options) {
         foreach($groups as $group) {
-            if($group['group_id'] === $group_id) {
+            if($group['group_id'] === $groupID) {
                 // check if it's the first in the question order
                 $last_question = array_values(array_slice($group['questions'], -1))[0];
-                if($last_question === $question_id) {
+                if($last_question === $questionID) {
                     return $options['fn']();
                 } else {
                     return '';
@@ -59,7 +59,7 @@ class Helpers {
     }
 
     // we don't need this function for the php version
-    public static function destination($destination_id, $destination_type, $option_id, $question_index, $options) {
+    public static function destination($destinationID, $destination_type, $optionID, $question_index, $options) {
         return '';
     }
 }

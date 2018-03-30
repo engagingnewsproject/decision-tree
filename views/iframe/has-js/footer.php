@@ -10,7 +10,7 @@
 <script src="<?php echo $url;?>/dist/js/cme-tree.min.js"></script>
 <script>
 var treeOptions = {
-        slug: '<?php echo $tree_slug;?>',
+        slug: '<?php echo $treeSlug;?>',
         container: document.getElementById('cme-tree')
 };
 // you can access all your trees with var trees

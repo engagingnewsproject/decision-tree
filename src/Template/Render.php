@@ -12,7 +12,7 @@ class Render extends Template {
            $template_name,
            $template_path;
 
-    public function __construct($template_name, $data_slug) {
+    public function __construct($template_name, $dataSlug) {
         // set the name
         $this->set_template_name($template_name);
         // get the name
@@ -20,7 +20,7 @@ class Render extends Template {
         // set the path
         $this->set_template_path($template_name);
         // set the data
-        $this->set_data($data_slug);
+        $this->set_data($dataSlug);
     }
 
     /**
@@ -32,10 +32,10 @@ class Render extends Template {
         return $renderer($this->get_data());
     }
 
-    protected function set_data($tree_slug) {
+    protected function set_data($treeSlug) {
         $data = false;
 
-        $body = file_get_contents(TREE_PATH."/data/$tree_slug.min.json");
+        $body = file_get_contents(TREE_PATH."/data/$treeSlug.min.json");
         // decode it if it's not empty
         if(!empty($body)) {
             $data = json_decode($body, true);
@@ -52,7 +52,7 @@ class Render extends Template {
     protected function set_template_path() {
         $path = false;
         $template_name = $this->get_template_name();
-        if(Utility\is_slug($template_name)) {
+        if(Utility\isSlug($template_name)) {
             $path = "views/$template_name.php";
         }
         $this->template_path = $path;

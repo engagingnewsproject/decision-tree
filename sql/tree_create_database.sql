@@ -17,132 +17,132 @@ USE `tree` ;
 -- Table `tree`.`tree`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tree`.`tree` (
-  `tree_id` INT NOT NULL AUTO_INCREMENT,
-  `tree_slug` VARCHAR(255) NOT NULL DEFAULT '',
-  `tree_content` VARCHAR(512) NOT NULL DEFAULT '',
-  `tree_title` VARCHAR(255) NOT NULL DEFAULT '',
-  `tree_created_at` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
-  `tree_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `tree_deleted` TINYINT DEFAULT 0,
-  `tree_owner` INT NULL,
-  `tree_created_by` INT NULL,
-  `tree_updated_by` INT NULL,
-  PRIMARY KEY (`tree_id`),
-  UNIQUE INDEX `treeSlug_UNIQUE` (`tree_slug` ASC))
+  `treeID` INT NOT NULL AUTO_INCREMENT,
+  `treeSlug` VARCHAR(255) NOT NULL DEFAULT '',
+  `treeContent` VARCHAR(512) NOT NULL DEFAULT '',
+  `treeTitle` VARCHAR(255) NOT NULL DEFAULT '',
+  `treeCreatedAt` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
+  `treeUpdatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `treeDeleted` TINYINT DEFAULT 0,
+  `treeOwner` INT NULL,
+  `treeCreatedBy` INT NULL,
+  `treeUpdatedBy` INT NULL,
+  PRIMARY KEY (`treeID`),
+  UNIQUE INDEX `treeSlug_UNIQUE` (`treeSlug` ASC))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_element_type`
+-- Table `tree`.`treeElementType`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_element_type` (
-  `el_type_id` INT NOT NULL AUTO_INCREMENT,
-  `el_type` VARCHAR(45) NOT NULL DEFAULT '',
-  PRIMARY KEY (`el_type_id`))
+CREATE TABLE IF NOT EXISTS `tree`.`treeElementType` (
+  `elTypeID` INT NOT NULL AUTO_INCREMENT,
+  `elType` VARCHAR(45) NOT NULL DEFAULT '',
+  PRIMARY KEY (`elTypeID`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_element`
+-- Table `tree`.`treeElement`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_element` (
-  `el_id` INT NOT NULL AUTO_INCREMENT,
-  `tree_id` INT NULL,
-  `el_type_id` INT NULL,
-  `el_title` VARCHAR(255) NOT NULL DEFAULT '',
-  `el_content` VARCHAR(512) NOT NULL DEFAULT '',
-  `el_created_by` INT NULL,
-  `el_updated_by` INT NULL,
-  `el_created_at` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
-  `el_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`el_id`),
-  INDEX `el_type_id_idx` (`el_type_id` ASC),
-  INDEX `tree_id_idx` (`tree_id` ASC),
-  CONSTRAINT `element_el_type_id`
-    FOREIGN KEY (`el_type_id`)
-    REFERENCES `tree`.`tree_element_type` (`el_type_id`)
+CREATE TABLE IF NOT EXISTS `tree`.`treeElement` (
+  `elID` INT NOT NULL AUTO_INCREMENT,
+  `treeID` INT NULL,
+  `elTypeID` INT NULL,
+  `elTitle` VARCHAR(255) NOT NULL DEFAULT '',
+  `elContent` VARCHAR(512) NOT NULL DEFAULT '',
+  `elCreatedBy` INT NULL,
+  `elUpdatedBy` INT NULL,
+  `elCreatedAt` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
+  `elUpdatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`elID`),
+  INDEX `elTypeIDIDx` (`elTypeID` ASC),
+  INDEX `treeIDIDx` (`treeID` ASC),
+  CONSTRAINT `elementElTypeID`
+    FOREIGN KEY (`elTypeID`)
+    REFERENCES `tree`.`treeElementType` (`elTypeID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `element_tree_id`
-    FOREIGN KEY (`tree_id`)
-    REFERENCES `tree`.`tree` (`tree_id`)
+  CONSTRAINT `elementTreeID`
+    FOREIGN KEY (`treeID`)
+    REFERENCES `tree`.`tree` (`treeID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_element_container`
+-- Table `tree`.`treeElementContainer`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_element_container` (
-  `el_container_id` INT NOT NULL AUTO_INCREMENT,
-  `el_id` INT NULL,
-  `el_id_child` INT NULL,
-  PRIMARY KEY (`el_container_id`),
-  INDEX `el_id_idx` (`el_id` ASC),
-  INDEX `el_id_idx1` (`el_id_child` ASC),
-  CONSTRAINT `container_el_id`
-    FOREIGN KEY (`el_id`)
-    REFERENCES `tree`.`tree_element` (`el_id`)
+CREATE TABLE IF NOT EXISTS `tree`.`treeElementContainer` (
+  `elContainerID` INT NOT NULL AUTO_INCREMENT,
+  `elID` INT NULL,
+  `elIDChild` INT NULL,
+  PRIMARY KEY (`elContainerID`),
+  INDEX `elIDIDx` (`elID` ASC),
+  INDEX `elIDIDx1` (`elIDChild` ASC),
+  CONSTRAINT `containerElID`
+    FOREIGN KEY (`elID`)
+    REFERENCES `tree`.`treeElement` (`elID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `container_el_id_child`
-    FOREIGN KEY (`el_id_child`)
-    REFERENCES `tree`.`tree_element` (`el_id`)
+  CONSTRAINT `containerElIDChild`
+    FOREIGN KEY (`elIDChild`)
+    REFERENCES `tree`.`treeElement` (`elID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_element_destination`
+-- Table `tree`.`treeElementDestination`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_element_destination` (
-  `el_destination_id` INT NOT NULL AUTO_INCREMENT,
-  `el_id` INT NULL,
-  `el_id_destination` INT NULL,
-  PRIMARY KEY (`el_destination_id`),
-  INDEX `el_id_idx` (`el_id` ASC),
-  INDEX `el_id_idx1` (`el_id_destination` ASC),
-  CONSTRAINT `destination_el_id`
-    FOREIGN KEY (`el_id`)
-    REFERENCES `tree`.`tree_element` (`el_id`)
+CREATE TABLE IF NOT EXISTS `tree`.`treeElementDestination` (
+  `elDestinationID` INT NOT NULL AUTO_INCREMENT,
+  `elID` INT NULL,
+  `elIDDestination` INT NULL,
+  PRIMARY KEY (`elDestinationID`),
+  INDEX `elIDIDx` (`elID` ASC),
+  INDEX `elIDIDx1` (`elIDDestination` ASC),
+  CONSTRAINT `destinationElID`
+    FOREIGN KEY (`elID`)
+    REFERENCES `tree`.`treeElement` (`elID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `destination_el_id_destination`
-    FOREIGN KEY (`el_id_destination`)
-    REFERENCES `tree`.`tree_element` (`el_id`)
+  CONSTRAINT `destinationElIDDestination`
+    FOREIGN KEY (`elIDDestination`)
+    REFERENCES `tree`.`treeElement` (`elID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_element_order`
+-- Table `tree`.`treeElementOrder`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_element_order` (
-  `el_order_id` INT NOT NULL AUTO_INCREMENT,
-  `el_id` INT NULL,
-  `el_order` INT NOT NULL DEFAULT 0,
-  PRIMARY KEY (`el_order_id`),
-  INDEX `el_id_idx` (`el_id` ASC),
-  CONSTRAINT `order_el_id`
-    FOREIGN KEY (`el_id`)
-    REFERENCES `tree`.`tree_element` (`el_id`)
+CREATE TABLE IF NOT EXISTS `tree`.`treeElementOrder` (
+  `elOrderID` INT NOT NULL AUTO_INCREMENT,
+  `elID` INT NULL,
+  `elOrder` INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`elOrderID`),
+  INDEX `elIDIDx` (`elID` ASC),
+  CONSTRAINT `orderElID`
+    FOREIGN KEY (`elID`)
+    REFERENCES `tree`.`treeElement` (`elID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_interaction_type`
+-- Table `tree`.`treeInteractionType`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_interaction_type` (
-  `interaction_type_id` INT NOT NULL AUTO_INCREMENT,
-  `interaction_type` VARCHAR(45) NOT NULL DEFAULT '',
-  PRIMARY KEY (`interaction_type_id`))
+CREATE TABLE IF NOT EXISTS `tree`.`treeInteractionType` (
+  `interactionTypeID` INT NOT NULL AUTO_INCREMENT,
+  `interactionType` VARCHAR(45) NOT NULL DEFAULT '',
+  PRIMARY KEY (`interactionTypeID`))
 ENGINE = InnoDB;
 
-INSERT INTO `tree`.`tree_interaction_type` (`interaction_type_id`, `interaction_type`) VALUES
+INSERT INTO `tree`.`treeInteractionType` (`interactionTypeID`, `interactionType`) VALUES
 (1, 'load'),
 (2, 'reload'),
 (3, 'start'),
@@ -152,137 +152,137 @@ INSERT INTO `tree`.`tree_interaction_type` (`interaction_type_id`, `interaction_
 (7, 'restart');
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_state_type`
+-- Table `tree`.`treeStateType`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_state_type` (
-  `state_type_id` INT NOT NULL AUTO_INCREMENT,
-  `state_type` VARCHAR(45) NOT NULL DEFAULT '',
-  PRIMARY KEY (`state_type_id`))
+CREATE TABLE IF NOT EXISTS `tree`.`treeStateType` (
+  `stateTypeID` INT NOT NULL AUTO_INCREMENT,
+  `stateType` VARCHAR(45) NOT NULL DEFAULT '',
+  PRIMARY KEY (`stateTypeID`))
 ENGINE = InnoDB;
 
-INSERT INTO `tree`.`tree_state_type` (`state_type_id`, `state_type`) VALUES
+INSERT INTO `tree`.`treeStateType` (`stateTypeID`, `stateType`) VALUES
 (1, 'intro'),
 (2, 'question'),
 (3, 'end'),
 (4, 'overview');
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_site`
+-- Table `tree`.`treeSite`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_site` (
-  `site_id` INT NOT NULL AUTO_INCREMENT,
-  `site_name` VARCHAR(255) NOT NULL DEFAULT '',
-  `site_host` VARCHAR(255) NOT NULL DEFAULT '',
-  `site_created_at` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
-  `site_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `site_is_dev` BOOLEAN DEFAULT 0,
-  PRIMARY KEY (`site_id`),
-  CONSTRAINT `treeSite_site_host` UNIQUE(`site_host`))
+CREATE TABLE IF NOT EXISTS `tree`.`treeSite` (
+  `siteID` INT NOT NULL AUTO_INCREMENT,
+  `siteName` VARCHAR(255) NOT NULL DEFAULT '',
+  `siteHost` VARCHAR(255) NOT NULL DEFAULT '',
+  `siteCreatedAt` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
+  `siteUpdatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `siteIsDev` BOOLEAN DEFAULT 0,
+  PRIMARY KEY (`siteID`),
+  CONSTRAINT `treeSiteSiteHost` UNIQUE(`siteHost`))
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_embed`
+-- Table `tree`.`treeEmbed`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_embed` (
-  `embed_id` INT NOT NULL AUTO_INCREMENT,
-  `site_id` INT NULL,
-  `tree_id` INT NULL,
-  `embed_path` VARCHAR(255) NOT NULL DEFAULT '',
-  `embed_created_at` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
-  `embed_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `embed_is_iframe` BOOLEAN DEFAULT 0,
-  `embed_is_dev` BOOLEAN DEFAULT 0,
-  PRIMARY KEY (`embed_id`),
-  CONSTRAINT `embed_site_id`
-    FOREIGN KEY (`site_id`)
-    REFERENCES `tree`.`tree_site` (`site_id`)
+CREATE TABLE IF NOT EXISTS `tree`.`treeEmbed` (
+  `embedID` INT NOT NULL AUTO_INCREMENT,
+  `siteID` INT NULL,
+  `treeID` INT NULL,
+  `embedPath` VARCHAR(255) NOT NULL DEFAULT '',
+  `embedCreatedAt` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
+  `embedUpdatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `embedIsIframe` BOOLEAN DEFAULT 0,
+  `embedIsDev` BOOLEAN DEFAULT 0,
+  PRIMARY KEY (`embedID`),
+  CONSTRAINT `embedSiteID`
+    FOREIGN KEY (`siteID`)
+    REFERENCES `tree`.`treeSite` (`siteID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `embed_tree_id`
-    FOREIGN KEY (`tree_id`)
-    REFERENCES `tree`.`tree` (`tree_id`)
+  CONSTRAINT `embedTreeID`
+    FOREIGN KEY (`treeID`)
+    REFERENCES `tree`.`tree` (`treeID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `treeEmbed_unique`
-    UNIQUE(`site_id`, `tree_id`, `embed_path`))
+  CONSTRAINT `treeEmbedUnique`
+    UNIQUE(`siteID`, `treeID`, `embedPath`))
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_interaction`
+-- Table `tree`.`treeInteraction`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_interaction` (
-  `interaction_id` INT NOT NULL AUTO_INCREMENT,
-  `user_id` varchar(45) NULL,
-  `embed_id` INT NULL,
-  `tree_id` INT NULL,
-  `interaction_type_id` INT NULL,
-  `state_type_id` INT NULL,
-  `interaction_created_at` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
-  `interaction_updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`interaction_id`),
-  INDEX `interaction_type_id_idx` (`interaction_type_id` ASC),
-  INDEX `tree_id_idx` (`tree_id` ASC),
-  CONSTRAINT `interaction_el_type_id`
-    FOREIGN KEY (`interaction_type_id`)
-    REFERENCES `tree`.`tree_interaction_type` (`interaction_type_id`)
+CREATE TABLE IF NOT EXISTS `tree`.`treeInteraction` (
+  `interactionID` INT NOT NULL AUTO_INCREMENT,
+  `userID` varchar(45) NULL,
+  `embedID` INT NULL,
+  `treeID` INT NULL,
+  `interactionTypeID` INT NULL,
+  `stateTypeID` INT NULL,
+  `interactionCreatedAt` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
+  `interactionUpdatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`interactionID`),
+  INDEX `interactionTypeIDIDx` (`interactionTypeID` ASC),
+  INDEX `treeIDIDx` (`treeID` ASC),
+  CONSTRAINT `interactionElTypeID`
+    FOREIGN KEY (`interactionTypeID`)
+    REFERENCES `tree`.`treeInteractionType` (`interactionTypeID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `interaction_state_type_id`
-    FOREIGN KEY (`state_type_id`)
-    REFERENCES `tree`.`tree_state_type` (`state_type_id`)
+  CONSTRAINT `interactionStateTypeID`
+    FOREIGN KEY (`stateTypeID`)
+    REFERENCES `tree`.`treeStateType` (`stateTypeID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `interaction_tree_id`
-    FOREIGN KEY (`tree_id`)
-    REFERENCES `tree`.`tree` (`tree_id`)
+  CONSTRAINT `interactionTreeID`
+    FOREIGN KEY (`treeID`)
+    REFERENCES `tree`.`tree` (`treeID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `interaction_embed_id`
-    FOREIGN KEY (`embed_id`)
-    REFERENCES `tree`.`tree_embed` (`embed_id`)
+  CONSTRAINT `interactionEmbedID`
+    FOREIGN KEY (`embedID`)
+    REFERENCES `tree`.`treeEmbed` (`embedID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_state`
+-- Table `tree`.`treeState`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_state` (
-  `state_id` INT NOT NULL AUTO_INCREMENT,
-  `interaction_id` INT NULL,
-  `el_id` INT NULL,
-  PRIMARY KEY (`state_id`),
-  INDEX `el_id_idx` (`el_id` ASC),
-  CONSTRAINT `state_interaction_id`
-    FOREIGN KEY (`interaction_id`)
-    REFERENCES `tree`.`tree_interaction` (`interaction_id`)
+CREATE TABLE IF NOT EXISTS `tree`.`treeState` (
+  `stateID` INT NOT NULL AUTO_INCREMENT,
+  `interactionID` INT NULL,
+  `elID` INT NULL,
+  PRIMARY KEY (`stateID`),
+  INDEX `elIDIDx` (`elID` ASC),
+  CONSTRAINT `stateInteractionID`
+    FOREIGN KEY (`interactionID`)
+    REFERENCES `tree`.`treeInteraction` (`interactionID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `state_el_id`
-    FOREIGN KEY (`el_id`)
-    REFERENCES `tree`.`tree_element` (`el_id`)
+  CONSTRAINT `stateElID`
+    FOREIGN KEY (`elID`)
+    REFERENCES `tree`.`treeElement` (`elID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------
--- Table `tree`.`tree_interaction_element`
+-- Table `tree`.`treeInteractionElement`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_interaction_element` (
-  `interaction_el_id` INT NOT NULL AUTO_INCREMENT,
-  `interaction_id` INT NULL,
-  `el_id` INT NULL,
-  PRIMARY KEY (`interaction_el_id`),
-  INDEX `el_id_idx` (`el_id` ASC),
-  CONSTRAINT `interaction_el_interaction_id`
-    FOREIGN KEY (`interaction_id`)
-    REFERENCES `tree`.`tree_interaction` (`interaction_id`)
+CREATE TABLE IF NOT EXISTS `tree`.`treeInteractionElement` (
+  `interactionElID` INT NOT NULL AUTO_INCREMENT,
+  `interactionID` INT NULL,
+  `elID` INT NULL,
+  PRIMARY KEY (`interactionElID`),
+  INDEX `elIDIDx` (`elID` ASC),
+  CONSTRAINT `interactionElInteractionID`
+    FOREIGN KEY (`interactionID`)
+    REFERENCES `tree`.`treeInteraction` (`interactionID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `interaction_el_id`
-    FOREIGN KEY (`el_id`)
-    REFERENCES `tree`.`tree_element` (`el_id`)
+  CONSTRAINT `interactionElID`
+    FOREIGN KEY (`elID`)
+    REFERENCES `tree`.`treeElement` (`elID`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -292,28 +292,28 @@ ENGINE = InnoDB;
 -- Trigger for setting "Created at" timestamp on tree table
 -- -----------------------------------------------------
 DELIMITER //
-DROP TRIGGER IF EXISTS tree_insert_trigger//
-CREATE TRIGGER tree_insert_trigger
+DROP TRIGGER IF EXISTS treeInsertTrigger//
+CREATE TRIGGER treeInsertTrigger
 BEFORE INSERT ON `tree`.`tree`
 FOR EACH ROW
 BEGIN
-IF NEW.tree_created_at = '1970-01-01 06:00:00' THEN
-SET NEW.tree_created_at = NOW();
+IF NEW.treeCreatedAt = '1970-01-01 06:00:00' THEN
+SET NEW.treeCreatedAt = NOW();
 END IF;
 END;//
 DELIMITER ;
 
 -- -----------------------------------------------------
--- Trigger for setting "Created at" timestamp on tree_element table
+-- Trigger for setting "Created at" timestamp on treeElement table
 -- -----------------------------------------------------
 DELIMITER //
-DROP TRIGGER IF EXISTS tree_element_insert_trigger//
-CREATE TRIGGER tree_element_insert_trigger
-BEFORE INSERT ON `tree`.`tree_element`
+DROP TRIGGER IF EXISTS treeElementInsertTrigger//
+CREATE TRIGGER treeElementInsertTrigger
+BEFORE INSERT ON `tree`.`treeElement`
 FOR EACH ROW
 BEGIN
-IF NEW.el_created_at = '1970-01-01 06:00:00' THEN
-SET NEW.el_created_at = NOW();
+IF NEW.elCreatedAt = '1970-01-01 06:00:00' THEN
+SET NEW.elCreatedAt = NOW();
 END IF;
 END;//
 DELIMITER ;
@@ -322,13 +322,13 @@ DELIMITER ;
 -- Trigger for setting "Created at" timestamp on tree table
 -- -----------------------------------------------------
 DELIMITER //
-DROP TRIGGER IF EXISTS tree_interaction_trigger//
-CREATE TRIGGER tree_interaction_trigger
-BEFORE INSERT ON `tree`.`tree_interaction`
+DROP TRIGGER IF EXISTS treeInteractionTrigger//
+CREATE TRIGGER treeInteractionTrigger
+BEFORE INSERT ON `tree`.`treeInteraction`
 FOR EACH ROW
 BEGIN
-IF NEW.interaction_created_at = '1970-01-01 06:00:00' THEN
-SET NEW.interaction_created_at = NOW();
+IF NEW.interactionCreatedAt = '1970-01-01 06:00:00' THEN
+SET NEW.interactionCreatedAt = NOW();
 END IF;
 END;//
 DELIMITER ;
@@ -337,13 +337,13 @@ DELIMITER ;
 -- Trigger for setting "Created at" timestamp on site table
 -- -----------------------------------------------------
 DELIMITER //
-DROP TRIGGER IF EXISTS tree_site_trigger//
-CREATE TRIGGER tree_site_trigger
-BEFORE INSERT ON `tree`.`tree_site`
+DROP TRIGGER IF EXISTS treeSiteTrigger//
+CREATE TRIGGER treeSiteTrigger
+BEFORE INSERT ON `tree`.`treeSite`
 FOR EACH ROW
 BEGIN
-IF NEW.site_created_at = '1970-01-01 06:00:00' THEN
-SET NEW.site_created_at = NOW();
+IF NEW.siteCreatedAt = '1970-01-01 06:00:00' THEN
+SET NEW.siteCreatedAt = NOW();
 END IF;
 END;//
 DELIMITER ;
@@ -352,13 +352,13 @@ DELIMITER ;
 -- Trigger for setting "Created at" timestamp on embed table
 -- -----------------------------------------------------
 DELIMITER //
-DROP TRIGGER IF EXISTS tree_embed_trigger//
-CREATE TRIGGER tree_embed_trigger
-BEFORE INSERT ON `tree`.`tree_embed`
+DROP TRIGGER IF EXISTS treeEmbedTrigger//
+CREATE TRIGGER treeEmbedTrigger
+BEFORE INSERT ON `tree`.`treeEmbed`
 FOR EACH ROW
 BEGIN
-IF NEW.embed_created_at = '1970-01-01 06:00:00' THEN
-SET NEW.embed_created_at = NOW();
+IF NEW.embedCreatedAt = '1970-01-01 06:00:00' THEN
+SET NEW.embedCreatedAt = NOW();
 END IF;
 END;//
 DELIMITER ;
@@ -367,334 +367,334 @@ DELIMITER ;
 USE `tree` ;
 
 -- -----------------------------------------------------
--- Placeholder table for view `tree`.`tree_question`
+-- Placeholder table for view `tree`.`treeQuestion`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_api` (`el_id` INT, `tree_id` INT, `el_title` INT, `el_content` INT);
+CREATE TABLE IF NOT EXISTS `tree`.`treeAPI` (`elID` INT, `treeID` INT, `elTitle` INT, `elContent` INT);
 
 -- -----------------------------------------------------
--- Placeholder table for view `tree`.`tree_question`
+-- Placeholder table for view `tree`.`treeQuestion`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_question` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT, `el_order` INT);
+CREATE TABLE IF NOT EXISTS `tree`.`treeQuestion` (`elID` INT, `treeID` INT, `elType` INT, `elTitle` INT, `elContent` INT, `elOrder` INT);
 
 -- -----------------------------------------------------
--- Placeholder table for view `tree`.`tree_group`
+-- Placeholder table for view `tree`.`treeGroup`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_group` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT, `el_order` INT);
+CREATE TABLE IF NOT EXISTS `tree`.`treeGroup` (`elID` INT, `treeID` INT, `elType` INT, `elTitle` INT, `elContent` INT, `elOrder` INT);
 
 -- -----------------------------------------------------
--- Placeholder table for view `tree`.`tree_option`
+-- Placeholder table for view `tree`.`treeOption`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_option` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT, `el_order` INT);
+CREATE TABLE IF NOT EXISTS `tree`.`treeOption` (`elID` INT, `treeID` INT, `elType` INT, `elTitle` INT, `elContent` INT, `elOrder` INT);
 
 -- -----------------------------------------------------
--- Placeholder table for view `tree`.`tree_end`
+-- Placeholder table for view `tree`.`treeEnd`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_end` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT);
+CREATE TABLE IF NOT EXISTS `tree`.`treeEnd` (`elID` INT, `treeID` INT, `elType` INT, `elTitle` INT, `elContent` INT);
 
 -- -----------------------------------------------------
--- Placeholder table for view `tree`.`tree_start`
+-- Placeholder table for view `tree`.`treeStart`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tree`.`tree_start` (`el_id` INT, `tree_id` INT, `el_type` INT, `el_title` INT, `el_content` INT);
+CREATE TABLE IF NOT EXISTS `tree`.`treeStart` (`elID` INT, `treeID` INT, `elType` INT, `elTitle` INT, `elContent` INT);
 
 -- -----------------------------------------------------
--- View `tree`.`tree_api`
+-- View `tree`.`treeAPI`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_api`;
+DROP TABLE IF EXISTS `tree`.`treeAPI`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_api` (tree_id, tree_slug, title, content, created_at, updated_at, owner) AS
+CREATE  OR REPLACE VIEW `treeAPI` (treeID, treeSlug, title, content, createdAt, updatedAt, owner) AS
     SELECT
-        tree_id, tree_slug, tree_title, tree_content, tree_created_at, tree_updated_at, tree_owner
+        treeID, treeSlug, treeTitle, treeContent, treeCreatedAt, treeUpdatedAt, treeOwner
     FROM
         tree.tree;
 
 -- -----------------------------------------------------
--- View `tree`.`tree_question`
+-- View `tree`.`treeQuestion`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_question`;
+DROP TABLE IF EXISTS `tree`.`treeQuestion`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_question` (question_id, tree_id, group_id, title, content, `order`) AS
+CREATE  OR REPLACE VIEW `treeQuestion` (questionID, treeID, groupID, title, content, `order`) AS
     SELECT
-        el.el_id, el.tree_id, el_group.el_id, el.el_title, el.el_content, el_order.el_order
+        el.elID, el.treeID, elGroup.elID, el.elTitle, el.elContent, elOrder.elOrder
     FROM
-        tree.tree_element el
+        tree.treeElement el
             INNER JOIN
-        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+        tree.treeElementType elType ON el.elTypeID = elType.elTypeID
             INNER JOIN
-        tree.tree_element_order el_order ON el.el_id = el_order.el_id
+        tree.treeElementOrder elOrder ON el.elID = elOrder.elID
             LEFT JOIN
-        tree.tree_element_container el_group ON el.el_id = el_group.el_id_child
+        tree.treeElementContainer elGroup ON el.elID = elGroup.elIDChild
     WHERE
-        el_type.el_type = 'question';
+        elType.elType = 'question';
 
 -- -----------------------------------------------------
--- View `tree`.`tree_end`
+-- View `tree`.`treeEnd`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_end`;
+DROP TABLE IF EXISTS `tree`.`treeEnd`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_end` (end_id, tree_id, title, content) AS
+CREATE  OR REPLACE VIEW `treeEnd` (endID, treeID, title, content) AS
     SELECT
-        el.el_id, el.tree_id, el.el_title, el.el_content
+        el.elID, el.treeID, el.elTitle, el.elContent
     FROM
-        tree.tree_element el
+        tree.treeElement el
             INNER JOIN
-        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+        tree.treeElementType elType ON el.elTypeID = elType.elTypeID
     WHERE
-        el_type.el_type = 'end';
+        elType.elType = 'end';
 
 -- -----------------------------------------------------
--- View `tree`.`tree_option`
+-- View `tree`.`treeOption`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_option`;
+DROP TABLE IF EXISTS `tree`.`treeOption`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_option` (option_id, tree_id, question_id, title, content, `order`, destination_id, destination_type) AS
+CREATE  OR REPLACE VIEW `treeOption` (optionID, treeID, questionID, title, content, `order`, destinationID, destinationType) AS
     SELECT
-        el.el_id, el.tree_id, question.el_id, el.el_title, el.el_content, el_order.el_order, destination.el_id_destination, destination_type.el_type
+        el.elID, el.treeID, question.elID, el.elTitle, el.elContent, elOrder.elOrder, destination.elIDDestination, destinationType.elType
     FROM
-        tree.tree_element el
+        tree.treeElement el
             INNER JOIN
-        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+        tree.treeElementType elType ON el.elTypeID = elType.elTypeID
             INNER JOIN
-        tree.tree_element_order el_order ON el.el_id = el_order.el_id
+        tree.treeElementOrder elOrder ON el.elID = elOrder.elID
             INNER JOIN
-        tree.tree_element_container question ON el.el_id = question.el_id_child
+        tree.treeElementContainer question ON el.elID = question.elIDChild
             INNER JOIN
-        tree.tree_element_destination destination ON el.el_id = destination.el_id
+        tree.treeElementDestination destination ON el.elID = destination.elID
             INNER JOIN
-        tree.tree_element destination_el ON destination_el.el_id = destination.el_id_destination
+        tree.treeElement destinationEl ON destinationEl.elID = destination.elIDDestination
             INNER JOIN
-        tree.tree_element_type destination_type ON destination_type.el_type_id = destination_el.el_type_id
+        tree.treeElementType destinationType ON destinationType.elTypeID = destinationEl.elTypeID
     WHERE
-        el_type.el_type = 'option';
+        elType.elType = 'option';
 
 -- -----------------------------------------------------
--- View `tree`.`tree_group`
+-- View `tree`.`treeGroup`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_group`;
+DROP TABLE IF EXISTS `tree`.`treeGroup`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_group` (group_id, tree_id, title, content, `order`) AS
+CREATE  OR REPLACE VIEW `treeGroup` (groupID, treeID, title, content, `order`) AS
     SELECT
-        el.el_id, el.tree_id, el.el_title, el.el_content, el_order.el_order
+        el.elID, el.treeID, el.elTitle, el.elContent, elOrder.elOrder
     FROM
-        tree.tree_element el
+        tree.treeElement el
             INNER JOIN
-        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+        tree.treeElementType elType ON el.elTypeID = elType.elTypeID
             INNER JOIN
-        tree.tree_element_order el_order ON el.el_id = el_order.el_id
+        tree.treeElementOrder elOrder ON el.elID = elOrder.elID
     WHERE
-        el_type.el_type = 'group';
+        elType.elType = 'group';
 
 -- -----------------------------------------------------
--- View `tree`.`tree_start`
+-- View `tree`.`treeStart`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_start`;
+DROP TABLE IF EXISTS `tree`.`treeStart`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_start` (start_id, tree_id, title, content, destination_id) AS
+CREATE  OR REPLACE VIEW `treeStart` (startID, treeID, title, content, destinationID) AS
     SELECT
-        el.el_id, el.tree_id, el.el_title, el.el_content, destination.el_id_destination
+        el.elID, el.treeID, el.elTitle, el.elContent, destination.elIDDestination
     FROM
-        tree.tree_element el
+        tree.treeElement el
     INNER JOIN
-        tree.tree_element_type el_type ON el.el_type_id = el_type.el_type_id
+        tree.treeElementType elType ON el.elTypeID = elType.elTypeID
     INNER JOIN
-        tree.tree_element_destination destination ON el.el_id = destination.el_id
+        tree.treeElementDestination destination ON el.elID = destination.elID
     WHERE
-        el_type.el_type = 'start';
+        elType.elType = 'start';
 
 
 -- -----------------------------------------------------
--- View `tree`.`tree_interactions`
+-- View `tree`.`treeInteractions`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_interactions`;
+DROP TABLE IF EXISTS `tree`.`treeInteractions`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_interactions` (interaction_id, user_id, tree_id, interaction_type, state_type, interaction_created_at) AS
+CREATE  OR REPLACE VIEW `treeInteractions` (interactionID, userID, treeID, interactionType, stateType, interactionCreatedAt) AS
     SELECT
-        interaction.interaction_id, interaction.user_id, interaction.tree_id, interaction_type.interaction_type, state_type.state_type, interaction.interaction_created_at
+        interaction.interactionID, interaction.userID, interaction.treeID, interactionType.interactionType, stateType.stateType, interaction.interactionCreatedAt
     FROM
-        tree.tree_interaction interaction
+        tree.treeInteraction interaction
     INNER JOIN
-        tree.tree_interaction_type interaction_type ON interaction.interaction_type_id = interaction_type.interaction_type_id
+        tree.treeInteractionType interactionType ON interaction.interactionTypeID = interactionType.interactionTypeID
     INNER JOIN
-        tree.tree_state_type state_type ON interaction.state_type_id = state_type.state_type_id
+        tree.treeStateType stateType ON interaction.stateTypeID = stateType.stateTypeID
     ORDER BY
-        interaction.interaction_id;
+        interaction.interactionID;
 
 
 -- -----------------------------------------------------
--- View `tree`.`tree_interaction_load`
+-- View `tree`.`treeInteractionLoad`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_interaction_load`;
+DROP TABLE IF EXISTS `tree`.`treeInteractionLoad`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_interaction_load` (interaction_id, user_id, tree_id, interaction_created_at) AS
+CREATE  OR REPLACE VIEW `treeInteractionLoad` (interactionID, userID, treeID, interactionCreatedAt) AS
     SELECT
-        interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.interaction_created_at
+        interactions.interactionID, interactions.userID, interactions.treeID, interactions.interactionCreatedAt
     FROM
-        tree.tree_interactions interactions
+        tree.treeInteractions interactions
     WHERE
-        interactions.interaction_type = 'load'
+        interactions.interactionType = 'load'
     ORDER BY
-        interactions.interaction_id;
+        interactions.interactionID;
 
 -- -----------------------------------------------------
--- View `tree`.`tree_interaction_reload`
+-- View `tree`.`treeInteractionReload`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_interaction_reload`;
+DROP TABLE IF EXISTS `tree`.`treeInteractionReload`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_interaction_reload` (interaction_id, user_id, tree_id, interaction_created_at) AS
+CREATE  OR REPLACE VIEW `treeInteractionReload` (interactionID, userID, treeID, interactionCreatedAt) AS
     SELECT
-        interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.interaction_created_at
+        interactions.interactionID, interactions.userID, interactions.treeID, interactions.interactionCreatedAt
     FROM
-        tree.tree_interactions interactions
+        tree.treeInteractions interactions
     WHERE
-        interactions.interaction_type = 'reload'
+        interactions.interactionType = 'reload'
     ORDER BY
-        interactions.interaction_id;
+        interactions.interactionID;
 
 -- -----------------------------------------------------
--- View `tree`.`tree_interaction_overview`
+-- View `tree`.`treeInteractionOverview`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_interaction_overview`;
+DROP TABLE IF EXISTS `tree`.`treeInteractionOverview`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_interaction_overview` (interaction_id, user_id, tree_id, interaction_created_at) AS
+CREATE  OR REPLACE VIEW `treeInteractionOverview` (interactionID, userID, treeID, interactionCreatedAt) AS
     SELECT
-        interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.interaction_created_at
+        interactions.interactionID, interactions.userID, interactions.treeID, interactions.interactionCreatedAt
     FROM
-        tree.tree_interactions interactions
+        tree.treeInteractions interactions
     WHERE
-        interactions.interaction_type = 'overview'
+        interactions.interactionType = 'overview'
     ORDER BY
-        interactions.interaction_id;
+        interactions.interactionID;
 
 -- -----------------------------------------------------
--- View `tree`.`tree_interaction_start`
+-- View `tree`.`treeInteractionStart`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_interaction_start`;
+DROP TABLE IF EXISTS `tree`.`treeInteractionStart`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_interaction_start` (interaction_id, user_id, tree_id, destination_state_type, destination_state_id, interaction_created_at) AS
+CREATE  OR REPLACE VIEW `treeInteractionStart` (interactionID, userID, treeID, destinationStateType, destinationStateID, interactionCreatedAt) AS
     SELECT
-        interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.state_type, state.el_id, interactions.interaction_created_at
+        interactions.interactionID, interactions.userID, interactions.treeID, interactions.stateType, state.elID, interactions.interactionCreatedAt
     FROM
-        tree.tree_interactions interactions
+        tree.treeInteractions interactions
     INNER JOIN
-        tree.tree_state state ON interactions.interaction_id = state.interaction_id
+        tree.treeState state ON interactions.interactionID = state.interactionID
     WHERE
-        interactions.interaction_type = 'start'
+        interactions.interactionType = 'start'
     ORDER BY
-        interactions.interaction_id;
+        interactions.interactionID;
 
 -- -----------------------------------------------------
--- View `tree`.`tree_interaction_option` interactions with questions
+-- View `tree`.`treeInteractionOption` interactions with questions
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_interaction_option`;
+DROP TABLE IF EXISTS `tree`.`treeInteractionOption`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_interaction_option` (interaction_id, user_id, tree_id, option_id, destination_state_type, destination_state_id, interaction_created_at) AS
+CREATE  OR REPLACE VIEW `treeInteractionOption` (interactionID, userID, treeID, optionID, destinationStateType, destinationStateID, interactionCreatedAt) AS
     SELECT
-        interactions.interaction_id, interactions.user_id, interactions.tree_id, interaction_el.el_id, interactions.state_type, state.el_id, interactions.interaction_created_at
+        interactions.interactionID, interactions.userID, interactions.treeID, interactionEl.elID, interactions.stateType, state.elID, interactions.interactionCreatedAt
     FROM
-        tree.tree_interactions interactions
+        tree.treeInteractions interactions
     LEFT JOIN
-        tree.tree_state state ON interactions.interaction_id = state.interaction_id
+        tree.treeState state ON interactions.interactionID = state.interactionID
     INNER JOIN
-        tree.tree_interaction_element interaction_el ON interactions.interaction_id = interaction_el.interaction_id
+        tree.treeInteractionElement interactionEl ON interactions.interactionID = interactionEl.interactionID
     WHERE
-        interactions.interaction_type = 'option'
+        interactions.interactionType = 'option'
     ORDER BY
-        interactions.interaction_id;
+        interactions.interactionID;
 
 -- -----------------------------------------------------
--- View `tree`.`tree_interaction_overview_option` interactions with overviews and options
+-- View `tree`.`treeInteractionOverviewOption` interactions with overviews and options
 -- -----------------------------------------------------
-/*DROP TABLE IF EXISTS `tree`.`tree_interaction_overview_option`;
+/*DROP TABLE IF EXISTS `tree`.`treeInteractionOverviewOption`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_interaction_option` (interaction_id, tree_id, user_id, option_id, state_type_id, state_type, state_id, `interaction_id`) AS*/
+CREATE  OR REPLACE VIEW `treeInteractionOption` (interactionID, treeID, userID, optionID, stateTypeID, stateType, stateID, `interactionID`) AS*/
 
 
 -- -----------------------------------------------------
--- View `tree`.`tree_interaction_question`
+-- View `tree`.`treeInteractionQuestion`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_interaction_question`;
+DROP TABLE IF EXISTS `tree`.`treeInteractionQuestion`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_interaction_question` (interaction_id, user_id, tree_id, question_id, interaction_created_at) AS
+CREATE  OR REPLACE VIEW `treeInteractionQuestion` (interactionID, userID, treeID, questionID, interactionCreatedAt) AS
     SELECT
-        interactions.interaction_id, interactions.user_id, interactions.tree_id, state.el_id, interactions.interaction_created_at
+        interactions.interactionID, interactions.userID, interactions.treeID, state.elID, interactions.interactionCreatedAt
     FROM
-        tree.tree_interactions interactions
+        tree.treeInteractions interactions
     INNER JOIN
-        tree.tree_state state ON interactions.interaction_id = state.interaction_id
+        tree.treeState state ON interactions.interactionID = state.interactionID
     WHERE
-        interactions.state_type = 'question'
+        interactions.stateType = 'question'
     ORDER BY
-        interactions.interaction_id;
+        interactions.interactionID;
 
 
 -- -----------------------------------------------------
--- View `tree`.`tree_interaction_end`
+-- View `tree`.`treeInteractionEnd`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_interaction_end`;
+DROP TABLE IF EXISTS `tree`.`treeInteractionEnd`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_interaction_end` (interaction_id, user_id, tree_id, end_id, interaction_created_at) AS
+CREATE  OR REPLACE VIEW `treeInteractionEnd` (interactionID, userID, treeID, endID, interactionCreatedAt) AS
     SELECT
-        interactions.interaction_id, interactions.user_id, interactions.tree_id, state.el_id, interactions.interaction_created_at
+        interactions.interactionID, interactions.userID, interactions.treeID, state.elID, interactions.interactionCreatedAt
     FROM
-        tree.tree_interactions interactions
+        tree.treeInteractions interactions
     INNER JOIN
-        tree.tree_state state ON interactions.interaction_id = state.interaction_id
+        tree.treeState state ON interactions.interactionID = state.interactionID
     WHERE
-        interactions.state_type = 'end'
+        interactions.stateType = 'end'
     ORDER BY
-        interactions.interaction_id;
+        interactions.interactionID;
 
 -- -----------------------------------------------------
--- View `tree`.`tree_interaction_history`
+-- View `tree`.`treeInteractionHistory`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_interaction_history`;
+DROP TABLE IF EXISTS `tree`.`treeInteractionHistory`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_interaction_history` (interaction_id, user_id, tree_id, destination_state_type, destination_state_id, interaction_created_at) AS
+CREATE  OR REPLACE VIEW `treeInteractionHistory` (interactionID, userID, treeID, destinationStateType, destinationStateID, interactionCreatedAt) AS
     SELECT
-        interactions.interaction_id, interactions.user_id, interactions.tree_id, interactions.state_type, state.el_id, interactions.interaction_created_at
+        interactions.interactionID, interactions.userID, interactions.treeID, interactions.stateType, state.elID, interactions.interactionCreatedAt
     FROM
-        tree.tree_interactions interactions
+        tree.treeInteractions interactions
     LEFT JOIN
-        tree.tree_state state ON interactions.interaction_id = state.interaction_id
+        tree.treeState state ON interactions.interactionID = state.interactionID
     WHERE
-        interactions.interaction_type = 'history'
+        interactions.interactionType = 'history'
     ORDER BY
-        interactions.interaction_id;
+        interactions.interactionID;
 
 
 -- -----------------------------------------------------
--- View `tree`.`tree_interactions_max_date_by_user_and_tree`
--- Subquery necessary for tree_bounce view
+-- View `tree`.`treeInteractionsMaxDateByUserAndTree`
+-- Subquery necessary for treeBounce view
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_interactions_max_date_by_user_and_tree`;
+DROP TABLE IF EXISTS `tree`.`treeInteractionsMaxDateByUserAndTree`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `tree_interactions_max_date_by_user_and_tree` (user_id, tree_id, interaction_created_at) AS
+CREATE  OR REPLACE VIEW `treeInteractionsMaxDateByUserAndTree` (userID, treeID, interactionCreatedAt) AS
 SELECT
-  user_id, tree_id, MAX(interaction_created_at)
+  userID, treeID, MAX(interactionCreatedAt)
  FROM
-   tree.tree_interactions
+   tree.treeInteractions
  GROUP BY
-   user_id, tree_id;
+   userID, treeID;
 
 -- -----------------------------------------------------
--- View `tree`.`tree_state_bounce`
+-- View `tree`.`treeStateBounce`
 -- This is the state the user left the site at
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `tree`.`tree_state_bounce`;
-CREATE  OR REPLACE VIEW `tree_state_bounce` (interaction_id, tree_id, state_bounced, el_id, interaction_created_at) AS
+DROP TABLE IF EXISTS `tree`.`treeStateBounce`;
+CREATE  OR REPLACE VIEW `treeStateBounce` (interactionID, treeID, stateBounced, elID, interactionCreatedAt) AS
 SELECT
-    interactions.interaction_id, interactions.tree_id, interactions.state_type, state.el_id, interactions.interaction_created_at
+    interactions.interactionID, interactions.treeID, interactions.stateType, state.elID, interactions.interactionCreatedAt
   FROM
-    tree.tree_interactions interactions
+    tree.treeInteractions interactions
   LEFT JOIN
-    tree.tree_state state ON interactions.interaction_id = state.interaction_id
+    tree.treeState state ON interactions.interactionID = state.interactionID
   INNER JOIN
-    tree.tree_interactions_max_date_by_user_and_tree max_date
+    tree.treeInteractionsMaxDateByUserAndTree maxDate
    ON
-     (interactions.user_id = max_date.user_id
+     (interactions.userID = maxDate.userID
       AND
-      interactions.interaction_created_at = max_date.interaction_created_at)
+      interactions.interactionCreatedAt = maxDate.interactionCreatedAt)
   ORDER BY
-    interactions.interaction_id;
+    interactions.interactionID;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

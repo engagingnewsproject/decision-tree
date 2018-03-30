@@ -19,45 +19,45 @@ class DBTestCase extends TreeTestCase
     /**
     * Dynamically uses getter functions (like getQuestions) and returns the results
     *
-    * @param $el_type STRING of the el type you want ('question', 'end', 'group', or )
-    * @return ARRAY of first result from get_$el_typeS vs get_$el_type($el_id)
+    * @param $elType STRING of the el type you want ('question', 'end', 'group', or )
+    * @return ARRAY of first result from get_$elTypeS vs get_$elType($elID)
     */
-    public function getAllDynamic($el_type, $tree_id) {
+    public function getAllDynamic($elType, $treeID) {
         $get = new Database\DB();
-        $get_all_function = 'get'.ucfirst($el_type).'s';
+        $get_all_function = 'get'.ucfirst($elType).'s';
 
-        return $get->$get_all_function($tree_id);
+        return $get->$get_all_function($treeID);
     }
 
     /**
     * Dynamically uses single getter functions (like getQuestion) and returns the result
     *
-    * @param $el_type STRING of the el type you want ('question', 'end', 'group', or 'start')
-    * @return ARRAY of first result from get_$el_typeS vs get_$el_type($el_id)
+    * @param $elType STRING of the el type you want ('question', 'end', 'group', or 'start')
+    * @return ARRAY of first result from get_$elTypeS vs get_$elType($elID)
     */
-    public function getOneDynamic($el_type, $tree_id, $el_id = false) {
+    public function getOneDynamic($elType, $treeID, $elID = false) {
         $get = new Database\DB();
 
-        if($el_type === 'option') {
-            return $this->getOneOptionDynamic($tree_id);
+        if($elType === 'option') {
+            return $this->getOneOptionDynamic($treeID);
         }
 
-        if($el_id === false) {
+        if($elID === false) {
             // let's find one
-            $el_id = $this->getAllDynamic($el_type, $tree_id)[0][$el_type.'_id'];
+            $elID = $this->getAllDynamic($elType, $treeID)[0][$elType.'ID'];
         }
-        $get_one_function = 'get'.ucfirst($el_type);
-        return $get->$get_one_function($el_id);
+        $get_one_function = 'get'.ucfirst($elType);
+        return $get->$get_one_function($elID);
     }
 
     /**
     * Gets an option row from a tree
     */
-    public function getOneOptionDynamic($tree_id) {
+    public function getOneOptionDynamic($treeID) {
         $get = new Database\DB();
 
-        $question = $this->getOneDynamic('question', $tree_id);
-        $options = $get->getOptions($question['question_id']);
+        $question = $this->getOneDynamic('question', $treeID);
+        $options = $get->getOptions($question['questionID']);
         return $options[0];
     }
 }

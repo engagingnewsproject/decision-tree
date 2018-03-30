@@ -7,11 +7,11 @@ use Cme\Utility as Utility;
 final class UtilityTest extends TreeTestCase
 {
     /**
-     * @covers Cme\Utility\is_id()
+     * @covers Cme\Utility\isID()
      * @dataProvider validateIdProvider
      */
     public function testValidateId($id, $expected) {
-        $valid = Utility\is_id($id);
+        $valid = Utility\isID($id);
         $this->evaluateAssert($valid, $expected);
     }
 
@@ -30,11 +30,11 @@ final class UtilityTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Utility\is_slug()
+     * @covers Cme\Utility\isSlug()
      * @dataProvider isSlugProvider
      */
     public function testIsSlug($slug, $expected) {
-        $valid = Utility\is_slug($slug);
+        $valid = Utility\isSlug($slug);
         $this->evaluateAssert($valid, $expected);
     }
 
@@ -55,13 +55,13 @@ final class UtilityTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Utility\getTreeSlugById($tree_id)
+     * @covers Cme\Utility\getTreeSlugById($treeID)
      * @dataProvider getTreeSlugByIdProvider
      */
     public function testGetTreeSlugById($id, $expected) {
         // $cme_save = new Cme_quiz_Save();
-        $tree_slug = Utility\getTreeSlugById($id);
-        $this->assertEquals($tree_slug, $expected);
+        $treeSlug = Utility\getTreeSlugById($id);
+        $this->assertEquals($treeSlug, $expected);
     }
 
     public function getTreeSlugByIdProvider() {
@@ -77,12 +77,12 @@ final class UtilityTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Utility\getTree_idBySlug($tree_id)
+     * @covers Cme\Utility\getTreeIDBySlug($treeID)
      * @dataProvider getTreeIdBySlugProvider
      */
     public function testGetTreeIdBySlug($slug, $expected) {
-        $tree_id = Utility\getTree_idBySlug($slug);
-        $this->assertEquals($tree_id, $expected);
+        $treeID = Utility\getTreeIDBySlug($slug);
+        $this->assertEquals($treeID, $expected);
     }
 
     public function getTreeIdBySlugProvider() {

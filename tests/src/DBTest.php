@@ -18,17 +18,17 @@ final class DBTest extends DBTestCase
      * @covers Cme\Database\query()
      * @dataProvider fetchAllByTreeProvider
      */
-    public function testFetchAllByTree($view, $tree_id, $options, $expected_key, $expected) {
-        $result = $this->db->fetchAllByTree($view, $tree_id, $options);
+    public function testFetchAllByTree($view, $treeID, $options, $expected_key, $expected) {
+        $result = $this->db->fetchAllByTree($view, $treeID, $options);
         $this->evaluateAssert(isset($result[0][$expected_key]), $expected);
     }
 
     public function fetchAllByTreeProvider() {
         return [
                 //'valid-1'=>['123456789', true],
-                'valid-1'=>['tree_start', 1, [], 'start_id', true],
-                'valid-2'=>['tree_group', 1, [], 'group_id', true],
-                'invalid-1'=>['tree_start', 1, [], 'asdfasdf', false],
+                'valid-1'=>['treeStart', 1, [], 'startID', true],
+                'valid-2'=>['treeGroup', 1, [], 'groupID', true],
+                'invalid-1'=>['treeStart', 1, [], 'asdfasdf', false],
         ];
     }
 
@@ -36,12 +36,12 @@ final class DBTest extends DBTestCase
      * @covers Cme\Database\fetchOneByView()
      * @dataProvider fetchOneByViewProvider
      */
-    public function testFetchOneByView($el_type, $tree_id) {
-        $el = $this->getOneDynamic($el_type, $tree_id);
-        $el_id = $el[$el_type.'_id'];
+    public function testFetchOneByView($elType, $treeID) {
+        $el = $this->getOneDynamic($elType, $treeID);
+        $elID = $el[$elType.'ID'];
 
-        $result = $this->db->fetchOneByView($el_type, $el_id, $tree_id);
-        $this->assertEquals($el_id, $result["${el_type}_id"]);
+        $result = $this->db->fetchOneByView($elType, $elID, $treeID);
+        $this->assertEquals($elID, $result["${elType}ID"]);
     }
 
     public function fetchOneByViewProvider() {
@@ -65,13 +65,13 @@ final class DBTest extends DBTestCase
         $i = 0;
         // loop 5 of them and test each
         foreach($trees as $tree) {
-            // get one tree off of the tree_id
-            $getTree = $this->db->getTree($tree['tree_id']);
-            // the tree_ids should match
+            // get one tree off of the treeID
+            $getTree = $this->db->getTree($tree['treeID']);
+            // the treeIDs should match
             $this->assertEquals($tree, $getTree);
             // get tree by slug
-            $getTreeBySlug = $this->db->getTreeBySlug($tree['tree_slug']);
-            // the tree_ids should match
+            $getTreeBySlug = $this->db->getTreeBySlug($tree['treeSlug']);
+            // the treeIDs should match
             $this->assertEquals($tree, $getTreeBySlug);
             if(5 < $i++) {
                 break;
@@ -98,10 +98,10 @@ final class DBTest extends DBTestCase
      * @covers Cme\Database\query()
      * @dataProvider gettersProvider
      */
-    public function testGetters($el_type, $tree_id) {
+    public function testGetters($elType, $treeID) {
 
-        $first_result = $this->getAllDynamic($el_type, $tree_id)[0];
-        $one_result = $this->getOneDynamic($el_type, $tree_id);
+        $first_result = $this->getAllDynamic($elType, $treeID)[0];
+        $one_result = $this->getOneDynamic($elType, $treeID);
 
         $this->assertEquals($first_result, $one_result);
     }
@@ -123,19 +123,19 @@ final class DBTest extends DBTestCase
      */
     public function testGetQuestionsByGroup() {
         // get group
-        $tree_id = 1;
-        $group = $this->getOneDynamic('group', $tree_id);
-        $group_id = $group['group_id'];
-        $question_ids = $this->db->getQuestionsByGroup($group_id);
+        $treeID = 1;
+        $group = $this->getOneDynamic('group', $treeID);
+        $groupID = $group['groupID'];
+        $questionIDs = $this->db->getQuestionsByGroup($groupID);
 
         // Questions by group id should match if you also pass a tree
-        $this->assertEquals($question_ids, $this->db->getQuestionsByGroup($group_id, $tree_id));
+        $this->assertEquals($questionIDs, $this->db->getQuestionsByGroup($groupID, $treeID));
 
         $validate = new Database\Validate();
-        // loop each question_id and make sure it's a question
-        foreach($question_ids as $question_id) {
-            // the tree_ids should match
-            $this->assertEquals($validate->questionID($question_id), true);
+        // loop each questionID and make sure it's a question
+        foreach($questionIDs as $questionID) {
+            // the treeIDs should match
+            $this->assertEquals($validate->questionID($questionID), true);
         }
     }
 
@@ -148,14 +148,14 @@ final class DBTest extends DBTestCase
      * @covers Cme\Database\getOption()
      */
     public function testGetOptions() {
-        $tree_id = 1;
+        $treeID = 1;
 
-        $question = $this->getOneDynamic('question', $tree_id);
-        $question_id = $question['question_id'];
-        $options = $this->db->getOptions($question_id);
+        $question = $this->getOneDynamic('question', $treeID);
+        $questionID = $question['questionID'];
+        $options = $this->db->getOptions($questionID);
 
         foreach($options as $option) {
-            $this->assertEquals($option, $this->db->getOption($option['option_id']));
+            $this->assertEquals($option, $this->db->getOption($option['optionID']));
            ;
         }
 

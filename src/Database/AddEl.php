@@ -7,8 +7,8 @@ namespace Cme\Database;
  * Add a question to the database
  */
 class SaveEl extends DB {
-    protected $tree_id,
-              $el_type_id,
+    protected $treeID,
+              $elTypeID,
               $content,
               $description,
               $user_id;

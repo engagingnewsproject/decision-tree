@@ -3,7 +3,7 @@ USE `tree`;
 -- Query:
 -- Date: 2017-07-18 14:01
 */
-INSERT INTO `tree` (`tree_id`,`tree_slug`,`tree_content`,`tree_title`,`tree_owner`,`tree_created_by`,`tree_updated_by`) VALUES (1,'citizen','','Are You Eligible to be a US Citizen',1,1,1);
+INSERT INTO `tree` (`tree_id`,`treeSlug`,`tree_content`,`tree_title`,`tree_owner`,`tree_created_by`,`tree_updated_by`) VALUES (1,'citizen','','Are You Eligible to be a US Citizen',1,1,1);
 
 /*
 -- Query:
