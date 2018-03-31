@@ -23,14 +23,14 @@ function handleCmeIframeMessage(event) {
     // parse the JSON data
     data = JSON.parse(event.data);
 
-    iframeID = 'cme-tree__' + data.tree_id;
+    iframeID = 'cme-tree__' + data.treeID;
 
     iframe = document.getElementById(iframeID);
     // if we need to use it...
     newIframe = {
         iframe: iframe,
         parentURL: parentURL,
-        treeID: data.tree_id
+        treeID: data.treeID
     };
 
     // if one doesn't exist, create it

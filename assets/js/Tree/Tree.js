@@ -24,7 +24,7 @@ function Tree(data, observers) {
     var _setData = function(data) {
         _data = data
         _state = {
-            id: data.tree_id,
+            id: data.treeID,
             type: 'intro'
         }
     }
@@ -213,14 +213,14 @@ Tree.prototype = {
 
                 // go to first question
                 let question = this.getQuestions()[0];
-                this.setState('question', question.question_id, data);
+                this.setState('question', question.questionID, data);
                 break
 
             case 'question':
-                if(data.question_id === undefined) {
+                if(data.questionID === undefined) {
                     id = data.id
                 } else {
-                    id = data.question_id
+                    id = data.questionID
                 }
                 // find the destination
                 this.setState(data.type, id, data);
@@ -228,20 +228,20 @@ Tree.prototype = {
 
             case 'option':
                 // find the destination
-                this.setState(data.destination_type, data.destination_id, data);
+                this.setState(data.destinationType, data.destinationID, data);
                 break
 
             case 'end':
                 // find the destination
-                if(data.destination_type === undefined) {
+                if(data.destinationType === undefined) {
                     type = data.type
                 } else {
-                    type = data.destination_type
+                    type = data.destinationType
                 }
-                if(data.destination_id === undefined) {
+                if(data.destinationID === undefined) {
                     id = data.id
                 }  else {
-                    type = data.destination_id
+                    type = data.destinationID
                 }
                 this.setState(type, id, data);
                 break
@@ -254,7 +254,7 @@ Tree.prototype = {
                 // emit a restart
                 this.emit('restart', this)
                 // go to first question
-                this.setState('question', this.getQuestions()[0].question_id, data);
+                this.setState('question', this.getQuestions()[0].questionID, data);
                 break
         }
     },
@@ -282,7 +282,7 @@ Tree.prototype = {
         // if there's an ID, let's get the specific one they're after
         if(id !== undefined) {
             // get the individual item
-            typeIndex = this.getIndexBy(data, type+'_id', id)
+            typeIndex = this.getIndexBy(data, type+'ID', id)
             if(typeIndex !== undefined) {
                 // found one!
                 data = data[typeIndex]
@@ -296,7 +296,7 @@ Tree.prototype = {
     },
 
     getTreeID: function() {
-        return this.getData().tree_id;
+        return this.getData().treeID;
     },
 
     getQuestions: function(id){
@@ -343,16 +343,16 @@ Tree.prototype = {
         return group;
     },
 
-    getOptions: function(question_id, option_id){
+    getOptions: function(questionID, optionID){
         let option,
             optionIndex,
             question;
 
         // get the individual item
-        question = this.getQuestions(question_id);
+        question = this.getQuestions(questionID);
 
-        if(option_id !== undefined) {
-            optionIndex = this.getIndexBy(question.options, 'option_id', option_id)
+        if(optionID !== undefined) {
+            optionIndex = this.getIndexBy(question.options, 'optionID', optionID)
             option = question.options[optionIndex]
         } else {
             option = question.options;

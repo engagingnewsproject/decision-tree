@@ -200,13 +200,13 @@ function TreeInteraction(options) {
 
         // combine data and our userID
         data = Object.assign(data, {
-            user_id: this.getUserID(),
-            tree_id: Tree.getTreeID(),
+            userID: this.getUserID(),
+            treeID: Tree.getTreeID(),
             site: {
                 name: this.getSiteName(),
                 host: this.getHost(),
                 path: this.getPath(),
-                is_iframe: this.getIsIframe()
+                isIframe: this.getIsIframe()
             }
         })
 
@@ -403,8 +403,8 @@ TreeInteraction.prototype = {
         data.interaction = {}
 
         if(interactionType === 'option') {
-            // pass the option_id
-            interactionID = update.data.option_id
+            // pass the optionID
+            interactionID = update.data.optionID
         }
         // check if it's a history click
         else if(observer === 'TreeHistoryView') {
@@ -432,7 +432,7 @@ TreeInteraction.prototype = {
         // build data
         interactionData = {
             interaction: {
-                id: data.option_id,
+                id: data.optionID,
                 type: data.type // 'option'
             }
         }

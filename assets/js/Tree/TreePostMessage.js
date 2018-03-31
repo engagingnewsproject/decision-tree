@@ -72,7 +72,7 @@ TreePostMessage.prototype = {
             console.error('PostMessage data is not an object')
             return false
         }
-        data.tree_id = this.getTree().getTreeID()
+        data.treeID = this.getTree().getTreeID()
         console.log('postIt send', data)
 
         // allow all domains to access this info (*)

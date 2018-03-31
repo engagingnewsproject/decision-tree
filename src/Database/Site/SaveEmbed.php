@@ -27,8 +27,8 @@ class SaveEmbed extends DB {
      * @param $data (ARRAY) needs all the info to be saved
      *
      *    'embed'=> [
-     *       'tree_id'=> (STRING/INT), // from tree table
-     *       'site_id'=> (STRING/INT), // from tree_site table
+     *       'treeID'=> (STRING/INT), // from tree table
+     *       'siteID'=> (STRING/INT), // from tree_site table
      *       'path'   => (STRING), // ex. '/path/to/embed/'
      *       'iframe' => (BOOLEAN), // is it in an iframe or not?
      *     ]
@@ -39,11 +39,11 @@ class SaveEmbed extends DB {
         $is_valid = false;
 
         // check if we have all the data we need
-        if(!isset($embed['tree_id'])) {
+        if(!isset($embed['treeID'])) {
             $this->errors[] = 'No Tree ID sent.';
         }
 
-        if(!isset($embed['site_id'])) {
+        if(!isset($embed['siteID'])) {
             $this->errors[] = 'No Site ID sent.';
         }
 
@@ -55,8 +55,8 @@ class SaveEmbed extends DB {
             $this->errors[] = 'Embed Path is empty.';
         }
 
-        if(!isset($embed['is_iframe'])) {
-            $this->errors[] = 'Is it an iframe? Set is_iframe to true or false.';
+        if(!isset($embed['isIframe'])) {
+            $this->errors[] = 'Is it an iframe? Set isIframe to true or false.';
         }
 
         // if we have any errors, return false. Passes first round of being the correct data structure
@@ -71,7 +71,7 @@ class SaveEmbed extends DB {
         // open the validator
         $validate = new Validate();
         // check that the site exists
-        $site = $this->DB->getSite($embed['site_id']);
+        $site = $this->DB->getSite($embed['siteID']);
         if($site === false) {
             $this->errors[] = 'Site doesn\'t exist.';
         }
@@ -82,13 +82,13 @@ class SaveEmbed extends DB {
         }
 
         // check that it's a valid Tree
-        if($validate->treeID($embed['tree_id']) === false) {
-            $this->errors[] = 'Invalid tree_id.';
+        if($validate->treeID($embed['treeID']) === false) {
+            $this->errors[] = 'Invalid treeID.';
         }
 
-        // check that is_iframe is boolean
-        if(is_bool( $embed['is_iframe'] ) === false) {
-            $this->errors[] = 'is_iframe must be boolean.';
+        // check that isIframe is boolean
+        if(is_bool( $embed['isIframe'] ) === false) {
+            $this->errors[] = 'isIframe must be boolean.';
         }
 
         // if we have don't have any errors, it's valid!
@@ -125,12 +125,12 @@ class SaveEmbed extends DB {
         }
         // check if it exists already
         $embed_check = $this->DB->getEmbed($embed['path'],
-                                        ['site_id' => $embed['site_id'],
-                                         'tree_id' => $embed['tree_id']
+                                        ['siteID' => $embed['siteID'],
+                                         'treeID' => $embed['treeID']
                                         ]);
         if($embed_check !== false) {
             $response = [
-                            'embed_id'   => $embed_check['embed_id'],
+                            'embedID'   => $embed_check['embedID'],
                             'status'     => 'success',
                             'action'     => 'embedExists'
                         ];
@@ -141,33 +141,33 @@ class SaveEmbed extends DB {
 
         // Get our Parameters ready
         $params = [
-                    ':tree_id'              => $embed['tree_id'],
-                    ':site_id'              => $embed['site_id'],
-                    ':embed_path'           => $embed['path'],
-                    ':embed_is_iframe'      => $embed['is_iframe']
+                    ':treeID'              => $embed['treeID'],
+                    ':siteID'              => $embed['siteID'],
+                    ':embedPath'           => $embed['path'],
+                    ':embedIsIframe'      => $embed['isIframe']
                   ];
         // write our SQL statement
         $sql = 'INSERT INTO '.$this->DB->tables['tree_embed'].' (
-                                            site_id,
-                                            tree_id,
-                                            embed_path,
-                                            embed_is_iframe
+                                            siteID,
+                                            treeID,
+                                            embedPath,
+                                            embedIsIframe
                                         )
                                         VALUES(
-                                            :site_id,
-                                            :tree_id,
-                                            :embed_path,
-                                            :embed_is_iframe
+                                            :siteID,
+                                            :treeID,
+                                            :embedPath,
+                                            :embedIsIframe
                                         )';
         // insert the mc_option into the database
         $stmt = $this->DB->query($sql, $params);
 
         // success!
         if($stmt !== false) {
-            $embed_id = $this->DB->lastInsertId();
+            $embedID = $this->DB->lastInsertId();
 
             $response = [
-                            'embed_id'          => $embed_id,
+                            'embedID'          => $embedID,
                             'status'           => 'success',
                             'action'           => 'insertEmbed'
                         ];

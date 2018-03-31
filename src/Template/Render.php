@@ -9,16 +9,16 @@ use Cme\Utility as Utility;
 
 class Render extends Template {
     public $data,
-           $template_name,
-           $template_path;
+           $templateName,
+           $templatePath;
 
-    public function __construct($template_name, $dataSlug) {
+    public function __construct($templateName, $dataSlug) {
         // set the name
-        $this->set_template_name($template_name);
+        $this->setTemplateName($templateName);
         // get the name
-        $template_name = $this->get_template_name();
+        $templateName = $this->getTemplateName();
         // set the path
-        $this->set_template_path($template_name);
+        $this->setTemplatePath($templateName);
         // set the data
         $this->set_data($dataSlug);
     }
@@ -27,7 +27,7 @@ class Render extends Template {
     * Passes data to the compiled template render function
     */
     public function render() {
-        $renderer = include $this->get_template_path();
+        $renderer = include $this->getTemplatePath();
         $data = $this->get_data();
         return $renderer($this->get_data());
     }
@@ -49,21 +49,21 @@ class Render extends Template {
         $this->data = $data;
     }
 
-    protected function set_template_path() {
+    protected function setTemplatePath() {
         $path = false;
-        $template_name = $this->get_template_name();
-        if(Utility\isSlug($template_name)) {
-            $path = "views/$template_name.php";
+        $templateName = $this->getTemplateName();
+        if(Utility\isSlug($templateName)) {
+            $path = "views/$templateName.php";
         }
-        $this->template_path = $path;
+        $this->templatePath = $path;
     }
 
     public function get_data() {
         return $this->data;
     }
 
-    public function get_template_path() {
-        return $this->template_path;
+    public function getTemplatePath() {
+        return $this->templatePath;
     }
 
 }

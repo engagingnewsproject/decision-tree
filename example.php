@@ -33,7 +33,7 @@
 <script src="dist/js/templates.js"></script>
 <script src="dist/js/scripts.js"></script>
 -->
-<script src="dist/js/cme-tree.min.js"></script>
+<script src="dist/js/cme-tree.js"></script>
 <script>
 
     var treeOptions = {

@@ -475,13 +475,13 @@ class DB extends PDO {
         return $this->fetchOne($sql, $params);
     }
 
-    public function getEmbedByPath($embed_path, $options) {
+    public function getEmbedByPath($embedPath, $options) {
         // Do a select query to see if we get a returned row
         $params = [
-                    ":embed_path" => $embed_path,
+                    ":embedPath" => $embedPath,
                   ];
         $sql = "SELECT * from ".$this->tables['treeEmbed']." WHERE
-                embed_path = :embed_path";
+                embedPath = :embedPath";
 
         // if a treeID was passed, append it to the params and sql statement
         if(isset($options['treeID']) && Utility\isID($options['treeID'])) {

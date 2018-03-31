@@ -93,7 +93,7 @@ class SaveSite extends DB {
         $site_check = $this->DB->getSite($site['host']);
         if($site_check !== false) {
             $response = [
-                            'site_id'   => $site_check['site_id'],
+                            'siteID'   => $site_check['siteID'],
                             'status'    => 'success',
                             'action'    => 'siteExists'
                         ];
@@ -103,27 +103,27 @@ class SaveSite extends DB {
 
         // Get our Parameters ready
         $params = [
-                    ':site_host'              => $site['host'],
-                    ':site_name'              => $site['name']
+                    ':siteHost'              => $site['host'],
+                    ':siteName'              => $site['name']
                   ];
         // write our SQL statement
         $sql = 'INSERT INTO '.$this->DB->tables['tree_site'].' (
-                                            site_host,
-                                            site_name
+                                            siteHost,
+                                            siteName
                                         )
                                         VALUES(
-                                            :site_host,
-                                            :site_name
+                                            :siteHost,
+                                            :siteName
                                         )';
         // insert the mc_option into the database
         $stmt = $this->DB->query($sql, $params);
 
         // success!
         if($stmt !== false) {
-            $site_id = $this->DB->lastInsertId();
+            $siteID = $this->DB->lastInsertId();
 
             $response = [
-                            'site_id'          => $site_id,
+                            'siteID'          => $siteID,
                             'status'           => 'success',
                             'action'           => 'insertSite'
                         ];

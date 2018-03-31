@@ -312,31 +312,30 @@ $app->group('/api', function() {
         $this->post('/interactions/new', function (Request $request, Response $response) {
             // passed data
             $data = $request->getParsedBody();
-
             // set empty errors array. This whole "check for errors then move on" thing
             // could probably be structured better
             $errors = [];
 
             $site = new Database\SaveSite();
             // get the siteID. It will either save a new one or return an existing one
-            $site_response = $site->save($data['site']);
-            if(isset($site_response['status']) && $site_response['status'] === 'success') {
-                $data['site']['siteID'] = $site_response['siteID'];
+            $siteResponse = $site->save($data['site']);
+            if(isset($siteResponse['status']) && $siteResponse['status'] === 'success') {
+                $data['site']['siteID'] = $siteResponse['siteID'];
                 $data['site']['treeID'] = $data['treeID'];
             } else {
-                $errors = $site_response;
+                $errors = $siteResponse;
             }
             // no errors? get the embed
             if(empty($errors)) {
                 // add the treeID into the site attribute cuz we'll need it
                 // try to get the embed
                 $embed = new Database\SaveEmbed();
-                $embed_response = $embed->save($data['site']);
+                $embedResponse = $embed->save($data['site']);
 
-                if(isset($embed_response['status']) && $embed_response['status'] === 'success') {
-                    $data['site']['embedID'] = $embed_response['embedID'];
+                if(isset($embedResponse['status']) && $embedResponse['status'] === 'success') {
+                    $data['site']['embedID'] = $embedResponse['embedID'];
                 } else {
-                    $errors = $embed_response;
+                    $errors = $embedResponse;
                 }
             }
 
@@ -344,9 +343,9 @@ $app->group('/api', function() {
             if(empty($errors)) {
                 // try to save it
                 $interaction = new Database\SaveInteraction();
-                $the_response = $interaction->save($data);
+                $theResponse = $interaction->save($data);
             } else {
-                $the_response = $errors;
+                $theResponse = $errors;
             }
 
             // return the JSON
@@ -375,18 +374,18 @@ $app->group('/api', function() {
 
         $this->get('/states/types/', function (Request $request, Response $response) {
             $db = new Database\DB();
-            $state_types = $db->getStateTypes();
+            $stateTypes = $db->getStateTypes();
 
-            $response->getBody()->write(json_encode($state_types));
+            $response->getBody()->write(json_encode($stateTypes));
             return $response;
         });
 
         $this->get('/states/types/{typeID}', function (Request $request, Response $response) {
             $typeID = $request->getAttribute('typeID');
             $db = new Database\DB();
-            $state_type = $db->getStateType($typeID);
+            $stateType = $db->getStateType($typeID);
 
-            $response->getBody()->write(json_encode($state_type));
+            $response->getBody()->write(json_encode($stateType));
             return $response;
         });
     });
