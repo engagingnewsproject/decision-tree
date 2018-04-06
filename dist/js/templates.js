@@ -97,16 +97,16 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
   return "                                                    <span class=\"cme-tree__destination-title\">"
     + ((stack1 = ((helper = (helper = helpers.destinationTitle || (depth0 != null ? depth0.destinationTitle : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"destinationTitle","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "</span>\n"
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.destination_icon : depth0),{"name":"if","hash":{},"fn":container.program(17, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.destinationIcon : depth0),{"name":"if","hash":{},"fn":container.program(17, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
 },"17":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function";
 
   return "                                                        <span class=\"cme-tree__icon-wrap\"><svg id=\"cme-tree__destination-icon--"
     + ((stack1 = ((helper = (helper = helpers.optionID || (depth0 != null ? depth0.optionID : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"optionID","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\" class=\"cme-tree__icon cme-tree__icon--"
-    + ((stack1 = ((helper = (helper = helpers.destination_icon || (depth0 != null ? depth0.destination_icon : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"destination_icon","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + ((stack1 = ((helper = (helper = helpers.destinationIcon || (depth0 != null ? depth0.destinationIcon : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"destinationIcon","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\"><use xlink:href=\"#icon-"
-    + ((stack1 = ((helper = (helper = helpers.destination_icon || (depth0 != null ? depth0.destination_icon : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"destination_icon","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+    + ((stack1 = ((helper = (helper = helpers.destinationIcon || (depth0 != null ? depth0.destinationIcon : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"destinationIcon","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\"></use></svg></span>\n";
 },"19":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
