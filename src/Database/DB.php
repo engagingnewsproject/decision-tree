@@ -174,7 +174,7 @@ class DB extends PDO {
      * Gets one tree from the database by id
      *
      * @param $treeID INT
-     * @return ARRAY/OBJECT of the TREE
+     * @return ARRAY
      */
     public function getTree($treeID) {
         // Do a select query to see if we get a returned row
@@ -189,7 +189,7 @@ class DB extends PDO {
      * Gets one tree from the database by slug
      *
      * @param $treeSlug STRING
-     * @return ARRAY/OBJECT of the TREE
+     * @return ARRAY
      */
     public function getTreeBySlug($treeSlug) {
         // Do a select query to see if we get a returned row
@@ -215,7 +215,7 @@ class DB extends PDO {
      *
      * @param $startID INT
      * @param $treeID INT (Optional)
-     * @return ARRAY of TREE ARRAYS
+     * @return ARRAY
      */
     public function getStart($startID, $treeID = false) {
         return $this->fetchOneByView('start', $startID, $treeID);
@@ -225,7 +225,7 @@ class DB extends PDO {
      * Gets all groups from the database by treeID
      *
      * @param $treeID INT
-     * @return ARRAY
+     * @return ARRAY of Group ARRAYS
      */
     public function getGroups($treeID) {
         return $this->fetchAllByTree('treeGroup', $treeID);
@@ -236,7 +236,7 @@ class DB extends PDO {
      *
      * @param $groupID INT
      * @param $treeID INT (Optional)
-     * @return ARRAY of TREE ARRAYS
+     * @return ARRAY
      */
     public function getGroup($groupID, $treeID = false) {
         return $this->fetchOneByView('group', $groupID, $treeID);
@@ -247,7 +247,7 @@ class DB extends PDO {
      *
      * @param $treeID INT
      * @param $options ARRAY (Optional) sets orderby paramater in SQL statement
-     * @return ARRAY
+     * @return ARRAY of Question ARRAYS
      */
     public function getQuestions($treeID, $options = []) {
         $default = array('orderby'=>'order');
@@ -260,18 +260,18 @@ class DB extends PDO {
      *
      * @param $questionID INT
      * @param $treeID INT (Optional)
-     * @return ARRAY of TREE ARRAYS
+     * @return ARRAY
      */
     public function getQuestion($questionID, $treeID = false) {
         return $this->fetchOneByView('question', $questionID, $treeID);
     }
 
-     /**
+    /**
      * Gets all questions from the database by groupID
      *
      * @param $groupID INT
      * @param $treeID INT (optional)
-     * @return ARRAY of Question IDs
+     * @return ARRAY of Question ARRAYS
      */
     public function getQuestionsByGroup($groupID, $treeID = false) {
         $params = [":groupID" => $groupID];
@@ -290,13 +290,19 @@ class DB extends PDO {
         return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
     }
 
+    /**
+     * Gets all options (question choices) for a question
+     *
+     * @param $questionID INT Question ID to get the options of
+     * @param $options ARRAY (optional)
+     * @return ARRAY of optionIDs
+     */
     public function getOptions($questionID, $options = []) {
         $default = array('treeID'=>false, 'orderby'=>'order');
         $options = array_merge($default, $options);
 
-        // validate the questionID
-        $validate = new Validate();
-        if($validate->questionID($questionID) === false) {
+        // validate the questionID is an ID
+        if(!Utility\isID($questionID)) {
             return false;
         }
 
@@ -315,6 +321,13 @@ class DB extends PDO {
         return $this->fetchAll($sql, $params);
     }
 
+    /**
+     * Gets an option (question choice)
+     *
+     * @param $optionID INT
+     * @param $options ARRAY (optional) 'questionID', 'treeID'
+     * @return ARRAY
+     */
     public function getOption($optionID, $options = []) {
         $default = array('treeID'=>false, 'questionID'=>false);
         $options = array_merge($default, $options);
@@ -338,14 +351,32 @@ class DB extends PDO {
         return $this->fetchOne($sql, $params);
     }
 
+    /**
+     * Gets all ends from the database by treeID
+     *
+     * @param $treeID INT
+     * @return ARRAY of End ARRAYS
+     */
     public function getEnds($treeID) {
         return $this->fetchAllByTree('treeEnd', $treeID);
     }
 
+    /**
+     * Gets an end from the database by endID
+     *
+     * @param $endID INT
+     * @param $treeID INT (optional)
+     * @return ARRAY
+     */
     public function getEnd($endID, $treeID = false) {
         return $this->fetchOneByView('end', $endID, $treeID);
     }
 
+    /**
+     * Gets all possible interaction types from database
+     *
+     * @return ARRAY of ARRAYS
+     */
     public function getInteractionTypes() {
         // Do a select query to see if we get a returned row
         $sql = "SELECT * from ".$this->tables['treeInteractionType'];
@@ -353,6 +384,12 @@ class DB extends PDO {
         return $this->fetchAll($sql);
     }
 
+    /**
+     * Gets an interaction type from database
+     *
+     * @param $interactionType MIXED (INT/STRING)
+     * @return ARRAY
+     */
     public function getInteractionType($interactionType) {
         if(Utility\isID($interactionType)) {
             return $this->getInteractionTypeByID($interactionType);
@@ -361,6 +398,12 @@ class DB extends PDO {
         }
     }
 
+    /**
+     * Gets an interaction type from database by ID
+     *
+     * @param $interactionTypeID MIXED (INT/STRING)
+     * @return ARRAY
+     */
     public function getInteractionTypeByID($interactionTypeID) {
         // Do a select query to see if we get a returned row
         $params = [":interactionTypeID" => $interactionTypeID];
@@ -370,6 +413,12 @@ class DB extends PDO {
         return $this->fetchOne($sql, $params);
     }
 
+    /**
+     * Gets an interaction type from database by slug
+     *
+     * @param $interactionType (STRING)
+     * @return ARRAY
+     */
     public function getInteractionTypeBySlug($interactionType) {
         // Do a select query to see if we get a returned row
         $params = [":interactionType" => $interactionType];
@@ -379,6 +428,11 @@ class DB extends PDO {
         return $this->fetchOne($sql, $params);
     }
 
+    /**
+     * Gets all possible state types from database
+     *
+     * @return ARRAY
+     */
     public function getStateTypes() {
         // Do a select query to see if we get a returned row
         $sql = "SELECT * from ".$this->tables['treeStateType'];
@@ -386,6 +440,12 @@ class DB extends PDO {
         return $this->fetchAll($sql);
     }
 
+    /**
+     * Gets a state type from database
+     *
+     * @param $stateType MIXED (INT/STRING)
+     * @return ARRAY
+     */
     public function getStateType($stateType) {
         if(Utility\isID($stateType)) {
             return $this->getStateTypeByID($stateType);
@@ -394,6 +454,12 @@ class DB extends PDO {
         }
     }
 
+    /**
+     * Gets a state type from database by ID
+     *
+     * @param $stateTypeID MIXED (INT/STRING)
+     * @return ARRAY
+     */
     public function getStateTypeByID($stateTypeID) {
         // Do a select query to see if we get a returned row
         $params = [":stateTypeID" => $stateTypeID];
@@ -403,6 +469,12 @@ class DB extends PDO {
         return $this->fetchOne($sql, $params);
     }
 
+    /**
+     * Gets a state type from database by slug
+     *
+     * @param $stateType (STRING)
+     * @return ARRAY
+     */
     public function getStateTypeBySlug($stateType) {
         // Do a select query to see if we get a returned row
         $params = [":stateType" => $stateType];

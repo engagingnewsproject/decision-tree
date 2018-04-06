@@ -160,9 +160,6 @@ final class DBTest extends DBTestCase
         }
 
         // do one failure test for getOptions
-        $this->assertFalse($this->db->getOptions(999999999999999999));
-
-        // do one failure test for getOption
-        $this->assertFalse($this->db->getOption(999999999999999999));
+        $this->assertEmpty($this->db->getOptions(999999999999999999));
     }
 }
