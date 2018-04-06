@@ -228,4 +228,57 @@ final class ValidateTest extends DBTestCase
 
         return $provider;
     }
+
+    /**
+     * @covers Cme\Database\site()
+     * @dataProvider validateSiteProvider
+     */
+    public function testValidateSite($state_type, $expected) {
+        $this->evaluateAssert($this->validate->site($state_type), $expected);
+    }
+
+    public function validateSiteProvider() {
+        $sites = ['localhost:3000', 'decision-tree.dev', 1];
+
+        $provider = [
+            'invalid_empty'   => ['', false],
+            'invalid_site'    => ['adfasdfasdfa', false],
+            'invalid_not_exists'  => [99999999999, false]
+        ];
+
+        foreach($sites as $site) {
+            $provider[$site] = [$site, true];
+        }
+
+        return $provider;
+    }
+
+    /**
+     * @covers Cme\Database\embed()
+     * @dataProvider validateEmbedProvider
+     */
+    public function testValidateEmbed($embed, $options, $expected) {
+        $this->evaluateAssert($this->validate->embed($embed, $options), $expected);
+    }
+
+    public function validateEmbedProvider() {
+        $embeds = ['/example.php', 1];
+
+        $provider = [
+            'invalid_empty'   => ['', [], false],
+            'invalid_embed'    => ['adfasdfasdfa', [], false],
+            'invalid_format'  => [99999999999, [], false]
+        ];
+
+        foreach($embeds as $embed) {
+            $provider[$embed] = [$embed, [], true];
+            $provider[$embed.'_siteID'] = [$embed, ['siteID' => 1], true];
+            $provider[$embed.'_treeID'] = [$embed, ['treeID' => 1], true];
+            $provider[$embed.'_siteID_treeID'] = [$embed, ['treeID' => 1, 'siteID' => 1], true];
+            $provider[$embed.'_invalid_treeID'] = [$embed, ['treeID' => 9999999999], false];
+            $provider[$embed.'_invalid_siteID'] = [$embed, ['siteID' => 9999999999], false];
+        }
+
+        return $provider;
+    }
 }

@@ -19,7 +19,7 @@ use PDO;
 class DB extends PDO {
 	public $tables,
 		   $views,
-		   $errors = array();
+		   $errors = [];
 
 	public function __construct() {
 		// Table names for dynamic reference
@@ -98,7 +98,7 @@ class DB extends PDO {
 	 * @param $options ARRAY of defaults you can add to the SQL statement, like an orderby option
 	 * @return MIXED ARRAY from the PDO query on success, ??? if error
 	 */
-	public function fetchAllByTree($view, $treeID, $options = array()) {
+	public function fetchAllByTree($view, $treeID, $options = []) {
 		$default = array('orderby'=>false);
 		$options = array_merge($default, $options);
 		// TODO: validate options
@@ -148,12 +148,12 @@ class DB extends PDO {
 		return $this->fetchOne($sql, $params);
 	}
 
-	public function fetchOne($sql, $params = array()) {
+	public function fetchOne($sql, $params = []) {
 		$stmt = $this->query($sql, $params);
 		return $stmt->fetch(PDO::FETCH_ASSOC);
 	}
 
-	public function fetchAll($sql, $params = array()) {
+	public function fetchAll($sql, $params = []) {
 		$stmt = $this->query($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
@@ -249,7 +249,7 @@ class DB extends PDO {
      * @param $options ARRAY (Optional) sets orderby paramater in SQL statement
      * @return ARRAY
      */
-    public function getQuestions($treeID, $options = array()) {
+    public function getQuestions($treeID, $options = []) {
         $default = array('orderby'=>'order');
         $options = array_merge($default, $options);
         return $this->fetchAllByTree('treeQuestion', $treeID, $options);
@@ -290,7 +290,7 @@ class DB extends PDO {
         return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
     }
 
-    public function getOptions($questionID, $options = array()) {
+    public function getOptions($questionID, $options = []) {
         $default = array('treeID'=>false, 'orderby'=>'order');
         $options = array_merge($default, $options);
 
@@ -315,7 +315,7 @@ class DB extends PDO {
         return $this->fetchAll($sql, $params);
     }
 
-    public function getOption($optionID, $options = array()) {
+    public function getOption($optionID, $options = []) {
         $default = array('treeID'=>false, 'questionID'=>false);
         $options = array_merge($default, $options);
 
@@ -446,7 +446,7 @@ class DB extends PDO {
         return $this->fetchAll($sql, $params);
     }
 
-    public function getEmbed($embed, $options) {
+    public function getEmbed($embed, $options = []) {
         if(Utility\isID($embed)) {
             return $this->getEmbedByID($embed, $options);
         } else {
@@ -454,7 +454,7 @@ class DB extends PDO {
         }
     }
 
-    public function getEmbedByID($embedID, $options) {
+    public function getEmbedByID($embedID, $options = []) {
         // Do a select query to see if we get a returned row
         $params = [":embedID" => $embedID];
         $sql = "SELECT * from ".$this->tables['treeEmbed']." WHERE
@@ -475,7 +475,7 @@ class DB extends PDO {
         return $this->fetchOne($sql, $params);
     }
 
-    public function getEmbedByPath($embedPath, $options) {
+    public function getEmbedByPath($embedPath, $options = []) {
         // Do a select query to see if we get a returned row
         $params = [
                     ":embedPath" => $embedPath,

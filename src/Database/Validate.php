@@ -148,7 +148,12 @@ class Validate extends DB {
         return $isValid;
     }
 
-    // Make sure the state type exists
+    /**
+     * Validates that the stateType is a valid state type
+     *
+     * @param $stateType STRING
+     * @return BOOLEAN
+     */
     public function stateType($stateType) {
         $isValid = false;
 
@@ -161,22 +166,50 @@ class Validate extends DB {
         return $isValid;
     }
 
-    // Make sure the site exists
+    /**
+     * Validates that the site exists in the database
+     *
+     * @param $site STRING
+     * @return BOOLEAN
+     */
     public function site($site) {
         $isValid = false;
-        // if we can find that site, it's valid
-        if($this->getSite($site) !== false) {
+        // check if we should compare by ID or host
+        if(Utility\isID($site)) {
+            $key = 'siteID';
+        } else {
+            $key = 'siteHost';
+        }
+
+
+        $getSite = $this->getSite($site);
+        // check if it's set and it equals the passed value
+        if(isset($getSite[$key]) && (string) $getSite[$key] === (string) $site) {
             $isValid = true;
         }
 
         return $isValid;
     }
 
-    // Make sure the embed exists
-    public function embed($embed, $options) {
+    /**
+     * Validates that the embed exists in the database
+     *
+     * @param $embed STRING
+     * @param $options ARRAY
+     * @return BOOLEAN
+     */
+    public function embed($embed, $options = []) {
         $isValid = false;
-        // if we can find that embed, it's valid
-        if($this->getEmbed($embed, $options) !== false) {
+        // check if we should compare by ID or path
+        if(Utility\isID($embed)) {
+            $key = 'embedID';
+        } else {
+            $key = 'embedPath';
+        }
+
+        $getEmbed = $this->getEmbed($embed, $options);
+        // check if it's set and it equals the passed value
+        if(isset($getEmbed[$key]) && (string) $getEmbed[$key] === (string) $embed) {
             $isValid = true;
         }
 
