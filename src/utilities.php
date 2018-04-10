@@ -100,6 +100,12 @@ function getEndpoint($path) {
         CURLOPT_RETURNTRANSFER => 1, // get response as string
         CURLOPT_URL => TREE_URL.'/api/v1/'.$path
     ));
+
+    // don't worry about SSL for local
+    if(TREE_URL === 'https://decision-tree.dev') {
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    }
+
     // Send the request
     $response = curl_exec($curl);
     // Close request to clear up some resources
