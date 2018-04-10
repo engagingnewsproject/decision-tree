@@ -6,7 +6,7 @@ use Cme\Utility as Utility;
 /**
  * @covers Cme\Database
  */
-final class DBTest extends DBTestCase
+final class DBTest extends TreeTestCase
 {
     protected function setUp()
     {
