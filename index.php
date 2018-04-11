@@ -224,8 +224,9 @@ $app->group('/api', function() {
             return $response;
         });
 
-        // Site data
-        $this->post('/sites/new', function (Request $request, Response $response) {
+        // Save new site
+        /*
+        $this->post('/sites', function (Request $request, Response $response) {
             // passed data
             $data = $request->getParsedBody();
             // validate it
@@ -242,7 +243,7 @@ $app->group('/api', function() {
                 ->write(json_encode($data));
             return $response;
         });
-
+        */
         // returns array of all the sites
         $this->get('/sites', function (Request $request, Response $response) {
             $sites = [['siteID'=>1, 'feature_finished'=>'nope!']];
@@ -289,7 +290,8 @@ $app->group('/api', function() {
         });
 
         // Add a new Tree Embed to a site
-        $this->post('/sites/{siteID}/embeds/new', function (Request $request, Response $response) {
+        /*
+        $this->post('/sites/{siteID}/embeds', function (Request $request, Response $response) {
             $siteID = $request->getAttribute('siteID');
             // passed data
             $data = $request->getParsedBody();
@@ -306,10 +308,10 @@ $app->group('/api', function() {
                 ->withHeader("Content-Type", "application/json")
                 ->write(json_encode($data));
             return $response;
-        });
+        });*/
 
         // save interactions
-        $this->post('/interactions/new', function (Request $request, Response $response) {
+        $this->post('/interactions', function (Request $request, Response $response) {
             // passed data
             $data = $request->getParsedBody();
             // set empty errors array. This whole "check for errors then move on" thing

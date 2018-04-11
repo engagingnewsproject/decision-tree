@@ -78,7 +78,7 @@ function TreeInteraction(options) {
     }
 
     this.setPostURL = function() {
-        _postURL = this.getRootURL()+'/api/v1/interactions/new';
+        _postURL = this.getRootURL()+'/api/v1/interactions'
         return _postURL
     }
 
