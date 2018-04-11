@@ -21,8 +21,8 @@ describe('Tree', function() {
             let treeData = tree.getData();
             // clear localstorage for this tree
             localStorage.removeItem('treeUserID');
-            localStorage.removeItem('treeHistory__'+treeData.tree_id);
-            localStorage.removeItem('treeHistoryIndex__'+treeData.tree_id);
+            localStorage.removeItem('treeHistory__'+treeData.treeID);
+            localStorage.removeItem('treeHistoryIndex__'+treeData.treeID);
         });
     });
 
@@ -46,8 +46,8 @@ describe('Tree', function() {
 
             var questions = tree.getDataByType('question');
             var lastQuestionIndex = questions.length - 1;
-            var lastQuestionID = questions[lastQuestionIndex].question_id;
-            var getIndexLastQuestion = tree.getIndexBy(questions, 'question_id', lastQuestionID);
+            var lastQuestionID = questions[lastQuestionIndex].questionID;
+            var getIndexLastQuestion = tree.getIndexBy(questions, 'questionID', lastQuestionID);
 
             expect(lastQuestionIndex).to.equal(getIndexLastQuestion);
         });
@@ -67,11 +67,11 @@ describe('Tree', function() {
             // get all of them so we can get the first id to make a valid call
             var questions = tree.getDataByType('question');
             // get the first one
-            var question = tree.getDataByType('question', questions[0].question_id);
+            var question = tree.getDataByType('question', questions[0].questionID);
 
-            expect(questions[0].question_id)
+            expect(questions[0].questionID)
             .to
-            .equal(question.question_id);
+            .equal(question.questionID);
         });
 
         it('should return undefined when using an invalid id', function() {
@@ -106,36 +106,36 @@ describe('Tree', function() {
             expect(tree.getState().id).to.equal(tree.getTreeID());
         });
 
-        it('should set the question_id to first question\'s question_id', function() {
+        it('should set the questionID to first question\'s questionID', function() {
             var questions = tree.getDataByType('question');
-            var question_id = questions[0].question_id;
-            tree.setState('question', question_id);
+            var questionID = questions[0].questionID;
+            tree.setState('question', questionID);
 
-            expect(question_id).to.equal(tree.getState().id);
+            expect(questionID).to.equal(tree.getState().id);
         });
 
         it('should set the state to "question"', function() {
             var questions = tree.getDataByType('question');
-            var question_id = questions[0].question_id;
-            tree.setState('question', question_id);
+            var questionID = questions[0].questionID;
+            tree.setState('question', questionID);
 
             expect('question').to.equal(tree.getState().type);
         });
 
         it('should set the state to "end"', function() {
             var ends = tree.getDataByType('end');
-            var end_id = ends[0].end_id;
-            tree.setState('end', end_id);
+            var endID = ends[0].endID;
+            tree.setState('end', endID);
 
             expect('end').to.equal(tree.getState().type);
         });
 
-        it('should set the end_id to first end\'s end_id', function() {
+        it('should set the endID to first end\'s endID', function() {
             var ends = tree.getDataByType('end');
-            var end_id = ends[0].end_id;
-            tree.setState('end', end_id);
+            var endID = ends[0].endID;
+            tree.setState('end', endID);
 
-            expect(end_id).to.equal(tree.getState().id);
+            expect(endID).to.equal(tree.getState().id);
         });
 
         it('should set the state to "intro"', function() {
@@ -155,7 +155,7 @@ describe('Tree', function() {
             expect(state).to.equal(false);
         });
 
-        it('should not set the state to an invalid question_id', function() {
+        it('should not set the state to an invalid questionID', function() {
             state = tree.setState('question', '12398019283102983102983102938102938');
             expect(state).to.equal(false);
         });
@@ -174,11 +174,11 @@ describe('Tree', function() {
             // get all of them so we can get the first id to make a valid call
             var questions = tree.getQuestions();
             // get the first one
-            var question = tree.getQuestions(questions[0].question_id);
+            var question = tree.getQuestions(questions[0].questionID);
 
-            expect(questions[0].question_id)
+            expect(questions[0].questionID)
             .to
-            .equal(question.question_id);
+            .equal(question.questionID);
         });
 
         it('should return undefined when using an invalid id', function() {
@@ -206,11 +206,11 @@ describe('Tree', function() {
             // get all of them so we can get the first id to make a valid call
             var groups = tree.getGroups();
             // get the first one
-            var group = tree.getGroups(groups[0].group_id);
+            var group = tree.getGroups(groups[0].groupID);
 
-            expect(groups[0].group_id)
+            expect(groups[0].groupID)
             .to
-            .equal(group.group_id);
+            .equal(group.groupID);
         });
 
         it('should return undefined when using an invalid id', function() {
@@ -238,11 +238,11 @@ describe('Tree', function() {
             // get all of them so we can get the first id to make a valid call
             var ends = tree.getEnds();
             // get the first one
-            var end = tree.getEnds(ends[0].end_id);
+            var end = tree.getEnds(ends[0].endID);
 
-            expect(ends[0].end_id)
+            expect(ends[0].endID)
             .to
-            .equal(end.end_id);
+            .equal(end.endID);
         });
 
         it('should return undefined when using an invalid id', function() {
@@ -270,11 +270,11 @@ describe('Tree', function() {
             // get all of them so we can get the first id to make a valid call
             var starts = tree.getStarts();
             // get the first one
-            var start = tree.getStarts(starts[0].start_id);
+            var start = tree.getStarts(starts[0].startID);
 
-            expect(starts[0].start_id)
+            expect(starts[0].startID)
             .to
-            .equal(start.start_id);
+            .equal(start.startID);
         });
 
         it('should return undefined when using an invalid id', function() {
