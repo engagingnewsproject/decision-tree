@@ -9,20 +9,20 @@ This project is the actual code for creating a Decision Tree. To include one of 
 Database
 -----------------------------------
 
-### Naming convention: underscores
+### Naming convention: camelCase
 Tables don't use abbreviations. Use full words: i.e. `element` good, `el` bad
-Columns can use abbreviations if they're consistent across all tables. `el_id` is fine.
-Id fields should be prefixed with the Id it relates to. So, table `tree` with `id` column, bad. Table `tree` with `tree_id`, good.
+Columns can use abbreviations if they're consistent across all tables. `elID` is fine.
+Id fields should be prefixed with the Id it relates to. So, table `tree` with `id` column, bad. Table `tree` with `treeID`, good.
 
-### Triggers on Insert for Created_at and Updated_at timestamps
-There are triggers (go to phpmyadmin tables, select "triggers" tab) set-up to automatically set the current time for the `created_at` column when a row is inserted. The `updated_at` fields are already set to `CURRENT_TIMESTAMP ON UPDATE`. This way, we don't have to pass any `updated_at` or `created_at` values from our application.
+### Triggers on Insert for CreatedAt and UpdatedAt timestamps
+There are triggers (go to phpmyadmin tables, select "triggers" tab) set-up to automatically set the current time for the `createdAt` column when a row is inserted. The `updatedAt` fields are already set to `CURRENT_TIMESTAMP ON UPDATE`. This way, we don't have to pass any `updatedAt` or `createdAt` values from our application.
 
 ### Only Select from Views
 When running sql `SELECT`, only interact with the `view`s:
-- `tree_column`
-- `tree_question`
-- `tree_option`
-- `tree_end`
+- `treeColumn`
+- `treeQuestion`
+- `treeOption`
+- `treeEnd`
 
 Actually, you can interact directly with the `tree` table... But for the others, `SELECT` from the view.
 
@@ -30,40 +30,49 @@ Actually, you can interact directly with the `tree` table... But for the others,
 
 API Endpoints
 --------------------------
-/trees/
-/trees/1
-/trees/1/questions/
-/trees/1/questions/2
-/trees/1/questions/2/options/
-/trees/1/questions/2/options/3
-/trees/1/ends/
-/trees/1/ends/4
-/trees/1/groups/
-/trees/1/groups/5
 
-/interactions/new
-/interactions/1
-/interactions/types/
-/interactions/types/1
-/interactions/types/load
+Naming follows conventions of general REST architecture:
+- GET /trees returns all trees
+- POST /trees creates a new tree
+- GET /trees/{{treeID}} returns that tree
+- PATCH /trees/{{treeID}} updates that tree
+- DELETE /trees/{{treeID}} deletes that tree
 
-/states/types/2
-/states/types/question
+GET /trees
+GET /trees/1
+GET /trees/1/questions
+GET /trees/1/questions/2
+GET /trees/1/questions/2/options
+GET /trees/1/questions/2/options/3
+GET /trees/1/ends
+GET /trees/1/ends/4
+GET /trees/1/groups
+GET /trees/1/groups/5
+
+POST /interactions
+GET /interactions
+GET /interactions/1
+GET /interactions/types
+GET /interactions/types/1
+GET /interactions/types/load
+
+GET /states/types/2
+GET /states/types/question
 
 Roadmap
 --------------------------
-/trees/1/embeds/
+/trees/1/embeds
 /trees/1/embeds/2
 
-/sites/
+/sites
 /sites/1
 /sites/1/embeds/
 /sites/1/embeds/new
 /sites/1/embeds/1
 
 /interactions/{tree_id}
-/interactions/{tree_id}/loads/
+/interactions/{tree_id}/loads
 /interactions/{tree_id}/loads/{interaction_id}
-/interactions/{tree_id}/reloads/
-/interactions/{tree_id}/starts/
+/interactions/{tree_id}/reloads
+/interactions/{tree_id}/starts
 /interactions/{tree_id}/starts/{interaction_id}
