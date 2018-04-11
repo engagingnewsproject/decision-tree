@@ -80,7 +80,7 @@ $app->group('/api', function() {
             ]);
         });
 
-        $this->get('/trees/', function (Request $request, Response $response) {
+        $this->get('/trees', function (Request $request, Response $response) {
             $db = new Database\DB();
             $trees = $db->getTrees();
 
@@ -98,7 +98,7 @@ $app->group('/api', function() {
             return $response;
         });
 
-        $this->get('/trees/{treeID}/starts/', function (Request $request, Response $response) {
+        $this->get('/trees/{treeID}/starts', function (Request $request, Response $response) {
             $treeID = $request->getAttribute('treeID');
             // get all starts from that tree id
             $db = new Database\DB();
@@ -119,7 +119,7 @@ $app->group('/api', function() {
             return $response;
         });
 
-        $this->get('/trees/{treeID}/groups/', function (Request $request, Response $response) {
+        $this->get('/trees/{treeID}/groups', function (Request $request, Response $response) {
             $treeID = $request->getAttribute('treeID');
             // get all groups from that tree id
             $db = new Database\DB();
@@ -140,7 +140,7 @@ $app->group('/api', function() {
             return $response;
         });
 
-        $this->get('/trees/{treeID}/questions/', function (Request $request, Response $response) {
+        $this->get('/trees/{treeID}/questions', function (Request $request, Response $response) {
             $treeID = $request->getAttribute('treeID');
 
             $db = new Database\DB();
@@ -161,7 +161,7 @@ $app->group('/api', function() {
             return $response;
         });
 
-        $this->get('/trees/{treeID}/questions/{questionID}/options/', function (Request $request, Response $response) {
+        $this->get('/trees/{treeID}/questions/{questionID}/options', function (Request $request, Response $response) {
             $treeID = $request->getAttribute('treeID');
             $questionID = $request->getAttribute('questionID');
 
@@ -184,7 +184,7 @@ $app->group('/api', function() {
             return $response;
         });
 
-        $this->get('/trees/{treeID}/ends/', function (Request $request, Response $response) {
+        $this->get('/trees/{treeID}/ends', function (Request $request, Response $response) {
             $treeID = $request->getAttribute('treeID');
 
             $db = new Database\DB();
@@ -205,7 +205,7 @@ $app->group('/api', function() {
             return $response;
         });
 
-        $this->get('/trees/{treeID}/embeds/', function (Request $request, Response $response) {
+        $this->get('/trees/{treeID}/embeds', function (Request $request, Response $response) {
             $treeID = $request->getAttribute('treeID');
             // TODO: returns array of all embeds that match this treeID
             $embeds = [[]];
@@ -244,7 +244,7 @@ $app->group('/api', function() {
         });
 
         // returns array of all the sites
-        $this->get('/sites/', function (Request $request, Response $response) {
+        $this->get('/sites', function (Request $request, Response $response) {
             $sites = [['siteID'=>1, 'feature_finished'=>'nope!']];
 
             // return the JSON
@@ -266,7 +266,7 @@ $app->group('/api', function() {
         });
 
         // Returns all embeds on that site
-        $this->get('/sites/{siteID}/embeds/', function (Request $request, Response $response) {
+        $this->get('/sites/{siteID}/embeds', function (Request $request, Response $response) {
             $siteID = $request->getAttribute('siteID');
             $db = new Database\DB();
             //TODO: see if the site ID is an ID or a URL
@@ -355,7 +355,7 @@ $app->group('/api', function() {
             return $response;
         });
 
-        $this->get('/interactions/types/', function (Request $request, Response $response) {
+        $this->get('/interactions/types', function (Request $request, Response $response) {
             $db = new Database\DB();
             $interactionTypes = $db->getInteractionTypes();
 
@@ -372,7 +372,7 @@ $app->group('/api', function() {
             return $response;
         });
 
-        $this->get('/states/types/', function (Request $request, Response $response) {
+        $this->get('/states/types', function (Request $request, Response $response) {
             $db = new Database\DB();
             $stateTypes = $db->getStateTypes();
 

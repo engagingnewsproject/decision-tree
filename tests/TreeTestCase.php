@@ -33,6 +33,24 @@ class TreeTestCase extends TestCase
       // unset($_SERVER["DOCUMENT_ROOT"]);
     }
 
+    public function getTreesProvider() {
+        $db = new Database\DB();
+        // get first three trees
+        return array_slice($db->getTrees(), 0, 3);
+    }
+
+    public function getQuestionsProvider($treeID) {
+        $db = new Database\DB();
+        // get first three trees
+        return array_slice($db->getQuestions($treeID), 0, 3);
+    }
+
+    public function getEndsProvider($treeID) {
+        $db = new Database\DB();
+        // get first three trees
+        return array_slice($db->getEnds($treeID), 0, 3);
+    }
+
 
     /**
     * Dynamically uses getter functions (like getQuestions) and returns the results
