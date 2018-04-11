@@ -16,7 +16,7 @@ final class APITest extends TreeTestCase
     }
 
     /**
-     * @covers api/v1/trees/
+     * @covers api/v1/trees
      */
     public function testGetTrees() {
         $trees = $this->db->getTrees();
@@ -27,9 +27,9 @@ final class APITest extends TreeTestCase
      * @covers api/v1/trees/{{treeID}}
      * @dataProvider APITreeProvider
      */
-    public function testAPITree($tree) {
-        $getTree = $this->db->getTree($tree);
-        $this->assertEquals(Utility\getEndpoint('trees/'.$tree), json_encode($getTree));
+    public function testAPITree($treeID) {
+        $getTree = $this->db->getTree($treeID);
+        $this->assertEquals(Utility\getEndpoint('trees/'.$treeID), json_encode($getTree));
     }
 
     public function APITreeProvider() {
@@ -38,7 +38,6 @@ final class APITest extends TreeTestCase
 
         foreach($trees as $tree) {
             $provider['tree'.$tree['treeID']] = [$tree['treeID']];
-            $provider['tree'.ucfirst($tree['treeSlug'])] = [$tree['treeSlug']];
         }
 
         return $provider;
@@ -82,5 +81,37 @@ final class APITest extends TreeTestCase
         }
 
         return $provider;
+    }
+
+    /**
+     * @covers api/v1/trees/{{treeID}}/questions/{{questionID}}/options
+     * @covers api/v1/trees/{{treeID}}/groups/{{groupID}}
+     * @dataProvider APITreeProvider
+     */
+    public function testAPIOptions($treeID) {
+        $questions = $this->getQuestionsProvider($treeID);
+
+        if(empty($questions)) {
+
+            $question = $this->getOneDynamic('question', 1);
+            $route = 'trees/1/questions/'.$question['questionID'].'/options/99999999999999';
+            // assert on one that doesn't exist to make sure it's empty
+            $this->assertEquals(Utility\getEndpoint($route), json_encode(false));
+        }
+        foreach($questions as $question) {
+            $route = 'trees/'.$treeID.'/questions/'.$question['questionID'].'/options';
+            $options = $this->db->getOptions($question['questionID']);
+            // check that the options match
+            $this->assertEquals(Utility\getEndpoint($route), json_encode($options));
+
+            if(empty($options)) {
+                continue;
+            }
+            // check individual options match
+            foreach($options as $option) {
+                $this->assertEquals(Utility\getEndpoint($route.'/'.$option['optionID']), json_encode($option));
+            }
+        }
+
     }
 }

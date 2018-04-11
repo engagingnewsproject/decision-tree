@@ -55,7 +55,7 @@ class TreeTestCase extends TestCase
     /**
     * Dynamically uses getter functions (like getQuestions) and returns the results
     *
-    * @param $elType STRING of the el type you want ('question', 'end', 'group', or )
+    * @param $elType STRING of the el type you want ('question', 'end', 'group', or 'start')
     * @return ARRAY of first result from get_$elTypeS vs get_$elType($elID)
     */
     public function getAllDynamic($elType, $treeID) {
