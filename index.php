@@ -30,7 +30,7 @@ $app->add(function ($req, $res, $next) {
 
 $app->add(new Tuupola\Middleware\HttpBasicAuthentication([
     "path" => ["/api"],
-    "passthrough" => ["/api/v1/interactions"],
+    "ignore" => ["/api/v1/interactions"],
     "realm" => "Protected",
     "users" => [
         "juryjowns" => TREE_ADMIN_PASSWORD,
