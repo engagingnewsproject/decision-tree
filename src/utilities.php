@@ -98,7 +98,8 @@ function getEndpoint($path) {
     // Set options
     curl_setopt_array($curl, array(
         CURLOPT_RETURNTRANSFER => 1, // get response as string
-        CURLOPT_URL => TREE_URL.'/api/v1/'.$path
+        CURLOPT_URL => TREE_URL.'/api/v1/'.$path,
+        CURLOPT_USERPWD => TREE_ADMIN_USERPASS
     ));
 
     // don't worry about SSL for local

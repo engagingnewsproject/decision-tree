@@ -28,6 +28,23 @@ $app->add(function ($req, $res, $next) {
 });
 // END Laxy CORS //
 
+$app->add(new Tuupola\Middleware\HttpBasicAuthentication([
+    "path" => ["/api"],
+    "passthrough" => ["/api/v1/interactions"],
+    "realm" => "Protected",
+    "users" => [
+        "juryjowns" => TREE_ADMIN_PASSWORD,
+    ],
+    "error" => function ($response, $message) {
+        $data = [
+            'error' => $message,
+        ];
+
+        return $response->getBody()->write(json_encode($data, JSON_UNESCAPED_SLASHES));
+    }
+]));
+
+
 // register views
 $container = $app->getContainer();
 $container['view'] = new \Slim\Views\PhpRenderer("views/");
