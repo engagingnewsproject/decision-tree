@@ -321,6 +321,7 @@ $app->group('/api', function() {
             $site = new Database\SaveSite();
             // get the siteID. It will either save a new one or return an existing one
             $siteResponse = $site->save($data['site']);
+
             if(isset($siteResponse['status']) && $siteResponse['status'] === 'success') {
                 $data['site']['siteID'] = $siteResponse['siteID'];
                 $data['site']['treeID'] = $data['treeID'];
@@ -350,10 +351,11 @@ $app->group('/api', function() {
                 $theResponse = $errors;
             }
 
+
             // return the JSON
             $response->withStatus(200)
                 ->withHeader("Content-Type", "application/json")
-                ->write(json_encode($data));
+                ->write(json_encode($theResponse));
             return $response;
         });
 
