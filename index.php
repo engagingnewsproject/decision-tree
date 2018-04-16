@@ -162,12 +162,28 @@ $app->group('/api', function() {
         $this->delete('/trees', function (Request $request, Response $response) {
             // passed data
             $data = $request->getParsedBody();
+            $user = $request->getAttribute('user');
 
-            $user = Utility\getUser('clientToken', $data['user']['clientToken']);
-            // if we have a user, try to create the tree
             $db = new Database\DB();
-            $tree = $db->createTree($data['tree'], $user);
-            $response->getBody()->write(json_encode($tree));
+            $delete = $db->deleteTree($data['tree'], $user);
+
+            $response->getBody()->write(json_encode($delete));
+            return $response;
+        });
+
+        $this->put('/trees', function (Request $request, Response $response) {
+            // passed data
+            $data = $request->getParsedBody();
+            $user = $request->getAttribute('user');
+
+            $db = new Database\DB();
+            $update = $db->updateTree($data['tree'], $user);
+            if($update === true) {
+                $tree = $db->getTree($data['tree']['treeID']);
+                $response->getBody()->write(json_encode($tree));
+            } else {
+                $response->getBody()->write(json_encode($update));
+            }
 
             return $response;
         });

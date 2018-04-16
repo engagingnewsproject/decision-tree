@@ -106,6 +106,52 @@ class DB extends PDO {
     }
 
     /**
+     * Builds out bound update SQL string
+     *
+     * @param $vals ARRAY
+     * @return STRING
+     */
+    public function buildUpdate($vals) {
+        $set = '';
+
+        $i = 1;
+        foreach($vals as $key => $val) {
+            $set .= "$key=:$key";
+
+            if($i !== count($vals)) {
+                // not the last one, so add a comma and space
+                $set .= ", ";
+                $i++;
+            }
+        }
+
+        return $set;
+    }
+
+    /**
+     * Builds out a simple WHERE statement with &
+     *
+     * @param $vals ARRAY
+     * @return STRING
+     */
+    public function buildWhere($vals) {
+        $where = '';
+
+        $i = 1;
+        foreach($vals as $key => $val) {
+            $where .= "$key=:$key";
+
+            if($i !== count($vals)) {
+                // not the last one, so add an AND statement
+                $where .= " AND ";
+                $i++;
+            }
+        }
+
+        return $where;
+    }
+
+    /**
      * Builds out a comma string of all passed parameters in the params
      *
      * @param $params ARRAY
@@ -237,29 +283,6 @@ class DB extends PDO {
     }
 
     /**
-     * Creates a tree in the DB
-     *
-     * @param $tree ARRAY Data to create tree with
-     * @return ARRAY
-     */
-    public function createTree($tree, $user) {
-        // validate the user
-        if(Utility\validateUser($user) !== true) {
-            return 'Invalid user.';
-        }
-
-        $tree['treeOwner'] = $user['userID'];
-        $tree['treeCreatedBy'] = $user['userID'];
-        $tree['treeUpdatedBy'] = $user['userID'];
-        // attempt to create the tree
-        return $this->insert([
-            'vals'      => $tree,
-            'required'  => ['treeSlug', 'treeOwner'],
-            'table'     => $this->tables['tree']
-        ]);
-    }
-
-    /**
      * Dynamic insert function to streamline the insert process
      *
      * $insert = ['vals' => ['treeslug'=>'mytree'], 'user' => $user, 'required'=> ['treeSlug', 'treeName'], 'table'=>$this->views['tree']]
@@ -289,8 +312,129 @@ class DB extends PDO {
                 VALUES (:".implode(', :', array_keys($params)).")";
 
         // attempt to create the tree
-        return $this->query($sql, $params);
+        $stmt = $this->query($sql, $params);
+        // return whatever ID just got inserted
+        return $pdo->lastInsertId();
     }
+
+    /**
+     * Dynamic delete function to streamline the delete process
+     *
+     * $update = [
+     *           'vals' => ['treeslug'=>'mytree'],
+     *           'user' => $user,
+     *           'required'=> ['treeSlug', 'treeName'],
+     *           'table'=>$this->views['tree']],
+     *           'where' => ['treeID' = $treeID]
+     *       ]
+     * return MIXED BOOL on success (true), ARRAY of errors on fail
+     */
+    protected function update($update) {
+
+        // get the values we'll be inserting
+        $vals = $update['vals'];
+        $table = $update['table'];
+
+        if(isset($update['required'])) {
+            $hasRequired = $this->hasRequired($vals, $update['required']);
+
+            if($hasRequired !== true) {
+                // returns array of the missing fields
+                return $hasRequired;
+            }
+        }
+
+        // build params on the vals and where statement vals
+        $params = array_merge($this->buildParams($vals), $this->buildParams($update['where']));
+
+        // dynamic expanding of passed keys and bound params
+        $sql = "UPDATE ".$table."
+                SET
+                  ".$this->buildUpdate($vals)."
+                WHERE
+                  ".$this->buildWhere($update['where'])."
+                  ";
+
+        // attempt to create the tree
+        $stmt = $this->query($sql, $params);
+
+        if($stmt !== false) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Creates a tree in the DB
+     *
+     * @param $tree ARRAY Data to create tree with
+     * @return ARRAY
+     */
+    public function createTree($tree, $user) {
+        // validate the user
+        if(Utility\validateUser($user) !== true) {
+            return 'Invalid user.';
+        }
+
+        $tree['treeOwner'] = $user['userID'];
+        $tree['treeCreatedBy'] = $user['userID'];
+        $tree['treeUpdatedBy'] = $user['userID'];
+        // attempt to create the tree
+        return $this->insert([
+            'vals'      => $tree,
+            'required'  => ['treeSlug', 'treeOwner'],
+            'table'     => $this->tables['tree']
+        ]);
+    }
+
+    /**
+     * Updates a tree in the DB
+     *
+     * @param $tree ARRAY Data to update
+     * @return updated tree
+     */
+    public function updateTree($tree, $user) {
+        $treeID = $tree['treeID'];
+        // validate the user
+        if(Utility\validateUser($user) !== true) {
+            return 'Invalid user.';
+        }
+
+        $validate = new Validate();
+        if(!$validate->treeID($treeID)) {
+            return 'Invalid tree.';
+        }
+
+        // find the tree and make sure the owner owns this tree
+        $getTree = $this->getTree($treeID);
+        if($getTree['owner'] !== $user['userID']) {
+            return 'Not tree owner.';
+        }
+        // unset the tree ID so we don't try updating that.
+        unset($tree['treeID']);
+        // attempt to create the tree
+        return $this->update([
+            'vals'      => $tree,
+            'required'  => [],
+            'table'     => $this->tables['tree'],
+            'where'     => ['treeID' => $treeID, 'treeOwner' => $user['userID']]
+        ]);
+    }
+
+
+    /**
+     * Deletes a tree from the DB
+     *
+     * @param $tree ARRAY Data to create tree with
+     * @return ARRAY
+     */
+    public function deleteTree($tree, $user) {
+        $tree['treeDeleted'] = 1;
+        return $this->updateTree($tree, $user);
+    }
+
+
     /**
      * Checks if all required fields are present
      *
