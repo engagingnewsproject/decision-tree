@@ -90,6 +90,42 @@ class DB extends PDO {
     }
 
     /**
+     * Builds out bound parameters in the array by adding a : to the beginning of the array keys
+     *
+     * @param $params ARRAY
+     * @return ARRAY
+     */
+    public function buildParams($params) {
+        $bound = [];
+
+        foreach($params as $key => $val) {
+            $bound[$key] = $val;
+        }
+
+        return $bound;
+    }
+
+    /**
+     * Builds out a comma string of all passed parameters in the params
+     *
+     * @param $params ARRAY
+     * @param $removeColon BOOL flag to remove the : from the beginning of the param keys
+     * @return STRING $params[0], $params[1]
+     */
+    public function paramKeysToString($params, $removeColon = false) {
+        $keys = array_keys($params);
+        if($removeColon === false) {
+            return implode(', ', $keys);
+        }
+
+        $keys = array_map(function($str) {
+            return ltrim($str, ':');
+        }, $keys);
+
+        return implode(', ', $keys);
+    }
+
+    /**
 	 * Gets all the results from a view based on the tree ID, such as all
 	 * questions by tree ID or all interactions by tree ID
 	 *
@@ -198,6 +234,83 @@ class DB extends PDO {
                 treeSlug = :treeSlug";
         // return the found tree row
         return $this->fetchOne($sql, $params);
+    }
+
+    /**
+     * Creates a tree in the DB
+     *
+     * @param $tree ARRAY Data to create tree with
+     * @return ARRAY
+     */
+    public function createTree($tree, $user) {
+        // validate the user
+        if(Utility\validateUser($user) !== true) {
+            return 'Invalid user.';
+        }
+
+        $tree['treeOwner'] = $user['userID'];
+        $tree['treeCreatedBy'] = $user['userID'];
+        $tree['treeUpdatedBy'] = $user['userID'];
+        // attempt to create the tree
+        return $this->insert([
+            'vals'      => $tree,
+            'required'  => ['treeSlug', 'treeOwner'],
+            'table'     => $this->tables['tree']
+        ]);
+    }
+
+    /**
+     * Dynamic insert function to streamline the insert process
+     *
+     * $insert = ['vals' => ['treeslug'=>'mytree'], 'user' => $user, 'required'=> ['treeSlug', 'treeName'], 'table'=>$this->views['tree']]
+     * return MIXED Inserted row on success, ARRAY of errors on fail
+     */
+    protected function insert($insert) {
+
+        // get the values we'll be inserting
+        $vals = $insert['vals'];
+        $table = $insert['table'];
+
+        if(isset($insert['required'])) {
+            $hasRequired = $this->hasRequired($vals, $insert['required']);
+
+            if($hasRequired !== true) {
+                // returns array of the missing fields
+                return $hasRequired;
+            }
+        }
+
+        // build params
+        $params = $this->buildParams($vals);
+
+        // dynamic expanding of passed keys and bound params
+        $sql = "INSERT INTO ".$table."
+                (".implode(', ', array_keys($vals)).")
+                VALUES (:".implode(', :', array_keys($params)).")";
+
+        // attempt to create the tree
+        return $this->query($sql, $params);
+    }
+    /**
+     * Checks if all required fields are present
+     *
+     * @param $fields ARRAY of KEY/VALUE pairs
+     * @param $required ARRAY of KEYS
+     * @return MIXED BOOL/ARRAY True on success, ARRAY on error
+     */
+    public function hasRequired($fields, $required) {
+        $missingFields = [];
+        foreach($required as $key) {
+            if(!isset($fields[$key])) {
+                $missingFields[] = $key. ' is a required field.';
+            }
+        }
+
+        if(empty($missingFields)) {
+            return true;
+        }
+
+        return $missingFields;
     }
 
     /**

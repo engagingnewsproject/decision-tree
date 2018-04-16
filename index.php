@@ -7,6 +7,7 @@ require 'vendor/autoload.php';
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Cme\Database as Database;
+use \Cme\Utility as Utility;
 
 $config = [];
 $config['displayErrorDetails'] = true;
@@ -28,7 +29,47 @@ $app->add(function ($req, $res, $next) {
 });
 // END Laxy CORS //
 
-$app->add(new Tuupola\Middleware\HttpBasicAuthentication([
+/**
+ * An authentication layer for validating users before
+ *
+ */
+$app->add(function ($request, $response, $next) {
+    if($request->isGet()) {
+        // No authentication needed.
+        // Go ahead and move on to the actual request.
+        $response = $next($request, $response);
+        return $response;
+    }
+
+    // passed data
+    $data = $request->getParsedBody();
+    $errors = [];
+
+    if(!isset($data['user'])) {
+        $errors[] = 'No user passed.';
+    } else {
+        $user = $data['user'];
+        // validate the user
+        $validUser = Utility\validateUserToken($user['clientToken'], $user['accessToken']);
+
+        if($validUser !== true) {
+            $errors[] = 'Invalid user.';
+        }
+    }
+
+    if(!empty($errors)) {
+        $response->getBody()->write(json_encode($errors));
+        return $response;
+    }
+
+    // add in our valid user to the request
+    $request = $request->withAttribute('user', Utility\getUser('clientToken', $data['user']['clientToken']));
+    // go ahead and move on to the actual request
+    $response = $next($request, $response);
+    return $response;
+});
+
+/* $app->add(new Tuupola\Middleware\HttpBasicAuthentication([
     "path" => ["/api"],
     "ignore" => ["/api/v1/interactions"],
     "realm" => "Protected",
@@ -42,7 +83,7 @@ $app->add(new Tuupola\Middleware\HttpBasicAuthentication([
 
         return $response->getBody()->write(json_encode($data, JSON_UNESCAPED_SLASHES));
     }
-]));
+]));*/
 
 
 // register views
@@ -102,6 +143,32 @@ $app->group('/api', function() {
             $trees = $db->getTrees();
 
             $response->getBody()->write(json_encode($trees));
+            return $response;
+        });
+
+        $this->post('/trees', function (Request $request, Response $response) {
+            // passed data
+            $data = $request->getParsedBody();
+
+            $user = $request->getAttribute('user');
+            // if we have a user, try to create the tree
+            $db = new Database\DB();
+            $tree = $db->createTree($data['tree'], $user);
+            $response->getBody()->write(json_encode($tree));
+
+            return $response;
+        });
+
+        $this->delete('/trees', function (Request $request, Response $response) {
+            // passed data
+            $data = $request->getParsedBody();
+
+            $user = Utility\getUser('clientToken', $data['user']['clientToken']);
+            // if we have a user, try to create the tree
+            $db = new Database\DB();
+            $tree = $db->createTree($data['tree'], $user);
+            $response->getBody()->write(json_encode($tree));
+
             return $response;
         });
 

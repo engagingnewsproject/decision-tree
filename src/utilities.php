@@ -90,16 +90,17 @@ function getTreeIDBySlug($treeSlug) {
     // return the tree slug
     return $tree['treeID'];
 }
-
-// really bare curl implementation to consume our own api
-function getEndpoint($path) {
+/**
+ * really bare curl implementation to consume our own api
+ * @param $user ARRAY ['userID'=>STRING, 'accessToken'=>STRING]
+ */
+function getEndpoint() {
     // Get cURL resource
     $curl = curl_init();
     // Set options
     curl_setopt_array($curl, array(
         CURLOPT_RETURNTRANSFER => 1, // get response as string
-        CURLOPT_URL => TREE_URL.'/api/v1/'.$path,
-        CURLOPT_USERPWD => TREE_ADMIN_USERPASS
+        CURLOPT_URL => TREE_URL.'/api/v1/'.$path
     ));
 
     // don't worry about SSL for local
@@ -113,4 +114,60 @@ function getEndpoint($path) {
     curl_close($curl);
 
     return $response;
+}
+
+/**
+ * Find a user by a key that matches the value you want
+ *
+ * @param $key STRING
+ * @param $val MIXED
+ * @return MIXED found user ARRAY or FALSE if not found
+ */
+function getUser($key, $val) {
+    $users = TREE_USERS;
+    foreach($users as $user) {
+        if($user[$key] === $val) {
+            return $user;
+        }
+    }
+    // could not locate user
+    return false;
+}
+
+
+// quick validate if the user token is valid
+function validateUserToken($clientToken, $accessToken) {
+    $user = getUser('clientToken', $clientToken);
+    if(empty($user)) {
+        return false;
+    }
+
+    // validate access token
+    if($user['accessToken'] === $accessToken) {
+        return true;
+    }
+
+    // invalid
+    return false;
+}
+
+// quick validate if the user token is valid
+function validateUser($user) {
+
+    // validate userID
+    if(!isset($user['userID']) || !isId($user['userID'])) {
+        return false;
+    }
+
+    // get the user from the DB
+    $foundUser = getUser('userID', $user['userID']);
+
+    // make sure our users match
+    if($foundUser === $user) {
+        // passed user and found user match, so we're good!
+        return true;
+    }
+
+    // invalid
+    return false;
 }
