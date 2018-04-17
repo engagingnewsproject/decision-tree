@@ -92,9 +92,10 @@ function getTreeIDBySlug($treeSlug) {
 }
 /**
  * really bare curl implementation to consume our own api
- * @param $user ARRAY ['userID'=>STRING, 'accessToken'=>STRING]
+ * @param $path STRING
+ * @return MIXED response
  */
-function getEndpoint() {
+function getEndpoint($path) {
     // Get cURL resource
     $curl = curl_init();
     // Set options
