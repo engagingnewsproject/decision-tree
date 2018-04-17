@@ -177,15 +177,15 @@ class DB extends PDO {
 	 *
 	 * @param $view The string of the view you want to use for the query
 	 * @param $treeID MIXED (STRING/INT) The treeID you want results for
-	 * @param $options ARRAY of defaults you can add to the SQL statement, like an orderby option
+	 * @param $options ARRAY of defaults you can add to the SQL statement, like an orderby option or which fields you want
 	 * @return MIXED ARRAY from the PDO query on success, ??? if error
 	 */
 	public function fetchAllByTree($view, $treeID, $options = []) {
-		$default = array('orderby'=>false);
+		$default = array('orderby'=>false, 'fields' => '*');
 		$options = array_merge($default, $options);
 		// TODO: validate options
 		$params = [":treeID" => $treeID];
-		$sql = "SELECT * from ".$this->views[$view]." WHERE
+		$sql = "SELECT ".$options['fields']." from ".$this->views[$view]." WHERE
 				treeID = :treeID";
 
 		$sql .= $this->getOrderby($options['orderby']);
