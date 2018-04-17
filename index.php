@@ -8,13 +8,14 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Cme\Database as Database;
 use \Cme\Utility as Utility;
+use \Cme\Tree as Tree;
 
 $config = [];
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
 
 $app = new \Slim\App(["settings" => $config]);
-
+$errors = [];
 
 // Start Laxy CORS //
 $app->options('/{routes:.+}', function ($request, $response, $args) {
@@ -152,38 +153,9 @@ $app->group('/api', function() {
 
             $user = $request->getAttribute('user');
             // if we have a user, try to create the tree
-            $db = new Database\DB();
-            $tree = $db->createTree($data['tree'], $user);
+            $db = new Database\DB($user);
+            $tree = $db->createTree($data['tree']);
             $response->getBody()->write(json_encode($tree));
-
-            return $response;
-        });
-
-        $this->delete('/trees', function (Request $request, Response $response) {
-            // passed data
-            $data = $request->getParsedBody();
-            $user = $request->getAttribute('user');
-
-            $db = new Database\DB();
-            $delete = $db->deleteTree($data['tree'], $user);
-
-            $response->getBody()->write(json_encode($delete));
-            return $response;
-        });
-
-        $this->put('/trees', function (Request $request, Response $response) {
-            // passed data
-            $data = $request->getParsedBody();
-            $user = $request->getAttribute('user');
-
-            $db = new Database\DB();
-            $update = $db->updateTree($data['tree'], $user);
-            if($update === true) {
-                $tree = $db->getTree($data['tree']['treeID']);
-                $response->getBody()->write(json_encode($tree));
-            } else {
-                $response->getBody()->write(json_encode($update));
-            }
 
             return $response;
         });
@@ -191,11 +163,57 @@ $app->group('/api', function() {
         $this->get('/trees/{treeID}', function (Request $request, Response $response) {
             $treeID = $request->getAttribute('treeID');
             $db = new Database\DB();
-            $tree = $db->getTree($treeID);
-
+            $tree = new Tree\Tree($db, $treeID);
             // format into JSON
-            $response->getBody()->write(json_encode($tree));
+            $response->getBody()->write(json_encode($tree->array()));
             return $response;
+        });
+
+        $this->put('/trees/{treeID}', function (Request $request, Response $response) {
+            // passed data
+            $data = $request->getParsedBody();
+            $user = $request->getAttribute('user');
+            $treeID = $request->getAttribute('treeID');
+
+            $db = new Database\DB($user);
+            $tree = new Tree\Tree($db, $treeID);
+
+            if(isset($data['slug'])) {
+                $tree->setFromArray($data['tree']);
+            }
+
+            $updateKeys = ['slug', 'title'];
+            foreach($data as $key => $val) {
+                if(in_array($key, $updateKeys)) {
+                    $function = 'set'.ucfirst($key);
+                    $tree->$function($val);
+                }
+            }
+
+            $result = $tree->save();
+
+            if($result === true) {
+                $response->getBody()->write(json_encode($tree->array()));
+            } else {
+                $response->getBody()->write(json_encode($result));
+            }
+
+            return $response;
+        });
+
+        $this->delete('/trees/{treeID}', function (Request $request, Response $response) {
+
+            $user = $request->getAttribute('user');
+            $treeID = $request->getAttribute('treeID');
+
+            $db = new Database\DB($user);
+
+            $tree = new Tree\Tree($db, $treeID);
+
+            $delete = $tree->delete();
+
+            $response->getBody()->write(json_encode($delete));
+
         });
 
         $this->get('/trees/{treeID}/starts', function (Request $request, Response $response) {

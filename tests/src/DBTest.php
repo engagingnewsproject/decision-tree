@@ -20,14 +20,31 @@ final class DBTest extends TreeTestCase
      */
     public function testFetchAllByTree($view, $treeID, $options, $expected_key, $expected) {
         $result = $this->db->fetchAllByTree($view, $treeID, $options);
-        $this->evaluateAssert(isset($result[0][$expected_key]), $expected);
+
+        if(!isset($options['fetch'])) {
+            $this->assertTrue(is_array($result));
+            $this->evaluateAssert(isset($result[0][$expected_key]), $expected);
+        } else {
+            $this->assertTrue(is_array($result));
+            $this->assertTrue(Utility\isID($result[0]));
+            $this->assertEquals($result[0], $expected);
+        }
+
     }
 
     public function fetchAllByTreeProvider() {
         return [
                 //'valid-1'=>['123456789', true],
-                'valid-1'=>['treeStart', 1, [], 'startID', true],
-                'valid-2'=>['treeGroup', 1, [], 'groupID', true],
+                'fetch all tree starts'=>['treeStart', 1, [], 'startID', true],
+                'fetch all tree group'=>['treeGroup', 1, [], 'groupID', true],
+                'fetch all question titles'=>['treeQuestion', 1, ['fields'=>'title'], 'title', true],
+                'fetch column end ID' => [
+                    'treeEnd',
+                    1,
+                    ['fields' => 'endID', 'fetch' => 'column'],
+                    'expected key param not needed',
+                    $this->getOneDynamic('end', 1)['endID']
+                ],
                 'invalid-1'=>['treeStart', 1, [], 'asdfasdf', false],
         ];
     }

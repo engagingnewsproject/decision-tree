@@ -20,8 +20,18 @@ class DB extends PDO {
 	public $tables,
 		   $views,
 		   $errors = [];
+    protected $user;
 
-	public function __construct() {
+    // pass a user to the database to create elements
+	public function __construct($user = false) {
+
+        if($user !== false) {
+            // validate the user
+            if(Utility\validateUser($user) !== true) {
+                return 'Invalid user.';
+            }
+            $this->user = $user;
+        }
 		// Table names for dynamic reference
 		$this->tables = [
 						 'tree'						=> 'tree',
@@ -61,10 +71,10 @@ class DB extends PDO {
 		try {
 
 			// set options for PDO connection
-			$options = array(
+			$options = [
 				PDO::ATTR_PERSISTENT => true,
 				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-			);
+			];
 			// create the new connection
             parent::__construct('mysql:host='.TREE_DB_HOST.';dbname='.TREE_DB_NAME,
 								TREE_DB_USER,
@@ -181,7 +191,12 @@ class DB extends PDO {
 	 * @return MIXED ARRAY from the PDO query on success, ??? if error
 	 */
 	public function fetchAllByTree($view, $treeID, $options = []) {
-		$default = array('orderby'=>false, 'fields' => '*');
+		$default = [
+            'orderby'=>false,
+            'fields' => '*',
+            'fetch' => 'all'
+        ];
+
 		$options = array_merge($default, $options);
 		// TODO: validate options
 		$params = [":treeID" => $treeID];
@@ -190,8 +205,14 @@ class DB extends PDO {
 
 		$sql .= $this->getOrderby($options['orderby']);
 
-		return $this->fetchAll($sql, $params);
+        if($options['fetch'] === 'column') {
+            return $this->fetchAllColumn($sql, $params);
+        } else {
+            return $this->fetchAll($sql, $params);
+        }
+
 	}
+
 
 	protected function getOrderby($orderby) {
         if($orderby === 'order') {
@@ -239,6 +260,11 @@ class DB extends PDO {
 		$stmt = $this->query($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
+
+    public function fetchAllColumn($sql, $params = []) {
+        $stmt = $this->query($sql, $params);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
 
 	/**
      * Gets all trees from the database
@@ -314,7 +340,7 @@ class DB extends PDO {
         // attempt to create the tree
         $stmt = $this->query($sql, $params);
         // return whatever ID just got inserted
-        return $pdo->lastInsertId();
+        return $this->lastInsertId();
     }
 
     /**
@@ -371,15 +397,18 @@ class DB extends PDO {
      * @param $tree ARRAY Data to create tree with
      * @return ARRAY
      */
-    public function createTree($tree, $user) {
+    public function createTree($tree) {
         // validate the user
-        if(Utility\validateUser($user) !== true) {
+        if(Utility\validateUser($this->user) !== true) {
             return 'Invalid user.';
         }
+        // if no tree owner is passed, set it as this user
+        if(!isset($tree['treeOwner'])) {
+            $tree['treeOwner'] = $this->user['userID'];
+        }
 
-        $tree['treeOwner'] = $user['userID'];
-        $tree['treeCreatedBy'] = $user['userID'];
-        $tree['treeUpdatedBy'] = $user['userID'];
+        $tree['treeCreatedBy'] = $this->user['userID'];
+        $tree['treeUpdatedBy'] = $this->user['userID'];
         // attempt to create the tree
         return $this->insert([
             'vals'      => $tree,
@@ -394,10 +423,10 @@ class DB extends PDO {
      * @param $tree ARRAY Data to update
      * @return updated tree
      */
-    public function updateTree($tree, $user) {
+    public function updateTree($tree) {
         $treeID = $tree['treeID'];
         // validate the user
-        if(Utility\validateUser($user) !== true) {
+        if(Utility\validateUser($this->user) !== true) {
             return 'Invalid user.';
         }
 
@@ -408,7 +437,7 @@ class DB extends PDO {
 
         // find the tree and make sure the owner owns this tree
         $getTree = $this->getTree($treeID);
-        if($getTree['owner'] !== $user['userID']) {
+        if($getTree['owner'] !== $this->user['userID']) {
             return 'Not tree owner.';
         }
         // unset the tree ID so we don't try updating that.
@@ -418,7 +447,7 @@ class DB extends PDO {
             'vals'      => $tree,
             'required'  => [],
             'table'     => $this->tables['tree'],
-            'where'     => ['treeID' => $treeID, 'treeOwner' => $user['userID']]
+            'where'     => ['treeID' => $treeID, 'treeOwner' => $this->user['userID']]
         ]);
     }
 
@@ -429,9 +458,9 @@ class DB extends PDO {
      * @param $tree ARRAY Data to create tree with
      * @return ARRAY
      */
-    public function deleteTree($tree, $user) {
+    public function deleteTree($tree) {
         $tree['treeDeleted'] = 1;
-        return $this->updateTree($tree, $user);
+        return $this->updateTree($tree);
     }
 
 
@@ -461,10 +490,11 @@ class DB extends PDO {
      * Gets all starts from the database by treeID
      *
      * @param $treeID INT
+     * @param $options ARRAY
      * @return ARRAY
      */
-    public function getStarts($treeID) {
-        return $this->fetchAllByTree('treeStart', $treeID);
+    public function getStarts($treeID, $options = []) {
+        return $this->fetchAllByTree('treeStart', $treeID, $options);
     }
 
     /**
@@ -479,13 +509,24 @@ class DB extends PDO {
     }
 
     /**
+     * Gets all start IDs from the database by treeID
+     *
+     * @param $treeID INT
+     * @return ARRAY of startIDs, order by 'order' by default
+     */
+    public function getStartIDs($treeID) {
+        return $this->getStarts($treeID, ['fields'=>'startID', 'fetch' => 'column']);
+    }
+
+    /**
      * Gets all groups from the database by treeID
      *
      * @param $treeID INT
+     * @param $options ARRAY
      * @return ARRAY of Group ARRAYS
      */
-    public function getGroups($treeID) {
-        return $this->fetchAllByTree('treeGroup', $treeID);
+    public function getGroups($treeID, $options = []) {
+        return $this->fetchAllByTree('treeGroup', $treeID, $options);
     }
 
     /**
@@ -500,6 +541,16 @@ class DB extends PDO {
     }
 
     /**
+     * Gets all group IDs from the database by treeID
+     *
+     * @param $treeID INT
+     * @return ARRAY of groupIDs, order by 'order' by default
+     */
+    public function getGroupIDs($treeID) {
+        return $this->getGroups($treeID, ['fields'=>'groupID', 'fetch' => 'column']);
+    }
+
+    /**
      * Gets all questions from the database by treeID
      *
      * @param $treeID INT
@@ -507,7 +558,7 @@ class DB extends PDO {
      * @return ARRAY of Question ARRAYS
      */
     public function getQuestions($treeID, $options = []) {
-        $default = array('orderby'=>'order');
+        $default = ['orderby'=>'order'];
         $options = array_merge($default, $options);
         return $this->fetchAllByTree('treeQuestion', $treeID, $options);
     }
@@ -521,6 +572,16 @@ class DB extends PDO {
      */
     public function getQuestion($questionID, $treeID = false) {
         return $this->fetchOneByView('question', $questionID, $treeID);
+    }
+
+    /**
+     * Gets all question IDs from the database by treeID
+     *
+     * @param $treeID INT
+     * @return ARRAY of questionIDs, order by 'order' by default
+     */
+    public function getQuestionIDs($treeID) {
+        return $this->getQuestions($treeID, ['fields'=>'questionID', 'fetch' => 'column']);
     }
 
     /**
@@ -555,7 +616,7 @@ class DB extends PDO {
      * @return ARRAY of optionIDs
      */
     public function getOptions($questionID, $options = []) {
-        $default = array('treeID'=>false, 'orderby'=>'order');
+        $default = ['treeID'=>false, 'orderby'=>'order'];
         $options = array_merge($default, $options);
 
         // validate the questionID is an ID
@@ -579,6 +640,16 @@ class DB extends PDO {
     }
 
     /**
+     * Gets all option IDs from the database by treeID
+     *
+     * @param $questionID INT
+     * @return ARRAY of optionIDs, order by 'order' by default
+     */
+    public function getOptionIDs($questionID) {
+        return $this->getOptions($questionID, ['fields'=>'optionID', 'fetch' => 'column']);
+    }
+
+    /**
      * Gets an option (question choice)
      *
      * @param $optionID INT
@@ -586,7 +657,7 @@ class DB extends PDO {
      * @return ARRAY
      */
     public function getOption($optionID, $options = []) {
-        $default = array('treeID'=>false, 'questionID'=>false);
+        $default = ['treeID'=>false, 'questionID'=>false];
         $options = array_merge($default, $options);
 
         $params = [":optionID" => $optionID];
@@ -612,10 +683,11 @@ class DB extends PDO {
      * Gets all ends from the database by treeID
      *
      * @param $treeID INT
+     * @param $options ARRAY (Optional) sets orderby paramater in SQL statement
      * @return ARRAY of End ARRAYS
      */
-    public function getEnds($treeID) {
-        return $this->fetchAllByTree('treeEnd', $treeID);
+    public function getEnds($treeID, $options = []) {
+        return $this->fetchAllByTree('treeEnd', $treeID, $options);
     }
 
     /**
@@ -627,6 +699,16 @@ class DB extends PDO {
      */
     public function getEnd($endID, $treeID = false) {
         return $this->fetchOneByView('end', $endID, $treeID);
+    }
+
+    /**
+     * Gets all end IDs from the database by treeID
+     *
+     * @param $treeID INT
+     * @return ARRAY of EndIDs, order by 'order' by default
+     */
+    public function getEndIDs($treeID) {
+        return $this->getEnds($treeID, ['fields'=>'endID', 'fetch' => 'column']);
     }
 
     /**
