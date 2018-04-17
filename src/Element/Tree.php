@@ -1,6 +1,6 @@
 <?php
 
-namespace Cme\Tree;
+namespace Cme;
 use Cme\Database as Database;
 use Cme\Database\Validate as Validate;
 use Cme\Utility as Utility;
@@ -8,7 +8,7 @@ use Cme\Utility as Utility;
 /**
  * Interact with Tree object
  */
-class Tree {
+class Tree extends Element {
     protected $db        = null,
               $ID        = null,
               $slug      = '',
@@ -57,10 +57,6 @@ class Tree {
         return $this;
     }
 
-    public function getID() {
-        return $this->ID;
-    }
-
     public function getSlug() {
         return $this->slug;
     }
@@ -73,18 +69,6 @@ class Tree {
         return $this->slug;
     }
 
-    public function getTitle() {
-        return $this->title;
-    }
-
-    public function setTitle($string) {
-        if(is_string($string)) {
-            $this->title = $string;
-        }
-
-        return $this->title;
-    }
-
     public function getOwner() {
         return $this->owner;
     }
@@ -95,15 +79,6 @@ class Tree {
         }
 
         return $this->owner;
-    }
-
-    public function save() {
-        if(!Utility\isID($this->getID())) {
-            // create it
-            return $this->create();
-        }
-
-        return $this->update();
     }
 
     protected function create() {
@@ -164,20 +139,5 @@ class Tree {
      */
     public function delete() {
         return $this->db->deleteTree(['treeID' => $this->getID()]);
-    }
-
-    /**
-     * Returns the object as an array for JSON usage
-     */
-    public function array() {
-        $return = [];
-        // loop the properties to make it into an array
-        foreach($this as $property => $val) {
-            $return[$property] = $val;
-        }
-        // unset the DB property
-        unset($return['db']);
-
-        return $return;
     }
 }

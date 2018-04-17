@@ -1,4 +1,5 @@
 <?php
+namespace Cme;
 // allow all sites to access this file
 header('Access-Control-Allow-Origin: *');
 
@@ -8,7 +9,6 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Cme\Database as Database;
 use \Cme\Utility as Utility;
-use \Cme\Tree as Tree;
 
 $config = [];
 $config['displayErrorDetails'] = true;
@@ -35,7 +35,16 @@ $app->add(function ($req, $res, $next) {
  *
  */
 $app->add(function ($request, $response, $next) {
+
     if($request->isGet()) {
+        // No authentication needed.
+        // Go ahead and move on to the actual request.
+        $response = $next($request, $response);
+        return $response;
+    }
+    // set any routes you don't want to worry about
+    $exclusions = ['/api/v1/interactions'];
+    if(in_array($request->getUri()->getPath(), $exclusions)) {
         // No authentication needed.
         // Go ahead and move on to the actual request.
         $response = $next($request, $response);
@@ -163,7 +172,7 @@ $app->group('/api', function() {
         $this->get('/trees/{treeID}', function (Request $request, Response $response) {
             $treeID = $request->getAttribute('treeID');
             $db = new Database\DB();
-            $tree = new Tree\Tree($db, $treeID);
+            $tree = new Tree($db, $treeID);
             // format into JSON
             $response->getBody()->write(json_encode($tree->array()));
             return $response;
@@ -176,7 +185,7 @@ $app->group('/api', function() {
             $treeID = $request->getAttribute('treeID');
 
             $db = new Database\DB($user);
-            $tree = new Tree\Tree($db, $treeID);
+            $tree = new Tree($db, $treeID);
 
             if(isset($data['slug'])) {
                 $tree->setFromArray($data['tree']);
@@ -208,7 +217,7 @@ $app->group('/api', function() {
 
             $db = new Database\DB($user);
 
-            $tree = new Tree\Tree($db, $treeID);
+            $tree = new Tree($db, $treeID);
 
             $delete = $tree->delete();
 

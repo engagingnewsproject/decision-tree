@@ -15,7 +15,8 @@
             "src/Database/Interaction/SaveInteraction.php",
             "src/Database/Site/SaveSite.php",
             "src/Database/Site/SaveEmbed.php",
-            "src/Tree.php",
+            "src/Element.php",
+            "src/Element/Tree.php",
             "tree-config.php",
             "tree-db.php"
         ]

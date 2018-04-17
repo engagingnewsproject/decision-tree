@@ -14,7 +14,8 @@ class ComposerStaticInit2ab4f31e916b7f2a91ceb237a10488e6
         'de0b3c462629f935d5f1d2ba22f1ded9' => __DIR__ . '/../..' . '/src/Database/Interaction/SaveInteraction.php',
         '770941bba48759cccf7d3369a2791b87' => __DIR__ . '/../..' . '/src/Database/Site/SaveSite.php',
         '399b26b1d2fcc1a95f9c6a104fbac3b7' => __DIR__ . '/../..' . '/src/Database/Site/SaveEmbed.php',
-        '2440d8f98fae621f77a3e040d5538909' => __DIR__ . '/../..' . '/src/Tree.php',
+        'e9fd6020b94d681d7bae3744c00029ee' => __DIR__ . '/../..' . '/src/Element.php',
+        '90eee8192e8d45fe66d95ab0d03496f7' => __DIR__ . '/../..' . '/src/Element/Tree.php',
         '303ca7f391c1c38f523e86b12dda9249' => __DIR__ . '/../..' . '/tree-config.php',
         'c88700f927f8d5638bed72bf95409ede' => __DIR__ . '/../..' . '/tree-db.php',
     );
