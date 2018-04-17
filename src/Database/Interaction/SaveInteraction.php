@@ -29,19 +29,19 @@ class SaveInteraction extends DB {
      *    [
      *        'interaction'=> [
      *            'type'=> 'load', // load, reload, start, restart, option, history
-     *            'id' => null // null, option_id
+     *            'id' => null // null, optionID
      *        ],
      *        'destination' => [
      *            'type'  => 'question', // question, end, overview, intro
      *            'id'    => (INT)
      *        ],
-     *        'user_id' => '123dsfa1231sdfa'
+     *        'userID' => '123dsfa1231sdfa'
      *    ]
      *
      * @return true or false
      */
     protected function validate($data) {
-        $is_valid = false;
+        $isValid = false;
 
         // check if we have all the data we need
         if(!isset($data['interaction'])) {
@@ -68,44 +68,44 @@ class SaveInteraction extends DB {
             $this->errors[] = 'No destination id.';
         }
 
-        if(!isset($data['user_id'])) {
+        if(!isset($data['userID'])) {
             $this->errors[] = 'No user id.';
         }
 
-        if(!isset($data['tree_id'])) {
+        if(!isset($data['treeID'])) {
             $this->errors[] = 'No tree id.';
         }
 
-        if(!isset($data['site']['embed_id'])) {
+        if(!isset($data['site']['embedID'])) {
             $this->errors[] = 'No embed id.';
         }
 
         // if we have any errors, return false. Passes first round of being the correct data structure
         if(!empty($this->errors)) {
-            return $is_valid;
+            return $isValid;
         }
 
         // we have all the data, now to validate it
-        $treeID = $data['tree_id'];
-        $user_id = $data['user_id'];
+        $treeID = $data['treeID'];
+        $userID = $data['userID'];
         $interactionType = $data['interaction']['type'];
-        $interaction_id = $data['interaction']['id'];
-        $destination_type = $data['destination']['type'];
+        $interactionID = $data['interaction']['id'];
+        $destinationType = $data['destination']['type'];
         $destinationID = $data['destination']['id'];
-        $embed_id = $data['site']['embed_id'];
+        $embedID = $data['site']['embedID'];
 
         // open the validator
         $validate = new Validate();
         // check that it's a valid Tree
         if($validate->treeID($treeID) === false) {
-            $this->errors[] = 'Invalid tree_id.';
+            $this->errors[] = 'Invalid treeID.';
             // return here because the next ones will get messed up if this isn't valid
             return false;
         }
 
         // check that it's a valid Embed ID
-        if($validate->embed($embed_id, $data) === false) {
-            $this->errors[] = 'Invalid embed_id.';
+        if($validate->embed($embedID, $data) === false) {
+            $this->errors[] = 'Invalid embedID.';
         }
 
         // check that it's a valid interaction type
@@ -114,31 +114,31 @@ class SaveInteraction extends DB {
 		}
 
         // check that it's a valid destination type
-        if($validate->stateType($destination_type) === false) {
+        if($validate->stateType($destinationType) === false) {
             $this->errors[] = 'Invalid destination type.';
 		}
 
-        // if it's an option interaction, check that it's a valid option_id
-        if($interactionType === 'question' && $validate->elTypeID($interactionType, $interaction_id, $treeID) === false) {
+        // if it's an option interaction, check that it's a valid optionID
+        if($interactionType === 'question' && $validate->elTypeID($interactionType, $interactionID, $treeID) === false) {
             $this->errors[] = 'Invalid interaction id.';
         }
 
         // if it's a question or end destination, check that it's a valid id for that type
-        if(($destination_type === 'question' || $destination_type === 'end') && $validate->elTypeID($destination_type, $destinationID, $treeID) === false) {
+        if(($destinationType === 'question' || $destinationType === 'end') && $validate->elTypeID($destinationType, $destinationID, $treeID) === false) {
             $this->errors[] = 'Invalid destination id.';
         }
 
-        // check that it's a valid user_id
-        if(Utility\isSlug($user_id) === false) {
-            $this->errors[] = 'Invalid user_id.';
+        // check that it's a valid userID
+        if(Utility\isSlug($userID) === false) {
+            $this->errors[] = 'Invalid userID.';
         }
 
         // if we have don't have any errors, it's valid!
         if(empty($this->errors)) {
-            $is_valid = true;
+            $isValid = true;
         }
 
-        return $is_valid;
+        return $isValid;
 
     }
 
@@ -150,67 +150,67 @@ class SaveInteraction extends DB {
     protected function insert($data) {
         $response = [];
         // make sure it's valid
-        $is_valid = $this->validate($data);
+        $isValid = $this->validate($data);
 
         // if validation doesn't pass, return the errors
-        if($is_valid !== true) {
+        if($isValid !== true) {
             return $this->errors;
         }
 
-        $treeID = $data['tree_id'];
-        $user_id = $data['user_id'];
+        $treeID = $data['treeID'];
+        $userID = $data['userID'];
         $interactionType = $this->DB->getInteractionType($data['interaction']['type']);
-        $interaction_id = $data['interaction']['id'];
-        $destination_type = $this->DB->getStateType($data['destination']['type']);
+        $interactionID = $data['interaction']['id'];
+        $destinationType = $this->DB->getStateType($data['destination']['type']);
         $destinationID = $data['destination']['id'];
-        $embed_id = $data['site']['embed_id'];
+        $embedID = $data['site']['embedID'];
 
         // Get our Parameters ready
         $params = [
-                    ':tree_id'              => $treeID,
-                    ':user_id'              => $user_id,
-                    ':embed_id'             => $embed_id,
-                    ':interaction_type_id'  => $interactionType['interaction_type_id'],
-                    ':state_type_id'        => $destination_type['state_type_id'],
+                    ':treeID'              => $treeID,
+                    ':userID'              => $userID,
+                    ':embedID'             => $embedID,
+                    ':interactionTypeID'  => $interactionType['interactionTypeID'],
+                    ':stateTypeID'        => $destinationType['stateTypeID'],
                   ];
         // write our SQL statement
-        $sql = 'INSERT INTO '.$this->DB->tables['tree_interaction'].' (
-                                            tree_id,
-                                            user_id,
-                                            embed_id,
-                                            interaction_type_id,
-                                            state_type_id
+        $sql = 'INSERT INTO '.$this->DB->tables['treeInteraction'].' (
+                                            treeID,
+                                            userID,
+                                            embedID,
+                                            interactionTypeID,
+                                            stateTypeID
                                         )
                                         VALUES(
-                                            :tree_id,
-                                            :user_id,
-                                            :embed_id,
-                                            :interaction_type_id,
-                                            :state_type_id
+                                            :treeID,
+                                            :userID,
+                                            :embedID,
+                                            :interactionTypeID,
+                                            :stateTypeID
                                         )';
         // insert the mc_option into the database
         $stmt = $this->DB->query($sql, $params);
 
         // success!
         if($stmt !== false) {
-            $inserted_interaction_id = $this->DB->lastInsertId();
+            $insertedInteractionID = $this->DB->lastInsertId();
 
             $response = [
-                            'interaction_id'   => $inserted_interaction_id,
+                            'interactionID'   => $insertedInteractionID,
                             'status'           => 'success',
                             'action'           => 'insertInteraction'
                         ];
 
-            // if it's one that has a state_id with it, then let's save that too
+            // if it's one that has a stateID with it, then let's save that too
             $interactions = ['option', 'history', 'start'];
-            if(in_array($interactionType['interaction_type'], $interactions) && $destination_type['state_type'] !== 'overview') {
-                $this->insertState($inserted_interaction_id, $destinationID);
+            if(in_array($interactionType['interactionType'], $interactions) && $destinationType['stateType'] !== 'overview') {
+                $this->insertState($insertedInteractionID, $destinationID);
             }
 
-            // if we interacted with an option, save the interaction_id to the elment_interactions
+            // if we interacted with an option, save the interactionID to the elment_interactions
             $interactions = ['option'];
-            if(in_array($interactionType['interaction_type'], $interactions)) {
-                $this->insertInteractionElement($inserted_interaction_id, $interaction_id);
+            if(in_array($interactionType['interactionType'], $interactions)) {
+                $this->insertInteractionElement($insertedInteractionID, $interactionID);
             }
         } else {
             // handle errors
@@ -227,16 +227,16 @@ class SaveInteraction extends DB {
     }
 
     /**
-    * Saves a state related to an interaction_id. Example:
+    * Saves a state related to an interactionID. Example:
     * Clicking an option will bring you to a new question state. We want to know
     * what the resulting state (or destination) of this interaction on the option brought someone to.
     * This insertion will allow us to track that.
     *
-    * @param $interaction_id (STRING/INT) ID from the `tree_interaction` table
-    * @param $state_id (STRING/INT) from the el_id of the resulting state (usually a question_id)
+    * @param $interactionID (STRING/INT) ID from the `tree_interaction` table
+    * @param $stateID (STRING/INT) from the elID of the resulting state (usually a questionID)
     * @return (MIXED) false on error, (STRING) of the inserted row on success
     */
-    private function insertState($interaction_id, $state_id) {
+    private function insertState($interactionID, $stateID) {
         /**************************************
         **         WARNING!!!!!!             **
         **                                   **
@@ -245,17 +245,17 @@ class SaveInteraction extends DB {
         ***************************************/
         // save the state too
         $params = [
-                    ':interaction_id'  => $interaction_id,
-                    ':el_id'           => $state_id
+                    ':interactionID'  => $interactionID,
+                    ':elID'           => $stateID
                   ];
         // write our SQL statement
-        $sql = 'INSERT INTO '.$this->DB->tables['tree_state'].' (
-                                            interaction_id,
-                                            el_id
+        $sql = 'INSERT INTO '.$this->DB->tables['treeState'].' (
+                                            interactionID,
+                                            elID
                                         )
                                         VALUES(
-                                            :interaction_id,
-                                            :el_id
+                                            :interactionID,
+                                            :elID
                                         )';
         // insert the mc_option into the database
         $stmt = $this->DB->query($sql, $params);
@@ -271,15 +271,15 @@ class SaveInteraction extends DB {
     }
 
     /**
-    * Saves the element interacted with (like a click) related to an interaction_id. Example:
+    * Saves the element interacted with (like a click) related to an interactionID. Example:
     * Clicking an option will bring you to a new question state. We want to know
     * what element (option) was clicked on. This insertion will allow us to track that.
     *
-    * @param $interaction_id (STRING/INT) ID from the `tree_interaction` table
-    * @param $elID (STRING/INT) of the element interacted with (usually an option_id)
+    * @param $interactionID (STRING/INT) ID from the `tree_interaction` table
+    * @param $elID (STRING/INT) of the element interacted with (usually an optionID)
     * @return (MIXED) false on error, (STRING) of the inserted row on success
     */
-    private function insertInteractionElement($interaction_id, $elID) {
+    private function insertInteractionElement($interactionID, $elID) {
         /**************************************
         **         WARNING!!!!!!             **
         **                                   **
@@ -289,17 +289,17 @@ class SaveInteraction extends DB {
 
         // save the interaction
         $params = [
-                    ':interaction_id'  => $interaction_id,
-                    ':el_id'           => $elID
+                    ':interactionID'  => $interactionID,
+                    ':elID'           => $elID
                   ];
         // write our SQL statement
-        $sql = 'INSERT INTO '.$this->DB->tables['tree_interaction_element'].' (
-                                            interaction_id,
-                                            el_id
+        $sql = 'INSERT INTO '.$this->DB->tables['treeInteractionElement'].' (
+                                            interactionID,
+                                            elID
                                         )
                                         VALUES(
-                                            :interaction_id,
-                                            :el_id
+                                            :interactionID,
+                                            :elID
                                         )';
         // insert the mc_option into the database
         $stmt = $this->DB->query($sql, $params);
