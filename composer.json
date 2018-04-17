@@ -2,8 +2,7 @@
     "require": {
         "zordius/lightncandy": "dev-master",
         "slim/slim": "^3.0",
-        "slim/php-view": "^2.2",
-        "tuupola/slim-basic-auth": "^3.0"
+        "slim/php-view": "^2.2"
     },
     "autoload": {
         "psr-4": {
@@ -16,6 +15,7 @@
             "src/Database/Interaction/SaveInteraction.php",
             "src/Database/Site/SaveSite.php",
             "src/Database/Site/SaveEmbed.php",
+            "src/Tree.php",
             "tree-config.php",
             "tree-db.php"
         ]

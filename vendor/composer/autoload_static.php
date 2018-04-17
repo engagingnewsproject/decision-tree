@@ -19,11 +19,6 @@ class ComposerStaticInit2ab4f31e916b7f2a91ceb237a10488e6
     );
 
     public static $prefixLengthsPsr4 = array (
-        'T' => 
-        array (
-            'Tuupola\\Middleware\\' => 19,
-            'Tuupola\\Http\\Factory\\' => 21,
-        ),
         'S' => 
         array (
             'Slim\\Views\\' => 11,
@@ -31,7 +26,6 @@ class ComposerStaticInit2ab4f31e916b7f2a91ceb237a10488e6
         ),
         'P' => 
         array (
-            'Psr\\Http\\Server\\' => 16,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
         ),
@@ -41,7 +35,6 @@ class ComposerStaticInit2ab4f31e916b7f2a91ceb237a10488e6
         ),
         'I' => 
         array (
-            'Interop\\Http\\Factory\\' => 21,
             'Interop\\Container\\' => 18,
         ),
         'F' => 
@@ -55,15 +48,6 @@ class ComposerStaticInit2ab4f31e916b7f2a91ceb237a10488e6
     );
 
     public static $prefixDirsPsr4 = array (
-        'Tuupola\\Middleware\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/tuupola/callable-handler/src',
-            1 => __DIR__ . '/..' . '/tuupola/slim-basic-auth/src',
-        ),
-        'Tuupola\\Http\\Factory\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/tuupola/http-factory/src',
-        ),
         'Slim\\Views\\' => 
         array (
             0 => __DIR__ . '/..' . '/slim/php-view/src',
@@ -71,11 +55,6 @@ class ComposerStaticInit2ab4f31e916b7f2a91ceb237a10488e6
         'Slim\\' => 
         array (
             0 => __DIR__ . '/..' . '/slim/slim/Slim',
-        ),
-        'Psr\\Http\\Server\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/http-server-handler/src',
-            1 => __DIR__ . '/..' . '/psr/http-server-middleware/src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -88,10 +67,6 @@ class ComposerStaticInit2ab4f31e916b7f2a91ceb237a10488e6
         'LightnCandy\\' => 
         array (
             0 => __DIR__ . '/..' . '/zordius/lightncandy/src',
-        ),
-        'Interop\\Http\\Factory\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/http-interop/http-factory/src',
         ),
         'Interop\\Container\\' => 
         array (
