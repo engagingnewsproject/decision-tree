@@ -2,7 +2,6 @@
 use PHPUnit\Framework\TestCase;
 use Cme\Database as Database;
 use Cme\Utility as Utility;
-use Cme\Tree as Tree;
 
 /**
  * @covers index.php API Routes
@@ -29,7 +28,7 @@ final class APITest extends TreeTestCase
      * @dataProvider APITreeProvider
      */
     public function testAPITree($treeID) {
-        $tree = new Tree\Tree($this->db, $treeID);
+        $tree = new \Cme\Tree($this->db, $treeID);
 
         $this->assertEquals(Utility\getEndpoint('trees/'.$treeID), json_encode($tree->array()));
     }
