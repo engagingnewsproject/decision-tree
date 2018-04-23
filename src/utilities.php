@@ -25,6 +25,11 @@ function get_data_url($slug) {
 * @return  BOOLEAN
 */
 function isSlug($string) {
+    // check to make sure it is, in fact, a string
+    if(!is_string($string)) {
+        return false;
+    }
+
     $isSlug = false;
     // check for disallowed characters and strings that starts or ends in a dash (-)
     // if matches === 1, then it's a slug
@@ -81,8 +86,8 @@ function slugify($string) {
 function isID($string) {
     $isID = false;
 
-    // make sure it's a valid string
-    if(is_bool($string) === false && !empty($string)) {
+    // make sure it's a valid string or integer
+    if((is_string($string) || is_int($string)) && !empty($string)) {
         $string = (string) $string;
         // Regex check where the only allowed characters are 0-9
         // if a match is found, then it's not an ID
@@ -120,12 +125,16 @@ function getTreeIDBySlug($treeSlug) {
     // return the tree slug
     return $tree['treeID'];
 }
+
+
 /**
  * really bare curl implementation to consume our own api
  * @param $path STRING
+ * @param $data data ARRAY to post/put if you need to
+ * @param $method GET
  * @return MIXED response
  */
-function getEndpoint($path) {
+function requestEndpoint($path, $data = [], $method = 'GET') {
     // Get cURL resource
     $curl = curl_init();
     // Set options
@@ -133,6 +142,22 @@ function getEndpoint($path) {
         CURLOPT_RETURNTRANSFER => 1, // get response as string
         CURLOPT_URL => TREE_URL.'/api/v1/'.$path
     ));
+
+    switch ($method) {
+        case 'POST':
+            curl_setopt($curl, CURLOPT_POST, true);
+            break;
+        case 'PUT':
+            curl_setopt($curl, CURLOPT_PUT, true);
+            break;
+        case 'DELETE':
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+            break;
+    }
+
+    if($method !== 'GET') {
+        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+    }
 
     // don't worry about SSL for local
     if(TREE_URL === 'https://decision-tree.dev') {
@@ -146,6 +171,47 @@ function getEndpoint($path) {
 
     return $response;
 }
+
+/**
+ * Wrapper function for requestEndpoint
+ *
+ * @param $path STRING
+ * @return MIXED response
+ */
+function getEndpoint($path) {
+    return requestEndpoint($path);
+}
+/**
+ * Wrapper function for requestEndpoint
+ *
+ * @param $path STRING
+ * @param $data data ARRAY
+ * @return MIXED response
+ */
+function postEndpoint($path, $data) {
+    return requestEndpoint($path, $data, 'POST');
+}
+/**
+ * Wrapper function for requestEndpoint
+ *
+ * @param $path STRING
+ * @param $data data ARRAY
+ * @return MIXED response
+ */
+function putEndpoint($path, $data) {
+    return requestEndpoint($path, $data, 'PUT');
+}
+/**
+ * Wrapper function for requestEndpoint
+ *
+ * @param $path STRING
+ * @param $data data ARRAY
+ * @return MIXED response
+ */
+function deleteEndpoint($path, $data) {
+    return requestEndpoint($path, $data, 'DELETE');
+}
+
 
 /**
  * Find a user by a key that matches the value you want

@@ -1,6 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
 use Cme\Database as Database;
+use Cme\Utility as Utility;
 
 /**
  * Functions for use by tests
@@ -97,4 +98,18 @@ class TreeTestCase extends TestCase
         return $options[0];
     }
 
+    /**
+     * Gets a random string
+     * @param $length INT MUST BE LESS THAN 32
+     * @return STRING
+     */
+    public function randomString($length = 32) {
+        $str = substr( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ,mt_rand( 0 ,51 ) ,1 ) .substr( md5( time() ), 1);
+
+        return substr($str, 0, $length);
+    }
+
+    protected function getAdminUser() {
+        return Utility\getUser('userRole', 'admin');
+    }
 }

@@ -12,8 +12,27 @@ final class ValidateTest extends TreeTestCase
     {
         $this->validate = new Database\Validate();
     }
+
     /**
-     * @covers Cme\Database\treeID()
+     * @covers Cme\Database\Validate\tree()
+     * @dataProvider validateTreeProvider
+     */
+    public function testValidateTree($tree, $expected) {
+        $this->evaluateAssert($this->validate->tree($tree), $expected);
+    }
+
+    public function validateTreeProvider() {
+        return [
+                'treeID'=>[1, true],
+                'treeSlug' => ['citizen', true],
+                'invalid_treeID'=>[123124143423423, false],
+                'invalid_treeSlug' => ['hitherestres', false],
+                'invalid_boolean' => [true, false]
+        ];
+    }
+
+    /**
+     * @covers Cme\Database\Validate\treeID()
      * @dataProvider validateTreeIdProvider
      */
     public function testValidateTreeId($treeID, $expected) {
@@ -24,12 +43,30 @@ final class ValidateTest extends TreeTestCase
         return [
                 'valid_tree'=>[1, true],
                 'invalid_tree'=>[123124143423423, false],
-                'invalid_treeSlug' => ['hitherestres', false]
+                'invalid_treeSlug' => ['hitherestres', false],
+                'invalid_butExists' => ['citizen', false]
         ];
     }
 
     /**
-     * @covers Cme\Database\elTypeID()
+     * @covers Cme\Database\Validate\treeSlug()
+     * @dataProvider validateTreeSlugProvider
+     */
+    public function testValidateTreeSlug($treeSlug, $expected) {
+        $this->evaluateAssert($this->validate->treeSlug($treeSlug), $expected);
+    }
+
+    public function validateTreeSlugProvider() {
+        return [
+                'valid_tree'=>['citizen', true],
+                'invalid_treeSlug'=>[123124143423423, false],
+                'invalid_notFoundtreeSlug' => ['hithereadfasasdfstres', false],
+                'invalid_boolean' => [true, false]
+        ];
+    }
+
+    /**
+     * @covers Cme\Database\Validate\elTypeID()
      * @dataProvider validateElTypeIdProvider
      */
     public function testValidateElTypeId($elType, $elTypeID, $treeID, $expected) {
@@ -57,7 +94,7 @@ final class ValidateTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Database\optionID()
+     * @covers Cme\Database\Validate\optionID()
      * @dataProvider validateOptionIdProvider
      */
     public function testValidateOptionId($optionID, $treeID, $expected) {
@@ -76,7 +113,7 @@ final class ValidateTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Database\questionID()
+     * @covers Cme\Database\Validate\questionID()
      * @dataProvider validateQuestionIdProvider
      */
     public function testValidateQuestionId($questionID, $treeID, $expected) {
@@ -95,7 +132,7 @@ final class ValidateTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Database\endID()
+     * @covers Cme\Database\Validate\endID()
      * @dataProvider validateEndIdProvider
      */
     public function testValidateEndId($endID, $treeID, $expected) {
@@ -116,7 +153,7 @@ final class ValidateTest extends TreeTestCase
 
 
     /**
-     * @covers Cme\Database\groupID()
+     * @covers Cme\Database\Validate\groupID()
      * @dataProvider validateGroupIdProvider
      */
     public function testValidateGroupId($groupID, $treeID, $expected) {
@@ -136,7 +173,7 @@ final class ValidateTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Database\startID()
+     * @covers Cme\Database\Validate\startID()
      * @dataProvider validateStartIdProvider
      */
     public function testValidateStartId($startID, $treeID, $expected) {
@@ -156,7 +193,7 @@ final class ValidateTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Database\destinationID()
+     * @covers Cme\Database\Validate\destinationID()
      * @dataProvider validateDestinationIdProvider
      */
     public function testValidateDestinationId($destinationID, $options, $expected) {
@@ -182,7 +219,7 @@ final class ValidateTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Database\interactionType()
+     * @covers Cme\Database\Validate\interactionType()
      * @dataProvider validateInteractionTypeProvider
      */
     public function testValidateInteractionType($interactionType, $expected) {
@@ -206,7 +243,7 @@ final class ValidateTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Database\stateType()
+     * @covers Cme\Database\Validate\stateType()
      * @dataProvider validateStateTypeProvider
      */
     public function testValidateStateType($state_type, $expected) {
@@ -230,7 +267,7 @@ final class ValidateTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Database\site()
+     * @covers Cme\Database\Validate\site()
      * @dataProvider validateSiteProvider
      */
     public function testValidateSite($state_type, $expected) {
@@ -254,7 +291,7 @@ final class ValidateTest extends TreeTestCase
     }
 
     /**
-     * @covers Cme\Database\embed()
+     * @covers Cme\Database\Validate\embed()
      * @dataProvider validateEmbedProvider
      */
     public function testValidateEmbed($embed, $options, $expected) {

@@ -20,29 +20,33 @@ class Tree extends Element {
               $ends      = [];
 
 
-    function __construct($db, $treeID = false) {
+    function __construct($db, $tree = false) {
         $this->db = $db;
-        if(Utility\isID($treeID)) {
-            return $this->build($treeID);
+        if(Utility\isID($tree) || Utility\isSlug($tree)) {
+            return $this->build($tree);
+        } elseif(is_array($tree)) {
+            return $this->buildFromArray($tree);
         }
     }
 
     /**
      * Gets a Tree from the DB and builds the object
      *
-     * @param $treeID INT ID of the tree you want to build
+     * @param $tree INT/STRING ID or Slug of the tree you want to build
      * @return MIXED OBJECT of build tree ID on success, FALSE on invalid ID
      */
-    public function build($treeID) {
+    protected function build($tree) {
         // validate the tree ID
         $validate = new Validate();
-        if(!$validate->treeID($treeID)) {
+        //print_r($tree);
+        if($validate->tree($tree) !== true) {
             return false;
         }
 
-        $tree = $this->db->getTree($treeID);
-        // Map the database values to our object
+        $tree = $this->db->getTree($tree);
 
+        // Map the database values to our object
+        $treeID = $tree['treeID'];
         // set the object values
         $this->ID = $tree['treeID'];
         $this->slug = $tree['treeSlug'];
@@ -53,6 +57,20 @@ class Tree extends Element {
         $this->groups = $this->db->getGroupIDs($treeID);
         $this->questions = $this->db->getQuestionIDs($treeID);
         $this->ends = $this->db->getEndIDs($treeID);
+
+        return $this;
+    }
+
+    /**
+     * Builds a tree object from an array of attributes
+     *
+     * @param $data ARRAY // 'ID' is not allowed
+     * @return OBJECT of Tree
+     */
+    public function buildFromArray($data) {
+        (isset($data['slug'])) ? $this->setSlug($data['slug']) : false;
+        (isset($data['title'])) ? $this->setTitle($data['title']) : false;
+        (isset($data['owner'])) ? $this->setOwner($data['owner']) : false;
 
         return $this;
     }
@@ -85,7 +103,6 @@ class Tree extends Element {
         // create it off the object
         $tree = [];
         $title = $this->getTitle();
-
         // map the tree object to the tree parameters in the DB
         if(!empty($title)) {
             $tree['treeTitle'] = $title;
@@ -98,8 +115,10 @@ class Tree extends Element {
             if(!empty($title)) {
                 $tree['treeSlug'] = Utility\slugify($title);
             } else {
+                // error!
+                return 'You must include a slug or title';
                 // random slug?
-                $tree['treeSlug'] = substr(md5(microtime()),rand(0,26),12);
+                // $tree['treeSlug'] = substr(md5(microtime()),rand(0,26),12);
             }
         }
 
@@ -108,10 +127,9 @@ class Tree extends Element {
         }
 
         $result = $this->db->createTree($tree);
-
         // it's hopefully returning the ID of the tree it inserted
         if(Utility\isID($result)) {
-            return $this->build();
+            return $this->build($result);
         }
         // oops. Return the errors.
         return $result;

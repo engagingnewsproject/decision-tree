@@ -163,8 +163,30 @@ $app->group('/api', function() {
             $user = $request->getAttribute('user');
             // if we have a user, try to create the tree
             $db = new Database\DB($user);
-            $tree = $db->createTree($data['tree']);
-            $response->getBody()->write(json_encode($tree));
+            if(isset($data['tree'])) {
+                $tree = $data['tree'];
+            } else {
+                $response->getBody()->write(json_encode(['error'=>['No tree data set.']]));
+                return $response;
+            }
+
+            // add the user to the tree data as the owner
+            if(!isset($tree['owner'])) {
+                $tree['owner'] = $user['userID'];
+            }
+
+            $tree = new Tree($db, $tree);
+            $tree = $tree->save();
+
+            if(is_object($tree)) {
+                // return the tree array
+                $response->getBody()->write(json_encode($tree->array()));
+            } else {
+                // it's an error, so return the error
+                $error = $tree;
+                $response->getBody()->write(json_encode(['errors'=>[$error]]));
+            }
+
 
             return $response;
         });

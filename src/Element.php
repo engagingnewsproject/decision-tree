@@ -19,7 +19,7 @@ class Element {
     }
 
     // scaffold
-    public function build($ID) {
+    protected function build($ID) {
 
         return $this;
     }

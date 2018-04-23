@@ -17,6 +17,16 @@ class Validate extends DB {
         parent::__construct();
     }
 
+    public function tree($tree) {
+        if(Utility\isID($tree)) {
+            return $this->treeID($tree);
+        } elseif(Utility\isSlug($tree)) {
+            return $this->treeSlug($tree);
+        } else {
+            return false;
+        }
+    }
+
     // Make sure the treeID exists
     public function treeID($treeID) {
         $isValid = false;
@@ -25,6 +35,20 @@ class Validate extends DB {
         $tree = $this->getTree($treeID);
         // see if the treeID exists in the returned results and if that treeID equals the passed treeID
         if(isset($tree['treeID']) && $tree['treeID'] == $treeID) {
+            $isValid = true;
+        }
+
+        return $isValid;
+    }
+
+    // Make sure the treeSlug exists
+    public function treeSlug($treeSlug) {
+        $isValid = false;
+
+        // try to get the tree by id
+        $tree = $this->getTree($treeSlug);
+        // see if the treeSlug exists in the returned results and if that treeSlug equals the passed treeSlug
+        if(isset($tree['treeSlug']) && $tree['treeSlug'] == $treeSlug) {
             $isValid = true;
         }
 

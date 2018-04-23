@@ -279,16 +279,33 @@ class DB extends PDO {
     }
 
     /**
-     * Gets one tree from the database by id
+     * Gets one tree from the database by id or slug, making a guess as to which one is wanted
      *
-     * @param $treeID INT
+     * @param $tree MIXED(INT/STRING) for ID or Slug
      * @return ARRAY
      */
-    public function getTree($treeID) {
-        // Do a select query to see if we get a returned row
+    public function getTree($tree) {
+        // check if it's a slug instead
+        if(Utility\isID($tree)) {
+            return $this->getTreeByID($tree);
+        } elseif(Utility\isSlug($tree)) {
+            return $this->getTreeBySlug($tree);
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * Gets one tree from the database by ID
+     *
+     * @param $treeSlug STRING
+     * @return ARRAY
+     */
+    public function getTreeByID($treeID) {
         $params = [":treeID" => $treeID];
-        $sql = "SELECT * from ".$this->views['tree']." WHERE
-                treeID = :treeID";
+
+        $sql = "SELECT * from ".$this->views['tree']."
+                WHERE treeID = :treeID";
         // return the found tree row
         return $this->fetchOne($sql, $params);
     }
@@ -300,10 +317,10 @@ class DB extends PDO {
      * @return ARRAY
      */
     public function getTreeBySlug($treeSlug) {
-        // Do a select query to see if we get a returned row
         $params = [":treeSlug" => $treeSlug];
-        $sql = "SELECT * from ".$this->views['tree']." WHERE
-                treeSlug = :treeSlug";
+
+        $sql = "SELECT * from ".$this->views['tree']."
+                WHERE treeSlug = :treeSlug";
         // return the found tree row
         return $this->fetchOne($sql, $params);
     }
