@@ -268,3 +268,49 @@ function validateUser($user) {
     // invalid
     return false;
 }
+
+// quick validate if the user ID exists
+function validateUserID($userID) {
+
+    // get the user from the DB
+    $foundUser = getUser('userID', $userID);
+
+    // make sure our users match
+    if($foundUser['userID'] === $userID) {
+        // passed user and found user match, so we're good!
+        return true;
+    }
+
+    // invalid
+    return false;
+}
+
+
+/**
+ * Move a value in an array to a new position
+ *
+ * @param $array (ARRAY) we're rearranging
+ * @param $val (MIXED) of element you want to move
+ * @param $to MIXED (INT/STRING) 'first', 'last', INT of the position you want to move it to
+ * @return ARRAY of rearranged IDs
+ */
+function move($array, $val, $to) {
+    // get index of the one you want to move
+    $index = array_search($val, $array);
+    // find the position of the element we want to move
+    $from = array_splice($array, $index, 1);
+
+    // see if we're using a keyword instead
+    switch ($to) {
+        case 'first':
+            $to = 0;
+            break;
+        case 'last':
+            $to = count($array);
+            break;
+    }
+
+    // actually move it
+    array_splice($array, $to, 0, $from);
+    return $array;
+}

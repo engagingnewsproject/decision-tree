@@ -40,6 +40,17 @@ class Element {
         return $this->title;
     }
 
+    public function getOwner() {
+        return $this->owner;
+    }
+
+    public function setOwner($userID) {
+        if(Utility\validateUserID($userID)) {
+            $this->owner = $userID;
+        }
+
+        return $this->owner;
+    }
 
     public function save() {
         if(!Utility\isID($this->getID())) {
@@ -76,5 +87,40 @@ class Element {
         unset($return['db']);
 
         return $return;
+    }
+
+    /**
+     * Sets allowed tree ID (for things like questions and ends)
+     * @param $treeID (INT)
+     * @return $this->treeID
+     */
+    public function setTreeID($treeID) {
+        $validate = new Validate();
+        if($validate->treeID($treeID)) {
+            $this->treeID = $treeID;
+        }
+
+        return $this->treeID;
+    }
+
+    /**
+     * Sets allowed tree ID (for things like questions and ends)
+     * @param $treeID (INT)
+     * @return $this->treeID
+     */
+    public function getTreeID() {
+        return $this->treeID;
+    }
+
+    /**
+     * Save reordered elements
+     *
+     * @param $array of element IDs
+     */
+    public function saveOrder($array) {
+        // takes an array of element IDs and saves their current order
+        foreach($array as $order => $elID) {
+            $this->db->updateOrder($elID, $order);
+        }
     }
 }

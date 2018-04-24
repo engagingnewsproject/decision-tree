@@ -123,20 +123,15 @@ final class APITest extends TreeTestCase
     public function testAPITreeCreate() {
         // create a new tree
         $db = false;
-        $tree = new Cme\Tree($db);
-        $treeTitle = $this->randomString();
-        // set title
-        $tree->setTitle($treeTitle);
         $user = $this->getAdminUser();
-
+        $title = $this->randomString();
         // add in the user to the request
         $data = [
-            'tree' => $tree->array(),
+            'title' => $title,
             'user' => $user
         ];
 
         $response = Utility\postEndpoint('trees', $data);
-
         $responseTree = json_decode($response);
         // check that it's an object
         $this->assertTrue(is_object($responseTree));
@@ -147,9 +142,9 @@ final class APITest extends TreeTestCase
         // check that we can find it in the DB
         $newTree = new Cme\Tree(new Database\DB(), $responseTree->ID);
         // compare details
-        $this->assertEquals($newTree->getTitle(),  $treeTitle);
+        $this->assertEquals($newTree->getTitle(),  $title);
         $this->assertEquals($newTree->getOwner(),  $user['userID']);
-        $this->assertEquals($newTree->getSlug(), Utility\slugify($treeTitle));
+        $this->assertEquals($newTree->getSlug(), Utility\slugify($title));
     }
 
 }

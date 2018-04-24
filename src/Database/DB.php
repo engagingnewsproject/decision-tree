@@ -426,7 +426,7 @@ class DB extends PDO {
 
         $tree['treeCreatedBy'] = $this->user['userID'];
         $tree['treeUpdatedBy'] = $this->user['userID'];
-        // attempt to create the tree
+
         return $this->insert([
             'vals'      => $tree,
             'required'  => ['treeSlug', 'treeOwner'],
@@ -729,6 +729,48 @@ class DB extends PDO {
     }
 
     /**
+     * Gets all possible el types from database
+     *
+     * @return ARRAY of ARRAYS
+     */
+    public function getElementTypes() {
+        // Do a select query to see if we get a returned row
+        $sql = "SELECT * from ".$this->tables['treeElementType'];
+        // return the found el types
+        return $this->fetchAll($sql);
+    }
+
+    /**
+     * Gets an el type from database
+     *
+     * @param $elType STRING
+     * @return ARRAY Row of desired eleemnt
+     */
+    public function getElementType($elType) {
+        $params = [':elType' => $elType];
+        // Do a select query to see if we get a returned row
+        $sql = "SELECT * from ".$this->tables['treeElementType']."
+                WHERE elType = :elType";
+        // return the found el types
+        return $this->fetchOne($sql, $params);
+    }
+
+    /**
+     * Gets an el type from database
+     *
+     * @param $elType STRING
+     * @return ID of desired element
+     */
+    public function getElementTypeID($elType) {
+        $elType = $this->getElementType($elType);
+        if(isset($elType['elTypeID'])) {
+            return $elType['elTypeID'];
+        } else {
+            return $elType;
+        }
+    }
+
+    /**
      * Gets all possible interaction types from database
      *
      * @return ARRAY of ARRAYS
@@ -924,6 +966,94 @@ class DB extends PDO {
         }
         // return the found interaction type row
         return $this->fetchOne($sql, $params);
+    }
+
+    public function getElement($elID) {
+
+        // Do a select query to see if we get a returned row
+        $params = [":elID" => $elID];
+        $sql = "SELECT * from ".$this->tables['treeElement']." WHERE
+                elID = :elID";
+        // return the found element type row
+        return $this->fetchOne($sql, $params);
+    }
+
+    public function createElement($el) {
+        // validate the user
+        if(Utility\validateUser($this->user) !== true) {
+            return 'Invalid user.';
+        }
+        $validate = new Validate();
+        // check that the tree ID is a valid Tree ID and owned by this user
+        if($validate->treeOwner($el['treeID'], $el['elCreatedBy']) !== true && $this->user['userRole'] !== 'admin') {
+            return 'Invalid tree or user does not own tree.';
+        }
+
+        $el['elUpdatedBy'] = $el['elCreatedBy'];
+        return $this->insert([
+            'vals'      => $el,
+            'required'  => ['treeID', 'elTypeID', 'elTitle', 'elCreatedBy', 'elUpdatedBy'],
+            'table'     => $this->tables['treeElement']
+        ]);
+    }
+
+    /**
+     * Inserts the order of an element
+     *
+     * @param $elID ID
+     * @param $order
+     * @return
+     */
+    public function insertOrder($elID, $elOrder) {
+        // validate the user
+        if(Utility\validateUser($this->user) !== true) {
+            return 'Invalid user.';
+        }
+
+        // find the element and make sure the owner owns this element
+        $el = $this->getElement($elID);
+
+        if($el['elCreatedBy'] !== $this->user['userID'] && $this->user['userRole'] !== 'admin') {
+            return 'Not element owner.';
+        }
+
+        return $this->insert([
+            'vals'      => [
+                            'elID' => $elID,
+                            'elOrder' => $elOrder
+            ],
+            'required'  => ['elID', 'elOrder'],
+            'table'     => $this->tables['treeElementOrder']
+        ]);
+    }
+
+
+    /**
+     * Updates the order of an element
+     *
+     * @param $elID ID
+     * @param $order
+     * @return
+     */
+    public function updateOrder($elID, $elOrder) {
+        // validate the user
+        if(Utility\validateUser($this->user) !== true) {
+            return 'Invalid user.';
+        }
+
+        // find the element and make sure the owner owns this element
+        $el = $this->getElement($elID);
+
+        if($el['elCreatedBy'] !== $this->user['userID']) {
+            return 'Not element owner.';
+        }
+
+        return $this->update([
+            'vals'      => ['elOrder' => $elOrder],
+            'required'  => ['elOrder'],
+            'table'     => $this->tables['treeElementOrder'],
+            'where'     => ['elID' => $elID]
+        ]);
     }
 
 }

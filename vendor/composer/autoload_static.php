@@ -16,6 +16,7 @@ class ComposerStaticInit2ab4f31e916b7f2a91ceb237a10488e6
         '399b26b1d2fcc1a95f9c6a104fbac3b7' => __DIR__ . '/../..' . '/src/Database/Site/SaveEmbed.php',
         'e9fd6020b94d681d7bae3744c00029ee' => __DIR__ . '/../..' . '/src/Element.php',
         '90eee8192e8d45fe66d95ab0d03496f7' => __DIR__ . '/../..' . '/src/Element/Tree.php',
+        'b3504dd659540c24b4ab290267753ab5' => __DIR__ . '/../..' . '/src/Element/Question.php',
         '303ca7f391c1c38f523e86b12dda9249' => __DIR__ . '/../..' . '/tree-config.php',
         'c88700f927f8d5638bed72bf95409ede' => __DIR__ . '/../..' . '/tree-db.php',
     );

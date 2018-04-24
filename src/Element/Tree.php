@@ -87,16 +87,20 @@ class Tree extends Element {
         return $this->slug;
     }
 
-    public function getOwner() {
-        return $this->owner;
+    public function getGroups() {
+        return $this->groups;
     }
 
-    public function setOwner($userID) {
-        if(Utility\validateUser($userID)) {
-            $this->owner = $userID;
-        }
+    public function getStarts() {
+        return $this->starts;
+    }
 
-        return $this->owner;
+    public function getQuestions() {
+        return $this->questions;
+    }
+
+    public function getEnds() {
+        return $this->ends;
     }
 
     protected function create() {
@@ -146,7 +150,17 @@ class Tree extends Element {
 
         $result = $this->db->updateTree($tree);
 
-         // rebuild it so we get the fresh copy
+
+        // update the order of the Starts
+        $this->saveOrder($this->getStarts());
+        // update the order of the Groups
+        $this->saveOrder($this->getGroups());
+        // update the order of the Questions
+        $this->saveOrder($this->getQuestions());
+        // update the order of the Ends
+        $this->saveOrder($this->getEnds());
+
+        // rebuild it so we get the fresh copy
         $this->build($this->getID());
         // return the original update result
         return $result;

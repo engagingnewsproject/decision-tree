@@ -17,6 +17,7 @@
             "src/Database/Site/SaveEmbed.php",
             "src/Element.php",
             "src/Element/Tree.php",
+            "src/Element/Question.php",
             "tree-config.php",
             "tree-db.php"
         ]

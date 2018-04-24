@@ -45,10 +45,45 @@ class Validate extends DB {
     public function treeSlug($treeSlug) {
         $isValid = false;
 
-        // try to get the tree by id
+        // try to get the tree by slug
         $tree = $this->getTree($treeSlug);
         // see if the treeSlug exists in the returned results and if that treeSlug equals the passed treeSlug
         if(isset($tree['treeSlug']) && $tree['treeSlug'] == $treeSlug) {
+            $isValid = true;
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * Checks if a user owns a tree
+     *
+     */
+    public function treeOwner($tree, $userID) {
+        // first validate the tree
+        if(!$this->tree($tree)) {
+            return false;
+        }
+
+        $isValid = false;
+
+        $tree = $this->getTree($tree);
+        // check owner
+        if(isset($tree['owner']) && $tree['owner'] === $userID) {
+            $isValid = true;
+        }
+
+        return $isValid;
+    }
+
+    // Make sure the elID exists
+    public function elID($elID) {
+        $isValid = false;
+
+        // try to get the tree by id
+        $el = $this->getElement($elID);
+        // see if the elID exists in the returned results and if that elID equals the passed elID
+        if(isset($el['elID']) && $el['elID'] == $elID) {
             $isValid = true;
         }
 

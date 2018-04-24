@@ -159,23 +159,25 @@ $app->group('/api', function() {
         $this->post('/trees', function (Request $request, Response $response) {
             // passed data
             $data = $request->getParsedBody();
-
             $user = $request->getAttribute('user');
             // if we have a user, try to create the tree
             $db = new Database\DB($user);
-            if(isset($data['tree'])) {
-                $tree = $data['tree'];
-            } else {
-                $response->getBody()->write(json_encode(['error'=>['No tree data set.']]));
-                return $response;
-            }
-
+            $tree = [];
+            $tree['owner'] = $user['userID'];
             // add the user to the tree data as the owner
-            if(!isset($tree['owner'])) {
-                $tree['owner'] = $user['userID'];
+            if(isset($data['owner'])) {
+                $tree['owner'] = $data['owner'];
+            }
+            $tree = new Tree($db, $tree);
+
+            $updateKeys = ['slug', 'title'];
+            foreach($data as $key => $val) {
+                if(in_array($key, $updateKeys)) {
+                    $function = 'set'.ucfirst($key);
+                    $tree->$function($val);
+                }
             }
 
-            $tree = new Tree($db, $tree);
             $tree = $tree->save();
 
             if(is_object($tree)) {
@@ -208,10 +210,6 @@ $app->group('/api', function() {
 
             $db = new Database\DB($user);
             $tree = new Tree($db, $treeID);
-
-            if(isset($data['slug'])) {
-                $tree->setFromArray($data['tree']);
-            }
 
             $updateKeys = ['slug', 'title'];
             foreach($data as $key => $val) {
@@ -296,6 +294,48 @@ $app->group('/api', function() {
             $questions = $db->getQuestions($treeID);
             // return the JSON
             $response->getBody()->write(json_encode($questions));
+            return $response;
+        });
+
+
+        $this->post('/trees/{treeID}/questions', function (Request $request, Response $response) {
+            // passed data
+            $data = $request->getParsedBody();
+            $treeID = $request->getAttribute('treeID');
+            $user = $request->getAttribute('user');
+            // if we have a user, try to create the question
+            $db = new Database\DB($user);
+            $question = [];
+            $question['owner'] = $user['userID'];
+            // add the user to the question data as the owner
+            if(isset($data['owner'])) {
+                $question['owner'] = $data['owner'];
+            }
+
+            // add in the treeID
+            $question['treeID'] = $treeID;
+            $question = new Question($db, $question);
+
+            $updateKeys = ['title'];
+            foreach($data as $key => $val) {
+                if(in_array($key, $updateKeys)) {
+                    $function = 'set'.ucfirst($key);
+                    $question->$function($val);
+                }
+            }
+
+            $question = $question->save();
+
+            if(is_object($question)) {
+                // return the question array
+                $response->getBody()->write(json_encode($question->array()));
+            } else {
+                // it's an error, so return the error
+                $error = $question;
+                $response->getBody()->write(json_encode(['errors'=>[$error]]));
+            }
+
+
             return $response;
         });
 
