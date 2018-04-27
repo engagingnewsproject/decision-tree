@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `tree`.`tree` (
   `treeTitle` VARCHAR(255) NOT NULL DEFAULT '',
   `treeCreatedAt` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
   `treeUpdatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `treeDeleted` TINYINT DEFAULT 0,
+  `treeDeleted` TINYINT(1) DEFAULT 0,
   `treeOwner` INT NULL,
   `treeCreatedBy` INT NULL,
   `treeUpdatedBy` INT NULL,
@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `tree`.`treeElement` (
   `elUpdatedBy` INT NULL,
   `elCreatedAt` TIMESTAMP DEFAULT '1970-01-01 06:00:00',
   `elUpdatedAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `elDeleted` TINYINT(1) DEFAULT 0,
   PRIMARY KEY (`elID`),
   INDEX `elTypeIDIDx` (`elTypeID` ASC),
   INDEX `treeIDIDx` (`treeID` ASC),
@@ -412,9 +413,9 @@ CREATE  OR REPLACE VIEW `treeAPI` (treeID, treeSlug, title, content, createdAt, 
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`treeQuestion`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `treeQuestion` (questionID, treeID, groupID, title, content, `order`) AS
+CREATE  OR REPLACE VIEW `treeQuestion` (questionID, treeID, groupID, title, content, `order`, deleted) AS
     SELECT
-        el.elID, el.treeID, elGroup.elID, el.elTitle, el.elContent, elOrder.elOrder
+        el.elID, el.treeID, elGroup.elID, el.elTitle, el.elContent, elOrder.elOrder, el.elDeleted
     FROM
         tree.treeElement el
             INNER JOIN
@@ -431,9 +432,9 @@ CREATE  OR REPLACE VIEW `treeQuestion` (questionID, treeID, groupID, title, cont
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`treeEnd`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `treeEnd` (endID, treeID, title, content) AS
+CREATE  OR REPLACE VIEW `treeEnd` (endID, treeID, title, content, deleted) AS
     SELECT
-        el.elID, el.treeID, el.elTitle, el.elContent
+        el.elID, el.treeID, el.elTitle, el.elContent, el.elDeleted
     FROM
         tree.treeElement el
             INNER JOIN
@@ -446,9 +447,9 @@ CREATE  OR REPLACE VIEW `treeEnd` (endID, treeID, title, content) AS
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`treeOption`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `treeOption` (optionID, treeID, questionID, title, content, `order`, destinationID, destinationType) AS
+CREATE  OR REPLACE VIEW `treeOption` (optionID, treeID, questionID, title, content, `order`, destinationID, destinationType, deleted) AS
     SELECT
-        el.elID, el.treeID, question.elID, el.elTitle, el.elContent, elOrder.elOrder, destination.elIDDestination, destinationType.elType
+        el.elID, el.treeID, question.elID, el.elTitle, el.elContent, elOrder.elOrder, destination.elIDDestination, destinationType.elType, el.elDeleted
     FROM
         tree.treeElement el
             INNER JOIN
@@ -471,9 +472,9 @@ CREATE  OR REPLACE VIEW `treeOption` (optionID, treeID, questionID, title, conte
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`treeGroup`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `treeGroup` (groupID, treeID, title, content, `order`) AS
+CREATE  OR REPLACE VIEW `treeGroup` (groupID, treeID, title, content, `order`, deleted) AS
     SELECT
-        el.elID, el.treeID, el.elTitle, el.elContent, elOrder.elOrder
+        el.elID, el.treeID, el.elTitle, el.elContent, elOrder.elOrder, el.elDeleted
     FROM
         tree.treeElement el
             INNER JOIN
@@ -488,9 +489,9 @@ CREATE  OR REPLACE VIEW `treeGroup` (groupID, treeID, title, content, `order`) A
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`treeStart`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `treeStart` (startID, treeID, title, content, destinationID) AS
+CREATE  OR REPLACE VIEW `treeStart` (startID, treeID, title, content, destinationID, deleted) AS
     SELECT
-        el.elID, el.treeID, el.elTitle, el.elContent, destination.elIDDestination
+        el.elID, el.treeID, el.elTitle, el.elContent, destination.elIDDestination, el.elDeleted
     FROM
         tree.treeElement el
     INNER JOIN
