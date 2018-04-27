@@ -170,9 +170,9 @@ $app->group('/api', function() {
             }
             $tree = new Tree($db, $tree);
 
-            $updateKeys = ['slug', 'title'];
+            $keys = ['slug', 'title'];
             foreach($data as $key => $val) {
-                if(in_array($key, $updateKeys)) {
+                if(in_array($key, $keys)) {
                     $function = 'set'.ucfirst($key);
                     $tree->$function($val);
                 }
@@ -211,9 +211,9 @@ $app->group('/api', function() {
             $db = new Database\DB($user);
             $tree = new Tree($db, $treeID);
 
-            $updateKeys = ['slug', 'title'];
+            $keys = ['slug', 'title'];
             foreach($data as $key => $val) {
-                if(in_array($key, $updateKeys)) {
+                if(in_array($key, $keys)) {
                     $function = 'set'.ucfirst($key);
                     $tree->$function($val);
                 }
@@ -291,9 +291,17 @@ $app->group('/api', function() {
             $treeID = $request->getAttribute('treeID');
 
             $db = new Database\DB();
-            $questions = $db->getQuestions($treeID);
+            $tree = new Tree($db, $treeID);
+            $questionIDs = $tree->getQuestions();
+            $allQuestions = [];
+            foreach($questionIDs as $questionID) {
+                $question = new Question($db, $questionID);
+                // remove treeID from the response
+                $allQuestions[] = $question->array(['treeID']);
+            }
+
             // return the JSON
-            $response->getBody()->write(json_encode($questions));
+            $response->getBody()->write(json_encode($allQuestions));
             return $response;
         });
 
@@ -316,9 +324,9 @@ $app->group('/api', function() {
             $question['treeID'] = $treeID;
             $question = new Question($db, $question);
 
-            $updateKeys = ['title'];
+            $keys = ['title'];
             foreach($data as $key => $val) {
-                if(in_array($key, $updateKeys)) {
+                if(in_array($key, $keys)) {
                     $function = 'set'.ucfirst($key);
                     $question->$function($val);
                 }
@@ -344,9 +352,49 @@ $app->group('/api', function() {
             $questionID = $request->getAttribute('questionID');
 
             $db = new Database\DB();
-            $question = $db->getQuestion($questionID, $treeID);
+            $question = new Question($db, $questionID);
+            $theQuestion = false;
+            // make sure this question is owned by this tree
+            if($question->getTreeID() == $treeID) {
+                // remove treeID from the response
+                $theQuestion = $question->array(['treeID']);
+            }
             // return the JSON
-            $response->getBody()->write(json_encode($question));
+            $response->getBody()->write(json_encode($theQuestion));
+            return $response;
+        });
+
+        $this->put('/trees/{treeID}/questions/{questionID}', function (Request $request, Response $response) {
+            // passed data
+            $data = $request->getParsedBody();
+            $user = $request->getAttribute('user');
+            $treeID = $request->getAttribute('treeID');
+            $questionID = $request->getAttribute('questionID');
+
+            $db = new Database\DB($user);
+            $tree = new Tree($db, $treeID);
+            $question = new Question($db, $questionID);
+
+            $keys = ['treeID','title'];
+            foreach($data as $key => $val) {
+                if(in_array($key, $keys)) {
+                    $function = 'set'.ucfirst($key);
+                    $question->$function($val);
+                }
+            }
+
+            if($question->getTreeID() == $treeID) {
+                $result = $question->save();
+            } else {
+                $result = ['errors'=>['Wrong tree.']];
+            }
+
+            if($result === true) {
+                $response->getBody()->write(json_encode($question->array(['treeID'])));
+            } else {
+                $response->getBody()->write(json_encode($result));
+            }
+
             return $response;
         });
 

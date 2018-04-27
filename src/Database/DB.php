@@ -633,7 +633,13 @@ class DB extends PDO {
      * @return ARRAY of optionIDs
      */
     public function getOptions($questionID, $options = []) {
-        $default = ['treeID'=>false, 'orderby'=>'order'];
+        $default = [
+                    'treeID'=>false,
+                    'orderby'=>'order',
+                    'fields' => '*',
+                    'fetch' => 'all'
+                ];
+
         $options = array_merge($default, $options);
 
         // validate the questionID is an ID
@@ -642,7 +648,7 @@ class DB extends PDO {
         }
 
         $params = [":questionID" => $questionID];
-        $sql = "SELECT * from ".$this->views['treeOption']." WHERE
+        $sql = "SELECT ".$options['fields']." from ".$this->views['treeOption']." WHERE
                 questionID = :questionID";
 
         // if a treeID was passed, append it to the params and sql statement
@@ -653,7 +659,11 @@ class DB extends PDO {
 
         $sql .= $this->getOrderby($options['orderby']);
 
-        return $this->fetchAll($sql, $params);
+        if($options['fetch'] === 'column') {
+            return $this->fetchAllColumn($sql, $params);
+        } else {
+            return $this->fetchAll($sql, $params);
+        }
     }
 
     /**
@@ -994,6 +1004,49 @@ class DB extends PDO {
             'vals'      => $el,
             'required'  => ['treeID', 'elTypeID', 'elTitle', 'elCreatedBy', 'elUpdatedBy'],
             'table'     => $this->tables['treeElement']
+        ]);
+    }
+
+    /**
+     * Updates an element in the DB
+     *
+     * @param $element ARRAY Data to update
+     * @return updated element
+     */
+    public function updateElement($el) {
+        $elID = $el['elID'];
+        // validate the user
+        if(Utility\validateUser($this->user) !== true) {
+            return 'Invalid user.';
+        }
+
+        $validate = new Validate();
+        if(!$validate->elID($elID)) {
+            return 'Invalid el.';
+        }
+
+        if(!isset($el['treeID'])) {
+            return 'No treeID.';
+        }
+
+        // find the el and make sure the owner owns this el
+        $tree = $this->getTree($el['treeID']);
+        if($tree['treeID'] !== $el['treeID']) {
+            return 'Incorrect treeID.';
+        }
+
+        if($tree['owner'] !== $this->user['userID'] && $this->user['userRole'] !== 'admin') {
+            return 'Not el owner.';
+        }
+
+        // unset the el ID so we don't try updating that.
+        unset($el['elID']);
+        // attempt to create the el
+        return $this->update([
+            'vals'      => $el,
+            'required'  => [],
+            'table'     => $this->tables['treeElement'],
+            'where'     => ['elID' => $elID]
         ]);
     }
 

@@ -77,14 +77,17 @@ class Element {
     /**
      * Returns the object as an array for JSON usage
      */
-    public function array() {
+    public function array($removeKeys = []) {
+        $removeKeys = array_merge($removeKeys, ['db']);
         $return = [];
         // loop the properties to make it into an array
         foreach($this as $property => $val) {
             $return[$property] = $val;
         }
-        // unset the DB property
-        unset($return['db']);
+        // unset the DB property, and anything else
+        foreach($removeKeys as $key) {
+            unset($return[$key]);
+        }
 
         return $return;
     }
@@ -110,6 +113,10 @@ class Element {
      */
     public function getTreeID() {
         return $this->treeID;
+    }
+
+    public function getOrder() {
+        return $this->order;
     }
 
     /**

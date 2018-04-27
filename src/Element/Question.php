@@ -43,16 +43,20 @@ class Question extends Element {
         }
 
         $question = $this->db->getQuestion($questionID);
-
+        //var_dump($question);
         // Map the database values to our object
         $questionID = $question['questionID'];
         // set the object values
-        $this->ID = $question['questionID'];
+        $this->ID = $questionID;
         $this->title = $question['title'];
+        $this->treeID = $question['treeID'];
+        $this->order = $question['order'];
 
         // set the owner off the tree
-        $tree = new Tree($question['treeID']);
+        $tree = new Tree($this->db, $this->treeID);
         $this->owner = $tree->getOwner();
+
+
         // set the array of IDs for each elem
         $this->options = $this->db->getOptionIDs($questionID);
 
@@ -73,6 +77,10 @@ class Question extends Element {
         return $this;
     }
 
+    public function getOptions() {
+        return $this->options;
+    }
+
     protected function create() {
         $question = [];
         // create it off the object
@@ -82,7 +90,6 @@ class Question extends Element {
         $question['treeID'] = $this->getTreeID();
         $question['elTypeID'] = $this->db->getElementTypeID('question');
 
-        print_r($question);
         $result = $this->db->createElement($question);
 
         // it's hopefully returning the ID of the question it inserted
@@ -109,7 +116,8 @@ class Question extends Element {
         // map the question object to the database
         $question = [
             'elID'        => $this->getID(),
-            'elTitle'     => $this->getTitle()
+            'elTitle'     => $this->getTitle(),
+            'treeID'      => $this->getTreeID()
         ];
 
         $result = $this->db->updateElement($question);
@@ -131,5 +139,7 @@ class Question extends Element {
     public function delete() {
         return $this->db->deleteQuestion(['questionID' => $this->getID()]);
     }
+
+    // TODO: use parent function for array?
 
 }
