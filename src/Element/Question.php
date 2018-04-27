@@ -137,7 +137,30 @@ class Question extends Element {
      * Deletes a question from the DB
      */
     public function delete() {
-        return $this->db->deleteQuestion(['questionID' => $this->getID()]);
+        $treeID = $this->getTreeID();
+        // delete the options
+        foreach($this->getOptions() as $optionID) {
+            $delete = $this->db->deleteElement(
+                ['elID'=>$optionID, 'treeID' => $treeID]
+            );
+            if($delete !== true) {
+                return false;
+            }
+        }
+        // delete the question
+        $delete = $this->db->deleteElement(
+            ['elID'=>$this->getID(), 'treeID' => $treeID]
+        );
+        if($delete !== true) {
+            return false;
+        }
+
+        // get the tree (shouldn't include the new question)
+        $tree = new Tree($this->db, $this->getTreeID());
+        // save it so the order updates
+        $tree->save();
+
+        return true;
     }
 
     // TODO: use parent function for array?

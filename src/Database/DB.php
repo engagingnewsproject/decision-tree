@@ -201,7 +201,8 @@ class DB extends PDO {
 		// TODO: validate options
 		$params = [":treeID" => $treeID];
 		$sql = "SELECT ".$options['fields']." from ".$this->views[$view]." WHERE
-				treeID = :treeID";
+				treeID = :treeID
+                AND deleted = 0";
 
 		$sql .= $this->getOrderby($options['orderby']);
 
@@ -240,7 +241,8 @@ class DB extends PDO {
 		$ucfirstType = ucfirst($elType);
 
 		$sql = "SELECT * from ".$this->views["tree${ucfirstType}"]." WHERE
-				".$elType."ID = :".$elType."ID";
+				".$elType."ID = :".$elType."ID
+                AND deleted = 0";
 
 		// if a treeID was passed, append it to the params and sql statement
 		if($treeID !== false) {
@@ -1048,6 +1050,17 @@ class DB extends PDO {
             'table'     => $this->tables['treeElement'],
             'where'     => ['elID' => $elID]
         ]);
+    }
+
+    /**
+     * Deletes an element from the DB
+     *
+     * @param $tree ARRAY Data to create tree with
+     * @return ARRAY
+     */
+    public function deleteElement($el) {
+        $el['elDeleted'] = 1;
+        return $this->updateElement($el);
     }
 
     /**

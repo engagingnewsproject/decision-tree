@@ -398,6 +398,27 @@ $app->group('/api', function() {
             return $response;
         });
 
+        $this->delete('/trees/{treeID}/questions/{questionID}', function (Request $request, Response $response) {
+
+            $data = $request->getParsedBody();
+            $user = $request->getAttribute('user');
+            $treeID = $request->getAttribute('treeID');
+            $questionID = $request->getAttribute('questionID');
+
+            $db = new Database\DB($user);
+            $tree = new Tree($db, $treeID);
+            $question = new Question($db, $questionID);
+
+            if($question->getTreeID() == $treeID) {
+                $result = $question->delete();
+            } else {
+                $result = ['errors'=>['Wrong tree.']];
+            }
+
+            $response->getBody()->write(json_encode($result));
+
+        });
+
         $this->get('/trees/{treeID}/questions/{questionID}/options', function (Request $request, Response $response) {
             $treeID = $request->getAttribute('treeID');
             $questionID = $request->getAttribute('questionID');
