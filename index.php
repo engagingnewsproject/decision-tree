@@ -7,8 +7,6 @@ require 'vendor/autoload.php';
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use \Cme\Database as Database;
-use \Cme\Utility as Utility;
 
 $config = [];
 $config['displayErrorDetails'] = true;
@@ -39,6 +37,7 @@ $app->add(function ($request, $response, $next) {
     if($request->isGet()) {
         // No authentication needed.
         // Go ahead and move on to the actual request.
+        $request = $request->withAttribute('user', false);
         $response = $next($request, $response);
         return $response;
     }
@@ -148,124 +147,16 @@ $app->group('/api', function() {
             ]);
         });
 
-        $this->get('/trees', function (Request $request, Response $response) {
-            $db = new Database\DB();
-            $trees = $db->getTrees();
-
-            $response->getBody()->write(json_encode($trees));
-            return $response;
-        });
-
-        $this->post('/trees', function (Request $request, Response $response) {
-            // passed data
-            $data = $request->getParsedBody();
-            $user = $request->getAttribute('user');
-            // if we have a user, try to create the tree
-            $db = new Database\DB($user);
-            $tree = [];
-            $tree['owner'] = $user['userID'];
-            // add the user to the tree data as the owner
-            if(isset($data['owner'])) {
-                $tree['owner'] = $data['owner'];
-            }
-            $tree = new Tree($db, $tree);
-
-            $keys = ['slug', 'title'];
-            foreach($data as $key => $val) {
-                if(in_array($key, $keys)) {
-                    $function = 'set'.ucfirst($key);
-                    $tree->$function($val);
-                }
-            }
-
-            $tree = $tree->save();
-
-            if(is_object($tree)) {
-                // return the tree array
-                $response->getBody()->write(json_encode($tree->array()));
-            } else {
-                // it's an error, so return the error
-                $error = $tree;
-                $response->getBody()->write(json_encode(['errors'=>[$error]]));
-            }
-
-
-            return $response;
-        });
-
-        $this->get('/trees/{treeID}', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-            $db = new Database\DB();
-            $tree = new Tree($db, $treeID);
-            // format into JSON
-            $response->getBody()->write(json_encode($tree->array()));
-            return $response;
-        });
-
-        $this->put('/trees/{treeID}', function (Request $request, Response $response) {
-            // passed data
-            $data = $request->getParsedBody();
-            $user = $request->getAttribute('user');
-            $treeID = $request->getAttribute('treeID');
-
-            $db = new Database\DB($user);
-            $tree = new Tree($db, $treeID);
-
-            $keys = ['slug', 'title'];
-            foreach($data as $key => $val) {
-                if(in_array($key, $keys)) {
-                    $function = 'set'.ucfirst($key);
-                    $tree->$function($val);
-                }
-            }
-
-            $result = $tree->save();
-
-            if($result === true) {
-                $response->getBody()->write(json_encode($tree->array()));
-            } else {
-                $response->getBody()->write(json_encode($result));
-            }
-
-            return $response;
-        });
-
-        $this->delete('/trees/{treeID}', function (Request $request, Response $response) {
-
-            $user = $request->getAttribute('user');
-            $treeID = $request->getAttribute('treeID');
-
-            $db = new Database\DB($user);
-
-            $tree = new Tree($db, $treeID);
-
-            $delete = $tree->delete();
-
-            $response->getBody()->write(json_encode($delete));
-
-        });
-
-        $this->get('/trees/{treeID}/starts', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-            // get all starts from that tree id
-            $db = new Database\DB();
-            $starts = $db->getStarts($treeID);
-            // return the JSON
-            $response->getBody()->write(json_encode($starts));
-            return $response;
-        });
-
-        $this->get('/trees/{treeID}/starts/{startID}', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-            $startID = $request->getAttribute('startID');
-
-            $db = new Database\DB();
-            $start = $db->getStart($startID, $treeID);
-            // return the JSON
-            $response->getBody()->write(json_encode($start));
-            return $response;
-        });
-
+        $this->get('/trees', '\App\Trees:getAll');
+        $this->post('/trees', '\App\Trees:create');
+        // trees
+        $this->get('/trees/{treeID}', '\App\Trees:get');
+        $this->put('/trees/{treeID}', '\App\Trees:update');
+        $this->delete('/trees/{treeID}', '\App\Trees:delete');
+        // starts
+        $this->get('/trees/{treeID}/starts', '\App\Starts:getAll');
+        $this->get('/trees/{treeID}/starts/{startID}', '\App\Starts:get');
+        // groups
         $this->get('/trees/{treeID}/groups', function (Request $request, Response $response) {
             $treeID = $request->getAttribute('treeID');
             // get all groups from that tree id
@@ -286,138 +177,14 @@ $app->group('/api', function() {
             $response->getBody()->write(json_encode($group));
             return $response;
         });
+        // questions
+        $this->get('/trees/{treeID}/questions', '\App\Questions:getAll');
+        $this->post('/trees/{treeID}/questions', '\App\Questions:create');
+        // question
+        $this->get('/trees/{treeID}/questions/{questionID}', '\App\Questions:get');
+        $this->put('/trees/{treeID}/questions/{questionID}', '\App\Questions:update');
+        $this->delete('/trees/{treeID}/questions/{questionID}', '\App\Questions:delete');
 
-        $this->get('/trees/{treeID}/questions', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-
-            $db = new Database\DB();
-            $tree = new Tree($db, $treeID);
-            $questionIDs = $tree->getQuestions();
-            $allQuestions = [];
-            foreach($questionIDs as $questionID) {
-                $question = new Question($db, $questionID);
-                // remove treeID from the response
-                $allQuestions[] = $question->array(['treeID']);
-            }
-
-            // return the JSON
-            $response->getBody()->write(json_encode($allQuestions));
-            return $response;
-        });
-
-
-        $this->post('/trees/{treeID}/questions', function (Request $request, Response $response) {
-            // passed data
-            $data = $request->getParsedBody();
-            $treeID = $request->getAttribute('treeID');
-            $user = $request->getAttribute('user');
-            // if we have a user, try to create the question
-            $db = new Database\DB($user);
-            $question = [];
-            $question['owner'] = $user['userID'];
-            // add the user to the question data as the owner
-            if(isset($data['owner'])) {
-                $question['owner'] = $data['owner'];
-            }
-
-            // add in the treeID
-            $question['treeID'] = $treeID;
-            $question = new Question($db, $question);
-
-            $keys = ['title'];
-            foreach($data as $key => $val) {
-                if(in_array($key, $keys)) {
-                    $function = 'set'.ucfirst($key);
-                    $question->$function($val);
-                }
-            }
-
-            $question = $question->save();
-
-            if(is_object($question)) {
-                // return the question array
-                $response->getBody()->write(json_encode($question->array()));
-            } else {
-                // it's an error, so return the error
-                $error = $question;
-                $response->getBody()->write(json_encode(['errors'=>[$error]]));
-            }
-
-
-            return $response;
-        });
-
-        $this->get('/trees/{treeID}/questions/{questionID}', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-            $questionID = $request->getAttribute('questionID');
-
-            $db = new Database\DB();
-            $question = new Question($db, $questionID);
-            $theQuestion = false;
-            // make sure this question is owned by this tree
-            if($question->getTreeID() == $treeID) {
-                // remove treeID from the response
-                $theQuestion = $question->array(['treeID']);
-            }
-            // return the JSON
-            $response->getBody()->write(json_encode($theQuestion));
-            return $response;
-        });
-
-        $this->put('/trees/{treeID}/questions/{questionID}', function (Request $request, Response $response) {
-            // passed data
-            $data = $request->getParsedBody();
-            $user = $request->getAttribute('user');
-            $treeID = $request->getAttribute('treeID');
-            $questionID = $request->getAttribute('questionID');
-
-            $db = new Database\DB($user);
-            $tree = new Tree($db, $treeID);
-            $question = new Question($db, $questionID);
-
-            $keys = ['treeID','title'];
-            foreach($data as $key => $val) {
-                if(in_array($key, $keys)) {
-                    $function = 'set'.ucfirst($key);
-                    $question->$function($val);
-                }
-            }
-
-            if($question->getTreeID() == $treeID) {
-                $result = $question->save();
-            } else {
-                $result = ['errors'=>['Wrong tree.']];
-            }
-
-            if($result === true) {
-                $response->getBody()->write(json_encode($question->array(['treeID'])));
-            } else {
-                $response->getBody()->write(json_encode($result));
-            }
-
-            return $response;
-        });
-
-        $this->delete('/trees/{treeID}/questions/{questionID}', function (Request $request, Response $response) {
-
-            $data = $request->getParsedBody();
-            $user = $request->getAttribute('user');
-            $treeID = $request->getAttribute('treeID');
-            $questionID = $request->getAttribute('questionID');
-
-            $db = new Database\DB($user);
-            $tree = new Tree($db, $treeID);
-            $question = new Question($db, $questionID);
-
-            if($question->getTreeID() == $treeID) {
-                $result = $question->delete();
-            } else {
-                $result = ['errors'=>['Wrong tree.']];
-            }
-
-            $response->getBody()->write(json_encode($result));
-
-        });
 
         $this->get('/trees/{treeID}/questions/{questionID}/options', function (Request $request, Response $response) {
             $treeID = $request->getAttribute('treeID');

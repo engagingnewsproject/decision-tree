@@ -9,6 +9,10 @@
             "Cme\\":"src"
         },
         "files": [
+            "src/Route.php",
+            "src/Route/Trees.php",
+            "src/Route/Starts.php",
+            "src/Route/Questions.php",
             "src/utilities.php",
             "src/Database/DB.php",
             "src/Database/CompileTree.php",

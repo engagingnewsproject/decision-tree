@@ -164,5 +164,9 @@ class Question extends Element {
     }
 
     // TODO: use parent function for array?
+    public function array($removeKeys = []) {
+        $removeKeys = array_merge($removeKeys, ['treeID','deleted']);
+        return parent::array($removeKeys);
+    }
 
 }

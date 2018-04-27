@@ -8,6 +8,10 @@ class ComposerStaticInit2ab4f31e916b7f2a91ceb237a10488e6
 {
     public static $files = array (
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
+        'f9ddfe77736e2a75194882332ec5263e' => __DIR__ . '/../..' . '/src/Route.php',
+        '21438caeccfc050f1a6054f82abac90d' => __DIR__ . '/../..' . '/src/Route/Trees.php',
+        'fda2c73e170b4acd53d4836ec6b612af' => __DIR__ . '/../..' . '/src/Route/Starts.php',
+        '908bcbbdfc1e847bcb9e466c9d5ac94f' => __DIR__ . '/../..' . '/src/Route/Questions.php',
         '7216b7cbf1fc50e5e50b729b892396be' => __DIR__ . '/../..' . '/src/utilities.php',
         '7da0dd2d2834a45b99ab7501637cf889' => __DIR__ . '/../..' . '/src/Database/DB.php',
         'b5763a759063aa47341bfed6cf732fc1' => __DIR__ . '/../..' . '/src/Database/CompileTree.php',
