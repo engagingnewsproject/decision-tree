@@ -20,7 +20,7 @@ class Render extends Template {
         // set the path
         $this->setTemplatePath($templateName);
         // set the data
-        $this->set_data($dataSlug);
+        $this->setData($dataSlug);
     }
 
     /**
@@ -29,10 +29,10 @@ class Render extends Template {
     public function render() {
         $renderer = include $this->getTemplatePath();
         $data = $this->get_data();
-        return $renderer($this->get_data());
+        return $renderer($data);
     }
 
-    protected function set_data($treeSlug) {
+    protected function setData($treeSlug) {
         $data = false;
 
         $body = file_get_contents(TREE_PATH."/data/$treeSlug.min.json");

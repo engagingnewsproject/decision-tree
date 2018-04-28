@@ -12,11 +12,11 @@ class Compile extends Template {
            $template_name;
 
     public function __construct($template_name) {
-        $this->set_template_name($template_name);
-        $this->set_template();
+        $this->setTemplateName($template_name);
+        $this->setTemplate();
 
-        $template_name = $this->get_template_name();
-        $template = $this->get_template();
+        $template_name = $this->getTemplateName();
+        $template = $this->getTemplate();
 
         if($template && $template_name) {
             return $this->compile($template, TREE_PATH."/views/$template_name.php");
@@ -34,13 +34,12 @@ class Compile extends Template {
             'flags' => \LightnCandy\LightnCandy::FLAG_HANDLEBARS,
             'helpers' => array(
                 'environment'  => '\Cme\Template\Helpers::environment',
-                'group_start'  => '\Cme\Template\Helpers::group_start',
-                'group_end'  => '\Cme\Template\Helpers::group_end',
-                'el_number'  => '\Cme\Template\Helpers::el_number',
+                'groupStart'  => '\Cme\Template\Helpers::groupStart',
+                'groupEnd'  => '\Cme\Template\Helpers::groupEnd',
+                'elNumber'  => '\Cme\Template\Helpers::elNumber',
                 'destination'  => '\Cme\Template\Helpers::destination',
             )
         );
-
 
 
         $phpStr = \LightnCandy\LightnCandy::compile($template, $options);

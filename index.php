@@ -127,25 +127,7 @@ $app->group('/api', function() {
             $response->getBody()->write(file_get_contents("data/".$treeSlug.".json"));
         });
 
-        $this->get('/trees/{treeSlug}/iframe', function (Request $request, Response $response) {
-
-            $treeSlug = $request->getAttribute('treeSlug');
-            $js = $request->getQueryParam('js', $default = 'true');
-
-            // check if we have a slug or an id
-            if(\Cme\Utility\isID($treeSlug)) {
-                $treeSlug = \Cme\Utility\getTreeSlugById($treeSlug);
-            }
-            if($js === 'false') {
-                $viewPath = 'no-js';
-            } else {
-                $viewPath = 'has-js';
-            }
-            $this->view->render($response, "iframe/$viewPath/index.php", [
-                "treeSlug" => $treeSlug,
-                "url"=>TREE_URL
-            ]);
-        });
+        $this->get('/trees/{treeSlug}/iframe', '\App\Trees:iframe');
 
         $this->get('/trees', '\App\Trees:getAll');
         $this->post('/trees', '\App\Trees:create');

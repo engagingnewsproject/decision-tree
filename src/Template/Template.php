@@ -8,16 +8,16 @@ use Cme\Utility as Utility;
 class Template
 {
     public $template,
-           $template_name;
+           $templateName;
 
     function __construct()
     {
     }
 
-    protected function set_template() {
+    protected function setTemplate() {
         $template = false;
-        if($this->template_name !== false) {
-            $template_file = file_get_contents(TREE_PATH."/templates/$this->template_name.hbs");
+        if($this->templateName !== false) {
+            $template_file = file_get_contents(TREE_PATH."/templates/$this->templateName.hbs");
 
             if(is_string($template_file)) {
                 $template = $template_file;
@@ -27,19 +27,19 @@ class Template
         $this->template = $template;
     }
 
-    protected function set_template_name($template_name) {
-        if(!Utility\isSlug($template_name)) {
+    protected function setTemplateName($templateName) {
+        if(!Utility\isSlug($templateName)) {
             return false;
         }
 
-        $this->template_name = $template_name;
+        $this->templateName = $templateName;
     }
 
-    public function get_template_name() {
-        return $this->template_name;
+    public function getTemplateName() {
+        return $this->templateName;
     }
 
-    public function get_template() {
+    public function getTemplate() {
         return $this->template;
     }
 }

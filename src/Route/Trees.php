@@ -52,6 +52,26 @@ class Trees extends Route
         $this->return($this->tree->array(), $response);
     }
 
+    public function iframe($request, $response) {
+        $treeSlug = $request->getAttribute('treeSlug');
+        $js = $request->getQueryParam('js', $default = 'true');
+
+        // check if we have a slug or an id
+        if(Utility\isID($treeSlug)) {
+            $treeSlug = Utility\getTreeSlugById($treeSlug);
+        }
+        if($js === 'false') {
+            $viewPath = 'no-js';
+        } else {
+            $viewPath = 'has-js';
+        }
+
+        $view = $this->app->get('view');
+        $view->render($response, "iframe/$viewPath/index.php", [
+            'treeSlug' => $treeSlug,
+            'url'=>TREE_URL
+        ]);
+    }
     public function create($request, $response) {
         // init data
         $this->init($request);
