@@ -139,26 +139,9 @@ $app->group('/api', function() {
         $this->get('/trees/{treeID}/starts', '\App\Starts:getAll');
         $this->get('/trees/{treeID}/starts/{startID}', '\App\Starts:get');
         // groups
-        $this->get('/trees/{treeID}/groups', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-            // get all groups from that tree id
-            $db = new Database\DB();
-            $groups = $db->getGroups($treeID);
-            // return the JSON
-            $response->getBody()->write(json_encode($groups));
-            return $response;
-        });
+        $this->get('/trees/{treeID}/groups', '\App\Groups:getAll');
+        $this->get('/trees/{treeID}/groups/{groupID}', '\App\Groups:get');
 
-        $this->get('/trees/{treeID}/groups/{groupID}', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-            $groupID = $request->getAttribute('groupID');
-
-            $db = new Database\DB();
-            $group = $db->getGroup($groupID, $treeID);
-            // return the JSON
-            $response->getBody()->write(json_encode($group));
-            return $response;
-        });
         // questions
         $this->get('/trees/{treeID}/questions', '\App\Questions:getAll');
         $this->post('/trees/{treeID}/questions', '\App\Questions:create');
@@ -191,45 +174,22 @@ $app->group('/api', function() {
             return $response;
         });
 
-        $this->get('/trees/{treeID}/ends', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
+        // ends
+        $this->get('/trees/{treeID}/ends', '\App\Ends:getAll');
+        $this->get('/trees/{treeID}/ends/{endID}', '\App\Ends:get');
 
-            $db = new Database\DB();
-            $ends = $db->getEnds($treeID);
-            // return the JSON
-            $response->getBody()->write(json_encode($ends));
-            return $response;
-        });
+        // embeds by tree
+        $this->get('/trees/{treeID}/embeds', '\App\Embeds:getAllEmbedsByTree');
+        $this->get('/trees/{treeID}/embeds/{embedID}', '\App\Embeds:getEmbedByTree');
 
-        $this->get('/trees/{treeID}/ends/{endID}', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-            $endID = $request->getAttribute('endID');
+        // sites
+        $this->get('/trees/{treeID}/sites', '\App\Sites:getAll');
+        $this->get('/trees/{treeID}/sites/{siteID}', '\App\Sites:get');
 
-            $db = new Database\DB();
-            $end = $db->getEnd($endID, $treeID);
-            // return the JSON
-            $response->getBody()->write(json_encode($end));
-            return $response;
-        });
+        // embeds by site
+        $this->get('/sites/{siteID}/embeds', '\App\Embeds:getAllEmbedsBySite');
+        $this->get('/sites/{siteID}/embeds/{embedID}', '\App\Embeds:getEmbedBySite');
 
-        $this->get('/trees/{treeID}/embeds', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-            // TODO: returns array of all embeds that match this treeID
-            $embeds = [[]];
-            // return the JSON
-            $response->getBody()->write(json_encode($embeds));
-            return $response;
-        });
-
-        $this->get('/trees/{treeID}/embeds/{embedID}', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-            $embedID = $request->getAttribute('embedID');
-            // TODO: returns array of the embed with that embedID
-            $embed = [];
-            // return the JSON
-            $response->getBody()->write(json_encode($embed));
-            return $response;
-        });
 
         // Save new site
         /*
@@ -251,50 +211,6 @@ $app->group('/api', function() {
             return $response;
         });
         */
-        // returns array of all the sites
-        $this->get('/sites', function (Request $request, Response $response) {
-            $sites = [['siteID'=>1, 'feature_finished'=>'nope!']];
-
-            // return the JSON
-            $response->getBody()->write(json_encode($sites));
-            return $response;
-        });
-
-        // returns the site info for that ID
-        // @param siteID can be an encoded root url w/o the http://
-        $this->get('/sites/{siteID}', function (Request $request, Response $response) {
-            $siteID = $request->getAttribute('siteID');
-
-            $db = new Database\DB();
-            //TODO: see if the site ID is an ID or a URL
-            $site = $db->getSite($siteID);
-            // return the JSON
-            $response->getBody()->write(json_encode($site));
-            return $response;
-        });
-
-        // Returns all embeds on that site
-        $this->get('/sites/{siteID}/embeds', function (Request $request, Response $response) {
-            $siteID = $request->getAttribute('siteID');
-            $db = new Database\DB();
-            //TODO: see if the site ID is an ID or a URL
-            $embeds = $db->getEmbedsBySite($siteID);
-            // return the JSON
-            $response->getBody()->write(json_encode($embeds));
-            return $response;
-        });
-
-        // Returns a specific embed on that site
-        $this->get('/sites/{siteID}/embeds/{embedID}', function (Request $request, Response $response) {
-            $siteID = $request->getAttribute('siteID');
-            $embedID = $request->getAttribute('embedID');
-
-            $db = new Database\DB();
-            $embed = $db->getEmbed($embedID, ['siteID'=>$siteID]);
-            // return the JSON
-            $response->getBody()->write(json_encode($embed));
-            return $response;
-        });
 
         // Add a new Tree Embed to a site
         /*
