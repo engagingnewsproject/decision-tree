@@ -19,6 +19,7 @@
             "src/Route/Sites.php",
             "src/Route/Interactions.php",
             "src/Route/States.php",
+            "src/Authentication.php",
             "src/utilities.php",
             "src/Database/DB.php",
             "src/Database/CompileTree.php",
