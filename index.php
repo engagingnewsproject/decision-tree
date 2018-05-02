@@ -78,23 +78,6 @@ $app->add(function ($request, $response, $next) {
     return $response;
 });
 
-/* $app->add(new Tuupola\Middleware\HttpBasicAuthentication([
-    "path" => ["/api"],
-    "ignore" => ["/api/v1/interactions"],
-    "realm" => "Protected",
-    "users" => [
-        "juryjowns" => TREE_ADMIN_PASSWORD,
-    ],
-    "error" => function ($response, $message) {
-        $data = [
-            'error' => $message,
-        ];
-
-        return $response->getBody()->write(json_encode($data, JSON_UNESCAPED_SLASHES));
-    }
-]));*/
-
-
 // register views
 $container = $app->getContainer();
 $container['view'] = new \Slim\Views\PhpRenderer("views/");
