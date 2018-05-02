@@ -25,7 +25,7 @@ class DB extends PDO {
     // pass a user to the database to create elements
 	public function __construct($user = false) {
 
-        if($user !== false) {
+        if(!empty($user)) {
             // validate the user
             if(Utility\validateUser($user) !== true) {
                 return 'Invalid user.';

@@ -9,8 +9,13 @@ use Cme\Utility as Utility;
 class SaveInteraction extends DB {
     public $DB;
 
-    function __construct() {
-        $this->DB = new \Cme\Database\DB();
+    function __construct($db = false) {
+        // allow a database connection to be passed in
+        if($db !== false) {
+            $this->DB = $db;
+        } else {
+            $this->DB = new \Cme\Database\DB();
+        }
     }
 
     /**

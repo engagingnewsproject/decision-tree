@@ -1,7 +1,6 @@
 <?php
 namespace App;
 use \Cme\Database as Database;
-use \Cme\Utility as Utility;
 
 class Embeds extends Trees
 {
