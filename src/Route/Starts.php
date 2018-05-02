@@ -1,6 +1,5 @@
 <?php
 namespace App;
-use \Cme\Database as Database;
 
 class Starts extends Trees
 {
