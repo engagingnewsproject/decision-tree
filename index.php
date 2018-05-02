@@ -190,114 +190,12 @@ $app->group('/api', function() {
         $this->get('/sites/{siteID}/embeds', '\App\Embeds:getAllEmbedsBySite');
         $this->get('/sites/{siteID}/embeds/{embedID}', '\App\Embeds:getEmbedBySite');
 
-
-        // Save new site
-        /*
-        $this->post('/sites', function (Request $request, Response $response) {
-            // passed data
-            $data = $request->getParsedBody();
-            // validate it
-            // print_r($data);
-            // save it
-
-            // build the response
-            $savedData = ['success'=>true,
-                          'savedData' => json_decode($data)
-                      ];
-            // return the JSON
-            $response->withStatus(200)
-                ->withHeader("Content-Type", "application/json")
-                ->write(json_encode($data));
-            return $response;
-        });
-        */
-
-        // Add a new Tree Embed to a site
-        /*
-        $this->post('/sites/{siteID}/embeds', function (Request $request, Response $response) {
-            $siteID = $request->getAttribute('siteID');
-            // passed data
-            $data = $request->getParsedBody();
-            // validate it
-            // print_r($data);
-            // save it
-
-            // build the response
-            $savedData = ['success'=>true,
-                          'savedData' => json_decode($data)
-                      ];
-            // return the JSON
-            $response->withStatus(200)
-                ->withHeader("Content-Type", "application/json")
-                ->write(json_encode($data));
-            return $response;
-        });*/
-
         // save interactions
-        $this->post('/interactions', function (Request $request, Response $response) {
-            // passed data
-            $data = $request->getParsedBody();
-            // set empty errors array. This whole "check for errors then move on" thing
-            // could probably be structured better
-            $errors = [];
-
-            $site = new Database\SaveSite();
-            // get the siteID. It will either save a new one or return an existing one
-            $siteResponse = $site->save($data['site']);
-
-            if(isset($siteResponse['status']) && $siteResponse['status'] === 'success') {
-                $data['site']['siteID'] = $siteResponse['siteID'];
-                $data['site']['treeID'] = $data['treeID'];
-            } else {
-                $errors = $siteResponse;
-            }
-            // no errors? get the embed
-            if(empty($errors)) {
-                // add the treeID into the site attribute cuz we'll need it
-                // try to get the embed
-                $embed = new Database\SaveEmbed();
-                $embedResponse = $embed->save($data['site']);
-
-                if(isset($embedResponse['status']) && $embedResponse['status'] === 'success') {
-                    $data['site']['embedID'] = $embedResponse['embedID'];
-                } else {
-                    $errors = $embedResponse;
-                }
-            }
-
-            // no errors? save the interaction
-            if(empty($errors)) {
-                // try to save it
-                $interaction = new Database\SaveInteraction();
-                $theResponse = $interaction->save($data);
-            } else {
-                $theResponse = $errors;
-            }
+        $this->post('/interactions', '\App\Interactions:create');
+        $this->get('/interactions/types', '\App\Interactions:getTypes');
+        $this->get('/interactions/types/{typeID}', '\App\Interactions:getType');
 
 
-            // return the JSON
-            $response->withStatus(200)
-                ->withHeader("Content-Type", "application/json")
-                ->write(json_encode($theResponse));
-            return $response;
-        });
-
-        $this->get('/interactions/types', function (Request $request, Response $response) {
-            $db = new Database\DB();
-            $interactionTypes = $db->getInteractionTypes();
-
-            $response->getBody()->write(json_encode($interactionTypes));
-            return $response;
-        });
-
-        $this->get('/interactions/types/{typeID}', function (Request $request, Response $response) {
-            $typeID = $request->getAttribute('typeID');
-            $db = new Database\DB();
-            $interactionType = $db->getInteractionType($typeID);
-
-            $response->getBody()->write(json_encode($interactionType));
-            return $response;
-        });
 
         $this->get('/states/types', function (Request $request, Response $response) {
             $db = new Database\DB();
