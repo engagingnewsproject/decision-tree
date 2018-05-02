@@ -190,29 +190,18 @@ $app->group('/api', function() {
         $this->get('/sites/{siteID}/embeds', '\App\Embeds:getAllEmbedsBySite');
         $this->get('/sites/{siteID}/embeds/{embedID}', '\App\Embeds:getEmbedBySite');
 
-        // save interactions
+        // interactions
         $this->post('/interactions', '\App\Interactions:create');
+
+        // interaction types
         $this->get('/interactions/types', '\App\Interactions:getTypes');
         $this->get('/interactions/types/{typeID}', '\App\Interactions:getType');
+        // state types
+        $this->get('/states/types', '\App\States:getStateTypes');
+        $this->get('/states/types/{typeID}', '\App\States:getStateType');
 
 
 
-        $this->get('/states/types', function (Request $request, Response $response) {
-            $db = new Database\DB();
-            $stateTypes = $db->getStateTypes();
-
-            $response->getBody()->write(json_encode($stateTypes));
-            return $response;
-        });
-
-        $this->get('/states/types/{typeID}', function (Request $request, Response $response) {
-            $typeID = $request->getAttribute('typeID');
-            $db = new Database\DB();
-            $stateType = $db->getStateType($typeID);
-
-            $response->getBody()->write(json_encode($stateType));
-            return $response;
-        });
     });
 });
 

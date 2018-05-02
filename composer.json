@@ -18,6 +18,7 @@
             "src/Route/Embeds.php",
             "src/Route/Sites.php",
             "src/Route/Interactions.php",
+            "src/Route/States.php",
             "src/utilities.php",
             "src/Database/DB.php",
             "src/Database/CompileTree.php",
