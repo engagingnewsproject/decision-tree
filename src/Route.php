@@ -1,21 +1,32 @@
 <?php
 namespace App;
+use \Cme\Database as Database;
 
 class Route
 {
     protected $app,
+              $db = false,
+              $data = [], // the passed data in the request
+              $user = false,
               $errors = [];
 
     public function __construct($app) {
         $this->app = $app;
     }
 
-    public function index($request, $response) {
-        $db = new Database\DB();
-        $trees = $db->getTrees();
+    public function init($request) {
+         // set the user, if any
+        $this->user = $request->getAttribute('user');
 
-        $response->getBody()->write(json_encode($trees));
-        return $response;
+        // pass the user to the database. If the user is false, it will connect but all POST/PUT/DELETE requests will be disabled
+        $this->db = new Database\DB($this->user);
+
+        // set the data, if any
+        $data = $request->getParsedBody();
+        if($data) {
+            $this->data = $request->getParsedBody();
+        }
+
     }
 
     public function addError($string) {

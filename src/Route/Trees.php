@@ -1,39 +1,26 @@
 <?php
 namespace App;
-use \Cme\Database as Database;
 use \Cme\Utility as Utility;
 
 class Trees extends Route
 {
     protected $app,
-              $data = [], // the passed data in the request
               $treeID = false,
-              $tree = false,
-              $user = false,
-              $db = false;
+              $tree = false;
 
     public function __construct($app = false) {
         $this->app = $app;
-
     }
 
     public function init($request) {
-        // set DB connection
-        $this->user = $request->getAttribute('user');
-
-        // if we have a user, try to create the tree
-        $this->db = new Database\DB($this->user);
+        // build the parent init
+        parent::init($request);
 
         // set tree
         $treeID = $request->getAttribute('treeID');
         if($treeID) {
             $this->treeID = $treeID;
             $this->tree = new \Cme\Tree($this->db, $treeID);
-        }
-
-        $data = $request->getParsedBody();
-        if($data) {
-            $this->data = $request->getParsedBody();
         }
     }
 
