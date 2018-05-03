@@ -1,5 +1,6 @@
 <?php
 namespace App;
+use \Cme\Database as Database;
 use \Cme\Utility as Utility;
 
 class Trees extends Route
@@ -59,6 +60,36 @@ class Trees extends Route
             'url'=>TREE_URL
         ]);
     }
+
+    public function compile($request, $response) {
+        $treeSlug = $request->getAttribute('treeSlug');
+
+        if(\Cme\Utility\isID($treeSlug)) {
+            $treeSlug = \Cme\Utility\getTreeSlugById($treeSlug);
+        }
+
+        // compile it, passing in the database
+        $compiled = new Database\CompileTree($treeSlug, $this->db);
+
+        // return the file that got written
+        // It's already JSON, so don't pass it through the $this->return function
+        $response->getBody()->write(file_get_contents("data/".$treeSlug.$ext.".json"));
+        return $response;
+    }
+
+    public function compiled($request, $response) {
+        $treeSlug = $request->getAttribute('treeSlug');
+        $minified = $request->getQueryParam('minified', $default = false);
+        $ext = ($minified === 'true' ? '.min' : '');
+
+        if(\Cme\Utility\isID($treeSlug)) {
+            $treeSlug = \Cme\Utility\getTreeSlugById($treeSlug);
+        }
+
+        $response->getBody()->write(file_get_contents("data/".$treeSlug.$ext.".json"));
+        return $response;
+    }
+
     public function create($request, $response) {
         // init data
         $this->init($request);

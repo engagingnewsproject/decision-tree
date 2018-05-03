@@ -12,8 +12,14 @@ class CompileTree extends DB {
     protected $db,
               $compiled;
 
-    public function __construct($treeID) {
-        $this->db = new DB();
+    public function __construct($treeID, $db = false) {
+        // allow a database connection to be passed in
+        if($db !== false) {
+            $this->db = $db;
+        } else {
+            $this->db = new \Cme\Database\DB();
+        }
+
         // kick off build process
         // get the tree by slug or ID
         if(\Cme\Utility\isSlug($treeID)) {

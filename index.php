@@ -13,7 +13,6 @@ $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
 
 $app = new \Slim\App(["settings" => $config]);
-$errors = [];
 
 // Start Laxy CORS //
 $app->options('/{routes:.+}', function ($request, $response, $args) {
@@ -28,44 +27,18 @@ $app->add(function ($req, $res, $next) {
 });
 // END Laxy CORS //
 
-/**
- * An authentication layer for validating users before
- *
- */
+// An authentication layer for validating users before passing them through to the route
 $app->add(new \App\Authentication());
 
 // register views
 $container = $app->getContainer();
 $container['view'] = new \Slim\Views\PhpRenderer("views/");
+
 $app->group('/api', function() {
     $this->group('/v1', function() {
-        $this->get('/trees/{treeSlug}/compiled', function (Request $request, Response $response) {
-            $treeSlug = $request->getAttribute('treeSlug');
-            $minified = $request->getQueryParam('minified', $default = false);
-            $ext = ($minified === 'true' ? '.min' : '');
+        $this->get('/trees/{treeSlug}/compiled', '\App\Trees:compiled');
 
-            if(\Cme\Utility\isID($treeSlug)) {
-                $treeSlug = \Cme\Utility\getTreeSlugById($treeSlug);
-            }
-
-            $response->getBody()->write(file_get_contents("data/".$treeSlug.$ext.".json"));
-            return $response;
-        });
-
-        $this->get('/trees/{treeSlug}/compile', function (Request $request, Response $response) {
-            $treeSlug = $request->getAttribute('treeSlug');
-
-            if(\Cme\Utility\isID($treeSlug)) {
-                $treeSlug = \Cme\Utility\getTreeSlugById($treeSlug);
-            }
-
-            // compile it
-            $compiled = new Database\CompileTree($treeSlug);
-
-            // return the file that got written
-            $response->getBody()->write(file_get_contents("data/".$treeSlug.".json"));
-        });
-
+        $this->get('/trees/{treeSlug}/compile', '\App\Trees:compile');
         $this->get('/trees/{treeSlug}/iframe', '\App\Trees:iframe');
 
         $this->get('/trees', '\App\Trees:getAll');
@@ -80,7 +53,6 @@ $app->group('/api', function() {
         // groups
         $this->get('/trees/{treeID}/groups', '\App\Groups:getAll');
         $this->get('/trees/{treeID}/groups/{groupID}', '\App\Groups:get');
-
         // questions
         $this->get('/trees/{treeID}/questions', '\App\Questions:getAll');
         $this->post('/trees/{treeID}/questions', '\App\Questions:create');
@@ -135,11 +107,10 @@ $app->group('/api', function() {
         // interaction types
         $this->get('/interactions/types', '\App\Interactions:getTypes');
         $this->get('/interactions/types/{typeID}', '\App\Interactions:getType');
+
         // state types
         $this->get('/states/types', '\App\States:getStateTypes');
         $this->get('/states/types/{typeID}', '\App\States:getStateType');
-
-
 
     });
 });
