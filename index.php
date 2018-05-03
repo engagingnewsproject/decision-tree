@@ -59,29 +59,9 @@ $app->group('/api', function() {
         $this->put('/trees/{treeID}/questions/{questionID}', '\App\Questions:update');
         $this->delete('/trees/{treeID}/questions/{questionID}', '\App\Questions:delete');
 
-
-        $this->get('/trees/{treeID}/questions/{questionID}/options', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-            $questionID = $request->getAttribute('questionID');
-
-            $db = new Database\DB();
-            $options = $db->getOptions($questionID, ['treeID' => $treeID]);
-            // return the JSON
-            $response->getBody()->write(json_encode($options));
-            return $response;
-        });
-
-        $this->get('/trees/{treeID}/questions/{questionID}/options/{optionID}', function (Request $request, Response $response) {
-            $treeID = $request->getAttribute('treeID');
-            $questionID = $request->getAttribute('questionID');
-            $optionID = $request->getAttribute('optionID');
-
-            $db = new Database\DB();
-            $option = $db->getOption($optionID, ['treeID' => $treeID, 'questionID' => $questionID]);
-            // return the JSON
-            $response->getBody()->write(json_encode($option));
-            return $response;
-        });
+        // options
+        $this->get('/trees/{treeID}/questions/{questionID}/options', '\App\Options:getAll');
+        $this->get('/trees/{treeID}/questions/{questionID}/options/{optionID}', '\App\Options:get');
 
         // ends
         $this->get('/trees/{treeID}/ends', '\App\Ends:getAll');

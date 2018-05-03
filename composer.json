@@ -15,6 +15,7 @@
             "src/Route/Groups.php",
             "src/Route/Ends.php",
             "src/Route/Questions.php",
+            "src/Route/Options.php",
             "src/Route/Embeds.php",
             "src/Route/Sites.php",
             "src/Route/Interactions.php",
