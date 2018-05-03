@@ -36,27 +36,25 @@ $container['view'] = new \Slim\Views\PhpRenderer("views/");
 
 $app->group('/api', function() {
     $this->group('/v1', function() {
-        $this->get('/trees/{treeSlug}/compiled', '\App\Trees:compiled');
-
-        $this->get('/trees/{treeSlug}/compile', '\App\Trees:compile');
-        $this->get('/trees/{treeSlug}/iframe', '\App\Trees:iframe');
-
+        // Trees
         $this->get('/trees', '\App\Trees:getAll');
         $this->post('/trees', '\App\Trees:create');
-        // trees
         $this->get('/trees/{treeID}', '\App\Trees:get');
         $this->put('/trees/{treeID}', '\App\Trees:update');
         $this->delete('/trees/{treeID}', '\App\Trees:delete');
-        // starts
+        // Tree Actions/Views
+        $this->get('/trees/{treeSlug}/compile', '\App\Trees:compile');
+        $this->get('/trees/{treeSlug}/compiled', '\App\Trees:compiled');
+        $this->get('/trees/{treeSlug}/iframe', '\App\Trees:iframe');
+        // Starts
         $this->get('/trees/{treeID}/starts', '\App\Starts:getAll');
         $this->get('/trees/{treeID}/starts/{startID}', '\App\Starts:get');
-        // groups
+        // Groups
         $this->get('/trees/{treeID}/groups', '\App\Groups:getAll');
         $this->get('/trees/{treeID}/groups/{groupID}', '\App\Groups:get');
-        // questions
+        // Questions
         $this->get('/trees/{treeID}/questions', '\App\Questions:getAll');
         $this->post('/trees/{treeID}/questions', '\App\Questions:create');
-        // question
         $this->get('/trees/{treeID}/questions/{questionID}', '\App\Questions:get');
         $this->put('/trees/{treeID}/questions/{questionID}', '\App\Questions:update');
         $this->delete('/trees/{treeID}/questions/{questionID}', '\App\Questions:delete');

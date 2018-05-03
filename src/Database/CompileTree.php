@@ -76,7 +76,7 @@ class CompileTree extends DB {
         $i = 0;
 
         foreach($questions as $question) {
-            $questions[$i]['content'] = addslashes($questions[$i]['content']);
+            // $questions[$i]['content'] = addslashes($questions[$i]['content']);
             $questions[$i]['description'] = ( isset($questions[$i]['description']) ? addslashes($questions[$i]['description']) : '');
             $questions[$i]['options'] = $this->compile_options($question['questionID']);
             $i++;

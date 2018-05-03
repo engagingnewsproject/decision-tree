@@ -19,6 +19,7 @@ use PDO;
 class DB extends PDO {
 	public $tables,
 		   $views,
+           $getColumns,
 		   $errors = [];
     protected $user;
 
@@ -67,6 +68,16 @@ class DB extends PDO {
 						'treeInteractionStart'		=> 'treeinteractionstart',
 						'treeInteractionsMaxDateByUserAndTree'	=> 'treeinteractionsmaxdatebyuserandtree' // SORRY!
 					   ];
+
+        // define columns we want on different getters (that don't return all)
+        $this->getColumns = [
+            'tree'     => 'treeID, treeSlug, title, owner, createdAt, updatedAt',
+            'start' => 'startID, treeID, title, destinationID',
+            'group' => 'groupID, treeID, title, content, `order`',
+            'question' => 'questionID, treeID, groupID, title, `order`',
+            'option' => 'optionID, treeID, questionID, title, `order`, destinationID, destinationType',
+            'end' => 'endID, treeID, title, content',
+        ];
 		// check if a connection already exists
 		try {
 
@@ -185,22 +196,22 @@ class DB extends PDO {
 	 * Gets all the results from a view based on the tree ID, such as all
 	 * questions by tree ID or all interactions by tree ID
 	 *
-	 * @param $view The string of the view you want to use for the query
+	 * @param $elType The string of the element type you want to get
 	 * @param $treeID MIXED (STRING/INT) The treeID you want results for
 	 * @param $options ARRAY of defaults you can add to the SQL statement, like an orderby option or which fields you want
 	 * @return MIXED ARRAY from the PDO query on success, ??? if error
 	 */
-	public function fetchAllByTree($view, $treeID, $options = []) {
-		$default = [
+	public function fetchAllByTree($elType, $treeID, $options = []) {
+        $default = [
             'orderby'=>false,
-            'fields' => '*',
+            'fields' => $this->getColumns[$elType],
             'fetch' => 'all'
         ];
 
 		$options = array_merge($default, $options);
 		// TODO: validate options
 		$params = [":treeID" => $treeID];
-		$sql = "SELECT ".$options['fields']." from ".$this->views[$view]." WHERE
+		$sql = "SELECT ".$options['fields']." from ".$this->views['tree'.ucfirst($elType)]." WHERE
 				treeID = :treeID
                 AND deleted = 0";
 
@@ -240,7 +251,7 @@ class DB extends PDO {
 		$params = [":${elType}ID" => $elID];
 		$ucfirstType = ucfirst($elType);
 
-		$sql = "SELECT * from ".$this->views["tree${ucfirstType}"]." WHERE
+		$sql = "SELECT ".$this->getColumns[$elType]." from ".$this->views["tree${ucfirstType}"]." WHERE
 				".$elType."ID = :".$elType."ID
                 AND deleted = 0";
 
@@ -275,7 +286,7 @@ class DB extends PDO {
      */
     public function getTrees() {
         // Do a select query to see if we get a returned row
-        $sql = "SELECT * from ".$this->views['tree'];
+        $sql = "SELECT ".$this->getColumns['tree']." from ".$this->views['tree'];
         // return the found tree row
         return $this->fetchAll($sql);
     }
@@ -306,7 +317,7 @@ class DB extends PDO {
     public function getTreeByID($treeID) {
         $params = [":treeID" => $treeID];
 
-        $sql = "SELECT * from ".$this->views['tree']."
+        $sql = "SELECT ".$this->getColumns['tree']." from ".$this->views['tree']."
                 WHERE treeID = :treeID";
         // return the found tree row
         return $this->fetchOne($sql, $params);
@@ -321,7 +332,7 @@ class DB extends PDO {
     public function getTreeBySlug($treeSlug) {
         $params = [":treeSlug" => $treeSlug];
 
-        $sql = "SELECT * from ".$this->views['tree']."
+        $sql = "SELECT ".$this->getColumns['tree']." from ".$this->views['tree']."
                 WHERE treeSlug = :treeSlug";
         // return the found tree row
         return $this->fetchOne($sql, $params);
@@ -513,7 +524,7 @@ class DB extends PDO {
      * @return ARRAY
      */
     public function getStarts($treeID, $options = []) {
-        return $this->fetchAllByTree('treeStart', $treeID, $options);
+        return $this->fetchAllByTree('start', $treeID, $options);
     }
 
     /**
@@ -545,7 +556,7 @@ class DB extends PDO {
      * @return ARRAY of Group ARRAYS
      */
     public function getGroups($treeID, $options = []) {
-        return $this->fetchAllByTree('treeGroup', $treeID, $options);
+        return $this->fetchAllByTree('group', $treeID, $options);
     }
 
     /**
@@ -579,7 +590,7 @@ class DB extends PDO {
     public function getQuestions($treeID, $options = []) {
         $default = ['orderby'=>'order'];
         $options = array_merge($default, $options);
-        return $this->fetchAllByTree('treeQuestion', $treeID, $options);
+        return $this->fetchAllByTree('question', $treeID, $options);
     }
 
     /**
@@ -638,7 +649,7 @@ class DB extends PDO {
         $default = [
                     'treeID'=>false,
                     'orderby'=>'order',
-                    'fields' => '*',
+                    'fields' => $this->getColumns['option'],
                     'fetch' => 'all'
                 ];
 
@@ -691,7 +702,7 @@ class DB extends PDO {
 
         $params = [":optionID" => $optionID];
 
-        $sql = "SELECT * from ".$this->views["treeOption"]." WHERE
+        $sql = "SELECT ".$this->getColumns['option']." from ".$this->views["treeOption"]." WHERE
                 optionID = :optionID";
 
         // if a treeID was passed, append it to the params and sql statement
@@ -716,7 +727,7 @@ class DB extends PDO {
      * @return ARRAY of End ARRAYS
      */
     public function getEnds($treeID, $options = []) {
-        return $this->fetchAllByTree('treeEnd', $treeID, $options);
+        return $this->fetchAllByTree('end', $treeID, $options);
     }
 
     /**

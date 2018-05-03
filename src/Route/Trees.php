@@ -73,7 +73,7 @@ class Trees extends Route
 
         // return the file that got written
         // It's already JSON, so don't pass it through the $this->return function
-        $response->getBody()->write(file_get_contents("data/".$treeSlug.$ext.".json"));
+        $response->getBody()->write(file_get_contents("data/".$treeSlug.".json"));
         return $response;
     }
 
