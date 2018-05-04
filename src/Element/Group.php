@@ -15,7 +15,6 @@ class Group extends Element {
               $title     = null,
               $content   = null,
               $order     = null,
-              $owner     = null,
               $questions = [];
 
 
@@ -54,10 +53,6 @@ class Group extends Element {
         $this->setTitle($group['title']);
         $this->order = $group['order'];
 
-        // set the owner off the tree
-        $tree = new Tree($this->db, $this->getTreeID());
-        $this->setOwner($tree->getOwner());
-
         // set the array of IDs for each elem
         $this->questions = $this->db->getQuestionsByGroup($groupID);
 
@@ -79,7 +74,6 @@ class Group extends Element {
         (isset($data['treeID'])) ? $this->setTreeID($data['treeID']) : false;
         (isset($data['title'])) ? $this->setTitle($data['title']) : false;
         (isset($data['content'])) ? $this->setContent($data['content']) : false;
-        (isset($data['owner'])) ? $this->setOwner($data['owner']) : false;
 
         return $this;
     }

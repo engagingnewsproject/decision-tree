@@ -1013,11 +1013,12 @@ class DB extends PDO {
             return 'Invalid user.';
         }
         $validate = new Validate();
+
         // check that the tree ID is a valid Tree ID and owned by this user
-        if($validate->treeOwner($el['treeID'], $el['elCreatedBy']) !== true && $this->user['userRole'] !== 'admin') {
+        if($validate->treeOwner($el['treeID'], $this->user['userID']) !== true && $this->user['userRole'] !== 'admin') {
             return 'Invalid tree or user does not own tree.';
         }
-
+        $el['elCreatedBy'] = $this->user['userID'];
         $el['elUpdatedBy'] = $el['elCreatedBy'];
         return $this->insert([
             'vals'      => $el,

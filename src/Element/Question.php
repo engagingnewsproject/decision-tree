@@ -14,7 +14,6 @@ class Question extends Element {
               $treeID    = null,
               $title     = '',
               $order     = null,
-              $owner     = null,
               $options   = [];
 
 
@@ -52,10 +51,6 @@ class Question extends Element {
         $this->treeID = $question['treeID'];
         $this->order = $question['order'];
 
-        // set the owner off the tree
-        $tree = new Tree($this->db, $this->treeID);
-        $this->owner = $tree->getOwner();
-
 
         // set the array of IDs for each elem
         $this->options = $this->db->getOptionIDs($questionID);
@@ -77,7 +72,6 @@ class Question extends Element {
 
         (isset($data['treeID'])) ? $this->setTreeID($data['treeID']) : false;
         (isset($data['title'])) ? $this->setTitle($data['title']) : false;
-        (isset($data['owner'])) ? $this->setOwner($data['owner']) : false;
 
         return $this;
     }
@@ -91,7 +85,6 @@ class Question extends Element {
         // create it off the object
         // map the question object to the question parameters in the DB
         $question['elTitle'] = $this->getTitle();
-        $question['elCreatedBy'] = $this->getOwner();
         $question['treeID'] = $this->getTreeID();
         $question['elTypeID'] = $this->db->getElementTypeID('question');
 

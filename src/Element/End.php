@@ -13,8 +13,7 @@ class End extends Element {
               $ID        = null,
               $treeID    = null,
               $title     = null,
-              $content   = null,
-              $owner     = null;
+              $content   = null;
 
 
 
@@ -51,11 +50,6 @@ class End extends Element {
         $this->setContent($end['content']);
         $this->setTitle($end['title']);
 
-        // set the owner off the tree
-        $tree = new Tree($this->db, $this->getTreeID());
-        $this->setOwner($tree->getOwner());
-
-
         return $this;
     }
 
@@ -74,7 +68,6 @@ class End extends Element {
         (isset($data['treeID'])) ? $this->setTreeID($data['treeID']) : false;
         (isset($data['title'])) ? $this->setTitle($data['title']) : false;
         (isset($data['content'])) ? $this->setContent($data['content']) : false;
-        (isset($data['owner'])) ? $this->setOwner($data['owner']) : false;
 
         return $this;
     }
