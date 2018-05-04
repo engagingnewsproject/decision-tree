@@ -1,8 +1,12 @@
 <?php
 namespace Cme\Route;
+use \Cme\Element\End as End;
 
 class Ends extends Trees
 {
+
+    public $endID = false,
+           $end = false;
 
     public function __construct($app = false) {
         $this->app = $app;
@@ -13,23 +17,37 @@ class Ends extends Trees
         // build the parent init
         parent::init($request);
 
+        // set group
+        $endID = $request->getAttribute('endID');
+        if($endID) {
+            $this->endID = $endID;
+            $this->end = new End($this->db, $endID);
+
+            // make sure this end is owned by this tree
+            if($this->end->getTreeID() != $this->treeID) {
+                $this->addError('End does not go with this Tree.');
+            }
+        }
     }
 
     public function getAll($request, $response) {
         // set up
         $this->init($request);
-        $ends = $this->db->getEnds($this->tree->getID());
-        $this->return($ends, $response);
+        $endIDs = $this->tree->getEnds();
+
+        $allEnds = [];
+        foreach($endIDs as $endID) {
+            $end = new End($this->db, $endID);
+            $allEnds[] = $end->array();
+        }
+
+        $this->return($allEnds, $response);
     }
 
     public function get($request, $response) {
         // set up
         $this->init($request);
 
-        $endID = $request->getAttribute('endID');
-
-        $end = $this->db->getEnd($endID, $this->tree->getID());
-
-        $this->return($end, $response);
+        return $this->return($this->end->array(), $response);
     }
 }

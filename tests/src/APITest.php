@@ -63,7 +63,7 @@ final class APITest extends TreeTestCase
         $els = $this->getAllDynamic($elType, $treeID);
         $elObject = '\\Cme\\Element\\'.ucfirst($elType);
         $route = 'trees/'.$treeID.'/'.$elType.'s';
-        if($elType !== 'question' && $elType !== 'group') {
+        if($elType !== 'question' && $elType !== 'group' && $elType !== 'end') {
             $this->assertEquals(Utility\getEndpoint($route), json_encode($els));
         } else {
             $questionEls = [];
@@ -80,7 +80,7 @@ final class APITest extends TreeTestCase
         $els = array_splice($els, 0, 5);
         foreach($els as $el) {
             $elFromEndpoint = Utility\getEndpoint($route.'/'.$el[$elType.'ID']);
-            if($elType !== 'question' && $elType !== 'group') {
+            if($elType !== 'question' && $elType !== 'group' && $elType !== 'end') {
                 $this->assertEquals($elFromEndpoint, json_encode($el));
             } else {
                 // get the object instead
