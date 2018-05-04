@@ -38,6 +38,18 @@ class Element {
         return $this->title;
     }
 
+    public function getContent() {
+        return $this->content;
+    }
+
+    public function setContent($string) {
+        if(is_string($string)) {
+            $this->content = $string;
+        }
+
+        return $this->content;
+    }
+
     public function getOwner() {
         return $this->owner;
     }

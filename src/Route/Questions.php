@@ -35,8 +35,7 @@ class Questions extends Trees
         $allQuestions = [];
         foreach($questionIDs as $questionID) {
             $question = new Question($this->db, $questionID);
-            // remove treeID from the response
-            $allQuestions[] = $question->array(['treeID']);
+            $allQuestions[] = $question->array();
         }
 
         $this->return($allQuestions, $response);

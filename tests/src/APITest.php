@@ -6,6 +6,7 @@ use Cme\Element as Element;
 use Cme\Element\Tree as Tree;
 
 
+
 /**
  * @covers index.php API Routes
  */
@@ -60,15 +61,15 @@ final class APITest extends TreeTestCase
      */
     public function testAPIGetters($elType, $treeID) {
         $els = $this->getAllDynamic($elType, $treeID);
-
+        $elObject = '\\Cme\\Element\\'.ucfirst($elType);
         $route = 'trees/'.$treeID.'/'.$elType.'s';
-        if($elType !== 'question') {
+        if($elType !== 'question' && $elType !== 'group') {
             $this->assertEquals(Utility\getEndpoint($route), json_encode($els));
         } else {
             $questionEls = [];
             foreach($els as $el) {
-                $el['ID'] = $el['questionID'];
-                $elObject = new Element\Question($this->db, $el);
+                $el['ID'] = $el[$elType.'ID'];
+                $elObject = new $elObject($this->db, $el);
                 $questionEls[] = $elObject->array();
             }
             $this->assertEquals(Utility\getEndpoint($route), json_encode($questionEls));
@@ -79,12 +80,12 @@ final class APITest extends TreeTestCase
         $els = array_splice($els, 0, 5);
         foreach($els as $el) {
             $elFromEndpoint = Utility\getEndpoint($route.'/'.$el[$elType.'ID']);
-            if($elType !== 'question') {
+            if($elType !== 'question' && $elType !== 'group') {
                 $this->assertEquals($elFromEndpoint, json_encode($el));
             } else {
                 // get the object instead
-                $el['ID'] = $el['questionID'];
-                $elObject = new Element\Question($this->db, $el);
+                $el['ID'] = $el[$elType.'ID'];
+                $elObject = new $elObject($this->db, $el);
                 $this->assertEquals($elFromEndpoint, json_encode($elObject->array()));
             }
 
