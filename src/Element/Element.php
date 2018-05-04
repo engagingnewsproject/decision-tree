@@ -62,6 +62,23 @@ class Element {
         return $this->owner;
     }
 
+    public function setDestination($destinationID, $destinationType) {
+        $validate = new Validate();
+
+        if($validate->destinationID($destinationID, ['elType'=>$destinationType])) {
+            $this->destinationID = $destinationID;
+            $this->destinationType = $destinationType;
+        }
+    }
+
+    public function getDestinationID() {
+        return $this->destinationID;
+    }
+
+    public function getDestinationType() {
+        return $this->destinationType;
+    }
+
     public function save() {
         if(!Utility\isID($this->getID())) {
             // create it
