@@ -1,5 +1,5 @@
 <?php
-namespace App;
+namespace Cme\Route;
 use \Cme\Database as Database;
 
 class Interactions extends Route

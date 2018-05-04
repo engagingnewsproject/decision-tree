@@ -8,7 +8,7 @@
 
 
 namespace Cme\Database;
-use Cme\Utility as Utility;
+use \Cme\Utility as Utility;
 use PDO;
 
 class Validate extends DB {

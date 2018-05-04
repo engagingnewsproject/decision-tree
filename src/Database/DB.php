@@ -428,9 +428,15 @@ class DB extends PDO {
      * @return ARRAY
      */
     public function createTree($tree) {
+        $validate = new Validate();
         // validate the user
         if(Utility\validateUser($this->user) !== true) {
             return 'Invalid user.';
+        }
+
+        // see if this tree already exists
+        if(isset($tree['treeSlug']) && $validate->treeSlug($tree['treeSlug'])) {
+            return 'Tree Slug already in use.';
         }
         // if no tree owner is passed, set it as this user
         if(!isset($tree['treeOwner'])) {

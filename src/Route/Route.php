@@ -1,6 +1,6 @@
 <?php
-namespace App;
-use \Cme\Database as Database;
+namespace Cme\Route;
+use Cme\Database as Database;
 
 class Route
 {

@@ -9,27 +9,7 @@
             "Cme\\":"src"
         },
         "files": [
-            "src/Route.php",
-            "src/Route/Trees.php",
-            "src/Route/Starts.php",
-            "src/Route/Groups.php",
-            "src/Route/Ends.php",
-            "src/Route/Questions.php",
-            "src/Route/Options.php",
-            "src/Route/Embeds.php",
-            "src/Route/Sites.php",
-            "src/Route/Interactions.php",
-            "src/Route/States.php",
-            "src/Authentication.php",
-            "src/utilities.php",
-            "src/Database/DB.php",
-            "src/Database/CompileTree.php",
-            "src/Database/Interaction/SaveInteraction.php",
-            "src/Database/Site/SaveSite.php",
-            "src/Database/Site/SaveEmbed.php",
-            "src/Element.php",
-            "src/Element/Tree.php",
-            "src/Element/Question.php",
+            "src/Utility.php",
             "tree-config.php",
             "tree-db.php"
         ]

@@ -1,5 +1,6 @@
 <?php
-namespace App;
+namespace Cme\Route;
+use \Cme\Element\Question as Question;
 
 class Questions extends Trees
 {
@@ -17,7 +18,7 @@ class Questions extends Trees
         $questionID = $request->getAttribute('questionID');
         if($questionID) {
             $this->questionID = $questionID;
-            $this->question = new \Cme\Question($this->db, $questionID);
+            $this->question = new Question($this->db, $questionID);
 
             // make sure this question is owned by this tree
             if($this->question->getTreeID() != $this->treeID) {
@@ -33,7 +34,7 @@ class Questions extends Trees
         $questionIDs = $this->tree->getQuestions();
         $allQuestions = [];
         foreach($questionIDs as $questionID) {
-            $question = new \Cme\Question($this->db, $questionID);
+            $question = new Question($this->db, $questionID);
             // remove treeID from the response
             $allQuestions[] = $question->array(['treeID']);
         }
@@ -54,7 +55,7 @@ class Questions extends Trees
 
         // add in the treeID
         $question['treeID'] = $this->treeID;
-        $question = new \Cme\Question($this->db, $question);
+        $question = new Question($this->db, $question);
 
         $keys = ['title'];
         $question = $this->dynamicSet($this->data, $keys, $question);

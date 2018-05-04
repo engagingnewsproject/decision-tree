@@ -1,9 +1,9 @@
 <?php
 
-namespace Cme;
-use Cme\Database as Database;
-use Cme\Database\Validate as Validate;
-use Cme\Utility as Utility;
+namespace Cme\Element;
+use \Cme\Database\Validate as Validate;
+use \Cme\Utility as Utility;
+
 
 /**
  * Interact with Question object
@@ -70,6 +70,11 @@ class Question extends Element {
      * @return OBJECT of Question
      */
     public function buildFromArray($data) {
+        // if there's an ID, build that first, then set the rest of the vars
+        if(isset($data['ID']) && Utility\isID($data['ID'])) {
+            $this->build($data['ID']);
+        }
+
         (isset($data['treeID'])) ? $this->setTreeID($data['treeID']) : false;
         (isset($data['title'])) ? $this->setTitle($data['title']) : false;
         (isset($data['owner'])) ? $this->setOwner($data['owner']) : false;

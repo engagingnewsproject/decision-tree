@@ -1,6 +1,5 @@
 <?php
-namespace App;
-use \Cme\Utility as Utility;
+namespace Cme;
 
 class Authentication {
     /**

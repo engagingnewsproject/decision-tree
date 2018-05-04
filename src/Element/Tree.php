@@ -1,9 +1,7 @@
 <?php
-
-namespace Cme;
-use Cme\Database as Database;
-use Cme\Database\Validate as Validate;
-use Cme\Utility as Utility;
+namespace Cme\Element;
+use \Cme\Database\Validate as Validate;
+use \Cme\Utility as Utility;
 
 /**
  * Interact with Tree object

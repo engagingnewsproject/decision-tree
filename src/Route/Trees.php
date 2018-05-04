@@ -1,7 +1,8 @@
 <?php
-namespace App;
-use \Cme\Database as Database;
-use \Cme\Utility as Utility;
+namespace Cme\Route;
+use Cme\Element\Tree as Tree;
+use Cme\Utility as Utility;
+use Cme\Database as Database;
 
 class Trees extends Route
 {
@@ -21,7 +22,7 @@ class Trees extends Route
         $treeID = $request->getAttribute('treeID');
         if($treeID) {
             $this->treeID = $treeID;
-            $this->tree = new \Cme\Tree($this->db, $treeID);
+            $this->tree = new Tree($this->db, $treeID);
         }
     }
 
@@ -64,8 +65,8 @@ class Trees extends Route
     public function compile($request, $response) {
         $treeSlug = $request->getAttribute('treeSlug');
 
-        if(\Cme\Utility\isID($treeSlug)) {
-            $treeSlug = \Cme\Utility\getTreeSlugById($treeSlug);
+        if(Utility\isID($treeSlug)) {
+            $treeSlug = Utility\getTreeSlugById($treeSlug);
         }
 
         // compile it, passing in the database
@@ -82,8 +83,8 @@ class Trees extends Route
         $minified = $request->getQueryParam('minified', $default = false);
         $ext = ($minified === 'true' ? '.min' : '');
 
-        if(\Cme\Utility\isID($treeSlug)) {
-            $treeSlug = \Cme\Utility\getTreeSlugById($treeSlug);
+        if(Utility\isID($treeSlug)) {
+            $treeSlug = Utility\getTreeSlugById($treeSlug);
         }
 
         $response->getBody()->write(file_get_contents("data/".$treeSlug.$ext.".json"));
@@ -101,18 +102,16 @@ class Trees extends Route
             $tree['owner'] = $this->data['owner'];
         }
 
-        $tree = new \Cme\Tree($this->db, $tree);
+        $tree = new Tree($this->db, $tree);
 
         $keys = ['slug', 'title'];
         $tree = $this->dynamicSet($this->data, $keys, $tree);
 
         $tree = $tree->save();
-
         if(!is_object($tree)) {
             $this->addError($tree);
         }
-
-        $this->return($tree->array(), $response);
+        $this->return((is_object($tree) ? $tree->array() : ''), $response);
     }
 
     public function update($request, $response) {

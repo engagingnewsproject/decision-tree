@@ -9,6 +9,6 @@ namespace Cme\Database;
 class AddQuestion extends DB {
 
     function __construct() {
-        
+
     }
 }

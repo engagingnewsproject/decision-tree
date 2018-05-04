@@ -1,5 +1,5 @@
 <?php
-namespace App;
+namespace Cme\Route;
 
 class Ends extends Trees
 {

@@ -17,7 +17,7 @@ class CompileTree extends DB {
         if($db !== false) {
             $this->db = $db;
         } else {
-            $this->db = new \Cme\Database\DB();
+            $this->db = parent::__construct();
         }
 
         // kick off build process

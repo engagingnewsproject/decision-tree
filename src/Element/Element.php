@@ -1,7 +1,5 @@
 <?php
-
-namespace Cme;
-use Cme\Database as Database;
+namespace Cme\Element;
 use Cme\Database\Validate as Validate;
 use Cme\Utility as Utility;
 

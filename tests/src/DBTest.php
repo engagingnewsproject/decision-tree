@@ -35,17 +35,17 @@ final class DBTest extends TreeTestCase
     public function fetchAllByTreeProvider() {
         return [
                 //'valid-1'=>['123456789', true],
-                'fetch all tree starts'=>['treeStart', 1, [], 'startID', true],
-                'fetch all tree group'=>['treeGroup', 1, [], 'groupID', true],
-                'fetch all question titles'=>['treeQuestion', 1, ['fields'=>'title'], 'title', true],
+                'fetch all tree starts'=>['start', 1, [], 'startID', true],
+                'fetch all tree group'=>['group', 1, [], 'groupID', true],
+                'fetch all question titles'=>['question', 1, ['fields'=>'title'], 'title', true],
                 'fetch column end ID' => [
-                    'treeEnd',
+                    'end',
                     1,
                     ['fields' => 'endID', 'fetch' => 'column'],
                     'expected key param not needed',
                     $this->getOneDynamic('end', 1)['endID']
                 ],
-                'invalid-1'=>['treeStart', 1, [], 'asdfasdf', false],
+                'invalid-1'=>['start', 1, [], 'asdfasdf', false],
         ];
     }
 

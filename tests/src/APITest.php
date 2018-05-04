@@ -2,6 +2,9 @@
 use PHPUnit\Framework\TestCase;
 use Cme\Database as Database;
 use Cme\Utility as Utility;
+use Cme\Element as Element;
+use Cme\Element\Tree as Tree;
+
 
 /**
  * @covers index.php API Routes
@@ -28,7 +31,7 @@ final class APITest extends TreeTestCase
      * @dataProvider APITreeProvider
      */
     public function testAPITree($treeID) {
-        $tree = new \Cme\Tree($this->db, $treeID);
+        $tree = new Tree($this->db, $treeID);
 
         $this->assertEquals(Utility\getEndpoint('trees/'.$treeID), json_encode($tree->array()));
     }
@@ -59,12 +62,32 @@ final class APITest extends TreeTestCase
         $els = $this->getAllDynamic($elType, $treeID);
 
         $route = 'trees/'.$treeID.'/'.$elType.'s';
-        $this->assertEquals(Utility\getEndpoint($route), json_encode($els));
+        if($elType !== 'question') {
+            $this->assertEquals(Utility\getEndpoint($route), json_encode($els));
+        } else {
+            $questionEls = [];
+            foreach($els as $el) {
+                $el['ID'] = $el['questionID'];
+                $elObject = new Element\Question($this->db, $el);
+                $questionEls[] = $elObject->array();
+            }
+            $this->assertEquals(Utility\getEndpoint($route), json_encode($questionEls));
+        }
+
 
         // test individual ones too, but only the first 5 of them so it doesn't take so long
         $els = array_splice($els, 0, 5);
         foreach($els as $el) {
-            $this->assertEquals(Utility\getEndpoint($route.'/'.$el[$elType.'ID']), json_encode($el));
+            $elFromEndpoint = Utility\getEndpoint($route.'/'.$el[$elType.'ID']);
+            if($elType !== 'question') {
+                $this->assertEquals($elFromEndpoint, json_encode($el));
+            } else {
+                // get the object instead
+                $el['ID'] = $el['questionID'];
+                $elObject = new Element\Question($this->db, $el);
+                $this->assertEquals($elFromEndpoint, json_encode($elObject->array()));
+            }
+
         }
     }
 
@@ -140,7 +163,7 @@ final class APITest extends TreeTestCase
         $this->assertTrue(Utility\isID($responseTree->ID));
 
         // check that we can find it in the DB
-        $newTree = new Cme\Tree(new Database\DB(), $responseTree->ID);
+        $newTree = new Tree(new Database\DB(), $responseTree->ID);
         // compare details
         $this->assertEquals($newTree->getTitle(),  $title);
         $this->assertEquals($newTree->getOwner(),  $user['userID']);

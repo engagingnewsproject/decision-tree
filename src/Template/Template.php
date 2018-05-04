@@ -3,7 +3,6 @@
  *
  */
 namespace Cme\Template;
-use Cme\Utility as Utility;
 
 class Template
 {

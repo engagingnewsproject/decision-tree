@@ -1,20 +1,20 @@
 <?php
 
 namespace Cme\Database;
-use Cme\Utility as Utility;
+use Cme;
 
 /**
  * Add a question to the database
  */
 class SaveEmbed extends DB {
-    public $DB;
+    public $db;
 
     function __construct($db = false) {
         // allow a database connection to be passed in
         if($db !== false) {
-            $this->DB = $db;
+            $this->db = $db;
         } else {
-            $this->DB = new \Cme\Database\DB();
+            $this->db = parent::__construct();;
         }
     }
 
@@ -76,13 +76,13 @@ class SaveEmbed extends DB {
         // open the validator
         $validate = new Validate();
         // check that the site exists
-        $site = $this->DB->getSite($embed['siteID']);
+        $site = $this->db->getSite($embed['siteID']);
         if($site === false) {
             $this->errors[] = 'Site doesn\'t exist.';
         }
 
         // check that it doesn't already exist
-        if($this->DB->getSite($embed['path']) !== false) {
+        if($this->db->getSite($embed['path']) !== false) {
             $this->errors[] = 'Site already exists.';
         }
 
@@ -129,7 +129,7 @@ class SaveEmbed extends DB {
             return $this->errors;
         }
         // check if it exists already
-        $embed_check = $this->DB->getEmbed($embed['path'],
+        $embed_check = $this->db->getEmbed($embed['path'],
                                         ['siteID' => $embed['siteID'],
                                          'treeID' => $embed['treeID']
                                         ]);
@@ -152,7 +152,7 @@ class SaveEmbed extends DB {
                     ':embedIsIframe'      => $embed['isIframe']
                   ];
         // write our SQL statement
-        $sql = 'INSERT INTO '.$this->DB->tables['tree_embed'].' (
+        $sql = 'INSERT INTO '.$this->db->tables['tree_embed'].' (
                                             siteID,
                                             treeID,
                                             embedPath,
@@ -165,11 +165,11 @@ class SaveEmbed extends DB {
                                             :embedIsIframe
                                         )';
         // insert the mc_option into the database
-        $stmt = $this->DB->query($sql, $params);
+        $stmt = $this->db->query($sql, $params);
 
         // success!
         if($stmt !== false) {
-            $embedID = $this->DB->lastInsertId();
+            $embedID = $this->db->lastInsertId();
 
             $response = [
                             'embedID'          => $embedID,

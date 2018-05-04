@@ -7,14 +7,14 @@ use Cme\Utility as Utility;
  * Add a question to the database
  */
 class SaveInteraction extends DB {
-    public $DB;
+    public $db;
 
     function __construct($db = false) {
         // allow a database connection to be passed in
         if($db !== false) {
-            $this->DB = $db;
+            $this->db = $db;
         } else {
-            $this->DB = new \Cme\Database\DB();
+            $this->db = parent::__construct();
         }
     }
 
@@ -164,9 +164,9 @@ class SaveInteraction extends DB {
 
         $treeID = $data['treeID'];
         $userID = $data['userID'];
-        $interactionType = $this->DB->getInteractionType($data['interaction']['type']);
+        $interactionType = $this->db->getInteractionType($data['interaction']['type']);
         $interactionID = $data['interaction']['id'];
-        $destinationType = $this->DB->getStateType($data['destination']['type']);
+        $destinationType = $this->db->getStateType($data['destination']['type']);
         $destinationID = $data['destination']['id'];
         $embedID = $data['site']['embedID'];
 
@@ -179,7 +179,7 @@ class SaveInteraction extends DB {
                     ':stateTypeID'        => $destinationType['stateTypeID'],
                   ];
         // write our SQL statement
-        $sql = 'INSERT INTO '.$this->DB->tables['treeInteraction'].' (
+        $sql = 'INSERT INTO '.$this->db->tables['treeInteraction'].' (
                                             treeID,
                                             userID,
                                             embedID,
@@ -194,11 +194,11 @@ class SaveInteraction extends DB {
                                             :stateTypeID
                                         )';
         // insert the mc_option into the database
-        $stmt = $this->DB->query($sql, $params);
+        $stmt = $this->db->query($sql, $params);
 
         // success!
         if($stmt !== false) {
-            $insertedInteractionID = $this->DB->lastInsertId();
+            $insertedInteractionID = $this->db->lastInsertId();
 
             $response = [
                             'interactionID'   => $insertedInteractionID,
@@ -254,7 +254,7 @@ class SaveInteraction extends DB {
                     ':elID'           => $stateID
                   ];
         // write our SQL statement
-        $sql = 'INSERT INTO '.$this->DB->tables['treeState'].' (
+        $sql = 'INSERT INTO '.$this->db->tables['treeState'].' (
                                             interactionID,
                                             elID
                                         )
@@ -263,11 +263,11 @@ class SaveInteraction extends DB {
                                             :elID
                                         )';
         // insert the mc_option into the database
-        $stmt = $this->DB->query($sql, $params);
+        $stmt = $this->db->query($sql, $params);
 
         if($stmt !== false) {
             // return the inserted ID
-            return $this->DB->lastInsertId();
+            return $this->db->lastInsertId();
         } else {
             // handle errors
             $this->errors[] = 'Insert state failed.';
@@ -298,7 +298,7 @@ class SaveInteraction extends DB {
                     ':elID'           => $elID
                   ];
         // write our SQL statement
-        $sql = 'INSERT INTO '.$this->DB->tables['treeInteractionElement'].' (
+        $sql = 'INSERT INTO '.$this->db->tables['treeInteractionElement'].' (
                                             interactionID,
                                             elID
                                         )
@@ -307,11 +307,11 @@ class SaveInteraction extends DB {
                                             :elID
                                         )';
         // insert the mc_option into the database
-        $stmt = $this->DB->query($sql, $params);
+        $stmt = $this->db->query($sql, $params);
 
         if($stmt !== false) {
             // return the inserted ID
-            return $this->DB->lastInsertId();
+            return $this->db->lastInsertId();
         } else {
             // handle errors
             $this->errors[] = 'Insert interaction element failed.';

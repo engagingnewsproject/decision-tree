@@ -1,20 +1,19 @@
 <?php
 
 namespace Cme\Database;
-use Cme\Utility as Utility;
 
 /**
  * Add a question to the database
  */
 class SaveSite extends DB {
-    public $DB;
+    public $db;
 
     function __construct($db = false) {
         // allow a database connection to be passed in
         if($db !== false) {
-            $this->DB = $db;
+            $this->db = $db;
         } else {
-            $this->DB = new \Cme\Database\DB();
+            $this->db = parent::__construct();
         }
 
     }
@@ -96,7 +95,7 @@ class SaveSite extends DB {
         }
 
         // check if it exists already
-        $site_check = $this->DB->getSite($site['host']);
+        $site_check = $this->db->getSite($site['host']);
         if($site_check !== false) {
             $response = [
                             'siteID'   => $site_check['siteID'],
@@ -113,7 +112,7 @@ class SaveSite extends DB {
                     ':siteName'              => $site['name']
                   ];
         // write our SQL statement
-        $sql = 'INSERT INTO '.$this->DB->tables['tree_site'].' (
+        $sql = 'INSERT INTO '.$this->db->tables['tree_site'].' (
                                             siteHost,
                                             siteName
                                         )
@@ -122,11 +121,11 @@ class SaveSite extends DB {
                                             :siteName
                                         )';
         // insert the mc_option into the database
-        $stmt = $this->DB->query($sql, $params);
+        $stmt = $this->db->query($sql, $params);
 
         // success!
         if($stmt !== false) {
-            $siteID = $this->DB->lastInsertId();
+            $siteID = $this->db->lastInsertId();
 
             $response = [
                             'siteID'          => $siteID,

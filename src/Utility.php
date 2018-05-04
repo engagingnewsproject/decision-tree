@@ -1,7 +1,4 @@
 <?php
-/**
- *  Utility functions for use throughout code
- */
 namespace Cme\Utility;
 
 
