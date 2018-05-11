@@ -1,8 +1,11 @@
 <?php
 namespace Cme\Route;
+use \Cme\Element\Option as Option;
 
 class Options extends Questions
 {
+    public $optionID,
+           $option;
 
     public function __construct($app = false) {
         $this->app = $app;
@@ -13,23 +16,45 @@ class Options extends Questions
         // build the parent init
         parent::init($request);
 
+        // set option
+        $optionID = $request->getAttribute('optionID');
+        if($optionID) {
+            $this->optionID = $optionID;
+            $this->option = new Option($this->db, $optionID);
+
+            // make sure this option is owned by this tree
+            if($this->option->getTreeID() != $this->treeID) {
+                $this->addError('Option does not go with this Tree.');
+            }
+
+            // make sure this option is owned by this question
+            if($this->option->getQuestionID() != $this->questionID) {
+                $this->addError('Option does not go with this Question.');
+            }
+        }
+
     }
 
     public function getAll($request, $response) {
         // set up
         $this->init($request);
-        $options = $this->db->getOptions($this->questionID, ['treeID' => $this->treeID]);
-        $this->return($options, $response);
+
+
+        $optionIDs = $this->question->getOptions();
+
+        $allOptions = [];
+        foreach($optionIDs as $optionID) {
+            $option = new Option($this->db, $optionID);
+            $allOptions[] = $option->array();
+        }
+
+        $this->return($allOptions, $response);
     }
 
     public function get($request, $response) {
         // set up
         $this->init($request);
 
-        $optionID = $request->getAttribute('optionID');
-
-        $option = $this->db->getOption($optionID, ['treeID' => $this->treeID, 'questionID' => $this->questionID]);
-
-        $this->return($option, $response);
+        return $this->return($this->option->array(), $response);
     }
 }
