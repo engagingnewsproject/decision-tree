@@ -13,7 +13,7 @@ const browserSync = require('browser-sync');
 const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const reload  = browserSync.reload;
-const csso = require('gulp-csso');
+const crass = require('gulp-crass');
 const cssVip = require('gulp-css-vip'); // adds !important tags to all CSS lines
 const uglify = require('gulp-uglify');
 const rename = require("gulp-rename");
@@ -169,7 +169,7 @@ function processSASS(filename) {
       .pipe(autoprefixer())
 
       // minify the CSS
-      .pipe(csso())
+      .pipe(crass())
 
       // rename to add .min
       .pipe(rename({
@@ -196,7 +196,7 @@ function cssImportantify(filename) {
     // add !important tags
     .pipe(cssVip())
     // minify the CSS
-    .pipe(csso())
+    .pipe(crass())
     // rename to add .min
     .pipe(rename({
       basename: filename+'-important',
@@ -215,7 +215,7 @@ function cssCleanSlate(filename) {
     .pipe(concat(filename+'-clean-slate.css'))
     // minify the CSS
     // @TODO This makes it so you have to save twice, apparently...
-    .pipe(csso())
+    .pipe(crass())
     // rename to add .min
     .pipe(rename({
       suffix: '.min'
