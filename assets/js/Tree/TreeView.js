@@ -236,13 +236,13 @@ TreeView.prototype = {
 
         style = document.createElement('style')
 
-    	// WebKit hack :(
-    	style.appendChild(document.createTextNode(""))
+        // WebKit hack :(
+        style.appendChild(document.createTextNode(""))
 
-    	// Add the <style> element to the page
-    	document.head.appendChild(style)
+        // Add the <style> element to the page
+        document.head.appendChild(style)
 
-    	return style.sheet
+        return style.sheet
     },
 
     getTreeHeight: function() {
@@ -771,7 +771,8 @@ TreeView.prototype = {
                     clonedObj = {
                         ID: data.ID,
                         type: 'question',
-                        order: data.order
+                        order: data.order,
+                        groupID: this.getTree().getGroupIDByQuestion(data.ID)
                     }
                     clonedObj.options = []
                     // add options
@@ -1044,9 +1045,7 @@ TreeView.prototype = {
                     // the same column.
                     destination = this.getDestination(options[o].data.destinationID)
 
-                    questionGroupID = this.getTree().getGroupIDByQuestion(questions[q].data.ID)
-                    destinationGroupID = this.getTree().getGroupIDByQuestion(options[o].data.destinationID)
-                    if(questionGroupID === destinationGroupID) {
+                    if(questions[q].data.groupID === destination.data.groupID) {
                         // if so, skip it (just use the down arrow)
                         continue;
                     }

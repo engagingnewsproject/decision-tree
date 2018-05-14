@@ -3496,7 +3496,7 @@ TreeInteraction.prototype = {
         data.interaction.type = interactionType;
         data.interaction.id = interactionID;
         data.destination = update.newState;
-        console.log('update ID', update.data.ID);
+
         return data;
     },
 
@@ -4409,7 +4409,8 @@ TreeView.prototype = {
                     clonedObj = {
                         ID: data.ID,
                         type: 'question',
-                        order: data.order
+                        order: data.order,
+                        groupID: this.getTree().getGroupIDByQuestion(data.ID)
                     };
                     clonedObj.options = [];
                     // add options
@@ -4675,9 +4676,7 @@ TreeView.prototype = {
                     // the same column.
                     destination = this.getDestination(options[o].data.destinationID);
 
-                    questionGroupID = this.getTree().getGroupIDByQuestion(questions[q].data.ID);
-                    destinationGroupID = this.getTree().getGroupIDByQuestion(options[o].data.destinationID);
-                    if (questionGroupID === destinationGroupID) {
+                    if (questions[q].data.groupID === destination.data.groupID) {
                         // if so, skip it (just use the down arrow)
                         continue;
                     }
@@ -4808,7 +4807,7 @@ Handlebars.registerHelper('elNumber', function (el_order) {
     return parseInt(el_order) + 1;
 });
 
-Handlebars.registerHelper('destination', function (destinationID, destinationType, optionID, question_index, options) {
+Handlebars.registerHelper('destination', function (destinationID, destinationType, optionID, questionIndex, options) {
     var data = void 0,
         destination = void 0,
         destinationNumber = void 0,
@@ -4819,10 +4818,10 @@ Handlebars.registerHelper('destination', function (destinationID, destinationTyp
     data = options.data.root[destinationType + 's'];
     i = 0;
     if (destinationType === 'question') {
-        // start it at the question_index.
+        // start it at the questionIndex.
         // An option will never go backwards, so we don't care
         // about the previous ones
-        i = question_index;
+        i = questionIndex;
     }
 
     // find the destination
