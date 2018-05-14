@@ -21,16 +21,12 @@ class Helpers {
     /**
     * Find out if this question starts a group
     */
-    public static function groupStart($questionID, $groupID, $groups, $options) {
+    public static function groupStart($questionID, $groups, $options) {
         foreach($groups as $group) {
-            if($group['groupID'] === $groupID) {
-                // check if it's the first in the question order
-                if($group['questions'][0] === $questionID) {
-                    // set the context of the values we'll need
-                    return $options['fn'](["groupID"=>$group['groupID'], "groupTitle"=>$group['title']]);
-                } else {
-                    return '';
-                }
+            // check if it's the first in the question order
+            if($group['questions'][0] === $questionID) {
+                // set the context of the values we'll need
+                return $options['fn'](["groupID"=>$group['ID'], "groupTitle"=>$group['title']]);
             }
         }
         return '';
@@ -39,16 +35,12 @@ class Helpers {
     /**
     * Find out if this question ends a group
     */
-    public static function groupEnd($questionID, $groupID, $groups, $options) {
+    public static function groupEnd($questionID, $groups, $options) {
         foreach($groups as $group) {
-            if($group['groupID'] === $groupID) {
-                // check if it's the first in the question order
-                $last_question = array_values(array_slice($group['questions'], -1))[0];
-                if($last_question === $questionID) {
-                    return $options['fn']();
-                } else {
-                    return '';
-                }
+            // check if it's the first in the question order
+            $last_question = array_values(array_slice($group['questions'], -1))[0];
+            if($last_question === $questionID) {
+                return $options['fn']();
             }
         }
         return '';

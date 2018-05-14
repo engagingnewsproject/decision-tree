@@ -10,103 +10,69 @@ namespace Cme\Database;
 
 class CompileTree extends DB {
     protected $db,
+              $tree,
               $compiled;
 
-    public function __construct($treeID, $db = false) {
+    public function __construct($tree, $db = false) {
         // allow a database connection to be passed in
         if($db !== false) {
             $this->db = $db;
         } else {
             $this->db = parent::__construct();
         }
+        $this->tree = $tree;
+        $this->compiled = $this->tree->array();
+        $this->compiled['starts'] = $this->compileElement('start', $this->tree->getStarts());
+        $this->compiled['groups'] = $this->compileElement('group', $this->tree->getGroups());
+        $this->compiled['questions'] = $this->compileElement('question', $this->tree->getQuestions());
+        $this->compiled['ends'] = $this->compileElement('end', $this->tree->getEnds());
 
-        // kick off build process
-        // get the tree by slug or ID
-        if(\Cme\Utility\isSlug($treeID)) {
-            $tree = $this->db->getTreeBySlug($treeID);
-            // set the real tree id
-            $treeID = $tree['treeID'];
-        } else {
-            $tree = $this->db->getTree($treeID);
-        }
-
-        $this->compiled = $tree;
-        $this->compiled['starts'] = $this->compile_starts($treeID);
-        $this->compiled['groups'] = $this->compile_groups($treeID);
-        $this->compiled['questions'] = $this->compile_questions($treeID);
-        $this->compiled['ends'] = $this->compile_ends($treeID);
         // figure out total paths and longest path
-        $this->compiled['stats'] = $this->compute_paths($this->compiled['questions']);
+        $this->compiled['stats'] = $this->computePaths($this->compiled['questions']);
         // encode to JSON
         $pretty_json = json_encode($this->compiled, JSON_PRETTY_PRINT);
         $minified_json = json_encode($this->compiled);
         // write to file
-        $this->write_file($tree['treeSlug'], $pretty_json);
-        $this->write_file($tree['treeSlug'].'.min', $minified_json);
+        $this->writeFile($this->tree->getSlug(), $pretty_json);
+        $this->writeFile($this->tree->getSlug().'.min', $minified_json);
         // return the json, if they need it
         return $pretty_json;
     }
 
-    protected function write_file($filename, $contents) {
+    protected function writeFile($filename, $contents) {
         file_put_contents(TREE_PATH.'/data/'.$filename.'.json', $contents);
     }
+    protected function compileElement($elType, $elIDs) {
+        $compiled = [];
+        $objName = '\Cme\Element\\'.ucfirst($elType);
 
-    protected function compile_starts($treeID) {
-        return $this->db->getStarts($treeID);
-    }
+        foreach($elIDs as $elID) {
+            $el = new $objName($this->db, $elID);
+            $compiledEl = $el->array();
 
-    protected function compile_groups($treeID) {
-        $groups = $this->db->getGroups($treeID);
-        $i = 0;
-
-        foreach($groups as $group) {
-
-            $groups[$i]['questions'] = $this->db->getQuestionsByGroup($group['groupID']);
-            $i++;
+            // if we're on a question, run this again for the options
+            if($elType === 'question') {
+                $compiledEl['options'] = $this->compileElement('option', $el->getOptions());
+            }
+            $compiled[] = $compiledEl;
         }
-
-
-        return $groups;
+        return $compiled;
 
     }
 
-
-    protected function compile_questions($treeID) {
-        $questions = $this->db->getQuestions($treeID);
-        $i = 0;
-
-        foreach($questions as $question) {
-            // $questions[$i]['content'] = addslashes($questions[$i]['content']);
-            $questions[$i]['description'] = ( isset($questions[$i]['description']) ? addslashes($questions[$i]['description']) : '');
-            $questions[$i]['options'] = $this->compile_options($question['questionID']);
-            $i++;
-        }
-
-
-        return $questions;
-
-    }
-
-    protected function compile_options($questionID) {
-        return $this->db->getOptions($questionID);
-    }
-
-    protected function compile_ends($treeID) {
-        return $this->db->getEnds($treeID);
-    }
 
     /**
     * Starts with the first question and computes all possible paths
     *
     */
-    protected function compute_paths($questions) {
+    protected function computePaths($questions) {
         // empty array to hold the paths
         $paths = [];
         $path_i = 0;
 
         // add the first question as a new array item in that array
-        $paths[$path_i][] = 'Question '.$questions[0]['questionID'];
-        $paths = $this->process_paths($paths, $path_i, $this->db->getOptions($questions[0]['questionID']));
+        $paths[$path_i][] = 'Question '.$questions[0]['ID'];
+        $paths = $this->process_paths($paths, $path_i, $this->db->getOptions($questions[0]['ID']));
         return ['total_paths'=>count($paths),'longest_path'=>$this->largest_array_count($paths), 'path_ends'=>$this->path_end_numbers($paths)];
         /*
         return $paths;*/
@@ -164,17 +130,17 @@ class CompileTree extends DB {
         $ends = $this->compiled['ends'];
         $path_ends = [];
         foreach($ends as $end) {
-            $path_ends[$end['endID']] = ['title'=>$end['title']];
+            $path_ends[$end['ID']] = ['title'=>$end['title']];
             $path_count = 0;
             foreach($paths as $path) {
                 $path_end = array_pop($path);
-                if($path_end === 'end '.$end['endID']) {
+                if($path_end === 'end '.$end['ID']) {
                     $path_count++;
                 }
             }
             // add it to the count
-            $path_ends[$end['endID']]['count'] = $path_count;
-            $path_ends[$end['endID']]['percentage'] = round($path_count/count($paths) * 100, 2);
+            $path_ends[$end['ID']]['count'] = $path_count;
+            $path_ends[$end['ID']]['percentage'] = round($path_count/count($paths) * 100, 2);
         }
         return $path_ends;
     }

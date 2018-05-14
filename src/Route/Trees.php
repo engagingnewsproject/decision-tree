@@ -23,6 +23,10 @@ class Trees extends Route
         if($treeID) {
             $this->treeID = $treeID;
             $this->tree = new Tree($this->db, $treeID);
+        } else {
+            $treeSlug = $request->getAttribute('treeSlug');
+            $this->tree = new Tree($this->db, $treeSlug);
+            $this->treeID = $this->tree->getID();
         }
     }
 
@@ -42,13 +46,10 @@ class Trees extends Route
     }
 
     public function iframe($request, $response) {
-        $treeSlug = $request->getAttribute('treeSlug');
+        // init data
+        $this->init($request);
         $js = $request->getQueryParam('js', $default = 'true');
 
-        // check if we have a slug or an id
-        if(Utility\isID($treeSlug)) {
-            $treeSlug = Utility\getTreeSlugById($treeSlug);
-        }
         if($js === 'false') {
             $viewPath = 'no-js';
         } else {
@@ -57,20 +58,18 @@ class Trees extends Route
 
         $view = $this->app->get('view');
         $view->render($response, "iframe/$viewPath/index.php", [
-            'treeSlug' => $treeSlug,
+            'treeSlug' => $this->tree->getSlug(),
             'url'=>TREE_URL
         ]);
     }
 
     public function compile($request, $response) {
-        $treeSlug = $request->getAttribute('treeSlug');
+        // init data
+        $this->init($request);
 
-        if(Utility\isID($treeSlug)) {
-            $treeSlug = Utility\getTreeSlugById($treeSlug);
-        }
-
+        $treeSlug = $this->tree->getSlug();
         // compile it, passing in the database
-        $compiled = new Database\CompileTree($treeSlug, $this->db);
+        $compiled = new Database\CompileTree($this->tree, $this->db);
 
         // return the file that got written
         // It's already JSON, so don't pass it through the $this->return function

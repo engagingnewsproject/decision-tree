@@ -2,33 +2,28 @@ Handlebars.registerHelper('environment', function(options) {
     return 'has-js';
 });
 
-Handlebars.registerHelper('groupStart', function(questionID, groupID, groups, options) {
+Handlebars.registerHelper('groupStart', function(questionID, groups, options) {
     // find the group
+    console.log(questionID);
     for(let i = 0; i < groups.length; i++) {
-        if(groups[i].groupID === groupID) {
-            // check if it's the first in the question order
-            if(groups[i].questions[0] === questionID) {
-                // pass the values we'll need in the template
-                return options.fn({groupID: groups[i].groupID, groupTitle: groups[i].title});
-            } else {
-                return '';
-            }
+        // check if it's the first in the question order
+        if(groups[i].questions[0] === questionID) {
+            console.log('found first question', questionID);
+            // pass the values we'll need in the template
+            return options.fn({groupID: groups[i].ID, groupTitle: groups[i].title});
         }
     }
     return '';
 });
 
-Handlebars.registerHelper('groupEnd', function(questionID, groupID, groups, options) {
+Handlebars.registerHelper('groupEnd', function(questionID, groups, options) {
     // find the group
     for(let i = 0; i < groups.length; i++) {
-        if(groups[i].groupID === groupID) {
-            let questions = groups[i].questions;
-            // check if it's the last in the question order
-            if(questions[questions.length - 1] === questionID) {
-                return options.fn(this);
-            } else {
-                return '';
-            }
+        let questions = groups[i].questions;
+        // check if it's the last in the question order
+        if(questions[questions.length - 1] === questionID) {
+            console.log('found last question', questionID);
+            return options.fn(this);
         }
     }
     return '';

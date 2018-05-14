@@ -5,7 +5,7 @@
 * @author jones.jeremydavid@gmail.com
 */
 namespace Cme\Template;
-use Cme;
+use Cme\Utility as Utility;
 
 class Render extends Template {
     public $data,

@@ -24,7 +24,7 @@ function Tree(data, observers) {
     var _setData = function(data) {
         _data = data
         _state = {
-            id: data.treeID,
+            id: data.ID,
             type: 'intro'
         }
     }
@@ -461,6 +461,7 @@ function buildTree(request) {
     }
 
     let data = JSON.parse(request.response);
+    console.log(data);
 
     let cssPriority = ''
     if(this.cssPriority) {
