@@ -213,7 +213,7 @@ Tree.prototype = {
 
                 // go to first question
                 let question = this.getQuestions()[0];
-                this.setState('question', question.questionID, data);
+                this.setState('question', question.ID, data);
                 break
 
             case 'question':
@@ -254,7 +254,7 @@ Tree.prototype = {
                 // emit a restart
                 this.emit('restart', this)
                 // go to first question
-                this.setState('question', this.getQuestions()[0].questionID, data);
+                this.setState('question', this.getQuestions()[0].ID, data);
                 break
         }
     },
@@ -282,7 +282,7 @@ Tree.prototype = {
         // if there's an ID, let's get the specific one they're after
         if(id !== undefined) {
             // get the individual item
-            typeIndex = this.getIndexBy(data, type+'ID', id)
+            typeIndex = this.getIndexBy(data, 'ID', id)
             if(typeIndex !== undefined) {
                 // found one!
                 data = data[typeIndex]
@@ -296,7 +296,7 @@ Tree.prototype = {
     },
 
     getTreeID: function() {
-        return this.getData().treeID;
+        return this.getData().ID;
     },
 
     getQuestions: function(id){
@@ -343,6 +343,20 @@ Tree.prototype = {
         return group;
     },
 
+    getGroupIDByQuestion: function(questionID) {
+        let groups;
+
+        groups = this.getGroups()
+        for(let i = 0; i < groups.length; i++) {
+            if(-1 < groups[i].questions.indexOf(questionID)) {
+                // found the group!
+                return groups[i].ID
+            }
+        }
+        // question isn't in a group
+        return undefined
+    },
+
     getOptions: function(questionID, optionID){
         let option,
             optionIndex,
@@ -352,7 +366,7 @@ Tree.prototype = {
         question = this.getQuestions(questionID);
 
         if(optionID !== undefined) {
-            optionIndex = this.getIndexBy(question.options, 'optionID', optionID)
+            optionIndex = this.getIndexBy(question.options, 'ID', optionID)
             option = question.options[optionIndex]
         } else {
             option = question.options;

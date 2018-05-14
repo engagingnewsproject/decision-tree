@@ -705,9 +705,9 @@ TreeView.prototype = {
             for(let j = 0; j < elData.length; j++) {
                 // get the id, ex. the id value '2'
                 // this is like saying: getDataByType('question').questionID
-                let id = elData[j][elTypes[i]+'ID']
+                let ID = elData[j]['ID']
                 // find the element in the DOM
-                let el = document.getElementById('cme-tree__el--'+id)
+                let el = document.getElementById('cme-tree__el--'+ID)
 
                 // bind the data
                 this.bindDOMData(elData[j], el, elTypes[i])
@@ -719,7 +719,7 @@ TreeView.prototype = {
                         // loop through the options
                         for(let k = 0; k < options.length; k++) {
                             // get option el
-                            let optionEl =  document.getElementById('cme-tree__el--'+options[k].optionID)
+                            let optionEl =  document.getElementById('cme-tree__el--'+options[k].ID)
                             // bind the data
                             this.bindDOMData(options[k], optionEl, 'option')
                         }
@@ -728,10 +728,10 @@ TreeView.prototype = {
                     case 'end':
                         // assign data to restart button
                         // restart button
-                        var restartEl = document.getElementById('cme-tree__restart--'+id)
+                        var restartEl = document.getElementById('cme-tree__restart--'+ID)
                         this.bindDOMData(elData[j], restartEl, 'restart')
                         // go to overview button
-                        var overviewEl = document.getElementById('cme-tree__overview--'+id)
+                        var overviewEl = document.getElementById('cme-tree__overview--'+ID)
                         this.bindDOMData(elData[j], overviewEl, 'overview')
                         break
                 }
@@ -753,39 +753,38 @@ TreeView.prototype = {
             switch(type) {
                 case 'start':
                     clonedObj = {
-                        startID: data.startID,
+                        ID: data.ID,
                         type: 'start',
                     }
                     break
 
                 case 'group':
                     clonedObj = {
-                        groupID: data.groupID,
+                        ID: data.ID,
                         type: 'group',
                         order: data.order
                     }
                     break
 
                 case 'question':
+
                     clonedObj = {
-                        questionID: data.questionID,
+                        ID: data.ID,
                         type: 'question',
-                        order: data.order,
-                        groupID: data.groupID
+                        order: data.order
                     }
                     clonedObj.options = []
                     // add options
                     for(let i = 0; i < data.options.length; i++) {
-                        clonedObj.options.push(data.options[i].optionID)
+                        clonedObj.options.push(data.options[i].ID)
                     }
                     break
 
                 case 'option':
                     clonedObj = {
-                        optionID: data.optionID,
+                        ID: data.ID,
                         type: 'option',
                         order: data.order,
-                        questionID: data.questionID,
                         destinationID: data.destinationID,
                         destinationType: data.destinationType,
                     }
@@ -793,7 +792,7 @@ TreeView.prototype = {
 
                 case 'end':
                     clonedObj = {
-                        endID: data.endID,
+                        ID: data.ID,
                         type: 'end',
                         order: data.order
                     }
@@ -801,13 +800,13 @@ TreeView.prototype = {
 
                 case 'restart':
                     clonedObj = {
-                        restartID: data.endID,
+                        ID: data.ID,
                         type: 'restart',
                     }
                     break
                 case 'overview':
                     clonedObj = {
-                        overviewID: data.endID,
+                        overviewID: data.ID,
                         type: 'overview',
                     }
                     break
@@ -1021,9 +1020,11 @@ TreeView.prototype = {
 
     displayArrowDirection: function() {
         let questions,
+            questionGroupID,
             destination,
             destinationPosition,
             destinationCoords,
+            destinationGroupID,
             options,
             arrow,
             arrowPosition,
@@ -1042,12 +1043,15 @@ TreeView.prototype = {
                     // see if the question and option destination are in
                     // the same column.
                     destination = this.getDestination(options[o].data.destinationID)
-                    if(questions[q].data.groupID === destination.data.groupID) {
+
+                    questionGroupID = this.getTree().getGroupIDByQuestion(questions[q].data.ID)
+                    destinationGroupID = this.getTree().getGroupIDByQuestion(options[o].data.destinationID)
+                    if(questionGroupID === destinationGroupID) {
                         // if so, skip it (just use the down arrow)
                         continue;
                     }
                     // ok, they're in different columns, figure out what direction it needs to go
-                    arrow = this.getDestinationIcon(options[o].data.optionID)
+                    arrow = this.getDestinationIcon(options[o].data.ID)
 
                     arrowPosition = this.getAbsoluteBoundingRect(arrow)
                     destinationPosition = this.getAbsoluteBoundingRect(destination)

@@ -4,11 +4,9 @@ Handlebars.registerHelper('environment', function(options) {
 
 Handlebars.registerHelper('groupStart', function(questionID, groups, options) {
     // find the group
-    console.log(questionID);
     for(let i = 0; i < groups.length; i++) {
         // check if it's the first in the question order
         if(groups[i].questions[0] === questionID) {
-            console.log('found first question', questionID);
             // pass the values we'll need in the template
             return options.fn({groupID: groups[i].ID, groupTitle: groups[i].title});
         }
@@ -22,7 +20,6 @@ Handlebars.registerHelper('groupEnd', function(questionID, groups, options) {
         let questions = groups[i].questions;
         // check if it's the last in the question order
         if(questions[questions.length - 1] === questionID) {
-            console.log('found last question', questionID);
             return options.fn(this);
         }
     }
@@ -35,7 +32,7 @@ Handlebars.registerHelper('elNumber', function(el_order) {
     return parseInt(el_order) + 1;
 });
 
-Handlebars.registerHelper('destination', function(destinationID, destinationType, optionID, question_index, options) {
+Handlebars.registerHelper('destination', function(destinationID, destinationType, optionID, questionIndex, options) {
     let data,
         destination,
         destinationNumber,
@@ -46,15 +43,15 @@ Handlebars.registerHelper('destination', function(destinationID, destinationType
     data = options.data.root[destinationType+'s']
     i = 0;
     if(destinationType === 'question') {
-        // start it at the question_index.
+        // start it at the questionIndex.
         // An option will never go backwards, so we don't care
         // about the previous ones
-        i = question_index;
+        i = questionIndex;
     }
 
     // find the destination
     for (i; i < data.length; i++) {
-        if (data[i][destinationType+'ID'] === destinationID) {
+        if (data[i]['ID'] === destinationID) {
             destination = data[i];
             if(destinationType === 'question') {
                 destinationNumber = i+ 1

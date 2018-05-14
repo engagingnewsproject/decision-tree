@@ -51,7 +51,7 @@ class Helpers {
     }
 
     // we don't need this function for the php version
-    public static function destination($destinationID, $destinationType, $optionID, $questioniIdex, $options) {
+    public static function destination($destinationID, $destinationType, $optionID, $questionIndex, $options) {
         return '';
     }
 }

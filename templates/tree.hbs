@@ -25,7 +25,7 @@
             {{#if starts}}
                 <div class="cme-tree__start-container">
                     {{#each starts}}
-                        <p><a id="cme-tree__el--{{startID}}" class="cme-tree__btn cme-tree__start" href="#cme-tree__el--{{{destinationID}}}">{{{title}}}</a></p>
+                        <p><a id="cme-tree__el--{{ID}}" class="cme-tree__btn cme-tree__start" href="#cme-tree__el--{{{destinationID}}}">{{{title}}}</a></p>
                         {{#if content}}
                             <div class="cme-tree__description cme-tree__description--start">
                                 {{content}}
@@ -62,7 +62,7 @@
                                                 {{#destination destinationID destinationType ID @../index}}
                                                     <span class="cme-tree__destination-title">{{{destinationTitle}}}</span>
                                                     {{#if destinationIcon}}
-                                                        <span class="cme-tree__icon-wrap"><svg id="cme-tree__destination-icon--{{{ID}}}" class="cme-tree__icon cme-tree__icon--{{{destinationIcon}}}"><use xlink:href="#icon-{{{destinationIcon}}}"></use></svg></span>
+                                                        <span class="cme-tree__icon-wrap"><svg id="cme-tree__destination-icon--{{{optionID}}}" class="cme-tree__icon cme-tree__icon--{{{destinationIcon}}}"><use xlink:href="#icon-{{{destinationIcon}}}"></use></svg></span>
                                                     {{/if}}
                                                 {{/destination}}
                                             </span></a></li>

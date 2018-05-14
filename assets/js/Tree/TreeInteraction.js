@@ -394,7 +394,7 @@ TreeInteraction.prototype = {
             interactionType,
             interactionID,
             observer;
-
+        console.log('update', update);
         data = {}
         interactionType = update.data.type
         interactionID = false
@@ -402,9 +402,9 @@ TreeInteraction.prototype = {
 
         data.interaction = {}
 
-        if(interactionType === 'option') {
-            // pass the optionID
-            interactionID = update.data.optionID
+        if(update.data.ID) {
+            // pass the element ID
+            interactionID = update.data.ID
         }
         // check if it's a history click
         else if(observer === 'TreeHistoryView') {
@@ -432,7 +432,7 @@ TreeInteraction.prototype = {
         // build data
         interactionData = {
             interaction: {
-                id: data.optionID,
+                id: data.ID,
                 type: data.type // 'option'
             }
         }

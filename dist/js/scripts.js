@@ -217,7 +217,7 @@
 
                     // go to first question
                     var question = this.getQuestions()[0];
-                    this.setState('question', question.questionID, data);
+                    this.setState('question', question.ID, data);
                     break;
 
                 case 'question':
@@ -258,7 +258,7 @@
                     // emit a restart
                     this.emit('restart', this);
                     // go to first question
-                    this.setState('question', this.getQuestions()[0].questionID, data);
+                    this.setState('question', this.getQuestions()[0].ID, data);
                     break;
             }
         },
@@ -286,7 +286,7 @@
             // if there's an ID, let's get the specific one they're after
             if (id !== undefined) {
                 // get the individual item
-                typeIndex = this.getIndexBy(data, type + 'ID', id);
+                typeIndex = this.getIndexBy(data, 'ID', id);
                 if (typeIndex !== undefined) {
                     // found one!
                     data = data[typeIndex];
@@ -299,7 +299,7 @@
         },
 
         getTreeID: function getTreeID() {
-            return this.getData().treeID;
+            return this.getData().ID;
         },
 
         getQuestions: function getQuestions(id) {
@@ -346,6 +346,20 @@
             return group;
         },
 
+        getGroupIDByQuestion: function getGroupIDByQuestion(questionID) {
+            var groups = void 0;
+
+            groups = this.getGroups();
+            for (var i = 0; i < groups.length; i++) {
+                if (-1 < groups[i].questions.indexOf(questionID)) {
+                    // found the group!
+                    return groups[i].ID;
+                }
+            }
+            // question isn't in a group
+            return undefined;
+        },
+
         getOptions: function getOptions(questionID, optionID) {
             var option = void 0,
                 optionIndex = void 0,
@@ -355,7 +369,7 @@
             question = this.getQuestions(questionID);
 
             if (optionID !== undefined) {
-                optionIndex = this.getIndexBy(question.options, 'optionID', optionID);
+                optionIndex = this.getIndexBy(question.options, 'ID', optionID);
                 option = question.options[optionIndex];
             } else {
                 option = question.options;
@@ -1824,7 +1838,7 @@ TreeInteraction.prototype = {
             interactionType = void 0,
             interactionID = void 0,
             observer = void 0;
-
+        console.log('update', update);
         data = {};
         interactionType = update.data.type;
         interactionID = false;
@@ -1832,9 +1846,9 @@ TreeInteraction.prototype = {
 
         data.interaction = {};
 
-        if (interactionType === 'option') {
-            // pass the optionID
-            interactionID = update.data.optionID;
+        if (update.data.ID) {
+            // pass the element ID
+            interactionID = update.data.ID;
         }
         // check if it's a history click
         else if (observer === 'TreeHistoryView') {
@@ -1860,7 +1874,7 @@ TreeInteraction.prototype = {
         // build data
         interactionData = {
             interaction: {
-                id: data.optionID,
+                id: data.ID,
                 type: data.type // 'option'
             }
 
@@ -2692,9 +2706,9 @@ TreeView.prototype = {
             for (var j = 0; j < elData.length; j++) {
                 // get the id, ex. the id value '2'
                 // this is like saying: getDataByType('question').questionID
-                var id = elData[j][elTypes[i] + 'ID'];
+                var ID = elData[j]['ID'];
                 // find the element in the DOM
-                var el = document.getElementById('cme-tree__el--' + id);
+                var el = document.getElementById('cme-tree__el--' + ID);
 
                 // bind the data
                 this.bindDOMData(elData[j], el, elTypes[i]);
@@ -2706,7 +2720,7 @@ TreeView.prototype = {
                         // loop through the options
                         for (var k = 0; k < options.length; k++) {
                             // get option el
-                            var optionEl = document.getElementById('cme-tree__el--' + options[k].optionID);
+                            var optionEl = document.getElementById('cme-tree__el--' + options[k].ID);
                             // bind the data
                             this.bindDOMData(options[k], optionEl, 'option');
                         }
@@ -2715,10 +2729,10 @@ TreeView.prototype = {
                     case 'end':
                         // assign data to restart button
                         // restart button
-                        var restartEl = document.getElementById('cme-tree__restart--' + id);
+                        var restartEl = document.getElementById('cme-tree__restart--' + ID);
                         this.bindDOMData(elData[j], restartEl, 'restart');
                         // go to overview button
-                        var overviewEl = document.getElementById('cme-tree__overview--' + id);
+                        var overviewEl = document.getElementById('cme-tree__overview--' + ID);
                         this.bindDOMData(elData[j], overviewEl, 'overview');
                         break;
                 }
@@ -2739,39 +2753,38 @@ TreeView.prototype = {
             switch (type) {
                 case 'start':
                     clonedObj = {
-                        startID: data.startID,
+                        ID: data.ID,
                         type: 'start'
                     };
                     break;
 
                 case 'group':
                     clonedObj = {
-                        groupID: data.groupID,
+                        ID: data.ID,
                         type: 'group',
                         order: data.order
                     };
                     break;
 
                 case 'question':
+
                     clonedObj = {
-                        questionID: data.questionID,
+                        ID: data.ID,
                         type: 'question',
-                        order: data.order,
-                        groupID: data.groupID
+                        order: data.order
                     };
                     clonedObj.options = [];
                     // add options
                     for (var i = 0; i < data.options.length; i++) {
-                        clonedObj.options.push(data.options[i].optionID);
+                        clonedObj.options.push(data.options[i].ID);
                     }
                     break;
 
                 case 'option':
                     clonedObj = {
-                        optionID: data.optionID,
+                        ID: data.ID,
                         type: 'option',
                         order: data.order,
-                        questionID: data.questionID,
                         destinationID: data.destinationID,
                         destinationType: data.destinationType
                     };
@@ -2779,7 +2792,7 @@ TreeView.prototype = {
 
                 case 'end':
                     clonedObj = {
-                        endID: data.endID,
+                        ID: data.ID,
                         type: 'end',
                         order: data.order
                     };
@@ -2787,13 +2800,13 @@ TreeView.prototype = {
 
                 case 'restart':
                     clonedObj = {
-                        restartID: data.endID,
+                        ID: data.ID,
                         type: 'restart'
                     };
                     break;
                 case 'overview':
                     clonedObj = {
-                        overviewID: data.endID,
+                        overviewID: data.ID,
                         type: 'overview'
                     };
                     break;
@@ -3000,9 +3013,11 @@ TreeView.prototype = {
 
     displayArrowDirection: function displayArrowDirection() {
         var questions = void 0,
+            questionGroupID = void 0,
             destination = void 0,
             destinationPosition = void 0,
             destinationCoords = void 0,
+            destinationGroupID = void 0,
             options = void 0,
             arrow = void 0,
             arrowPosition = void 0,
@@ -3021,12 +3036,15 @@ TreeView.prototype = {
                     // see if the question and option destination are in
                     // the same column.
                     destination = this.getDestination(options[o].data.destinationID);
-                    if (questions[q].data.groupID === destination.data.groupID) {
+
+                    questionGroupID = this.getTree().getGroupIDByQuestion(questions[q].data.ID);
+                    destinationGroupID = this.getTree().getGroupIDByQuestion(options[o].data.destinationID);
+                    if (questionGroupID === destinationGroupID) {
                         // if so, skip it (just use the down arrow)
                         continue;
                     }
                     // ok, they're in different columns, figure out what direction it needs to go
-                    arrow = this.getDestinationIcon(options[o].data.optionID);
+                    arrow = this.getDestinationIcon(options[o].data.ID);
 
                     arrowPosition = this.getAbsoluteBoundingRect(arrow);
                     destinationPosition = this.getAbsoluteBoundingRect(destination);
@@ -3124,11 +3142,9 @@ Handlebars.registerHelper('environment', function (options) {
 
 Handlebars.registerHelper('groupStart', function (questionID, groups, options) {
     // find the group
-    console.log(questionID);
     for (var i = 0; i < groups.length; i++) {
         // check if it's the first in the question order
         if (groups[i].questions[0] === questionID) {
-            console.log('found first question', questionID);
             // pass the values we'll need in the template
             return options.fn({ groupID: groups[i].ID, groupTitle: groups[i].title });
         }
@@ -3142,7 +3158,6 @@ Handlebars.registerHelper('groupEnd', function (questionID, groups, options) {
         var questions = groups[i].questions;
         // check if it's the last in the question order
         if (questions[questions.length - 1] === questionID) {
-            console.log('found last question', questionID);
             return options.fn(this);
         }
     }
@@ -3155,7 +3170,7 @@ Handlebars.registerHelper('elNumber', function (el_order) {
     return parseInt(el_order) + 1;
 });
 
-Handlebars.registerHelper('destination', function (destinationID, destinationType, optionID, question_index, options) {
+Handlebars.registerHelper('destination', function (destinationID, destinationType, optionID, questionIndex, options) {
     var data = void 0,
         destination = void 0,
         destinationNumber = void 0,
@@ -3166,15 +3181,15 @@ Handlebars.registerHelper('destination', function (destinationID, destinationTyp
     data = options.data.root[destinationType + 's'];
     i = 0;
     if (destinationType === 'question') {
-        // start it at the question_index.
+        // start it at the questionIndex.
         // An option will never go backwards, so we don't care
         // about the previous ones
-        i = question_index;
+        i = questionIndex;
     }
 
     // find the destination
     for (i; i < data.length; i++) {
-        if (data[i][destinationType + 'ID'] === destinationID) {
+        if (data[i]['ID'] === destinationID) {
             destination = data[i];
             if (destinationType === 'question') {
                 destinationNumber = i + 1;
