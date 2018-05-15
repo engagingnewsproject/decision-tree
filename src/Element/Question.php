@@ -96,6 +96,14 @@ class Question extends Element {
             // it'll get put at the end of the order
             // find the total number of questions for this tree
             $tree = new Tree($this->db, $this->getTreeID());
+
+            /* TODO: Way to set the order when creating the question
+            if(isset($question['order']) && $question['order'] <= count($tree->getQuestions()) && 0 <= $question['order'] ) {
+                $order = $question['order'];
+            } else {
+                $order = count($tree->getQuestions());
+            }*/
+
             $order = count($tree->getQuestions());
             $insertOrder = $this->db->insertOrder($questionID, $order);
             if(!Utility\isID($insertOrder)) {

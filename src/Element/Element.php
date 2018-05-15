@@ -151,7 +151,7 @@ class Element {
      *
      * @param $array of element IDs
      */
-    public function saveOrder($array) {
+    protected function updateOrder($array) {
         // takes an array of element IDs and saves their current order
         foreach($array as $order => $elID) {
             $this->db->updateOrder($elID, $order);

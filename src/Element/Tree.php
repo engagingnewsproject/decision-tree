@@ -53,7 +53,7 @@ class Tree extends Element {
         // set the array of IDs for each elem
         $this->starts = $this->db->getStartIDs($treeID);
         $this->groups = $this->db->getGroupIDs($treeID);
-        $this->questions = $this->db->getQuestionIDs($treeID);
+        $this->setQuestions();
         $this->ends = $this->db->getEndIDs($treeID);
 
         return $this;
@@ -91,6 +91,25 @@ class Tree extends Element {
 
     public function getStarts() {
         return $this->starts;
+    }
+
+    public function setQuestions($questions = false) {
+        if($questions === false) {
+            $this->questions = $this->db->getQuestionIDs($this->getID());
+            return $this->questions;
+        }
+
+        // if they passed questions, make sure every question is in the array from the database
+        //use a clone here so we don't actually sort the passed questions array
+        $questionsClone = $questions;
+        $dbQuestions = $this->db->getQuestionIDs($this->getID());
+        if(sort($dbQuestions) == sort($questionsClone)) {
+            $this->questions = $questions;
+        } else {
+            throw new \Error('Passed questions do not match questions from database.');
+        }
+
+        return $this->questions;
     }
 
     public function getQuestions() {
@@ -150,17 +169,35 @@ class Tree extends Element {
 
 
         // update the order of the Starts
-        $this->saveOrder($this->getStarts());
+        $this->updateOrder($this->getStarts());
         // update the order of the Groups
-        $this->saveOrder($this->getGroups());
+        $this->updateOrder($this->getGroups());
         // update the order of the Questions
-        $this->saveOrder($this->getQuestions());
+        $this->updateOrder($this->getQuestions());
         // update the order of the Ends
-        $this->saveOrder($this->getEnds());
+        $this->updateOrder($this->getEnds());
 
         // rebuild it so we get the fresh copy
         $this->build($this->getID());
         // return the original update result
+        return $result;
+    }
+
+    public function saveOrder($elType) {
+        $whitelist = ['questions', 'ends', 'groups', 'starts'];
+        if(!in_array($elType, $whitelist)) {
+            throw new \Error('Element type not allowed.');
+        }
+
+        $getter = 'get'.ucfirst($elType);
+
+        // save the order of just this type of question
+        $result = $this->updateOrder($this->$getter());
+
+        // rebuild it so we get the fresh copy
+        $this->build($this->getID());
+
+        // return the saveOrder result
         return $result;
     }
 

@@ -305,7 +305,7 @@ function move($array, $val, $to) {
 
     // validate it
     // it not INT or 'first' or 'last'
-    if(is_string($to)) {
+    if(!is_numeric ($to)) {
         // see if we're using a keyword instead
         switch ($to) {
             case 'first':

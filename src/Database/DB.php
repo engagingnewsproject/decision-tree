@@ -29,7 +29,7 @@ class DB extends PDO {
         if(!empty($user)) {
             // validate the user
             if(Utility\validateUser($user) !== true) {
-                return 'Invalid user.';
+                throw new \Error('Invalid user.');
             }
             $this->user = $user;
         }
