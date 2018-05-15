@@ -145,7 +145,7 @@ function requestEndpoint($path, $data = [], $method = 'GET') {
             curl_setopt($curl, CURLOPT_POST, true);
             break;
         case 'PUT':
-            curl_setopt($curl, CURLOPT_PUT, true);
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
             break;
         case 'DELETE':
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');

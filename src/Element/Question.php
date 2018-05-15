@@ -131,7 +131,7 @@ class Question extends Element {
         // TODO: Save options (attach an option to a question)?? Or, actually, I don't think we can do that. It needs to be at the option level.
 
         // update the order of the options
-        $this->saveOrder($this->getOptions());
+        $this->updateOrder($this->getOptions());
 
         // rebuild it so we get the fresh copy
         $this->build($this->getID());
