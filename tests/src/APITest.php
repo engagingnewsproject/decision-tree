@@ -114,22 +114,32 @@ final class APITest extends TreeTestCase
 
             $question = $this->getOneDynamic('question', 1);
             $route = 'trees/1/questions/'.$question['questionID'].'/options/99999999999999';
+            $response = json_decode(Utility\getEndpoint($route));
             // assert on one that doesn't exist to make sure it's empty
-            $this->assertEquals(Utility\getEndpoint($route), json_encode(false));
+            $this->assertEquals($response->status, 'error');
         }
         foreach($questions as $question) {
-            $route = 'trees/'.$treeID.'/questions/'.$question['questionID'].'/options';
-            $options = $this->db->getOptions($question['questionID']);
-            // check that the options match
-            $this->assertEquals(Utility\getEndpoint($route), json_encode($options));
+            $questionID = $question['questionID'];
+            $route = 'trees/'.$treeID.'/questions/'.$questionID.'/options';
 
-            if(empty($options)) {
+            $optionIDs = $this->db->getOptionIDs($questionID);
+
+            if(empty($optionIDs)) {
+                $this->assertEquals(Utility\getEndpoint($route), json_encode([]));
                 continue;
             }
-            // check individual options match
-            foreach($options as $option) {
-                $this->assertEquals(Utility\getEndpoint($route.'/'.$option['optionID']), json_encode($option));
+
+            $optionObjs = [];
+            foreach($optionIDs as $optionID) {
+                $option = new Element\Option($this->db, $optionID);
+                // check that the individual option matches the endpoint
+                $this->assertEquals(Utility\getEndpoint($route.'/'.$optionID), json_encode($option->array()));
+                // ad to the options array
+                $optionObjs[] = $option->array();
             }
+
+            // check that the options match
+            $this->assertEquals(Utility\getEndpoint($route), json_encode($optionObjs));
         }
     }
 
