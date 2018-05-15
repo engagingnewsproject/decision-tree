@@ -34,14 +34,14 @@ class Authentication {
         $errors = [];
 
         if(!isset($data['user'])) {
-            $errors[] = 'No user passed.';
+            throw new \Error('No user passed.');
         } else {
             $user = $data['user'];
             // validate the user
             $validUser = Utility\validateUserToken($user['clientToken'], $user['accessToken']);
 
             if($validUser !== true) {
-                $errors[] = 'Invalid user.';
+                throw new \Error('Invalid user.');
             }
         }
 

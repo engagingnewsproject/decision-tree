@@ -100,8 +100,15 @@ final class UtilityTest extends TreeTestCase
      * @dataProvider moveProvider
      */
     public function testMove($array, $val, $to, $expected) {
-        $moved = Utility\move($array, $val, $to);
-        $this->assertEquals($moved, $expected);
+
+        if($expected == Error::class) {
+            $this->expectException(\Error::class);
+            $moved = Utility\move($array, $val, $to);
+        } else {
+            $moved = Utility\move($array, $val, $to);
+            $this->assertEquals($moved, $expected);
+        }
+
     }
 
     public function moveProvider() {
@@ -109,7 +116,10 @@ final class UtilityTest extends TreeTestCase
                 'move-to-front'=>[[2, 1, 3, 4], 1, 'first', [1,2,3,4]],
                 'move-to-end'=>[[4,1,2,3], 4, 'last', [1,2,3,4]],
                 'move-to-second'=>[[1,3,2,4], 2, 1, [1,2,3,4]],
-                'move-to-third'=>[[1,2,4,3], 3, 2, [1,2,3,4]]
+                'move-to-third'=>[[1,2,4,3], 3, 2, [1,2,3,4]],
+                'move-to-end-catch-high'=>[[1,2,4,3], 4, 99, [1,2,3,4]],
+                'move-to-end-catch-low'=>[[2,1,3,4], 1, -20, [1,2,3,4]],
+                'move-to-invalid-option' => [[1,2,3,4], 2, 'wut', Error::class],
         ];
     }
 }

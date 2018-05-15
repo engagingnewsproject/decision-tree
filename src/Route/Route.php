@@ -30,7 +30,7 @@ class Route
     }
 
     public function addError($string) {
-        $this->errors[] = $string;
+        throw new \Error($string);
     }
 
     public function getErrors() {

@@ -30,9 +30,6 @@ $app->add(function ($req, $res, $next) {
 });
 // END Laxy CORS //
 
-// An authentication layer for validating users before passing them through to the route
-$app->add(new \Cme\Authentication());
-
 // register views
 $c = $app->getContainer();
 $c['view'] = new \Slim\Views\PhpRenderer("views/");
@@ -50,6 +47,9 @@ $c['phpErrorHandler'] = function ($c) {
             ->write(json_encode($return));
     };
 };
+
+// An authentication layer for validating users before passing them through to the route
+$app->add(new \Cme\Authentication());
 
 $app->group('/api', function() {
     $this->group('/v1', function() {

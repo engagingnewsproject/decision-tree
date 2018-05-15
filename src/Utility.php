@@ -292,20 +292,45 @@ function validateUserID($userID) {
  * @return ARRAY of rearranged IDs
  */
 function move($array, $val, $to) {
+
+    // The default is to insert and shift the current item in that position forward
+    //
+    //                    (moved to 5)
+    //                         |
+    // move(5) means 0 1 2 3 4 5 6 7 8 9 10
+    //                           |
+    //                 (was at 5, moved to 6)
+    //
+    // helpers: 'first', 'last'
+
+    // validate it
+    // it not INT or 'first' or 'last'
+    if(is_string($to)) {
+        // see if we're using a keyword instead
+        switch ($to) {
+            case 'first':
+                $to = 0;
+                break;
+            case 'last':
+                $to = count($array);
+                break;
+            default:
+                throw new \Error('$to must be "first", "last", or an integer.');
+        }
+    }
+
+    // make sure we're not moving it to a location that's not possible with this array. If it's greater than array count, just set it as the last one
+    if(count($array) < $to) {
+        $to = count($array);
+    } elseif($to <= -1) {
+        $to = 0;
+    }
+
     // get index of the one you want to move
     $index = array_search($val, $array);
     // find the position of the element we want to move
     $from = array_splice($array, $index, 1);
 
-    // see if we're using a keyword instead
-    switch ($to) {
-        case 'first':
-            $to = 0;
-            break;
-        case 'last':
-            $to = count($array);
-            break;
-    }
 
     // actually move it
     array_splice($array, $to, 0, $from);
