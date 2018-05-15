@@ -9,6 +9,10 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 $config = [];
 $config['displayErrorDetails'] = true;
+if(TREE_ENV === 'prod') {
+    $config['displayErrorDetails'] = false;
+}
+
 $config['addContentLengthHeader'] = false;
 
 $app = new \Slim\App(["settings" => $config]);
@@ -30,8 +34,22 @@ $app->add(function ($req, $res, $next) {
 $app->add(new \Cme\Authentication());
 
 // register views
-$container = $app->getContainer();
-$container['view'] = new \Slim\Views\PhpRenderer("views/");
+$c = $app->getContainer();
+$c['view'] = new \Slim\Views\PhpRenderer("views/");
+
+// anytime a throw new Error happens, it'll run through this.
+$c['phpErrorHandler'] = function ($c) {
+    return function ($request, $response, $error) use ($c) {
+        $return = [
+            'status'  => 'error',
+            'message' => $error->getMessage()
+        ];
+        return $c['response']
+            ->withStatus(500)
+            ->withHeader('Content-Type', 'application/json')
+            ->write(json_encode($return));
+    };
+};
 
 $app->group('/api', function() {
     $this->group('/v1', function() {
@@ -56,6 +74,7 @@ $app->group('/api', function() {
         $this->post('/trees/{treeID}/questions', '\Cme\Route\Questions:create');
         $this->get('/trees/{treeID}/questions/{questionID}', '\Cme\Route\Questions:get');
         $this->put('/trees/{treeID}/questions/{questionID}', '\Cme\Route\Questions:update');
+        $this->put('/trees/{treeID}/questions/{questionID}/move/{position}', '\Cme\Route\Questions:move');
         $this->delete('/trees/{treeID}/questions/{questionID}', '\Cme\Route\Questions:delete');
 
         // options
