@@ -57,4 +57,12 @@ class Options extends Questions
 
         return $this->return($this->option->array(), $response);
     }
+
+    // Move an option from one position to another
+    public function move($request, $response) {
+        // init data
+        $this->init($request);
+
+        return parent::reorder($request, $response, 'option');
+    }
 }

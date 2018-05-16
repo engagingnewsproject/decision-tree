@@ -49,4 +49,12 @@ class Groups extends Trees
 
         return $this->return($this->group->array(), $response);
     }
+
+    // Move a group from one position to another
+    public function move($request, $response) {
+        // init data
+        $this->init($request);
+
+        return parent::reorder($request, $response, 'group');
+    }
 }

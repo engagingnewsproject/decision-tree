@@ -83,12 +83,9 @@ class Route
 
     /**
      * Moves an element on the tree and updates it. Use it for
-     * reordering questions, options, groups, andends
+     * reordering questions, options, groups, and ends
      *
-     *
-     *
-     *
-     *
+     * @param $elType STRING question, option, group, or end
      */
     public function reorder($request, $response, $elType) {
         // get the location they want to move it to

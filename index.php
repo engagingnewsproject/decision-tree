@@ -69,6 +69,7 @@ $app->group('/api', function() {
         // Groups
         $this->get('/trees/{treeID}/groups', '\Cme\Route\Groups:getAll');
         $this->get('/trees/{treeID}/groups/{groupID}', '\Cme\Route\Groups:get');
+        // $this->put('/trees/{treeID}/groups/{groupID}/move/{position}', '\Cme\Route\Groups:move');
         // Questions
         $this->get('/trees/{treeID}/questions', '\Cme\Route\Questions:getAll');
         $this->post('/trees/{treeID}/questions', '\Cme\Route\Questions:create');
@@ -80,10 +81,12 @@ $app->group('/api', function() {
         // options
         $this->get('/trees/{treeID}/questions/{questionID}/options', '\Cme\Route\Options:getAll');
         $this->get('/trees/{treeID}/questions/{questionID}/options/{optionID}', '\Cme\Route\Options:get');
+        // $this->put('/trees/{treeID}/options/{optionID}/move/{position}', '\Cme\Route\Options:move');
 
         // ends
         $this->get('/trees/{treeID}/ends', '\Cme\Route\Ends:getAll');
         $this->get('/trees/{treeID}/ends/{endID}', '\Cme\Route\Ends:get');
+        // $this->put('/trees/{treeID}/ends/{endID}/move/{position}', '\Cme\Route\Ends:move');
 
         // embeds by tree
         $this->get('/trees/{treeID}/embeds', '\Cme\Route\Embeds:getAllEmbedsByTree');
