@@ -59,56 +59,48 @@ class Validate extends DB {
      * Checks if a user owns a tree
      *
      */
-    public function treeOwner($tree, $userID) {
+    public function treeOwner($tree, $user) {
         // first validate the tree
         if(!$this->tree($tree)) {
-            return false;
+            throw new \Error('Tree does not exist.');
         }
-
-        $isValid = false;
 
         $tree = $this->getTree($tree);
         // check owner
-        if(isset($tree['owner']) && $tree['owner'] === $userID) {
-            $isValid = true;
+        if(isset($tree['owner']) && ($tree['owner'] === $user['userID'] || $user['userRole'] === 'admin')) {
+            return true;
         }
 
-        return $isValid;
+        throw new \Error('Not tree owner.');
     }
 
     // Make sure the elID exists
     public function elID($elID) {
-        $isValid = false;
-
         // try to get the tree by id
         $el = $this->getElement($elID);
         // see if the elID exists in the returned results and if that elID equals the passed elID
         if(isset($el['elID']) && $el['elID'] == $elID) {
-            $isValid = true;
+            return true;
         }
 
-        return $isValid;
+        throw new \Error('Element does not exist.');
     }
 
     /**
      * Checks if a user owns an element
      *
      */
-    public function elOwner($elID, $userID) {
+    public function elOwner($elID, $user) {
         // first validate the element
-        if(!$this->elID($elID)) {
-            return false;
-        }
-
-        $isValid = false;
+        $this->elID($elID);
 
         $el = $this->getElement($elID);
         // check owner
-        if($el['elCreatedBy'] === $userID || $this->user['userRole'] === 'admin') {
-            $isValid = true;
+        if($el['elCreatedBy'] === $user['userID'] || $this->user['userRole'] === 'admin') {
+            return true;
         }
 
-        return $isValid;
+        throw new \Error('Not element owner.');
     }
 
     // Make sure the id is what it's supposed to be ( ie, that elID 2 is a 'question')

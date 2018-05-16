@@ -430,13 +430,12 @@ class DB extends PDO {
     public function createTree($tree) {
         $validate = new Validate();
         // validate the user
-        if(Utility\validateUser($this->user) !== true) {
-            return 'Invalid user.';
-        }
+        Utility\validateUser($this->user);
 
         // see if this tree already exists
         if(isset($tree['treeSlug']) && $validate->treeSlug($tree['treeSlug'])) {
-            return 'Tree Slug already in use.';
+            // TODO: append a # to the end of it so it validates?
+            throw new \Error('Tree Slug already in use.');
         }
         // if no tree owner is passed, set it as this user
         if(!isset($tree['treeOwner'])) {
@@ -462,20 +461,12 @@ class DB extends PDO {
     public function updateTree($tree) {
         $treeID = $tree['treeID'];
         // validate the user
-        if(Utility\validateUser($this->user) !== true) {
-            return 'Invalid user.';
-        }
+        Utility\validateUser($this->user);
 
         $validate = new Validate();
-        if(!$validate->treeID($treeID)) {
-            return 'Invalid tree.';
-        }
-
         // find the tree and make sure the owner owns this tree
-        $getTree = $this->getTree($treeID);
-        if($getTree['owner'] !== $this->user['userID']) {
-            return 'Not tree owner.';
-        }
+        $validate->treeOwner($treeID, $this->user);
+
         // unset the tree ID so we don't try updating that.
         unset($tree['treeID']);
         // attempt to create the tree
@@ -1009,15 +1000,12 @@ class DB extends PDO {
 
     public function createElement($el) {
         // validate the user
-        if(Utility\validateUser($this->user) !== true) {
-            return 'Invalid user.';
-        }
+        Utility\validateUser($this->user);
         $validate = new Validate();
 
         // check that the tree ID is a valid Tree ID and owned by this user
-        if($validate->treeOwner($el['treeID'], $this->user['userID']) !== true && $this->user['userRole'] !== 'admin') {
-            return 'Invalid tree or user does not own tree.';
-        }
+        $validate->treeOwner($el['treeID'], $this->user);
+
         $el['elCreatedBy'] = $this->user['userID'];
         $el['elUpdatedBy'] = $el['elCreatedBy'];
         return $this->insert([
@@ -1036,14 +1024,10 @@ class DB extends PDO {
     public function updateElement($el) {
         $elID = $el['elID'];
         // validate the user
-        if(Utility\validateUser($this->user) !== true) {
-            return 'Invalid user.';
-        }
+        Utility\validateUser($this->user);
 
         $validate = new Validate();
-        if(!$validate->elID($elID)) {
-            return 'Invalid el.';
-        }
+        $validate->elOwner($elID, $this->user);
 
         if(!isset($el['treeID'])) {
             return 'No treeID.';
@@ -1053,10 +1037,6 @@ class DB extends PDO {
         $tree = $this->getTree($el['treeID']);
         if($tree['treeID'] !== $el['treeID']) {
             return 'Incorrect treeID.';
-        }
-
-        if($tree['owner'] !== $this->user['userID'] && $this->user['userRole'] !== 'admin') {
-            return 'Not el owner.';
         }
 
         // unset the el ID so we don't try updating that.
@@ -1090,15 +1070,11 @@ class DB extends PDO {
      */
     public function insertOrder($elID, $elOrder) {
         // validate the user
-        if(Utility\validateUser($this->user) !== true) {
-            return 'Invalid user.';
-        }
+        Utility\validateUser($this->user);
 
         // find the element and make sure the owner owns this element
         $validate = new Validate();
-        if(!$validate->elOwner($elID, $this->user['userID'])) {
-            throw new \Error('Not element owner.');
-        }
+        $validate->elOwner($elID, $this->user);
 
         return $this->insert([
             'vals'      => [
@@ -1120,15 +1096,12 @@ class DB extends PDO {
      */
     public function updateOrder($elID, $elOrder) {
         // validate the user
-        if(Utility\validateUser($this->user) !== true) {
-            return 'Invalid user.';
-        }
+        Utility\validateUser($this->user);
 
         // find the element and make sure the owner owns this element
         $validate = new Validate();
-        if(!$validate->elOwner($elID, $this->user['userID'])) {
-            throw new \Error('Not element owner.');
-        }
+        $validate->elOwner($elID, $this->user);
+
 
         return $this->update([
             'vals'      => ['elOrder' => $elOrder],
@@ -1148,23 +1121,19 @@ class DB extends PDO {
      */
     public function insertContainer($parentID, $childID) {
         // validate the user
-        if(Utility\validateUser($this->user) !== true) {
-            return 'Invalid user.';
-        }
+        Utility\validateUser($this->user);
 
         // find the element and make sure the owner owns this element
         $validate = new Validate();
-        if(!$validate->elOwner($elID, $this->user['userID'])) {
-            throw new \Error('Not element owner.');
-        }
+        $validate->elOwner($elID, $this->user);
 
         return $this->insert([
             'vals'      => [
-                            'elID' => $elID,
-                            'elOrder' => $elOrder
+                            'elID' => $parentID,
+                            'elIDChild' => $childID
             ],
-            'required'  => ['elID', 'elOrder'],
-            'table'     => $this->tables['treeElementOrder']
+            'required'  => ['elID', 'elIDChild'],
+            'table'     => $this->tables['treeElementContainer']
         ]);
     }
 
@@ -1178,21 +1147,16 @@ class DB extends PDO {
      */
     public function updateContainer($containerID, $parentID, $childID) {
         // validate the user
-        if(Utility\validateUser($this->user) !== true) {
-            return 'Invalid user.';
-        }
+        Utility\validateUser($this->user);
 
         // find the element and make sure the owner owns this element
-        $el = $this->getElement($elID);
-
-        if($el['elCreatedBy'] !== $this->user['userID']) {
-            return 'Not element owner.';
-        }
+        $validate = new Validate();
+        $validate->elOwner($elID, $this->user);
 
         return $this->update([
             'vals'      => ['elOrder' => $elOrder],
             'required'  => ['elOrder'],
-            'table'     => $this->tables['treeElementOrder'],
+            'table'     => $this->tables['treeElementContainer'],
             'where'     => ['elID' => $elID]
         ]);
     }

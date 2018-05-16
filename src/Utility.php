@@ -263,7 +263,7 @@ function validateUser($user) {
     }
 
     // invalid
-    return false;
+    throw new \Error('Invalid user.');
 }
 
 // quick validate if the user ID exists
