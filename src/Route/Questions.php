@@ -100,20 +100,7 @@ class Questions extends Trees
     public function move($request, $response) {
         // init data
         $this->init($request);
-        // get the location they want to move it to
-        $position = $request->getAttribute('position');
-        // get all the questions
-        $questions = $this->tree->getQuestions();
-        $questions = Utility\move($questions, $this->questionID, $position);
 
-        // move this question to that position
-        $this->tree->setQuestions($questions);
-        // save question order on the tree
-        $this->tree->saveOrder('questions');
-
-        // rebuild the question
-        $question = new Question($this->db, $this->questionID);
-
-        return $this->return($question->array(), $response);
+        return parent::reorder($request, $response, 'question');
     }
 }
