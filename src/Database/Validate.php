@@ -90,6 +90,27 @@ class Validate extends DB {
         return $isValid;
     }
 
+    /**
+     * Checks if a user owns an element
+     *
+     */
+    public function elOwner($elID, $userID) {
+        // first validate the element
+        if(!$this->elID($elID)) {
+            return false;
+        }
+
+        $isValid = false;
+
+        $el = $this->getElement($elID);
+        // check owner
+        if($el['elCreatedBy'] === $userID || $this->user['userRole'] === 'admin') {
+            $isValid = true;
+        }
+
+        return $isValid;
+    }
+
     // Make sure the id is what it's supposed to be ( ie, that elID 2 is a 'question')
     /**
      * Validates that an ID is an ID of a certain type. IE if you need to know that

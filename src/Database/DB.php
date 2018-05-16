@@ -1095,10 +1095,9 @@ class DB extends PDO {
         }
 
         // find the element and make sure the owner owns this element
-        $el = $this->getElement($elID);
-
-        if($el['elCreatedBy'] !== $this->user['userID'] && $this->user['userRole'] !== 'admin') {
-            return 'Not element owner.';
+        $validate = new Validate();
+        if(!$validate->elOwner($elID, $this->user['userID'])) {
+            throw new \Error('Not element owner.');
         }
 
         return $this->insert([
@@ -1126,6 +1125,64 @@ class DB extends PDO {
         }
 
         // find the element and make sure the owner owns this element
+        $validate = new Validate();
+        if(!$validate->elOwner($elID, $this->user['userID'])) {
+            throw new \Error('Not element owner.');
+        }
+
+        return $this->update([
+            'vals'      => ['elOrder' => $elOrder],
+            'required'  => ['elOrder'],
+            'table'     => $this->tables['treeElementOrder'],
+            'where'     => ['elID' => $elID]
+        ]);
+    }
+
+    /**
+     * Inserts a container row where a parent contains a child
+     * ie - a question contains an option, a group contains a question, etc
+     *
+     * @param $parentID (int) element ID
+     * @param $childID (int) element ID
+     * @return
+     */
+    public function insertContainer($parentID, $childID) {
+        // validate the user
+        if(Utility\validateUser($this->user) !== true) {
+            return 'Invalid user.';
+        }
+
+        // find the element and make sure the owner owns this element
+        $validate = new Validate();
+        if(!$validate->elOwner($elID, $this->user['userID'])) {
+            throw new \Error('Not element owner.');
+        }
+
+        return $this->insert([
+            'vals'      => [
+                            'elID' => $elID,
+                            'elOrder' => $elOrder
+            ],
+            'required'  => ['elID', 'elOrder'],
+            'table'     => $this->tables['treeElementOrder']
+        ]);
+    }
+
+
+    /**
+     * Updates the order of an element
+     *
+     * @param $elID ID
+     * @param $order
+     * @return
+     */
+    public function updateContainer($containerID, $parentID, $childID) {
+        // validate the user
+        if(Utility\validateUser($this->user) !== true) {
+            return 'Invalid user.';
+        }
+
+        // find the element and make sure the owner owns this element
         $el = $this->getElement($elID);
 
         if($el['elCreatedBy'] !== $this->user['userID']) {
@@ -1139,5 +1196,4 @@ class DB extends PDO {
             'where'     => ['elID' => $elID]
         ]);
     }
-
 }

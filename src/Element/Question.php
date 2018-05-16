@@ -51,7 +51,6 @@ class Question extends Element {
         $this->treeID = $question['treeID'];
         $this->order = $question['order'];
 
-
         // set the array of IDs for each elem
         $this->options = $this->db->getOptionIDs($questionID);
 
