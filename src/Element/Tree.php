@@ -50,11 +50,10 @@ class Tree extends Element {
         $this->slug = $tree['treeSlug'];
         $this->title = $tree['title'];
         $this->owner = $tree['owner'];
-        // set the array of IDs for each elem
-        $this->starts = $this->db->getStartIDs($treeID);
-        $this->groups = $this->db->getGroupIDs($treeID);
+        $this->setGroups();
+        $this->setStarts();
         $this->setQuestions();
-        $this->ends = $this->db->getEndIDs($treeID);
+        $this->setEnds();
 
         return $this;
     }
@@ -85,8 +84,18 @@ class Tree extends Element {
         return $this->slug;
     }
 
+    public function setGroups($groups = false) {
+        $this->groups = $this->getEls('group');
+        return $this->groups;
+    }
+
     public function getGroups() {
         return $this->groups;
+    }
+
+    public function setStarts($starts = false) {
+        $this->starts = $this->getEls('start');
+        return $this->starts;
     }
 
     public function getStarts() {
@@ -94,26 +103,17 @@ class Tree extends Element {
     }
 
     public function setQuestions($questions = false) {
-        if($questions === false) {
-            $this->questions = $this->db->getQuestionIDs($this->getID());
-            return $this->questions;
-        }
-
-        // if they passed questions, make sure every question is in the array from the database
-        //use a clone here so we don't actually sort the passed questions array
-        $questionsClone = $questions;
-        $dbQuestions = $this->db->getQuestionIDs($this->getID());
-        if(sort($dbQuestions) == sort($questionsClone)) {
-            $this->questions = $questions;
-        } else {
-            throw new \Error('Passed questions do not match questions from database.');
-        }
-
+        $this->questions = $this->getEls('question', $questions);
         return $this->questions;
     }
 
     public function getQuestions() {
         return $this->questions;
+    }
+
+    public function setEnds($ends = false) {
+        $this->ends = $this->getEls('end');
+        return $this->ends;
     }
 
     public function getEnds() {
@@ -180,24 +180,6 @@ class Tree extends Element {
         // rebuild it so we get the fresh copy
         $this->build($this->getID());
         // return the original update result
-        return $result;
-    }
-
-    public function saveOrder($elType) {
-        $whitelist = ['questions', 'ends', 'groups', 'starts'];
-        if(!in_array($elType, $whitelist)) {
-            throw new \Error('Element type not allowed.');
-        }
-
-        $getter = 'get'.ucfirst($elType);
-
-        // save the order of just this type of question
-        $result = $this->updateOrder($this->$getter());
-
-        // rebuild it so we get the fresh copy
-        $this->build($this->getID());
-
-        // return the saveOrder result
         return $result;
     }
 

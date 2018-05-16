@@ -90,33 +90,8 @@ class Route
     public function reorder($request, $response, $elType) {
         // get the location they want to move it to
         $position = $request->getAttribute('position');
-        // set our dynamic names:
-        // ex: getQuestions
-        $getter = 'get'.ucfirst($elType).'s';
-        // ex: setQuestions
-        $setter = 'set'.ucfirst($elType).'s';
-        // ex: new Question
-        $objName = '\Cme\Element\\'.ucfirst($elType);
-        // ex: $this->questionID
-        $getID = $elType.'ID';
-        // if it's an option, the interaction needs to work with the question, otherwise the tree
-        $parentObj = ($elType === 'option' ? $this->question : $this->tree);
 
-        $ID = $this->$getID;
-
-        // get all the els
-        $els = $parentObj->$getter();
-        // move it
-        $els = Utility\move($els, $ID, $position);
-
-        // set this el to that position on the tree
-        $parentObj->$setter($els);
-
-        // save el order on the tree
-        $parentObj->saveOrder($elType.'s');
-
-        // rebuild the el
-        $el = new $objName($this->db, $ID);
+        $el = $this->$elType->move($position);
 
         return $this->return($el->array(), $response);
     }

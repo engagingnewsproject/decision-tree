@@ -22,9 +22,9 @@ class Options extends Questions
             $this->optionID = $optionID;
             $this->option = new Option($this->db, $optionID);
 
-            // make sure this option is owned by this tree
-            if($this->option->getTreeID() != $this->treeID) {
-                $this->addError('Option does not go with this Tree.');
+            // make sure this question is owned by this tree
+            if($this->question->getTreeID() != $this->treeID) {
+                $this->addError('Question does not go with this Tree.');
             }
 
             // make sure this option is owned by this question
@@ -58,11 +58,59 @@ class Options extends Questions
         return $this->return($this->option->array(), $response);
     }
 
+    /**
+     * params: destination = ID, title = string
+     */
+    public function create($request, $response) {
+        // init data
+        $this->init($request);
+
+        $option = [];
+        $option['owner'] = $this->user['userID'];
+        // add the user to the question data as the owner
+        if(isset($this->data['owner'])) {
+            $option['owner'] = $this->data['owner'];
+        }
+
+        // add in the questionID
+        $option['questionID'] = $this->questionID;
+
+        $option = new Option($this->db, $option);
+        // allow them to move questions
+        $keys = ['title', 'destination', 'questionID'];
+        $option = $this->dynamicSet($this->data, $keys, $option);
+
+        $option = $option->save();
+
+        /*if(!is_object($option)) {
+            $this->addError('Option could not be created.');
+        }*/
+
+        $this->return($option->array(), $response);
+    }
+
+    public function update($request, $response) {
+        // init data
+        $this->init($request);
+
+        $keys = ['questionID', 'destination', 'title'];
+        $this->option = $this->dynamicSet($this->data, $keys, $this->option);
+
+        $this->option->save();
+
+        return $this->return($this->option->array(), $response);
+    }
+
     // Move an option from one position to another
     public function move($request, $response) {
         // init data
         $this->init($request);
 
         return parent::reorder($request, $response, 'option');
+    }
+
+    // TODO
+    public function prune() {
+        // remove all options that don't have a destination (maybe the destination was deleted)
     }
 }

@@ -35,6 +35,7 @@ $c = $app->getContainer();
 $c['view'] = new \Slim\Views\PhpRenderer("views/");
 
 // anytime a throw new Error happens, it'll run through this.
+
 $c['phpErrorHandler'] = function ($c) {
     return function ($request, $response, $error) use ($c) {
         $return = [
@@ -81,7 +82,9 @@ $app->group('/api', function() {
         // options
         $this->get('/trees/{treeID}/questions/{questionID}/options', '\Cme\Route\Options:getAll');
         $this->get('/trees/{treeID}/questions/{questionID}/options/{optionID}', '\Cme\Route\Options:get');
-        // $this->put('/trees/{treeID}/options/{optionID}/move/{position}', '\Cme\Route\Options:move');
+        $this->post('/trees/{treeID}/questions/{questionID}/options', '\Cme\Route\Options:create');
+        $this->put('/trees/{treeID}/questions/{questionID}/options/{optionID}', '\Cme\Route\Options:update');
+        $this->put('/trees/{treeID}/questions/{questionID}/options/{optionID}/move/{position}', '\Cme\Route\Options:move');
 
         // ends
         $this->get('/trees/{treeID}/ends', '\Cme\Route\Ends:getAll');

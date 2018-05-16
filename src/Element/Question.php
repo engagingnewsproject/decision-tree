@@ -75,6 +75,11 @@ class Question extends Element {
         return $this;
     }
 
+    public function setOptions($options = false) {
+        $this->options = $this->getEls('option', $options);
+        return $this->options;
+    }
+
     public function getOptions() {
         return $this->options;
     }
@@ -127,15 +132,28 @@ class Question extends Element {
 
         $result = $this->db->updateElement($question);
 
-        // TODO: Save options (attach an option to a question)?? Or, actually, I don't think we can do that. It needs to be at the option level.
-
-        // update the order of the options
-        $this->updateOrder($this->getOptions());
+        $this->saveOptions();
 
         // rebuild it so we get the fresh copy
         $this->build($this->getID());
         // return the original update result
         return $result;
+    }
+
+    public function saveOptions() {
+        $this->updateContainer($this->getID(), $this->getOptions());
+
+        // update the order of the options
+        $this->saveOrder();
+    }
+
+    public function addOption($option) {
+        // validate option
+        $validate = new Validate();
+        if($validate->optionID($option->getID())) {
+            $this->options[] = $option->getID();
+        }
+        return;
     }
 
     /**
@@ -168,9 +186,18 @@ class Question extends Element {
         return true;
     }
 
+    public function saveOrder() {
+        // save the order of the options for this question
+        return $this->updateOrder($this->getOptions());
+    }
+
     public function array($removeKeys = []) {
         $removeKeys = array_merge($removeKeys, ['treeID']);
         return parent::array($removeKeys);
+    }
+
+    public function move($position) {
+        return $this->reorder('question', $position);
     }
 
 }

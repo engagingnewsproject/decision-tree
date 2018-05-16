@@ -50,7 +50,7 @@ class Questions extends Trees
         $question['owner'] = $this->user['userID'];
         // add the user to the question data as the owner
         if(isset($this->data['owner'])) {
-            $question['owner'] = $$this->data['owner'];
+            $question['owner'] = $this->data['owner'];
         }
 
         // add in the treeID

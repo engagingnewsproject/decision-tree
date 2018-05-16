@@ -1125,7 +1125,8 @@ class DB extends PDO {
 
         // find the element and make sure the owner owns this element
         $validate = new Validate();
-        $validate->elOwner($elID, $this->user);
+        $validate->elOwner($parentID, $this->user);
+        $validate->elOwner($childID, $this->user);
 
         return $this->insert([
             'vals'      => [
@@ -1139,25 +1140,79 @@ class DB extends PDO {
 
 
     /**
-     * Updates the order of an element
+     * Updates the parent container of an element
+     * Parent containers can have multiple children. Children can only have one parent.
+     * We're updating based on the child ID since a child can only have one parent, but parents can have multiple children.
      *
-     * @param $elID ID
-     * @param $order
      * @return
      */
-    public function updateContainer($containerID, $parentID, $childID) {
+    public function updateContainer($parentID, $childID) {
+        // validate the user
+        Utility\validateUser($this->user);
+
+        // find the element and make sure the owner owns this element
+        $validate = new Validate();
+        $validate->elOwner($parentID, $this->user);
+        $validate->elOwner($childID, $this->user);
+
+        return $this->update([
+            'vals'      => ['elID' => $parentID],
+            'required'  => ['elID'],
+            'table'     => $this->tables['treeElementContainer'],
+            'where'     => ['elIDChild' => $childID]
+        ]);
+    }
+
+
+    /**
+     * Inserts a destination row
+     *
+     * @param $elID (int) element ID
+     * @param $destinationID (int) element ID
+     * @return
+     */
+    public function insertDestination($elID, $destinationID) {
         // validate the user
         Utility\validateUser($this->user);
 
         // find the element and make sure the owner owns this element
         $validate = new Validate();
         $validate->elOwner($elID, $this->user);
+        $validate->elOwner($destinationID, $this->user);
+
+        return $this->insert([
+            'vals'      => [
+                            'elID' => $elID,
+                            'elIDDestination' => $destinationID
+            ],
+            'required'  => ['elID', 'elIDDestination'],
+            'table'     => $this->tables['treeElementDestination']
+        ]);
+    }
+
+
+    /**
+     * Updates the destination of an element
+     * Elements can only have one destination, but a destination can have multiple ways of arriving at it. We update by the parent (elID) since there can be only one of those.
+     *
+     * @return
+     */
+    public function updateDestination($elID, $destinationID) {
+        // validate the user
+        Utility\validateUser($this->user);
+
+        // find the element and make sure the owner owns this element
+        $validate = new Validate();
+        $validate->elOwner($elID, $this->user);
+        $validate->elOwner($destinationID, $this->user);
 
         return $this->update([
-            'vals'      => ['elOrder' => $elOrder],
-            'required'  => ['elOrder'],
-            'table'     => $this->tables['treeElementContainer'],
+            'vals'      => ['elIDDestination' => $destinationID],
+            'required'  => ['elIDDestination'],
+            'table'     => $this->tables['treeElementDestination'],
             'where'     => ['elID' => $elID]
         ]);
     }
+
+
 }

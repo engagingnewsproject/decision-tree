@@ -46,7 +46,6 @@ class Option extends Element {
         $optionID = $option['optionID'];
         // set the object values
         $this->ID = $optionID;
-        $this->setTreeID($option['treeID']);
         $this->setQuestionID($option['questionID']);
         $this->setTitle($option['title']);
         $this->setDestination($option['destinationID'], $option['destinationType']);
@@ -67,8 +66,7 @@ class Option extends Element {
             $this->build($data['ID']);
         }
 
-        (isset($data['treeID'])) ? $this->setTreeID($data['treeID']) : false;
-        (isset($data['questionID'])) ? $this->setTreeID($data['questionID']) : false;
+        (isset($data['questionID'])) ? $this->setQuestionID($data['questionID']) : false;
         (isset($data['title'])) ? $this->setTitle($data['title']) : false;
         (isset($data['destinationID']) && $data['destinationType']) ? $this->setDestination($data['destinationID'], $data['destinationType']) : false;
 
@@ -89,9 +87,71 @@ class Option extends Element {
       return $this->questionID;
     }
 
+    protected function create() {
+        $option = [];
+        // create it off the object
+        // map the option object to the option parameters in the DB
+        $option['elTitle'] = $this->getTitle();
+        $option['elTypeID'] = $this->db->getElementTypeID('option');
+
+        $question = new Question($this->db, $this->getQuestionID());
+        $option['treeID'] = $question->getTreeID();
+        if(!Utility\isID($this->getDestinationID())) {
+          throw new \Error('Option must have a destination.');
+        }
+
+
+
+        $result = $this->db->createElement($option);
+
+        // it's hopefully returning the ID of the option it inserted
+        if(!Utility\isID($result)) {
+            return $result;
+        }
+
+        $optionID = $result;
+
+        $order = count($question->getOptions());
+        $this->db->insertOrder($optionID, $order);
+
+        // assign it to the question container
+        $this->db->insertContainer($this->getQuestionID(), $optionID);
+
+        $this->db->insertDestination($optionID, $this->getDestinationID());
+
+        // we're good! Build the option again and return it
+        return $this->build($optionID);
+    }
+
+    protected function update() {
+        $question = new Question($this->db, $this->getQuestionID());
+        // map the question object to the database
+        $option = [
+            'elID'          => $this->getID(),
+            'elTitle'       => $this->getTitle(),
+            'treeID'        => $question->getTreeID()
+        ];
+
+        $result = $this->db->updateElement($option);
+        $question->addOption($this);
+        // update the question container
+        $question->saveOptions();
+        // ORDER gets updated by the Question object
+        // update the destination
+        $this->db->updateDestination($this->getID(), $this->getDestinationID());
+        // rebuild it so we get the fresh copy
+        $this->build($this->getID());
+        // return the original update result
+        return $result;
+    }
+
     public function array($removeKeys = []) {
         $removeKeys = array_merge($removeKeys, ['treeID', 'questionID']);
         return parent::array($removeKeys);
+    }
+
+    public function move($position) {
+        return $this->reorder('option', $position);
     }
 
 }

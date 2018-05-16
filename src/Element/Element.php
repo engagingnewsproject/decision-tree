@@ -62,13 +62,28 @@ class Element {
         return $this->owner;
     }
 
-    public function setDestination($destinationID, $destinationType) {
+    public function setDestination($destinationID, $destinationType = false) {
         $validate = new Validate();
 
-        if($validate->destinationID($destinationID, ['elType'=>$destinationType])) {
-            $this->destinationID = $destinationID;
-            $this->destinationType = $destinationType;
+        if($destinationType === false) {
+            $whitelist = ['end', 'question'];
+            // if no $destinationType was passed, check all possible destination types (question and end)
+            foreach($whitelist as $elType) {
+                $isValid = $validate->elTypeID($elType, $destinationID);
+                if($isValid === true) {
+                    // if we have a valid destination ID, set it and break out
+                    $destinationType = $elType;
+                    break;
+                }
+            }
+        } else {
+            if(!$validate->destinationID($destinationID, ['elType'=>$destinationType])) {
+                return;
+            }
         }
+
+        $this->destinationID = $destinationID;
+        $this->destinationType = $destinationType;
     }
 
     public function getDestinationID() {
@@ -149,12 +164,84 @@ class Element {
     /**
      * Save reordered elements
      *
-     * @param $array of element IDs
+     * @param $IDs of element IDs
      */
-    protected function updateOrder($array) {
+    protected function updateOrder($IDs) {
         // takes an array of element IDs and saves their current order
-        foreach($array as $order => $elID) {
+        foreach($IDs as $order => $elID) {
             $this->db->updateOrder($elID, $order);
         }
+    }
+
+    /**
+     * Saves elements to a parentID container
+     *
+     * @param $childIDs of element IDs
+     */
+    protected function updateContainer($parentID, $childIDs) {
+        // takes an array of element IDs and saves their current order
+        foreach($childIDs as $childID) {
+            $this->db->updateContainer($parentID, $childID);
+        }
+    }
+
+    /**
+     * Helper for getting element
+     *
+     */
+    public function getEls($elType, $els = false) {
+        $dbGetter = 'get'.ucfirst($elType).'IDs';
+        if($els === false) {
+            return $this->db->$dbGetter($this->getID());
+        }
+
+        // if they passed els, make sure every el is in the array from the database
+        //use a clone here so we don't actually sort the passed els array
+        $elsClone = $els;
+        $dbEls = $this->db->$dbGetter($this->getID());
+        if(sort($dbEls) == sort($elsClone)) {
+            return $els;
+        } else {
+            throw new \Error('Passed '.$elType.'s do not match '.$elType.'s from database.');
+        }
+    }
+
+    /**
+     * Save the reordered elements
+     *
+     */
+    public function reorder($elType, $position) {
+        $whitelist = ['question', 'end', 'option', 'group', 'start'];
+        if(!in_array($elType, $whitelist)) {
+            throw new \Error('$elType not allowed.');
+        }
+        // set our dynamic names:
+        // ex: getQuestions
+        $getter = 'get'.ucfirst($elType).'s';
+        // ex: setQuestions
+        $setter = 'set'.ucfirst($elType).'s';
+        // ex: new Question
+        $objName = '\Cme\Element\\'.ucfirst($elType);
+        // if it's an option, the interaction needs to work with the question, otherwise the tree
+        if($elType === 'option') {
+            $parentObj = new Question($this->db, $this->getQuestionID());
+        } else {
+            $parentObj = new Tree($this->db, $this->getTreeID());
+        }
+
+
+        // get all the els
+        $els = $parentObj->$getter();
+        // move it
+        $els = Utility\move($els, $this->getID(), $position);
+
+        // set this el to that position on the tree
+        $parentObj->$setter($els);
+
+        // save el order
+        $this->updateOrder($els);
+
+        // rebuild the el
+        return $this->build($this->getID());
     }
 }
