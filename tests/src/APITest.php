@@ -244,16 +244,15 @@ final class APITest extends TreeTestCase
         $optionOneUpdated = json_decode(
             Utility\putEndpoint('trees/'.$tree->getID().'/questions/'.$question->getID().'/options/'.$option->getID(), $data)
         );
-
         //rebuild from the database so we can check for the new questionID
         $option = new Option($this->db, $option->getID());
         $this->assertEquals($option->getQuestionID(), $questionTwo->getID());
         $this->assertEquals($option->getDestinationID(), $questionThree->getID());
-
         // rebuild the question
         $question = new Question($this->db, $question->getID());
-        var_dump($question->array());
         // check that the numbers line-up now. Option three should now be order = 1
+        // rebuild it to validate
+        $optionThree = new Option($this->db, $optionThree->getID());
         $this->assertEquals($optionThree->getOrder(), 1);
         // check that it's NOT on the question it was before
         $this->assertEquals($question->getOptions(), [$optionTwo->getID(), $optionThree->getID()]);

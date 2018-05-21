@@ -88,19 +88,27 @@ class Option extends Element {
     }
 
     protected function create() {
+
+        $validate = new Validate();
+        // early validation
+        if(!$validate->questionID($this->getQuestionID())) {
+          throw new \Error('Option must be a part of a question');
+        }
+
+        if(!$validate->destinationID($this->getDestinationID())) {
+          throw new \Error('Option must have a valid destination (Question ID or End ID).');
+        }
+
         $option = [];
         // create it off the object
         // map the option object to the option parameters in the DB
         $option['elTitle'] = $this->getTitle();
         $option['elTypeID'] = $this->db->getElementTypeID('option');
 
+        // get the question and add this as an option to that question
         $question = new Question($this->db, $this->getQuestionID());
+        // add the treeID in from the question
         $option['treeID'] = $question->getTreeID();
-        if(!Utility\isID($this->getDestinationID())) {
-          throw new \Error('Option must have a destination.');
-        }
-
-
 
         $result = $this->db->createElement($option);
 
@@ -117,6 +125,7 @@ class Option extends Element {
         // assign it to the question container
         $this->db->insertContainer($this->getQuestionID(), $optionID);
 
+        // insert the destination row
         $this->db->insertDestination($optionID, $this->getDestinationID());
 
         // we're good! Build the option again and return it
@@ -124,19 +133,52 @@ class Option extends Element {
     }
 
     protected function update() {
+        // get this option from the DB so we can figure out what got updated.
+        $original = new Option($this->db, $this->getID());
+
         $question = new Question($this->db, $this->getQuestionID());
-        // map the question object to the database
-        $option = [
-            'elID'          => $this->getID(),
-            'elTitle'       => $this->getTitle(),
-            'treeID'        => $question->getTreeID()
+
+        // map the option object to the database.
+        // It'll end up looking something like this, depending on what needs updated.
+        //
+        // $option = [
+        //    'elID'          => $this->getID(),
+        //    'elTitle'       => $this->getTitle(),
+        //    'treeID'        => $question->getTreeID()
+        // ];
+        //
+        $update = [
+          'elID'  => $this->getID(),
         ];
 
-        $result = $this->db->updateElement($option);
-        $question->addOption($this);
-        // update the question container
-        $question->saveOptions();
-        // ORDER gets updated by the Question object
+        // see if the title has changed
+        if($original->getTitle() !== $this->getTitle()) {
+          $update['elTitle'] = $this->getTitle();
+        }
+
+        // see if the treeID has changed
+        if($original->getTreeID() !== $this->getTreeID()) {
+          $update['treeID'] = $this->getTreeID();
+        }
+
+        $result = $this->db->updateElement($update);
+
+        // check if this option is already in the parent question
+        if(!in_array($this->getID(), $question->getOptions())) {
+          $question->addOption($this);
+          // update the question container
+          $question->saveOptions();
+          // ORDER gets updated by the Question object
+          // since this option got moved to a new question, let's check if the original question matched this ID or not.
+          if((int) $original->getQuestionID() !== (int) $this->getQuestionID()) {
+            // the option is a part of a different question now, so update the original question so its option order is up to date
+            $oldQuestionParent = new Question($this->db, $original->getQuestionID());
+            $oldQuestionParent->saveOptions();
+          }
+        }
+
+        //
+
         // update the destination
         $this->db->updateDestination($this->getID(), $this->getDestinationID());
         // rebuild it so we get the fresh copy

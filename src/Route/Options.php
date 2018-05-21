@@ -72,12 +72,12 @@ class Options extends Questions
             $option['owner'] = $this->data['owner'];
         }
 
-        // add in the questionID
+        // add in the questionID from the route
         $option['questionID'] = $this->questionID;
 
         $option = new Option($this->db, $option);
-        // allow them to move questions
-        $keys = ['title', 'destination', 'questionID'];
+
+        $keys = ['title', 'destination'];
         $option = $this->dynamicSet($this->data, $keys, $option);
 
         $option = $option->save();
@@ -93,6 +93,7 @@ class Options extends Questions
         // init data
         $this->init($request);
 
+        // allow them to move questions by passing a separate question ID
         $keys = ['questionID', 'destination', 'title'];
         $this->option = $this->dynamicSet($this->data, $keys, $this->option);
 

@@ -216,26 +216,25 @@ class Element {
             throw new \Error('$elType not allowed.');
         }
         // set our dynamic names:
-        // ex: getQuestions
+        // ex: getQuestions, getEnds, etc
         $getter = 'get'.ucfirst($elType).'s';
-        // ex: setQuestions
+        // ex: setQuestions, getEnds, etc
         $setter = 'set'.ucfirst($elType).'s';
-        // ex: new Question
+        // ex: new Question, new End, etc
         $objName = '\Cme\Element\\'.ucfirst($elType);
-        // if it's an option, the interaction needs to work with the question, otherwise the tree
+        // if it's an option, the interaction needs to work with the question, otherwise it uses the tree as its parent
         if($elType === 'option') {
             $parentObj = new Question($this->db, $this->getQuestionID());
         } else {
             $parentObj = new Tree($this->db, $this->getTreeID());
         }
 
-
         // get all the els
         $els = $parentObj->$getter();
         // move it
         $els = Utility\move($els, $this->getID(), $position);
 
-        // set this el to that position on the tree
+        // set this el to that position on the parent (tree or question)
         $parentObj->$setter($els);
 
         // save el order
