@@ -150,7 +150,7 @@ class Question extends Element {
     public function addOption($option) {
         // validate option
         $validate = new Validate();
-        if($validate->optionID($option->getID())) {
+        if(!in_array($option->getID(), $this->getOptions()) && $validate->optionID($option->getID())) {
             $this->options[] = $option->getID();
         }
         return;
