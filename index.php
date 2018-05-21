@@ -85,6 +85,7 @@ $app->group('/api', function() {
         $this->post('/trees/{treeID}/questions/{questionID}/options', '\Cme\Route\Options:create');
         $this->put('/trees/{treeID}/questions/{questionID}/options/{optionID}', '\Cme\Route\Options:update');
         $this->put('/trees/{treeID}/questions/{questionID}/options/{optionID}/move/{position}', '\Cme\Route\Options:move');
+        $this->delete('/trees/{treeID}/questions/{questionID}/options/{optionID}', '\Cme\Route\Options:delete');
 
         // ends
         $this->get('/trees/{treeID}/ends', '\Cme\Route\Ends:getAll');

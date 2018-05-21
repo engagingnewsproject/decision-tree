@@ -22,6 +22,10 @@ class Element {
         return $this;
     }
 
+    public function rebuild() {
+        return $this->build($this->getID());
+    }
+
     public function getID() {
         return $this->ID;
     }

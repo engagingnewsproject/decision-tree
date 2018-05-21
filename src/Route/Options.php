@@ -102,6 +102,15 @@ class Options extends Questions
         return $this->return($this->option->array(), $response);
     }
 
+    public function delete($request, $response) {
+        // init data
+        $this->init($request);
+
+        $result = $this->option->delete();
+
+        return $this->return($result, $response);
+    }
+
     // Move an option from one position to another
     public function move($request, $response) {
         // init data

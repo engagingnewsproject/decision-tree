@@ -318,7 +318,8 @@ class DB extends PDO {
         $params = [":treeID" => $treeID];
 
         $sql = "SELECT ".$this->getColumns['tree']." from ".$this->views['tree']."
-                WHERE treeID = :treeID";
+                WHERE treeID = :treeID
+                AND deleted = 0";
         // return the found tree row
         return $this->fetchOne($sql, $params);
     }
@@ -333,7 +334,8 @@ class DB extends PDO {
         $params = [":treeSlug" => $treeSlug];
 
         $sql = "SELECT ".$this->getColumns['tree']." from ".$this->views['tree']."
-                WHERE treeSlug = :treeSlug";
+                WHERE treeSlug = :treeSlug
+                AND deleted = 0";
         // return the found tree row
         return $this->fetchOne($sql, $params);
     }

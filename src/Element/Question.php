@@ -38,7 +38,7 @@ class Question extends Element {
         $validate = new Validate();
         //print_r($questionID);
         if($validate->questionID($questionID) !== true) {
-            return false;
+            throw new \Error('Question does not exist.');
         }
 
         $question = $this->db->getQuestion($questionID);
@@ -163,25 +163,22 @@ class Question extends Element {
         $treeID = $this->getTreeID();
         // delete the options
         foreach($this->getOptions() as $optionID) {
-            $delete = $this->db->deleteElement(
-                ['elID'=>$optionID, 'treeID' => $treeID]
-            );
-            if($delete !== true) {
-                return false;
-            }
+            $option = new Option($this->db, $optionID);
+            $option->delete();
         }
+
         // delete the question
         $delete = $this->db->deleteElement(
             ['elID'=>$this->getID(), 'treeID' => $treeID]
         );
         if($delete !== true) {
-            return false;
+            throw new \Error('Could not delete questionID '.$optionID);
         }
 
         // get the tree (shouldn't include the new question)
         $tree = new Tree($this->db, $this->getTreeID());
         // save it so the order updates
-        $tree->save();
+        $tree->updateOrder($tree->getQuestions());
 
         return true;
     }

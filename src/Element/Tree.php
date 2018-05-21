@@ -38,7 +38,7 @@ class Tree extends Element {
         $validate = new Validate();
         //print_r($tree);
         if($validate->tree($tree) !== true) {
-            return false;
+            throw new \Error('Tree does not exist.');
         }
 
         $tree = $this->db->getTree($tree);

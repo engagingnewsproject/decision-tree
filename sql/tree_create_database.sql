@@ -402,9 +402,9 @@ CREATE TABLE IF NOT EXISTS `tree`.`treeStart` (`elID` INT, `treeID` INT, `elType
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `tree`.`treeAPI`;
 USE `tree`;
-CREATE  OR REPLACE VIEW `treeAPI` (treeID, treeSlug, title, content, createdAt, updatedAt, owner) AS
+CREATE  OR REPLACE VIEW `treeAPI` (treeID, treeSlug, title, content, createdAt, updatedAt, owner, deleted) AS
     SELECT
-        treeID, treeSlug, treeTitle, treeContent, treeCreatedAt, treeUpdatedAt, treeOwner
+        treeID, treeSlug, treeTitle, treeContent, treeCreatedAt, treeUpdatedAt, treeOwner, treeDeleted
     FROM
         tree.tree;
 

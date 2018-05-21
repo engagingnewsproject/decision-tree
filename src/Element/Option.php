@@ -177,14 +177,30 @@ class Option extends Element {
           }
         }
 
-        //
-
         // update the destination
         $this->db->updateDestination($this->getID(), $this->getDestinationID());
         // rebuild it so we get the fresh copy
         $this->build($this->getID());
         // return the original update result
         return $result;
+    }
+
+    public function delete() {
+        $question = new Question($this->db, $this->getQuestionID());
+        $treeID = $question->getTreeID();
+        // delete the option
+        $delete = $this->db->deleteElement(
+            ['elID'=>$this->getID(), 'treeID' => $treeID]
+        );
+        if($delete !== true) {
+            throw new \Error('Could not delete optionID '.$optionID);
+        }
+
+        // update the question to not include this option)
+        // save it so the order updates
+        $question->save();
+
+        return true;
     }
 
     public function array($removeKeys = []) {
