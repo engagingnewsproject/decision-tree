@@ -123,6 +123,10 @@ class Question extends Element {
     }
 
     protected function update() {
+        $result = false;
+        // get this option from the DB so we can figure out what got updated.
+        $original = new Question($this->db, $this->getID());
+
         // map the question object to the database
         $question = [
             'elID'        => $this->getID(),
@@ -130,12 +134,19 @@ class Question extends Element {
             'treeID'      => $this->getTreeID()
         ];
 
-        $result = $this->db->updateElement($question);
+        // the only thing that we allow to change here is the Title
+        if($original->getTitle() !== $this->getTitle()) {
+            $result = $this->db->updateElement($question);
+        }
 
-        $this->saveOptions();
+        // if the options or order of options changed, save it
+        if($original->getOptions() !== $this->getOptions()) {
+            $this->saveOptions();
+        }
 
         // rebuild it so we get the fresh copy
-        $this->build($this->getID());
+        $this->rebuild();
+
         // return the original update result
         return $result;
     }
