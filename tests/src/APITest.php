@@ -17,20 +17,69 @@ use Cme\Element\Option as Option;
  */
 final class APITest extends TreeTestCase
 {
-    public $tree, // place to store a temporary tree we've created for testing
+    public $data = []; // sets user for api calls
+
+    public static
+           $treeTitle, // string of title we're using to create tre
+           $tree, // place to store a temporary tree we've created for testing
            $options = [], // options we created during test
-           $questions = []; // questions we created during test
-    protected function setUp() {
-        $this->db = new Database\DB();
-        // get trees, but limit to 3
-        $this->trees = array_slice($this->db->getTrees(), 0, 3);
+           $questions = [], // questions we created during test
+           $ends = [], // questions we created during test
+           $groups = [],
+           $db; // database connection
+
+    public static function setUpBeforeClass() {
+        self::$db = new Database\DB();
+
+        // create a new tree via the API
+        self::$treeTitle = self::randomString();
+        self::$tree = self::createTree(self::$treeTitle);
+        // create a question via the API
+        self::$questions['one'] = self::createQuestion(self::$tree->getID(), 'Question One Title');
+        self::$questions['two'] = self::createQuestion(self::$tree->getID(), 'Question Two Title');
+        self::$questions['three'] = self::createQuestion(self::$tree->getID(), 'Question Three Title');
+
+        // create options
+        self::$options['one'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option One Title','destination'=>self::$questions['two']->getID()]);
+        self::$options['two'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option Two Title','destination'=>self::$questions['two']->getID()]);
+        self::$options['three'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option Three Title','destination'=>self::$questions['three']->getID()]);
+
+    }
+
+    public function setUp() {
+        $this->data = [
+            'user' => self::getAdminUser()
+        ];
+
+        // rebuild each of the trees so they're always up to date
+        try {
+            if(!empty(self::$tree)) {
+                self::$tree->rebuild();
+            }
+
+            if(!empty(self::$questions)) {
+                foreach(self::$questions as $question) {
+                    $question->rebuild();
+                }
+            }
+            if(!empty(self::$options)) {
+                foreach(self::$options as $option) {
+                    $option->rebuild();
+                }
+            }
+
+        } catch(\Error $e) {
+            echo $e->getMessage();
+        }
+
+
     }
 
     /**
      * @covers api/v1/trees
      */
     public function testGetTrees() {
-        $trees = $this->db->getTrees();
+        $trees = self::$db->getTrees();
         $this->assertEquals(Utility\getEndpoint('trees'), json_encode($trees));
     }
 
@@ -39,7 +88,7 @@ final class APITest extends TreeTestCase
      * @dataProvider APITreeProvider
      */
     public function testAPITree($treeID) {
-        $tree = new Tree($this->db, $treeID);
+        $tree = new Tree(self::$db, $treeID);
 
         $this->assertEquals(Utility\getEndpoint('trees/'.$treeID), json_encode($tree->array()));
     }
@@ -74,7 +123,7 @@ final class APITest extends TreeTestCase
         $elements = [];
         foreach($els as $el) {
             $el['ID'] = $el[$elType.'ID'];
-            $elObject = new $elObject($this->db, $el);
+            $elObject = new $elObject(self::$db, $el);
             $elements[] = $elObject->array();
         }
         $this->assertEquals(Utility\getEndpoint($route), json_encode($elements));
@@ -87,7 +136,7 @@ final class APITest extends TreeTestCase
 
             // get the object
             $el['ID'] = $el[$elType.'ID'];
-            $elObject = new $elObject($this->db, $el);
+            $elObject = new $elObject(self::$db, $el);
             $this->assertEquals($elFromEndpoint, json_encode($elObject->array()));
 
         }
@@ -129,7 +178,7 @@ final class APITest extends TreeTestCase
             $questionID = $question['questionID'];
             $route = 'trees/'.$treeID.'/questions/'.$questionID.'/options';
 
-            $optionIDs = $this->db->getOptionIDs($questionID);
+            $optionIDs = self::$db->getOptionIDs($questionID);
 
             if(empty($optionIDs)) {
                 $this->assertEquals(Utility\getEndpoint($route), json_encode([]));
@@ -138,7 +187,7 @@ final class APITest extends TreeTestCase
 
             $optionObjs = [];
             foreach($optionIDs as $optionID) {
-                $option = new Element\Option($this->db, $optionID);
+                $option = new Element\Option(self::$db, $optionID);
                 // check that the individual option matches the endpoint
                 $this->assertEquals(Utility\getEndpoint($route.'/'.$optionID), json_encode($option->array()));
                 // ad to the options array
@@ -150,302 +199,261 @@ final class APITest extends TreeTestCase
         }
     }
 
-
-    /**
-     * Test creating a tree
-     * @covers api/v1/trees/ POST
+    /*
+     * we're going to check to make sure the tree we
+     * created in set-up indeed did get created
+     *
+     * @covers POST api/v1/trees
+     * @provider from setUpBeforeClass()
      */
     public function testAPITreeCreate() {
-        // create a new tree
-        $title = $this->randomString();
-        // create a new tree
-        $tree = $this->createTree($title);
-
+        // check that it's an object
+        $this->assertTrue(is_object(self::$tree));
+        // do we have an id?
+        $this->assertTrue(Utility\isID(self::$tree->getID()));
         // compare details
-        $this->assertEquals($tree->getTitle(),  $title);
-        $this->assertEquals($tree->getOwner(),  $this->getAdminUser()['userID']);
-        $this->assertEquals($tree->getSlug(), Utility\slugify($title));
+        $this->assertEquals(self::$tree->getTitle(),  self::$treeTitle);
+        $this->assertEquals(self::$tree->getOwner(),  self::getAdminUser()['userID']);
+        $this->assertEquals(self::$tree->getSlug(), Utility\slugify(self::$treeTitle));
+    }
+
+    /*
+     * we're going to check to make sure the questions we
+     * created in set-up indeed did get created
+     *
+     * @covers POST api/v1/trees/{treeID}/questions
+     * @provider from setUpBeforeClass()
+     */
+    public function testAPIQuestionCreate() {
+        $i = 0;
+        foreach(self::$questions as $question) {
+            // check that it's an object
+            $this->assertTrue(is_object($question));
+            // do we have an id?
+            $this->assertTrue(Utility\isID($question->getID()));
+            // check order
+            $this->assertEquals($question->getOrder(), $i);
+            $i++;
+        }
+
+    }
+
+    /*
+     * we're going to check to make sure the questions we
+     * created in set-up indeed did get created
+     *
+     * @covers POST api/v1/trees/{treeID}/questions/{questionID}/options
+     * @provider from setUpBeforeClass()
+     */
+    public function testAPIOptionCreate() {
+        $i = 0;
+        foreach(self::$options as $key => $option) {
+            // check that it's an object
+            $this->assertTrue(is_object($option));
+            // do we have an id?
+            $this->assertTrue(Utility\isID($option->getID()));
+            // does the order match the order it was created?
+            $this->assertEquals($option->getOrder(), $i);
+
+            // check destinations. Options one and two go to question two as their destination
+            if($key === 'one' || $key === 'two') {
+                $this->assertEquals($option->getDestinationID(), self::$questions['two']->getID());
+                $this->assertEquals($option->getDestinationType(), 'question');
+            }
+
+            $i++;
+        }
     }
 
 
-    /**
-     * Test Question and Option API methods
-     * @covers api/v1/trees/ POST
-     */
-    public function testAPIQuestionAndOptions() {
-        $data = [
-            'user' => $this->getAdminUser()
-        ];
-        // create a tree
-        $this->tree = $this->createTree($this->randomString());
+    public function testAPIQuestionUpdate() {
 
-        //*******************************************//
-        //                                           //
-        //       TEST CREATING QUESTIONS!            //
-        //                                           //
-        //*******************************************//
-        // create a question
-        $this->questions['one'] = $this->createQuestion($this->tree->getID(), 'Question One Title');
-        $this->questions['two'] = $this->createQuestion($this->tree->getID(), 'Question Two Title');
-        $this->questions['three'] = $this->createQuestion($this->tree->getID(), 'Question Three Title');
+        // update question title
+        $this->data['title'] = self::$questions['one']->getTitle().' Updated';
+        $questionOneUpdated = json_decode(
+            Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.self::$questions['one']->getID(), $this->data)
+        );
 
-        // check order
-        $this->assertEquals($this->questions['one']->getOrder(), 0);
-        $this->assertEquals($this->questions['two']->getOrder(), 1);
+        $this->assertEquals($questionOneUpdated->title, $this->data['title']);
+    }
 
-
-        //*******************************************//
-        //                                           //
-        //         TEST MOVING QUESTIONS!            //
-        //                                           //
-        //*******************************************//
-
+    public function testAPIQuestionMove() {
         // move first to end
         $questionOneMoved = json_decode(
-            Utility\putEndpoint('trees/'.$this->tree->getID().'/questions/'.$this->questions['one']->getID().'/move/last', $data)
+            Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.self::$questions['one']->getID().'/move/last', $this->data)
         );
 
         $this->assertEquals($questionOneMoved->order, 2);
 
         // get the other question and make sure it's now first
-        $this->questions['two'] = $this->getQuestionFromEndpoint($this->tree->getID(), $this->questions['two']->getID());
+        self::$questions['two'] = $this->getQuestionFromEndpoint(self::$tree->getID(), self::$questions['two']->getID());
 
-        $this->assertEquals($this->questions['two']->getOrder(), 0);
+        $this->assertEquals(self::$questions['two']->getOrder(), 0);
+    }
 
-        //*******************************************//
-        //                                           //
-        //       TEST UPDATING QUESTION TITLE!       //
-        //                                           //
-        //*******************************************//
 
-        // update question title
-        $data['title'] = $this->questions['one']->getTitle().' Updated';
-        $questionOneUpdated = json_decode(
-            Utility\putEndpoint('trees/'.$this->tree->getID().'/questions/'.$this->questions['one']->getID(), $data)
+    public function testAPIOptionUpdate() {
+
+
+        $option = self::$options['one'];
+        $questionID = $option->getQuestionID();
+        $question = new Question(self::$db, $questionID);
+        $treeID = $question->getTreeID();
+
+        // update option title
+        $this->data['title'] = $option->getTitle().' Updated';
+
+        $optionOneUpdated = json_decode(
+            Utility\putEndpoint('trees/'.$treeID.'/questions/'.$questionID.'/options/'.$option->getID(), $this->data)
         );
 
-        $this->assertEquals($questionOneUpdated->title, $data['title']);
-
-        //*******************************************//
-        //                                           //
-        //         TEST CREATING OPTIONS!            //
-        //                                           //
-        //*******************************************//
-
-        // create an option
-        $this->options['one'] = $this->createOption($this->tree->getID(), $this->questions['one']->getID(), ['title'=>'Option One Title','destination'=>$this->questions['two']->getID()]);
-        $this->options['two'] = $this->createOption($this->tree->getID(), $this->questions['one']->getID(), ['title'=>'Option Two Title','destination'=>$this->questions['two']->getID()]);
-        $this->options['three'] = $this->createOption($this->tree->getID(), $this->questions['one']->getID(), ['title'=>'Option Three Title','destination'=>$this->questions['three']->getID()]);
-
-        // check order
-        $this->assertEquals($this->options['one']->getOrder(), 0);
-        $this->assertEquals($this->options['two']->getOrder(), 1);
-
-        // check destinations
-        $this->assertEquals($this->options['one']->getDestinationID(), $this->questions['two']->getID());
-        $this->assertEquals($this->options['two']->getDestinationID(), $this->questions['two']->getID());
-        $this->assertEquals($this->options['two']->getDestinationType(), 'question');
+        $this->assertEquals($optionOneUpdated->title, $this->data['title']);
+    }
 
 
 
-        //*******************************************//
-        //                                           //
-        //         TEST MOVING OPTIONS!              //
-        //                                           //
-        //*******************************************//
-
+    public function testAPIOptionMove() {
         // move first to second
         $optionOneMoved = json_decode(
-            Utility\putEndpoint('trees/'.$this->tree->getID().'/questions/'.$this->questions['one']->getID().'/options/'.$this->options['one']->getID().'/move/1', $data)
+            Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.self::$questions['one']->getID().'/options/'.self::$options['one']->getID().'/move/1', $this->data)
         );
 
         $this->assertEquals($optionOneMoved->order, 1);
 
         // get the other option and make sure it's now first
-        $this->options['two'] = $this->getOptionFromEndpoint($this->tree->getID(), $this->questions['one']->getID(), $this->options['two']->getID());
+        self::$options['two'] = $this->getOptionFromEndpoint(self::$tree->getID(), self::$questions['one']->getID(), self::$options['two']->getID());
 
-        $this->assertEquals($this->options['two']->getOrder(), 0);
+        $this->assertEquals(self::$options['two']->getOrder(), 0);
+    }
 
-
-        //*******************************************//
-        //                                           //
-        //       TEST UPDATING OPTION TITLE!         //
-        //                                           //
-        //*******************************************//
-
-        // update option title
-        $data['title'] = $this->options['one']->getTitle().' Updated';
+    public function testAPIOptionMoveToDifferentQuestion() {
+        $this->data['questionID'] = self::$questions['two']->getID();
+        $this->data['destination'] = self::$questions['three']->getID();
         $optionOneUpdated = json_decode(
-            Utility\putEndpoint('trees/'.$this->tree->getID().'/questions/'.$this->questions['one']->getID().'/options/'.$this->options['one']->getID(), $data)
-        );
-
-
-        //*******************************************//
-        //                                           //
-        //       TEST MOVING OPTIONS                 //
-        //       TO NEW QUESTION                     //
-        //*******************************************//
-
-        // move an option to another question
-        $data['questionID'] = $this->questions['two']->getID();
-        $data['destination'] = $this->questions['three']->getID();
-        $optionOneUpdated = json_decode(
-            Utility\putEndpoint('trees/'.$this->tree->getID().'/questions/'.$this->questions['one']->getID().'/options/'.$this->options['one']->getID(), $data)
+            Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.self::$questions['one']->getID().'/options/'.self::$options['one']->getID(), $this->data)
         );
         //rebuild from the database so we can check for the new questionID
-        $this->options['one'] = $this->options['one']->rebuild();
-        $this->assertEquals($this->options['one']->getQuestionID(), $this->questions['two']->getID());
-        $this->assertEquals($this->options['one']->getDestinationID(), $this->questions['three']->getID());
+        self::$options['one'] = self::$options['one']->rebuild();
+        $this->assertEquals(self::$options['one']->getQuestionID(), self::$questions['two']->getID());
+        $this->assertEquals(self::$options['one']->getDestinationID(), self::$questions['three']->getID());
         // rebuild the question
-        $this->questions['one'] = $this->questions['one']->rebuild();
+        self::$questions['one'] = self::$questions['one']->rebuild();
         // check that the numbers line-up now. Option three should now be order = 1
         // rebuild it to validate
-        $this->options['three'] = $this->options['three']->rebuild();
-        $this->assertEquals($this->options['three']->getOrder(), 1);
+        self::$options['three'] = self::$options['three']->rebuild();
+        $this->assertEquals(self::$options['three']->getOrder(), 1);
         // check that it's NOT on the question it was before
-        $this->assertEquals($this->questions['one']->getOptions(), [$this->options['two']->getID(), $this->options['three']->getID()]);
+        $this->assertEquals(self::$questions['one']->getOptions(), [self::$options['two']->getID(), self::$options['three']->getID()]);
+    }
 
-
-        //*******************************************//
-        //                                           //
-        //                 TEST DELETE!              //
-        //                                           //
-        //*******************************************//
-
-
-        // Delete everything!
+    /**
+     * Delete an option
+     *
+     * @covers DELETE api/v1/trees/{treeID}/question/{questionID}/options/{optionID}
+     */
+    public function testAPIOptionDelete() {
         // Deleting questions should delete all options. Let's delete one option first
-        $this->assertTrue(
-            json_decode(
-                Utility\deleteEndpoint(
-                    'trees/'.$this->tree->getID().'/questions/'.$this->questions['one']->getID().'/options/'.$this->options['three']->getID(),
-                    $data
-                )
-            )
+
+        // delete the option
+        $endpoint = 'trees/'.self::$tree->getID().'/questions/'.self::$questions['one']->getID().'/options/'.self::$options['three']->getID();
+
+        $deleteOption = Utility\deleteEndpoint(
+            $endpoint,
+            $this->data
         );
 
+        $this->assertTrue(json_decode($deleteOption));
+
+
+        $optionDeleted = json_decode(
+            Utility\getEndpoint($endpoint)
+        );
+
+        $this->assertEquals($optionDeleted->status, 'error');
+
+        // unset option three from the options since we just deleted it
+        unset(self::$options['three']);
+
+    }
+
+    /**
+     * Delete a question (and all its options)
+     *
+     * @covers DELETE api/v1/trees/{treeID}/question/{questionID}
+
+    public function testAPIQuestionDelete() {
+        // Deleting questions should delete all its options.
+
         // delete the question
-        foreach($this->questions as $question)  {
+        foreach(self::$questions as $question)  {
+            $questionID = $question->getID();
+            $optionsIDs = $question->getOptions();
+
             $this->assertTrue(
                 json_decode(
                     Utility\deleteEndpoint(
-                        'trees/'.$this->tree->getID().'/questions/'.$question->getID(),
-                        $data
+                        'trees/'.self::$tree->getID().'/questions/'.$question->getID(),
+                        $this->data
                     )
                 )
             );
+
+            // check that it was deleted
+            $questionDeleted =json_decode(
+                Utility\getEndpoint('trees/'.self::$tree->getID().'/questions/'.$questionID)
+            );
+            $this->assertEquals($questionDeleted->status, 'error');
+
+
+            // check to make sure its options were deleted
+            if(empty($optionsIDS)) {
+                continue;
+            }
+
+            foreach($optionIDs as $optionID) {
+                $optionDeleted =json_decode(
+                    Utility\getEndpoint('trees/'.self::$tree->getID().'/questions/'.$questionID.'/options/'.$optionID)
+                );
+
+                $this->assertEquals($optionDeleted->status, 'error');
+            }
         }
+
+
+        // delete the static questions and options
+        self::$questions = false;
+        self::$options = false;
+    }
+
+    */
+    /**
+     * Test Question and Option API methods
+     * @covers DELETE api/v1/trees/{treeID}
+
+    public function testAPITreeDelete() {
 
         // delete the tree
         $this->assertTrue(
             json_decode(
                 Utility\deleteEndpoint(
-                    'trees/'.$this->tree->getID(),
-                    $data
+                    'trees/'.self::$tree->getID(),
+                    $this->data
                 )
             )
         );
 
         // check to make sure the endpoints are deleted
         $treeDeleted = json_decode(
-            Utility\getEndpoint('trees/'.$this->tree->getID())
+            Utility\getEndpoint('trees/'.self::$tree->getID())
         );
+
         // this expects that the tree status will be an error of something like 'Tree does not exist.' since we're trying to find a deleted tree
         $this->assertEquals($treeDeleted->status, 'error');
 
-        $questionDeleted =json_decode(
-            Utility\getEndpoint('trees/'.$this->tree->getID().'/questions/'.$this->questions['one']->getID())
-        );
-        $this->assertEquals($questionDeleted->status, 'error');
-
-        $optionDeleted = json_decode(
-            Utility\getEndpoint('trees/'.$this->tree->getID().'/questions/'.$this->questions['one']->getID().'/options/'.$this->options['three']->getID())
-        );
-        $this->assertEquals($optionDeleted->status, 'error');
+        // delete the static tree
+        self::$tree = false;
 
     }
 
-    public function createTree($title) {
-        // add in the user to the request
-        $data = [
-            'title' => $title,
-            'user' => $this->getAdminUser()
-        ];
-
-        $response = Utility\postEndpoint('trees', $data);
-
-        $tree = json_decode($response);
-        // check that it's an object
-        $this->assertTrue(is_object($tree));
-
-        // do we have an id?
-        $this->assertTrue(Utility\isID($tree->ID));
-
-        // check that we can find it in the DB
-        return new Tree(new Database\DB(), $tree->ID);
-    }
-
-    public function createQuestion($treeID, $title) {
-        // create a new tree
-        $user = $this->getAdminUser();
-        // add in the user to the request
-        $data = [
-            'title' => $title,
-            'user' => $user
-        ];
-
-        $question = json_decode(
-            Utility\postEndpoint('trees/'.$treeID.'/questions', $data)
-        );
-
-        // check that it's an object
-        $this->assertTrue(is_object($question));
-
-        // do we have an id?
-        $this->assertTrue(Utility\isID($question->ID));
-
-        // check that we can find it in the DB
-        return new Question(new Database\DB(), $question->ID);
-    }
-
-    public function getQuestionFromEndpoint($treeID, $questionID) {
-        $question = json_decode(
-            Utility\getEndpoint('trees/'.$treeID.'/questions/'.$questionID)
-        );
-
-        return new Question(new Database\DB(), $question->ID);
-    }
-
-    public function createOption($treeID, $questionID, $data) {
-        // create a new tree
-        $user = $this->getAdminUser();
-        // add in the user to the request
-        $data = [
-            'title'       => $data['title'],
-            'destination' => $data['destination'],
-            'user'        => $user
-        ];
-
-        $option = json_decode(
-            Utility\postEndpoint('trees/'.$treeID.'/questions/'.$questionID.'/options', $data)
-        );
-
-        // check that it's an object
-        $this->assertTrue(is_object($option));
-
-        // do we have an id?
-        $this->assertTrue(Utility\isID($option->ID));
-
-        // check that we can find it in the DB
-        return new Option(new Database\DB(), $option->ID);
-    }
-
-    public function getOptionFromEndpoint($treeID, $questionID, $optionID) {
-        $option = json_decode(
-            Utility\getEndpoint('trees/'.$treeID.'/questions/'.$questionID.'/options/'.$optionID)
-        );
-
-        return new Option(new Database\DB(), $option->ID);
-    }
-
+    */
 }

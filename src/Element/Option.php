@@ -37,7 +37,7 @@ class Option extends Element {
         $validate = new Validate();
         //print_r($optionID);
         if($validate->optionID($optionID) !== true) {
-            return false;
+            throw new \Error('Option does not exist.');
         }
 
         $option = $this->db->getOption($optionID);
@@ -144,23 +144,17 @@ class Option extends Element {
         // $option = [
         //    'elID'          => $this->getID(),
         //    'elTitle'       => $this->getTitle(),
-        //    'treeID'        => $question->getTreeID()
         // ];
         //
         $update = [
           'elID'  => $this->getID(),
+          'treeID'=> $question->getTreeID()
         ];
 
         // see if the title has changed
         if($original->getTitle() !== $this->getTitle()) {
           $update['elTitle'] = $this->getTitle();
         }
-
-        // see if the treeID has changed
-        if($original->getTreeID() !== $this->getTreeID()) {
-          $update['treeID'] = $this->getTreeID();
-        }
-
         $result = $this->db->updateElement($update);
 
         // check if this option is already in the parent question
@@ -180,7 +174,7 @@ class Option extends Element {
         // update the destination
         $this->db->updateDestination($this->getID(), $this->getDestinationID());
         // rebuild it so we get the fresh copy
-        $this->build($this->getID());
+        $this->rebuild();
         // return the original update result
         return $result;
     }

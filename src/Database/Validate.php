@@ -128,7 +128,7 @@ class Validate extends DB {
             $elData = $this->getOption($elTypeID, ['treeID' => $treeID]);
         } else {
             // dynamically get the element
-        $function = 'get'.ucfirst($elType);
+            $function = 'get'.ucfirst($elType);
             $elData = $this->$function($elTypeID, $treeID);
         }
 

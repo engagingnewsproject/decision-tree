@@ -661,7 +661,8 @@ class DB extends PDO {
 
         $params = [":questionID" => $questionID];
         $sql = "SELECT ".$options['fields']." from ".$this->views['treeOption']." WHERE
-                questionID = :questionID";
+                questionID = :questionID
+                AND deleted = 0";
 
         // if a treeID was passed, append it to the params and sql statement
         if(Utility\isID($options['treeID'])) {
@@ -702,7 +703,8 @@ class DB extends PDO {
         $params = [":optionID" => $optionID];
 
         $sql = "SELECT ".$this->getColumns['option']." from ".$this->views["treeOption"]." WHERE
-                optionID = :optionID";
+                optionID = :optionID
+                AND deleted = 0";
 
         // if a treeID was passed, append it to the params and sql statement
         if( Utility\isID($options['treeID']) ) {
@@ -1032,13 +1034,13 @@ class DB extends PDO {
         $validate->elOwner($elID, $this->user);
 
         if(!isset($el['treeID'])) {
-            return 'No treeID.';
+            throw new \Error('No treeID.');
         }
 
         // find the el and make sure the owner owns this el
         $tree = $this->getTree($el['treeID']);
         if($tree['treeID'] !== $el['treeID']) {
-            return 'Incorrect treeID.';
+            throw new \Error('Incorrect treeID.');
         }
 
         // unset the el ID so we don't try updating that.
