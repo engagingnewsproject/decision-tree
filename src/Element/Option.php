@@ -174,8 +174,12 @@ class Option extends Element {
           }
         }
 
-        // update the destination
-        $this->db->updateDestination($this->getID(), $this->getDestinationID());
+        // if destination ID has changed, then update it
+        if((int) $original->getDestinationID() !== (int) $this->getDestinationID()) {
+            // update the destination
+            $this->db->updateDestination($this->getID(), $this->getDestinationID());
+        }
+
         // rebuild it so we get the fresh copy
         $this->rebuild();
         // return the original update result
@@ -190,7 +194,7 @@ class Option extends Element {
             ['elID'=>$this->getID(), 'treeID' => $treeID]
         );
         if($delete !== true) {
-            throw new \Error('Could not delete optionID '.$optionID);
+            throw new \Error('Could not delete optionID '.$this->getID());
         }
 
         // update the question to not include this option)

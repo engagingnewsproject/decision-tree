@@ -107,8 +107,6 @@ class End extends Element {
             'treeID'      => $this->getTreeID()
         ];
 
-        $result = $this->db->updateElement($end);
-
         // the only thing that we allow to change here is the Title and Content
         if($original->getTitle() !== $this->getTitle()) {
             $end['elTitle'] = $this->getTitle();
@@ -138,7 +136,7 @@ class End extends Element {
             ['elID'=>$this->getID(), 'treeID' => $treeID]
         );
         if($delete !== true) {
-            throw new \Error('Could not delete endID '.$optionID);
+            throw new \Error('Could not delete endID '.$this->getID());
         }
 
         return true;

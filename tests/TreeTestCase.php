@@ -174,6 +174,32 @@ class TreeTestCase extends TestCase
         return new Tree(new Database\DB(), $tree->ID);
     }
 
+     // $options should have 'title' and 'destination'
+    public static function createStart($treeID, $options = []) {
+        // add in the user to the request
+        $data = [
+            'user' => self::getAdminUser()
+        ];
+
+        $data = array_merge($data, $options);
+
+        $start = json_decode(
+            Utility\postEndpoint('trees/'.$treeID.'/starts', $data)
+        );
+
+        // return from the DB
+        return new Start(new Database\DB(), $start->ID);
+    }
+
+    public function getStartFromEndpoint($treeID, $startID) {
+        $start = json_decode(
+            Utility\getEndpoint('trees/'.$treeID.'/starts/'.$startID)
+        );
+
+        return new Start(new Database\DB(), $start->ID);
+    }
+
+
     // $options should have 'content' and or 'title'
     public static function createEnd($treeID, $options = []) {
         // add in the user to the request

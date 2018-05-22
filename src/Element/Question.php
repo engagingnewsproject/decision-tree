@@ -183,7 +183,7 @@ class Question extends Element {
             ['elID'=>$this->getID(), 'treeID' => $treeID]
         );
         if($delete !== true) {
-            throw new \Error('Could not delete questionID '.$optionID);
+            throw new \Error('Could not delete questionID '.$this->getID());
         }
 
         // get the tree (shouldn't include the new question)

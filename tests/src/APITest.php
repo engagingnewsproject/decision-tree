@@ -24,6 +24,7 @@ final class APITest extends TreeTestCase
            $tree, // place to store a temporary tree we've created for testing
            $options = [], // options we created during test
            $questions = [], // questions we created during test
+           $starts = [],
            $ends = [], // questions we created during test
            $groups = [],
            $db; // database connection
@@ -43,6 +44,9 @@ final class APITest extends TreeTestCase
         // create ends via the API
         self::$ends['one'] = self::createEnd(self::$tree->getID(), ['title' => 'End One Title', 'content' => 'End One Content']);
         self::$ends['two'] = self::createEnd(self::$tree->getID(), ['title' => 'End Two Title', 'content' => 'End Two Content']);
+
+        // create starts via the API
+        self::$starts['one'] = self::createStart(self::$tree->getID(), ['title' => 'Start One Title', 'destination' => self::$questions['one']->getID()]);
 
         // create options
         self::$options['one'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option One Title','destination'=>self::$questions['three']->getID()]);
@@ -371,7 +375,46 @@ final class APITest extends TreeTestCase
         $this->assertEquals($option->getDestinationID(), $newDestinationID);
     }
 
+    /*
+     * we're going to check to make sure the starts we
+     * created in set-up indeed did get created
+     *
+     * @covers POST api/v1/trees/{treeID}/starts
+     * @provider from setUpBeforeClass()
+     */
+    public function testApiStartCreate() {
+        $i = 0;
+        foreach(self::$starts as $start) {
+            // check that it's an object
+            $this->assertTrue(is_object($start));
+            // do we have an id?
+            $this->assertTrue(Utility\isID($start->getID()));
 
+            $i++;
+        }
+    }
+
+    public function testApiStartUpdate() {
+
+        // update start title
+        $this->data['title'] = self::$starts['one']->getTitle().' Updated';
+        $startOneUpdated = json_decode(
+            Utility\putEndpoint('trees/'.self::$tree->getID().'/starts/'.self::$starts['one']->getID(), $this->data)
+        );
+
+        $this->assertEquals($startOneUpdated->title, $this->data['title']);
+    }
+
+    public function testApiStartDestinationChange() {
+        $newDestinationID = self::$questions['two']->getID();
+        // update start destination
+        $this->data['destination'] = $newDestinationID;
+        $startOneUpdated = json_decode(
+            Utility\putEndpoint('trees/'.self::$tree->getID().'/starts/'.self::$starts['one']->getID(), $this->data)
+        );
+
+        $this->assertEquals($startOneUpdated->destinationID, $newDestinationID);
+    }
 
     /*
      * we're going to check to make sure the ends we
@@ -412,6 +455,36 @@ final class APITest extends TreeTestCase
 
         $this->assertEquals($endTwoUpdated->title, $this->data['title']);
         $this->assertEquals($endTwoUpdated->content, $this->data['content']);
+
+
+    }
+
+
+    public function testApiStartDelete() {
+
+               // delete the question
+        foreach(self::$starts as $start)  {
+            $startID = $start->getID();
+
+            $this->assertTrue(
+                json_decode(
+                    Utility\deleteEndpoint(
+                        'trees/'.self::$tree->getID().'/starts/'.$start->getID(),
+                        $this->data
+                    )
+                )
+            );
+
+            // check that it was deleted
+            $startDeleted =json_decode(
+                Utility\getEndpoint('trees/'.self::$tree->getID().'/starts/'.$startID)
+            );
+            $this->assertEquals($startDeleted->status, 'error');
+        }
+
+
+        // delete the static starts
+        self::$starts = false;
 
 
     }

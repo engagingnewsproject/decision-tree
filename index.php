@@ -67,6 +67,9 @@ $app->group('/api', function() {
         // Starts
         $this->get('/trees/{treeID}/starts', '\Cme\Route\Starts:getAll');
         $this->get('/trees/{treeID}/starts/{startID}', '\Cme\Route\Starts:get');
+        $this->post('/trees/{treeID}/starts', '\Cme\Route\Starts:create');
+        $this->put('/trees/{treeID}/starts/{startID}', '\Cme\Route\Starts:update');
+        $this->delete('/trees/{treeID}/starts/{startID}', '\Cme\Route\Starts:delete');
         // Groups
         $this->get('/trees/{treeID}/groups', '\Cme\Route\Groups:getAll');
         $this->get('/trees/{treeID}/groups/{groupID}', '\Cme\Route\Groups:get');

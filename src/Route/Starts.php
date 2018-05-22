@@ -47,4 +47,52 @@ class Starts extends Trees
 
         return $this->return($this->start->array(), $response);
     }
+
+    public function create($request, $response) {
+        // init data
+        $this->init($request);
+
+        $start = [];
+        $start['owner'] = $this->user['userID'];
+        // add the user to the end data as the owner
+        if(isset($this->data['owner'])) {
+            $start['owner'] = $this->data['owner'];
+        }
+
+        // add in the treeID
+        $start['treeID'] = $this->treeID;
+        $start = new Start($this->db, $start);
+
+        $keys = ['title', 'destination'];
+        $start = $this->dynamicSet($this->data, $keys, $start);
+
+        $start = $start->save();
+
+        if(!is_object($start)) {
+            $this->addError($start);
+        }
+
+        $this->return($start->array(), $response);
+    }
+
+    public function update($request, $response) {
+        // init data
+        $this->init($request);
+
+        $keys = ['title','destination'];
+        $this->start = $this->dynamicSet($this->data, $keys, $this->start);
+
+        $this->start->save();
+
+        return $this->return($this->start->array(), $response);
+    }
+
+    public function delete($request, $response) {
+        // init data
+        $this->init($request);
+
+        $result = $this->start->delete();
+
+        return $this->return($result, $response);
+    }
 }

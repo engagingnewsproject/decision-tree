@@ -70,6 +70,84 @@ class Start extends Element {
         return $this;
     }
 
+    protected function create() {
+        $validate = new Validate();
+
+        if(!$validate->destinationID($this->getDestinationID())) {
+            throw new \Error('Start must have a valid destination (Question ID or End ID). Likely a Question ID...');
+        }
+
+        // create it off the object
+        // map the start object to the start parameters in the DB
+        $start = [
+          'elTitle'   => $this->getTitle(),
+          'treeID'    => $this->getTreeID(),
+          'elTypeID'  => $this->db->getElementTypeID('start')
+        ];
+
+        $result = $this->db->createElement($start);
+
+        // it's hopefully returning the ID of the start it inserted
+        if(Utility\isID($result)) {
+            $startID = $result;
+
+            // insert the destination row
+            $this->db->insertDestination($startID, $this->getDestinationID());
+
+            // we're good! Build the start again and return it
+            return $this->build($startID);
+        }
+        // oops. Return the errors.
+        return $result;
+    }
+
+    protected function update() {
+        $result = false;
+        // get this start from the DB so we can figure out what got updated.
+        $original = new Start($this->db, $this->getID());
+
+        // map the start object to the database
+        $start = [
+            'elID'        => $this->getID(),
+            'treeID'      => $this->getTreeID()
+        ];
+
+        // the only thing that we allow to change here is the Title
+        if($original->getTitle() !== $this->getTitle()) {
+            $start['elTitle'] = $this->getTitle();
+
+            $result = $this->db->updateElement($start);
+        }
+
+        // if destination ID has changed, then update it
+        if((int) $original->getDestinationID() !== (int) $this->getDestinationID()) {
+            // update the destination
+            $this->db->updateDestination($this->getID(), $this->getDestinationID());
+        }
+
+        // rebuild it so we get the fresh copy
+        $this->rebuild();
+        // return the original update result
+        return $result;
+    }
+
+    /**
+     * Deletes a start from the DB
+     */
+    public function delete() {
+        $treeID = $this->getTreeID();
+
+        // delete the start
+        $delete = $this->db->deleteElement(
+            ['elID'=>$this->getID(), 'treeID' => $treeID]
+        );
+        if($delete !== true) {
+            throw new \Error('Could not delete startID '.$this->getID());
+        }
+
+        return true;
+    }
+
     public function array($removeKeys = []) {
         $removeKeys = array_merge($removeKeys, ['treeID']);
         return parent::array($removeKeys);
