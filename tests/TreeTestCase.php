@@ -111,13 +111,11 @@ class TreeTestCase extends TestCase
         return Utility\getUser('userRole', 'admin');
     }
 
-        public static function createQuestion($treeID, $title) {
-        // create a new tree
-        $user = self::getAdminUser();
+    public static function createQuestion($treeID, $title) {
         // add in the user to the request
         $data = [
             'title' => $title,
-            'user' => $user
+            'user' => self::getAdminUser()
         ];
 
         $question = json_decode(
@@ -137,13 +135,11 @@ class TreeTestCase extends TestCase
     }
 
     public static function createOption($treeID, $questionID, $data) {
-        // create a new tree
-        $user = self::getAdminUser();
         // add in the user to the request
         $data = [
             'title'       => $data['title'],
             'destination' => $data['destination'],
-            'user'        => $user
+            'user'        => self::getAdminUser()
         ];
 
         $option = json_decode(
@@ -176,5 +172,30 @@ class TreeTestCase extends TestCase
 
         // check that we can find it in the DB
         return new Tree(new Database\DB(), $tree->ID);
+    }
+
+    // $options should have 'content' and or 'title'
+    public static function createEnd($treeID, $options = []) {
+        // add in the user to the request
+        $data = [
+            'user' => self::getAdminUser()
+        ];
+
+        $data = array_merge($data, $options);
+
+        $end = json_decode(
+            Utility\postEndpoint('trees/'.$treeID.'/ends', $data)
+        );
+
+        // return from the DB
+        return new End(new Database\DB(), $end->ID);
+    }
+
+    public function getEndFromEndpoint($treeID, $endID) {
+        $end = json_decode(
+            Utility\getEndpoint('trees/'.$treeID.'/ends/'.$endID)
+        );
+
+        return new End(new Database\DB(), $end->ID);
     }
 }

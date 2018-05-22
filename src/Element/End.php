@@ -73,29 +73,20 @@ class End extends Element {
     }
 
     protected function create() {
-        $end = [];
         // create it off the object
         // map the end object to the end parameters in the DB
-        $end['elTitle'] = $this->getTitle();
-        $end['treeID'] = $this->getTreeID();
-        $end['elTypeID'] = $this->db->getElementTypeID('end');
+        $end = [
+          'elTitle'   => $this->getTitle(),
+          'elContent' => $this->getContent(),
+          'treeID'    => $this->getTreeID(),
+          'elTypeID'  => $this->db->getElementTypeID('end')
+        ];
 
         $result = $this->db->createElement($end);
 
         // it's hopefully returning the ID of the end it inserted
         if(Utility\isID($result)) {
             $endID = $result;
-            // it'll get put at the end of the order
-            // find the total number of ends for this tree
-            $tree = new Tree($this->db, $this->getTreeID());
-
-            $order = count($tree->getEnds());
-            $insertOrder = $this->db->insertOrder($endID, $order);
-            if(!Utility\isID($insertOrder)) {
-                // oops. Return the errors.
-                return $insertOrder;
-            }
-
             // we're good! Build the end again and return it
             return $this->build($endID);
         }
@@ -104,15 +95,32 @@ class End extends Element {
     }
 
     protected function update() {
+        $result = false;
+        // get this end from the DB so we can figure out what got updated.
+        $original = new End($this->db, $this->getID());
+
         // map the end object to the database
         $end = [
             'elID'        => $this->getID(),
             'elTitle'     => $this->getTitle(),
+            'elContent'     => $this->getContent(),
             'treeID'      => $this->getTreeID()
         ];
 
         $result = $this->db->updateElement($end);
 
+        // the only thing that we allow to change here is the Title and Content
+        if($original->getTitle() !== $this->getTitle()) {
+            $end['elTitle'] = $this->getTitle();
+        }
+
+        if($original->getContent() !== $this->getContent()) {
+            $end['elContent'] = $this->getContent();
+        }
+
+        if(isset($end['elTitle']) || isset($end['elContent'])) {
+            $result = $this->db->updateElement($end);
+        }
         // rebuild it so we get the fresh copy
         $this->rebuild();
         // return the original update result

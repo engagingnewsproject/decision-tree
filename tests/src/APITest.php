@@ -40,6 +40,10 @@ final class APITest extends TreeTestCase
         self::$questions['three'] = self::createQuestion(self::$tree->getID(), 'Question Three Title');
         self::$questions['four'] = self::createQuestion(self::$tree->getID(), 'Question Four Title');
 
+        // create ends via the API
+        self::$ends['one'] = self::createEnd(self::$tree->getID(), ['title' => 'End One Title', 'content' => 'End One Content']);
+        self::$ends['two'] = self::createEnd(self::$tree->getID(), ['title' => 'End Two Title', 'content' => 'End Two Content']);
+
         // create options
         self::$options['one'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option One Title','destination'=>self::$questions['three']->getID()]);
         self::$options['two'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option Two Title','destination'=>self::$questions['two']->getID()]);
@@ -79,7 +83,7 @@ final class APITest extends TreeTestCase
     /**
      * @covers api/v1/trees
      */
-    public function testGetTrees() {
+    public function testApiGetTrees() {
         $trees = self::$db->getTrees();
         $this->assertEquals(Utility\getEndpoint('trees'), json_encode($trees));
     }
@@ -240,7 +244,7 @@ final class APITest extends TreeTestCase
     }
 
     /*
-     * we're going to check to make sure the questions we
+     * we're going to check to make sure the options we
      * created in set-up indeed did get created
      *
      * @covers POST api/v1/trees/{treeID}/questions/{questionID}/options
@@ -355,7 +359,7 @@ final class APITest extends TreeTestCase
 
     public function testApiOptionChangeDestination() {
         $option = self::$options['one'];
-        $newDestinationID = self::$questions['four']->getID();
+        $newDestinationID = self::$ends['one']->getID();
         $this->data['destination'] = $newDestinationID;
 
         $optionOneUpdated = Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.$option->getQuestionID().'/options/'.$option->getID(), $this->data);
@@ -366,6 +370,81 @@ final class APITest extends TreeTestCase
 
         $this->assertEquals($option->getDestinationID(), $newDestinationID);
     }
+
+
+
+    /*
+     * we're going to check to make sure the ends we
+     * created in set-up indeed did get created
+     *
+     * @covers POST api/v1/trees/{treeID}/ends
+     * @provider from setUpBeforeClass()
+     */
+    public function testApiEndCreate() {
+        $i = 0;
+        foreach(self::$ends as $end) {
+            // check that it's an object
+            $this->assertTrue(is_object($end));
+            // do we have an id?
+            $this->assertTrue(Utility\isID($end->getID()));
+
+            $i++;
+        }
+    }
+
+    public function testApiEndUpdate() {
+
+        // update end title
+        $this->data['title'] = self::$ends['one']->getTitle().' Updated';
+        $endOneUpdated = json_decode(
+            Utility\putEndpoint('trees/'.self::$tree->getID().'/ends/'.self::$ends['one']->getID(), $this->data)
+        );
+
+        $this->assertEquals($endOneUpdated->title, $this->data['title']);
+
+        // update end content and title
+        $this->data['title'] = self::$ends['two']->getTitle().' Updated';
+        $this->data['content'] = self::$ends['two']->getContent().' Updated';
+
+        $endTwoUpdated = json_decode(
+            Utility\putEndpoint('trees/'.self::$tree->getID().'/ends/'.self::$ends['two']->getID(), $this->data)
+        );
+
+        $this->assertEquals($endTwoUpdated->title, $this->data['title']);
+        $this->assertEquals($endTwoUpdated->content, $this->data['content']);
+
+
+    }
+
+     public function testApiEndDelete() {
+
+               // delete the question
+        foreach(self::$ends as $end)  {
+            $endID = $end->getID();
+
+            $this->assertTrue(
+                json_decode(
+                    Utility\deleteEndpoint(
+                        'trees/'.self::$tree->getID().'/ends/'.$end->getID(),
+                        $this->data
+                    )
+                )
+            );
+
+            // check that it was deleted
+            $endDeleted =json_decode(
+                Utility\getEndpoint('trees/'.self::$tree->getID().'/ends/'.$endID)
+            );
+            $this->assertEquals($endDeleted->status, 'error');
+        }
+
+
+        // delete the static ends
+        self::$ends = false;
+
+
+    }
+
 
     /**
      * Delete an option
@@ -397,11 +476,14 @@ final class APITest extends TreeTestCase
 
     }
 
+
+
+
     /**
      * Delete a question (and all its options)
      *
      * @covers DELETE api/v1/trees/{treeID}/question/{questionID}
-
+     */
     public function testApiQuestionDelete() {
         // Deleting questions should delete all its options.
 
@@ -446,11 +528,11 @@ final class APITest extends TreeTestCase
         self::$options = false;
     }
 
-    */
+
     /**
      * Test Question and Option API methods
      * @covers DELETE api/v1/trees/{treeID}
-
+    */
     public function testApiTreeDelete() {
 
         // delete the tree
@@ -475,6 +557,4 @@ final class APITest extends TreeTestCase
         self::$tree = false;
 
     }
-
-    */
 }

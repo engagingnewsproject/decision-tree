@@ -90,7 +90,9 @@ $app->group('/api', function() {
         // ends
         $this->get('/trees/{treeID}/ends', '\Cme\Route\Ends:getAll');
         $this->get('/trees/{treeID}/ends/{endID}', '\Cme\Route\Ends:get');
-        // $this->put('/trees/{treeID}/ends/{endID}/move/{position}', '\Cme\Route\Ends:move');
+        $this->post('/trees/{treeID}/ends', '\Cme\Route\Ends:create');
+        $this->put('/trees/{treeID}/ends/{endID}', '\Cme\Route\Ends:update');
+        $this->delete('/trees/{treeID}/ends/{endID}', '\Cme\Route\Ends:delete');
 
         // embeds by tree
         $this->get('/trees/{treeID}/embeds', '\Cme\Route\Embeds:getAllEmbedsByTree');

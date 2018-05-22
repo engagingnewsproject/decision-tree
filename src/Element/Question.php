@@ -124,7 +124,7 @@ class Question extends Element {
 
     protected function update() {
         $result = false;
-        // get this option from the DB so we can figure out what got updated.
+        // get this Question from the DB so we can figure out what got updated.
         $original = new Question($this->db, $this->getID());
 
         // map the question object to the database
