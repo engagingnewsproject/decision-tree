@@ -133,6 +133,7 @@ class Option extends Element {
     }
 
     protected function update() {
+        $result = false;
         // get this option from the DB so we can figure out what got updated.
         $original = new Option($this->db, $this->getID());
 
@@ -154,8 +155,10 @@ class Option extends Element {
         // see if the title has changed
         if($original->getTitle() !== $this->getTitle()) {
           $update['elTitle'] = $this->getTitle();
+          // this is the only reason to update at the moment, so... only run it if the element has changed
+          $result = $this->db->updateElement($update);
         }
-        $result = $this->db->updateElement($update);
+
 
         // check if this option is already in the parent question
         if(!in_array($this->getID(), $question->getOptions())) {

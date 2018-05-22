@@ -38,9 +38,10 @@ final class APITest extends TreeTestCase
         self::$questions['one'] = self::createQuestion(self::$tree->getID(), 'Question One Title');
         self::$questions['two'] = self::createQuestion(self::$tree->getID(), 'Question Two Title');
         self::$questions['three'] = self::createQuestion(self::$tree->getID(), 'Question Three Title');
+        self::$questions['four'] = self::createQuestion(self::$tree->getID(), 'Question Four Title');
 
         // create options
-        self::$options['one'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option One Title','destination'=>self::$questions['two']->getID()]);
+        self::$options['one'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option One Title','destination'=>self::$questions['three']->getID()]);
         self::$options['two'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option Two Title','destination'=>self::$questions['two']->getID()]);
         self::$options['three'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option Three Title','destination'=>self::$questions['three']->getID()]);
 
@@ -87,7 +88,7 @@ final class APITest extends TreeTestCase
      * @covers api/v1/trees/{{treeID}}
      * @dataProvider APITreeProvider
      */
-    public function testAPITree($treeID) {
+    public function testApiTree($treeID) {
         $tree = new Tree(self::$db, $treeID);
 
         $this->assertEquals(Utility\getEndpoint('trees/'.$treeID), json_encode($tree->array()));
@@ -115,7 +116,7 @@ final class APITest extends TreeTestCase
      * @covers api/v1/trees/{{treeID}}/groups/{{groupID}}
      * @dataProvider APIGettersProvider
      */
-    public function testAPIGetters($elType, $treeID) {
+    public function testApiGetters($elType, $treeID) {
         $els = $this->getAllDynamic($elType, $treeID);
         $elObject = '\\Cme\\Element\\'.ucfirst($elType);
         $route = 'trees/'.$treeID.'/'.$elType.'s';
@@ -163,7 +164,7 @@ final class APITest extends TreeTestCase
      * @covers api/v1/trees/{{treeID}}/groups/{{groupID}}
      * @dataProvider APITreeProvider
      */
-    public function testAPIOptions($treeID) {
+    public function testApiOptions($treeID) {
         $questions = $this->getQuestionsProvider($treeID);
 
         if(empty($questions)) {
@@ -206,7 +207,7 @@ final class APITest extends TreeTestCase
      * @covers POST api/v1/trees
      * @provider from setUpBeforeClass()
      */
-    public function testAPITreeCreate() {
+    public function testApiTreeCreate() {
         // check that it's an object
         $this->assertTrue(is_object(self::$tree));
         // do we have an id?
@@ -224,7 +225,7 @@ final class APITest extends TreeTestCase
      * @covers POST api/v1/trees/{treeID}/questions
      * @provider from setUpBeforeClass()
      */
-    public function testAPIQuestionCreate() {
+    public function testApiQuestionCreate() {
         $i = 0;
         foreach(self::$questions as $question) {
             // check that it's an object
@@ -245,7 +246,7 @@ final class APITest extends TreeTestCase
      * @covers POST api/v1/trees/{treeID}/questions/{questionID}/options
      * @provider from setUpBeforeClass()
      */
-    public function testAPIOptionCreate() {
+    public function testApiOptionCreate() {
         $i = 0;
         foreach(self::$options as $key => $option) {
             // check that it's an object
@@ -255,8 +256,8 @@ final class APITest extends TreeTestCase
             // does the order match the order it was created?
             $this->assertEquals($option->getOrder(), $i);
 
-            // check destinations. Options one and two go to question two as their destination
-            if($key === 'one' || $key === 'two') {
+            // check a destination to make sure it got set as well. This is manually done.
+            if($key === 'two') {
                 $this->assertEquals($option->getDestinationID(), self::$questions['two']->getID());
                 $this->assertEquals($option->getDestinationType(), 'question');
             }
@@ -266,7 +267,7 @@ final class APITest extends TreeTestCase
     }
 
 
-    public function testAPIQuestionUpdate() {
+    public function testApiQuestionUpdate() {
 
         // update question title
         $this->data['title'] = self::$questions['one']->getTitle().' Updated';
@@ -277,22 +278,23 @@ final class APITest extends TreeTestCase
         $this->assertEquals($questionOneUpdated->title, $this->data['title']);
     }
 
-    public function testAPIQuestionMove() {
+    public function testApiQuestionMove() {
+        $question = self::$questions['one'];
         // move first to end
         $questionOneMoved = json_decode(
-            Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.self::$questions['one']->getID().'/move/last', $this->data)
+            Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.$question->getID().'/move/last', $this->data)
         );
 
-        $this->assertEquals($questionOneMoved->order, 2);
+        $this->assertEquals($questionOneMoved->order, (count(self::$questions) - 1) );
 
         // get the other question and make sure it's now first
-        self::$questions['two'] = $this->getQuestionFromEndpoint(self::$tree->getID(), self::$questions['two']->getID());
+        $newFirstQuestion = $this->getQuestionFromEndpoint(self::$tree->getID(), self::$questions['two']->getID());
 
-        $this->assertEquals(self::$questions['two']->getOrder(), 0);
+        $this->assertEquals($newFirstQuestion->getOrder(), 0);
     }
 
 
-    public function testAPIOptionUpdate() {
+    public function testApiOptionUpdate() {
 
 
         $option = self::$options['one'];
@@ -312,7 +314,7 @@ final class APITest extends TreeTestCase
 
 
 
-    public function testAPIOptionMove() {
+    public function testApiOptionMove() {
         // move first to second
         $optionOneMoved = json_decode(
             Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.self::$questions['one']->getID().'/options/'.self::$options['one']->getID().'/move/1', $this->data)
@@ -326,24 +328,43 @@ final class APITest extends TreeTestCase
         $this->assertEquals(self::$options['two']->getOrder(), 0);
     }
 
-    public function testAPIOptionMoveToDifferentQuestion() {
+    public function testApiOptionMoveToDifferentQuestion() {
+        // moving this option to question two
         $this->data['questionID'] = self::$questions['two']->getID();
-        $this->data['destination'] = self::$questions['three']->getID();
-        $optionOneUpdated = json_decode(
-            Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.self::$questions['one']->getID().'/options/'.self::$options['one']->getID(), $this->data)
-        );
+
+        $optionOneUpdated = Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.self::$questions['one']->getID().'/options/'.self::$options['one']->getID(), $this->data);
+        $optionOneUpdated = json_decode($optionOneUpdated);
+
         //rebuild from the database so we can check for the new questionID
         self::$options['one'] = self::$options['one']->rebuild();
+
         $this->assertEquals(self::$options['one']->getQuestionID(), self::$questions['two']->getID());
-        $this->assertEquals(self::$options['one']->getDestinationID(), self::$questions['three']->getID());
+
         // rebuild the question
         self::$questions['one'] = self::$questions['one']->rebuild();
+
         // check that the numbers line-up now. Option three should now be order = 1
         // rebuild it to validate
         self::$options['three'] = self::$options['three']->rebuild();
         $this->assertEquals(self::$options['three']->getOrder(), 1);
+
         // check that it's NOT on the question it was before
         $this->assertEquals(self::$questions['one']->getOptions(), [self::$options['two']->getID(), self::$options['three']->getID()]);
+    }
+
+
+    public function testApiOptionChangeDestination() {
+        $option = self::$options['one'];
+        $newDestinationID = self::$questions['four']->getID();
+        $this->data['destination'] = $newDestinationID;
+
+        $optionOneUpdated = Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.$option->getQuestionID().'/options/'.$option->getID(), $this->data);
+        $optionOneUpdated = json_decode($optionOneUpdated);
+
+        //rebuild from the database so we can check for the new questionID
+        $option->rebuild();
+
+        $this->assertEquals($option->getDestinationID(), $newDestinationID);
     }
 
     /**
@@ -351,7 +372,7 @@ final class APITest extends TreeTestCase
      *
      * @covers DELETE api/v1/trees/{treeID}/question/{questionID}/options/{optionID}
      */
-    public function testAPIOptionDelete() {
+    public function testApiOptionDelete() {
         // Deleting questions should delete all options. Let's delete one option first
 
         // delete the option
@@ -381,7 +402,7 @@ final class APITest extends TreeTestCase
      *
      * @covers DELETE api/v1/trees/{treeID}/question/{questionID}
 
-    public function testAPIQuestionDelete() {
+    public function testApiQuestionDelete() {
         // Deleting questions should delete all its options.
 
         // delete the question
@@ -430,7 +451,7 @@ final class APITest extends TreeTestCase
      * Test Question and Option API methods
      * @covers DELETE api/v1/trees/{treeID}
 
-    public function testAPITreeDelete() {
+    public function testApiTreeDelete() {
 
         // delete the tree
         $this->assertTrue(

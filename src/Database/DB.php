@@ -376,7 +376,7 @@ class DB extends PDO {
     }
 
     /**
-     * Dynamic delete function to streamline the delete process
+     * Dynamic update function to streamline the update process
      *
      * $update = [
      *           'vals' => ['treeslug'=>'mytree'],
@@ -1043,8 +1043,14 @@ class DB extends PDO {
             throw new \Error('Incorrect treeID.');
         }
 
-        // unset the el ID so we don't try updating that.
+        // unset the el ID and treeID so we don't try updating those.
         unset($el['elID']);
+        unset($el['treeID']);
+        // if $el is empty now, don't actually return anything...
+        if(empty($el)) {
+            throw new \Error('Nothing to update.');
+        }
+
         // attempt to create the el
         return $this->update([
             'vals'      => $el,

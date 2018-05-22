@@ -51,6 +51,54 @@ class Ends extends Trees
         return $this->return($this->end->array(), $response);
     }
 
+    public function create($request, $response) {
+        // init data
+        $this->init($request);
+
+        $end = [];
+        $end['owner'] = $this->user['userID'];
+        // add the user to the end data as the owner
+        if(isset($this->data['owner'])) {
+            $end['owner'] = $this->data['owner'];
+        }
+
+        // add in the treeID
+        $end['treeID'] = $this->treeID;
+        $end = new End($this->db, $end);
+
+        $keys = ['title', 'content'];
+        $end = $this->dynamicSet($this->data, $keys, $end);
+
+        $end = $end->save();
+
+        if(!is_object($end)) {
+            $this->addError($end);
+        }
+
+        $this->return($end->array(), $response);
+    }
+
+    public function update($request, $response) {
+        // init data
+        $this->init($request);
+
+        $keys = ['title','content'];
+        $this->end = $this->dynamicSet($this->data, $keys, $this->end);
+
+        $this->end->save();
+
+        return $this->return($this->end->array(), $response);
+    }
+
+    public function delete($request, $response) {
+        // init data
+        $this->init($request);
+
+        $result = $this->end->delete();
+
+        return $this->return($result, $response);
+    }
+
     // Move an end from one position to another
     public function move($request, $response) {
         // init data
