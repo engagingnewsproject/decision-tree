@@ -199,6 +199,31 @@ class TreeTestCase extends TestCase
         return new Start(new Database\DB(), $start->ID);
     }
 
+    // $options should have 'title', 'content', 'questions'
+    public static function createGroup($treeID, $options = []) {
+        // add in the user to the request
+        $data = [
+            'user' => self::getAdminUser()
+        ];
+
+        $data = array_merge($data, $options);
+
+        $group = Utility\postEndpoint('trees/'.$treeID.'/groups', $data);
+
+        $group = json_decode($group);
+
+        // return from the DB
+        return new Group(new Database\DB(), $group->ID);
+    }
+
+    public function getGroupFromEndpoint($treeID, $groupID) {
+        $group = json_decode(
+            Utility\getEndpoint('trees/'.$treeID.'/groups/'.$groupID)
+        );
+
+        return new Group(new Database\DB(), $group->ID);
+    }
+
 
     // $options should have 'content' and or 'title'
     public static function createEnd($treeID, $options = []) {

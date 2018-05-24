@@ -39,7 +39,7 @@ class Questions extends Trees
             $allQuestions[] = $question->array();
         }
 
-        $this->return($allQuestions, $response);
+        return $this->return($allQuestions, $response);
     }
 
     public function create($request, $response) {
@@ -66,7 +66,7 @@ class Questions extends Trees
             $this->addError($question);
         }
 
-        $this->return($question->array(), $response);
+        return $this->return($question->array(), $response);
     }
 
     public function get($request, $response) {

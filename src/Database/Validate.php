@@ -83,7 +83,7 @@ class Validate extends DB {
             return true;
         }
 
-        throw new \Error('Element does not exist.');
+        throw new \Error('Element '.$elID.' does not exist.');
     }
 
     /**

@@ -41,7 +41,7 @@ class Ends extends Trees
             $allEnds[] = $end->array();
         }
 
-        $this->return($allEnds, $response);
+        return $this->return($allEnds, $response);
     }
 
     public function get($request, $response) {
@@ -75,7 +75,7 @@ class Ends extends Trees
             $this->addError($end);
         }
 
-        $this->return($end->array(), $response);
+        return $this->return($end->array(), $response);
     }
 
     public function update($request, $response) {

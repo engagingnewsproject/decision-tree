@@ -53,6 +53,18 @@ final class APITest extends TreeTestCase
         self::$options['two'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option Two Title','destination'=>self::$questions['two']->getID()]);
         self::$options['three'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option Three Title','destination'=>self::$questions['three']->getID()]);
 
+        $groupQuestions = [
+                    self::$questions['one']->getID(),
+                    self::$questions['two']->getID()
+                ];
+        self::$groups['one'] = self::createGroup(self::$tree->getID(),
+            [
+                'title' => 'Group One Title',
+                'questions' => $groupQuestions
+            ]
+        );
+        self::$groups['two'] = self::createGroup(self::$tree->getID(), ['title' => 'Group Two Title', 'content'=>'Group Two Content']);
+
     }
 
     public function setUp() {
@@ -414,6 +426,106 @@ final class APITest extends TreeTestCase
         );
 
         $this->assertEquals($startOneUpdated->destinationID, $newDestinationID);
+    }
+
+    /*
+     * we're going to check to make sure the groups we
+     * created in set-up indeed did get created
+     *
+     * @covers POST api/v1/trees/{treeID}/groups
+     * @provider from setUpBeforeClass()
+     */
+    public function testApiGroupCreate() {
+        $i = 0;
+        $groupQuestions = [
+                    self::$questions['one']->getID(),
+                    self::$questions['two']->getID()
+                ];
+
+        foreach(self::$groups as $group) {
+            // check that it's an object
+            $this->assertTrue(is_object($group));
+            // do we have an id?
+            $this->assertTrue(Utility\isID($group->getID()));
+
+            // if it's the first group, check that it has questions
+            if($group->getID() === self::$groups['one']) {
+                $this->assertEquals($group->getQuestions(), $groupQuestions);
+            }
+            $i++;
+        }
+    }
+
+    public function testApiGroupUpdate() {
+
+        // update group title
+        $this->data['title'] = self::$groups['one']->getTitle().' Updated';
+        $groupOneUpdated = Utility\putEndpoint('trees/'.self::$tree->getID().'/groups/'.self::$groups['one']->getID(), $this->data);
+        $groupOneUpdated = json_decode(
+            $groupOneUpdated
+        );
+
+        $this->assertEquals($groupOneUpdated->title, $this->data['title']);
+
+    }
+
+    public function testApiGroupUpdateQuestions() {
+
+
+        $this->data['questionsArray'] = [self::$questions['three']->getID(), self::$questions['four']->getID()];
+        $this->data['questions'] = implode(',', $this->data['questionsArray']);
+
+        $groupTwoUpdated = Utility\putEndpoint('trees/'.self::$tree->getID().'/groups/'.self::$groups['two']->getID(), $this->data);
+
+        $groupTwoUpdated = json_decode($groupTwoUpdated);
+
+        $this->assertEquals($groupTwoUpdated->questions, $this->data['questionsArray']);
+
+
+        $this->data['questions'] = self::$questions['two']->getID();
+
+
+        $groupOneUpdated = Utility\putEndpoint('trees/'.self::$tree->getID().'/groups/'.self::$groups['two']->getID(), $this->data);
+
+        $groupOneUpdated = json_decode($groupOneUpdated);
+
+         $this->assertEquals($groupOneUpdated->questions, [$this->data['questions']]);
+
+    }
+
+    public function testApiGroupAddQuestion() {
+
+        $this->data['question'] = self::$questions['two']->getID();
+
+        $groupOneUpdated = Utility\putEndpoint('trees/'.self::$tree->getID().'/groups/'.self::$groups['one']->getID().'/questions', $this->data);
+
+        $groupOneUpdated = json_decode($groupOneUpdated);
+
+        // rebuild group One so we can see if it matches
+        self::$groups['one']->rebuild();
+
+        $this->assertEquals($groupOneUpdated->questions, self::$groups['one']->getQuestions());
+
+    }
+
+    public function testApiGroupRemoveQuestion() {
+
+        $questions = self::$groups['one']->getQuestions();
+
+        $groupOneUpdated = Utility\deleteEndpoint('trees/'.self::$tree->getID().'/groups/'.self::$groups['one']->getID().'/questions/'.$questions[0], $this->data);
+
+        $groupOneUpdated = json_decode($groupOneUpdated);
+
+        // unset the question we removed
+        unset($questions[0]);
+        // reindex it so our keys match
+        $questions = array_values($questions);
+
+        $this->assertEquals($groupOneUpdated->questions, $questions);
+        // check off the object too
+        self::$groups['one']->rebuild();
+        $this->assertEquals($groupOneUpdated->questions, self::$groups['one']->getQuestions());
+
     }
 
     /*

@@ -424,6 +424,35 @@ class DB extends PDO {
     }
 
     /**
+     * Dynamic update function to streamline the row delete process
+     *
+     * $update = [
+     *           'table'=>$this->views['tree']],
+     *           'where' => ['treeID' = $treeID]
+     *       ]
+     * return MIXED BOOL on success (true), ARRAY of errors on fail
+     */
+    protected function delete($delete) {
+
+        // build params on the vals and where statement vals
+        $params = $this->buildParams($delete['where']);
+
+        // dynamic expanding of passed keys and bound params
+        $sql = "DELETE FROM ".$delete['table']."
+                WHERE
+                  ".$this->buildWhere($delete['where'])."
+                  ";
+
+        $stmt = $this->query($sql, $params);
+
+        if($stmt !== false) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Creates a tree in the DB
      *
      * @param $tree ARRAY Data to create tree with
@@ -1170,6 +1199,29 @@ class DB extends PDO {
             'required'  => ['elID'],
             'table'     => $this->tables['treeElementContainer'],
             'where'     => ['elIDChild' => $childID]
+        ]);
+    }
+
+    /**
+     * Deletes containers that should no longer be in use.
+     *
+     * @return
+     */
+    public function deleteContainer($parentID, $childID) {
+        // validate the user
+        Utility\validateUser($this->user);
+
+        // find the element and make sure the owner owns this element
+        $validate = new Validate();
+        $validate->elOwner($parentID, $this->user);
+        $validate->elOwner($childID, $this->user);
+
+        return $this->delete([
+            'table'     => $this->tables['treeElementContainer'],
+            'where'     => [
+                'elID'      => $parentID,
+                'elIDChild' => $childID
+            ]
         ]);
     }
 

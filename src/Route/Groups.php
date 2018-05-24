@@ -40,7 +40,7 @@ class Groups extends Trees
             $allGroups[] = $group->array();
         }
 
-        $this->return($allGroups, $response);
+        return $this->return($allGroups, $response);
     }
 
     public function get($request, $response) {
@@ -50,6 +50,55 @@ class Groups extends Trees
         return $this->return($this->group->array(), $response);
     }
 
+    public function create($request, $response) {
+        // init data
+        $this->init($request);
+
+        $group = [];
+        $group['owner'] = $this->user['userID'];
+        // add the user to the end data as the owner
+        if(isset($this->data['owner'])) {
+            $group['owner'] = $this->data['owner'];
+        }
+
+        // add in the treeID
+        $group['treeID'] = $this->treeID;
+        $group = new Group($this->db, $group);
+
+        $keys = ['title', 'content', 'questions'];
+        $group = $this->dynamicSet($this->data, $keys, $group);
+
+        $group = $group->save();
+
+        if(!is_object($group)) {
+            $this->addError($group);
+        }
+
+        return $this->return($group->array(), $response);
+    }
+
+    public function update($request, $response) {
+        // init data
+        $this->init($request);
+
+        // using 'questions' here will overwrite any questions that were already in the group. To individually add or remove them, put-> to the groups/{groupID}/questions endpoint
+        $keys = ['title', 'content', 'questions'];
+        $this->group = $this->dynamicSet($this->data, $keys, $this->group);
+
+        $this->group->save();
+
+        return $this->return($this->group->array(), $response);
+    }
+
+    public function delete($request, $response) {
+        // init data
+        $this->init($request);
+
+        $result = $this->group->delete();
+
+        return $this->return($result, $response);
+    }
+
     // Move a group from one position to another
     public function move($request, $response) {
         // init data
@@ -57,4 +106,36 @@ class Groups extends Trees
 
         return parent::reorder($request, $response, 'group');
     }
+
+    // add a question to a group
+    public function addQuestion($request, $response) {
+        // init data
+        $this->init($request);
+
+        if(!isset($this->data['question'])) {
+            // add one question
+            $this->addError('Must include a "question" parameter with a valid question ID.');
+        }
+
+        $this->group->addQuestion($this->data['question']);
+        $this->group->save();
+
+        return $this->return($this->group->array(), $response);
+    }
+
+
+    // remove a question from a group
+    public function removeQuestion($request, $response) {
+        // init data
+        $this->init($request);
+
+         // get the question ID
+        $questionID = $request->getAttribute('questionID');
+
+        $this->group->removeQuestion($questionID);
+        $this->group->save();
+
+        return $this->return($this->group->array(), $response);
+    }
+
 }

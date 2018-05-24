@@ -73,6 +73,13 @@ $app->group('/api', function() {
         // Groups
         $this->get('/trees/{treeID}/groups', '\Cme\Route\Groups:getAll');
         $this->get('/trees/{treeID}/groups/{groupID}', '\Cme\Route\Groups:get');
+        $this->post('/trees/{treeID}/groups', '\Cme\Route\Groups:create');
+        $this->put('/trees/{treeID}/groups/{groupID}', '\Cme\Route\Groups:update');
+        $this->delete('/trees/{treeID}/groups/{groupID}', '\Cme\Route\Groups:delete');
+        $this->put('/trees/{treeID}/groups/{groupID}/move/{position}', '\Cme\Route\Groups:move');
+        // add question(s) to a group
+        $this->put('/trees/{treeID}/groups/{groupID}/questions', '\Cme\Route\Groups:addQuestion');
+        $this->delete('/trees/{treeID}/groups/{groupID}/questions/{questionID}', '\Cme\Route\Groups:removeQuestion');
         // $this->put('/trees/{treeID}/groups/{groupID}/move/{position}', '\Cme\Route\Groups:move');
         // Questions
         $this->get('/trees/{treeID}/questions', '\Cme\Route\Questions:getAll');

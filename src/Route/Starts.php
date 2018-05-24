@@ -38,7 +38,7 @@ class Starts extends Trees
             $allStarts[] = $start->array();
         }
 
-        $this->return($allStarts, $response);
+        return $this->return($allStarts, $response);
     }
 
     public function get($request, $response) {
@@ -72,7 +72,7 @@ class Starts extends Trees
             $this->addError($start);
         }
 
-        $this->return($start->array(), $response);
+        return $this->return($start->array(), $response);
     }
 
     public function update($request, $response) {

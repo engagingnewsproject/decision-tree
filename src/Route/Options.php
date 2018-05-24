@@ -48,7 +48,7 @@ class Options extends Questions
             $allOptions[] = $option->array();
         }
 
-        $this->return($allOptions, $response);
+        return $this->return($allOptions, $response);
     }
 
     public function get($request, $response) {
@@ -86,7 +86,7 @@ class Options extends Questions
             $this->addError('Option could not be created.');
         }*/
 
-        $this->return($option->array(), $response);
+        return $this->return($option->array(), $response);
     }
 
     public function update($request, $response) {

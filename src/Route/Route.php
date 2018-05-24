@@ -70,9 +70,18 @@ class Route
             return $obj;
         }
 
+        // keys that are comma separated values that need to get exploded into an array
+        $exploders = ['questions'];
+
         foreach($data as $key => $val) {
             if(in_array($key, $keys)) {
                 $function = 'set'.ucfirst($key);
+
+                // if we need to explode the value and it's not already an array
+                if(in_array($key, $exploders) && !is_array($val)) {
+                    $val = explode(',', $val);
+                }
+
                 $obj->$function($val);
             }
         }
