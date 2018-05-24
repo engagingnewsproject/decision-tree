@@ -126,14 +126,14 @@ final class APITest extends TreeTestCase
     }
 
     /**
-     * @covers api/v1/trees/{{treeID}}/questions
-     * @covers api/v1/trees/{{treeID}}/question/{{questionID}}
-     * @covers api/v1/trees/{{treeID}}/ends
-     * @covers api/v1/trees/{{treeID}}/ends/{{endID}}
-     * @covers api/v1/trees/{{treeID}}/starts
-     * @covers api/v1/trees/{{treeID}}/starts/{{startID}}
-     * @covers api/v1/trees/{{treeID}}/groups
-     * @covers api/v1/trees/{{treeID}}/groups/{{groupID}}
+     * @covers GET api/v1/trees/{{treeID}}/questions
+     * @covers GET api/v1/trees/{{treeID}}/question/{{questionID}}
+     * @covers GET api/v1/trees/{{treeID}}/ends
+     * @covers GET api/v1/trees/{{treeID}}/ends/{{endID}}
+     * @covers GET api/v1/trees/{{treeID}}/starts
+     * @covers GET api/v1/trees/{{treeID}}/starts/{{startID}}
+     * @covers GET api/v1/trees/{{treeID}}/groups
+     * @covers GET api/v1/trees/{{treeID}}/groups/{{groupID}}
      * @dataProvider APIGettersProvider
      */
     public function testApiGetters($elType, $treeID) {
@@ -180,8 +180,8 @@ final class APITest extends TreeTestCase
     }
 
     /**
-     * @covers api/v1/trees/{{treeID}}/questions/{{questionID}}/options
-     * @covers api/v1/trees/{{treeID}}/groups/{{groupID}}
+     * @covers GET api/v1/trees/{{treeID}}/questions/{{questionID}}/options
+     * @covers GET api/v1/trees/{{treeID}}/questions/{{questionID}}/options/{{optionID}}
      * @dataProvider APITreeProvider
      */
     public function testApiOptions($treeID) {
@@ -286,7 +286,10 @@ final class APITest extends TreeTestCase
         }
     }
 
-
+    /*
+     * @covers PUT api/v1/trees/{treeID}/questions/{questionID}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiQuestionUpdate() {
 
         // update question title
@@ -297,7 +300,10 @@ final class APITest extends TreeTestCase
 
         $this->assertEquals($questionOneUpdated->title, $this->data['title']);
     }
-
+    /*
+     * @covers PUT api/v1/trees/{treeID}/questions/{questionID}/move/{position}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiQuestionMove() {
         $question = self::$questions['one'];
         // move first to end
@@ -313,7 +319,10 @@ final class APITest extends TreeTestCase
         $this->assertEquals($newFirstQuestion->getOrder(), 0);
     }
 
-
+    /*
+     * @covers PUT api/v1/trees/{treeID}/questions/{questionID}/options/{optionID}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiOptionUpdate() {
 
 
@@ -333,7 +342,10 @@ final class APITest extends TreeTestCase
     }
 
 
-
+    /*
+     * @covers PUT api/v1/trees/{treeID}/questions/{questionID}/options/{optionID}/move/{position}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiOptionMove() {
         // move first to second
         $optionOneMoved = json_decode(
@@ -348,6 +360,17 @@ final class APITest extends TreeTestCase
         $this->assertEquals(self::$options['two']->getOrder(), 0);
     }
 
+    /*
+     * Moving an option from one question to another.
+     * It should:
+     * - remove the option from the current question,
+     * - rebuild the question so the order is set correctly,
+     * - move the option to the new question
+     * - rebuild the question
+     *
+     * @covers PUT api/v1/trees/{treeID}/questions/{questionID}/options/{optionID}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiOptionMoveToDifferentQuestion() {
         // moving this option to question two
         $this->data['questionID'] = self::$questions['two']->getID();
@@ -373,6 +396,10 @@ final class APITest extends TreeTestCase
     }
 
 
+    /*
+     * @covers PUT api/v1/trees/{treeID}/questions/{questionID}/options/{optionID}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiOptionChangeDestination() {
         $option = self::$options['one'];
         $newDestinationID = self::$ends['one']->getID();
@@ -406,6 +433,10 @@ final class APITest extends TreeTestCase
         }
     }
 
+    /*
+     * @covers PUT api/v1/trees/{treeID}/starts/{startID}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiStartUpdate() {
 
         // update start title
@@ -417,6 +448,10 @@ final class APITest extends TreeTestCase
         $this->assertEquals($startOneUpdated->title, $this->data['title']);
     }
 
+    /*
+     * @covers PUT api/v1/trees/{treeID}/starts/{startID}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiStartDestinationChange() {
         $newDestinationID = self::$questions['two']->getID();
         // update start destination
@@ -456,6 +491,10 @@ final class APITest extends TreeTestCase
         }
     }
 
+    /*
+     * @covers PUT api/v1/trees/{treeID}/groups/{groupID}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiGroupUpdate() {
 
         // update group title
@@ -469,6 +508,12 @@ final class APITest extends TreeTestCase
 
     }
 
+    /*
+     * Updating all questions in a group
+     *
+     * @covers PUT api/v1/trees/{treeID}/groups/{groupID}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiGroupUpdateQuestions() {
 
 
@@ -493,6 +538,10 @@ final class APITest extends TreeTestCase
 
     }
 
+    /*
+     * @covers POST api/v1/trees/{treeID}/groups/{groupID}/questions
+     * @provider from setUpBeforeClass()
+     */
     public function testApiGroupAddQuestion() {
 
         $this->data['question'] = self::$questions['two']->getID();
@@ -508,6 +557,10 @@ final class APITest extends TreeTestCase
 
     }
 
+    /*
+     * @covers DELETE api/v1/trees/{treeID}/groups/{groupID}/questions/{questionID}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiGroupRemoveQuestion() {
 
         $questions = self::$groups['one']->getQuestions();
@@ -547,6 +600,10 @@ final class APITest extends TreeTestCase
         }
     }
 
+    /*
+     * @covers PUT api/v1/trees/{treeID}/ends/{endID}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiEndUpdate() {
 
         // update end title
@@ -571,7 +628,10 @@ final class APITest extends TreeTestCase
 
     }
 
-
+    /*
+     * @covers DELETE api/v1/trees/{treeID}/starts/{startID}
+     * @provider from setUpBeforeClass()
+     */
     public function testApiStartDelete() {
 
                // delete the question
@@ -601,7 +661,11 @@ final class APITest extends TreeTestCase
 
     }
 
-     public function testApiEndDelete() {
+    /*
+     * @covers DELETE api/v1/trees/{treeID}/ends/{endID}
+     * @provider from setUpBeforeClass()
+     */
+    public function testApiEndDelete() {
 
                // delete the question
         foreach(self::$ends as $end)  {
