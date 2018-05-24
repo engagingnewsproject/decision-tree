@@ -80,7 +80,6 @@ $app->group('/api', function() {
         // add question(s) to a group
         $this->put('/trees/{treeID}/groups/{groupID}/questions', '\Cme\Route\Groups:addQuestion');
         $this->delete('/trees/{treeID}/groups/{groupID}/questions/{questionID}', '\Cme\Route\Groups:removeQuestion');
-        // $this->put('/trees/{treeID}/groups/{groupID}/move/{position}', '\Cme\Route\Groups:move');
         // Questions
         $this->get('/trees/{treeID}/questions', '\Cme\Route\Questions:getAll');
         $this->post('/trees/{treeID}/questions', '\Cme\Route\Questions:create');

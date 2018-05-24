@@ -564,9 +564,9 @@ final class APITest extends TreeTestCase
     public function testApiGroupRemoveQuestion() {
 
         $questions = self::$groups['one']->getQuestions();
+        $questionCount = count($questions);
 
         $groupOneUpdated = Utility\deleteEndpoint('trees/'.self::$tree->getID().'/groups/'.self::$groups['one']->getID().'/questions/'.$questions[0], $this->data);
-
         $groupOneUpdated = json_decode($groupOneUpdated);
 
         // unset the question we removed
@@ -575,10 +575,32 @@ final class APITest extends TreeTestCase
         $questions = array_values($questions);
 
         $this->assertEquals($groupOneUpdated->questions, $questions);
+
+        // questions should be one less than before
+        $this->assertEquals(count($groupOneUpdated->questions), ($questionCount - 1));
         // check off the object too
         self::$groups['one']->rebuild();
         $this->assertEquals($groupOneUpdated->questions, self::$groups['one']->getQuestions());
 
+    }
+
+    /*
+     * @covers PUT api/v1/trees/{treeID}/groups/{groupID}/move/{position}
+     * @provider from setUpBeforeClass()
+     */
+    public function testApiGroupMove() {
+        $group = self::$groups['one'];
+        // move first to end
+        $groupOneMoved = Utility\putEndpoint('trees/'.self::$tree->getID().'/groups/'.$group->getID().'/move/last', $this->data);
+
+        $groupOneMoved = json_decode($groupOneMoved);
+
+        $this->assertEquals($groupOneMoved->order, (count(self::$groups) - 1) );
+
+        // get the other group and make sure it's now first
+        $newFirstGroup = $this->getGroupFromEndpoint(self::$tree->getID(), self::$groups['two']->getID());
+
+        $this->assertEquals($newFirstGroup->getOrder(), 0);
     }
 
     /*

@@ -99,14 +99,6 @@ class Groups extends Trees
         return $this->return($result, $response);
     }
 
-    // Move a group from one position to another
-    public function move($request, $response) {
-        // init data
-        $this->init($request);
-
-        return parent::reorder($request, $response, 'group');
-    }
-
     // add a question to a group
     public function addQuestion($request, $response) {
         // init data
@@ -137,5 +129,14 @@ class Groups extends Trees
 
         return $this->return($this->group->array(), $response);
     }
+
+    // Move a group from one position to another
+    public function move($request, $response) {
+        // init data
+        $this->init($request);
+
+        return parent::reorder($request, $response, 'group');
+    }
+
 
 }
