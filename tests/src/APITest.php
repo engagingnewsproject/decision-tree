@@ -96,6 +96,14 @@ final class APITest extends TreeTestCase
 
     }
 
+    public static function tearDownAfterClass() {
+        // remove the files from the data direcory
+        unlink(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.json');
+        unlink(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.min.json');
+        // delete the static tree
+        self::$tree = false;
+    }
+
     /**
      * @covers api/v1/trees
      */
@@ -505,7 +513,6 @@ final class APITest extends TreeTestCase
         );
 
         $this->assertEquals($groupOneUpdated->title, $this->data['title']);
-
     }
 
     /*
@@ -650,6 +657,42 @@ final class APITest extends TreeTestCase
 
     }
 
+
+    /*
+     * @covers POST api/v1/trees/compiled
+     */
+    public function testApiCompile() {
+        $compiled = Utility\postEndpoint('trees/'.self::$tree->getID().'/compiled', $this->data);
+        $compiled = json_decode($compiled);
+
+        // check structure
+        $this->validateCompiledStructure($compiled);
+
+        // check that a file was created
+        $this->assertTrue(file_exists(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.json'));
+        // check that a minified file was created
+        $this->assertTrue(file_exists(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.min.json'));
+    }
+
+        /*
+     * @covers GET api/v1/trees/compiled
+     */
+    public function testApiGetCompiled() {
+        $compiled = Utility\getEndpoint('trees/'.self::$tree->getID().'/compiled');
+        $compiled = json_decode($compiled);
+
+        // check structure
+        $this->validateCompiledStructure($compiled);
+    }
+
+    public function validateCompiledStructure($compiled) {
+        // top level keys
+        $keys = ['ID', 'title', 'slug', 'starts', 'groups', 'questions', 'ends', 'stats'];
+
+        foreach($keys as $key) {
+            $this->assertObjectHasAttribute($key, $compiled);
+        }
+    }
     /*
      * @covers DELETE api/v1/trees/{treeID}/starts/{startID}
      * @provider from setUpBeforeClass()
@@ -822,10 +865,10 @@ final class APITest extends TreeTestCase
             }
         }
 
-
         // delete the static questions and options
         self::$questions = false;
         self::$options = false;
+
     }
 
 
@@ -853,8 +896,8 @@ final class APITest extends TreeTestCase
         // this expects that the tree status will be an error of something like 'Tree does not exist.' since we're trying to find a deleted tree
         $this->assertEquals($treeDeleted->status, 'error');
 
-        // delete the static tree
-        self::$tree = false;
+
+
 
     }
 }

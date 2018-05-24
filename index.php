@@ -61,7 +61,7 @@ $app->group('/api', function() {
         $this->put('/trees/{treeID}', '\Cme\Route\Trees:update');
         $this->delete('/trees/{treeID}', '\Cme\Route\Trees:delete');
         // Tree Actions/Views
-        $this->get('/trees/{treeSlug}/compile', '\Cme\Route\Trees:compile');
+        $this->post('/trees/{treeSlug}/compiled', '\Cme\Route\Trees:compile');
         $this->get('/trees/{treeSlug}/compiled', '\Cme\Route\Trees:compiled');
         $this->get('/trees/{treeSlug}/iframe', '\Cme\Route\Trees:iframe');
         // Starts
