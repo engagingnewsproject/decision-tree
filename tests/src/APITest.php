@@ -667,7 +667,7 @@ final class APITest extends TreeTestCase
      */
     public function testApiEndDelete() {
 
-               // delete the question
+        // delete the ends
         foreach(self::$ends as $end)  {
             $endID = $end->getID();
 
@@ -690,8 +690,37 @@ final class APITest extends TreeTestCase
 
         // delete the static ends
         self::$ends = false;
+    }
+
+    /*
+     * @covers DELETE api/v1/trees/{treeID}/groups/{groupID}
+     * @provider from setUpBeforeClass()
+     */
+    public function testApiGroupDelete() {
+
+        // delete the groups
+        foreach(self::$groups as $group)  {
+            $groupID = $group->getID();
+
+            $this->assertTrue(
+                json_decode(
+                    Utility\deleteEndpoint(
+                        'trees/'.self::$tree->getID().'/groups/'.$group->getID(),
+                        $this->data
+                    )
+                )
+            );
+
+            // check that it was deleted
+            $groupDeleted =json_decode(
+                Utility\getEndpoint('trees/'.self::$tree->getID().'/groups/'.$groupID)
+            );
+            $this->assertEquals($groupDeleted->status, 'error');
+        }
 
 
+        // delete the static groups
+        self::$groups = false;
     }
 
 
