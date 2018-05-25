@@ -14,7 +14,7 @@
     */
     var _setRootURL = function(url) {
         // regex it to see if it's one of our DEV urls
-        let regex = /https?:\/\/(?:(?:localhost:3000|decision-tree.dev)|(?:enptree)\.(?:staging\.)?wpengine\.com)\b/
+        let regex = /https?:\/\/(?:(?:localhost:3000|decision-tree.dev)|(?:enptree|cmetree)\.(?:staging\.)?wpengine\.com)\b/
         _rootURL = regex.exec(url)
 
         if(_rootURL === null) {

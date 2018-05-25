@@ -469,7 +469,7 @@ function getTreeData(slug) {
 function buildTree(request) {
 
     // check our response URL to make sure it's from a trusted source
-    if(!/https?:\/\/(?:decision-tree\.dev|tree\.mediaengagement\.org|enptree(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
+    if(!/https?:\/\/(?:decision-tree\.dev|tree\.mediaengagement\.org|(?:enptree|cmetree)(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
         console.error('responseURL from an invalidated source.')
         return false;
     }

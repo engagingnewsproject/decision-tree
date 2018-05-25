@@ -9,7 +9,7 @@ function handleCmeIframeMessage(event) {
 
     // quit the postmessage loop if it's NOT from a trusted site (engagingnewsproject.org or our dev sites)
     // If you want to see what it matches/doesn't match, go here: http://regexr.com/3g4rc
-    if (!/https?:\/\/(?:dev|localhost:3000|tree\.mediaengagement\.org|enptree(\.staging)?\.wpengine\.com)\b/.test(event.origin)) {
+    if (!/https?:\/\/(?:dev|localhost:3000|tree\.mediaengagement\.org|(?:enptree|cmetree)(\.staging)?\.wpengine\.com)\b/.test(event.origin)) {
         console.error('Domain not allowed.', event.origin);
         return false;
     }
