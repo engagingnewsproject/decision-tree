@@ -98,8 +98,8 @@ final class APITest extends TreeTestCase
 
     public static function tearDownAfterClass() {
         // remove the files from the data direcory
-        unlink(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.json');
-        unlink(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.min.json');
+        // unlink(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.json');
+        // unlink(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.min.json');
         // delete the static tree
         self::$tree = false;
     }
@@ -693,16 +693,15 @@ final class APITest extends TreeTestCase
             $this->assertObjectHasAttribute($key, $compiled);
         }
     }
+
     /*
      * @covers DELETE api/v1/trees/{treeID}/starts/{startID}
      * @provider from setUpBeforeClass()
      */
     public function testApiStartDelete() {
-
                // delete the question
         foreach(self::$starts as $start)  {
             $startID = $start->getID();
-
             $this->assertTrue(
                 json_decode(
                     Utility\deleteEndpoint(
@@ -711,31 +710,23 @@ final class APITest extends TreeTestCase
                     )
                 )
             );
-
             // check that it was deleted
             $startDeleted =json_decode(
                 Utility\getEndpoint('trees/'.self::$tree->getID().'/starts/'.$startID)
             );
             $this->assertEquals($startDeleted->status, 'error');
         }
-
-
         // delete the static starts
         self::$starts = false;
-
-
     }
-
     /*
      * @covers DELETE api/v1/trees/{treeID}/ends/{endID}
      * @provider from setUpBeforeClass()
      */
     public function testApiEndDelete() {
-
         // delete the ends
         foreach(self::$ends as $end)  {
             $endID = $end->getID();
-
             $this->assertTrue(
                 json_decode(
                     Utility\deleteEndpoint(
@@ -744,29 +735,23 @@ final class APITest extends TreeTestCase
                     )
                 )
             );
-
             // check that it was deleted
             $endDeleted =json_decode(
                 Utility\getEndpoint('trees/'.self::$tree->getID().'/ends/'.$endID)
             );
             $this->assertEquals($endDeleted->status, 'error');
         }
-
-
         // delete the static ends
         self::$ends = false;
     }
-
     /*
      * @covers DELETE api/v1/trees/{treeID}/groups/{groupID}
      * @provider from setUpBeforeClass()
      */
     public function testApiGroupDelete() {
-
         // delete the groups
         foreach(self::$groups as $group)  {
             $groupID = $group->getID();
-
             $this->assertTrue(
                 json_decode(
                     Utility\deleteEndpoint(
@@ -775,20 +760,15 @@ final class APITest extends TreeTestCase
                     )
                 )
             );
-
             // check that it was deleted
             $groupDeleted =json_decode(
                 Utility\getEndpoint('trees/'.self::$tree->getID().'/groups/'.$groupID)
             );
             $this->assertEquals($groupDeleted->status, 'error');
         }
-
-
         // delete the static groups
         self::$groups = false;
     }
-
-
     /**
      * Delete an option
      *
@@ -796,32 +776,20 @@ final class APITest extends TreeTestCase
      */
     public function testApiOptionDelete() {
         // Deleting questions should delete all options. Let's delete one option first
-
         // delete the option
         $endpoint = 'trees/'.self::$tree->getID().'/questions/'.self::$questions['one']->getID().'/options/'.self::$options['three']->getID();
-
         $deleteOption = Utility\deleteEndpoint(
             $endpoint,
             $this->data
         );
-
         $this->assertTrue(json_decode($deleteOption));
-
-
         $optionDeleted = json_decode(
             Utility\getEndpoint($endpoint)
         );
-
         $this->assertEquals($optionDeleted->status, 'error');
-
         // unset option three from the options since we just deleted it
         unset(self::$options['three']);
-
     }
-
-
-
-
     /**
      * Delete a question (and all its options)
      *
@@ -829,12 +797,10 @@ final class APITest extends TreeTestCase
      */
     public function testApiQuestionDelete() {
         // Deleting questions should delete all its options.
-
         // delete the question
         foreach(self::$questions as $question)  {
             $questionID = $question->getID();
             $optionsIDs = $question->getOptions();
-
             $this->assertTrue(
                 json_decode(
                     Utility\deleteEndpoint(
@@ -843,41 +809,31 @@ final class APITest extends TreeTestCase
                     )
                 )
             );
-
             // check that it was deleted
             $questionDeleted =json_decode(
                 Utility\getEndpoint('trees/'.self::$tree->getID().'/questions/'.$questionID)
             );
             $this->assertEquals($questionDeleted->status, 'error');
-
-
             // check to make sure its options were deleted
             if(empty($optionsIDS)) {
                 continue;
             }
-
             foreach($optionIDs as $optionID) {
                 $optionDeleted =json_decode(
                     Utility\getEndpoint('trees/'.self::$tree->getID().'/questions/'.$questionID.'/options/'.$optionID)
                 );
-
                 $this->assertEquals($optionDeleted->status, 'error');
             }
         }
-
         // delete the static questions and options
         self::$questions = false;
         self::$options = false;
-
     }
-
-
     /**
      * Test Question and Option API methods
      * @covers DELETE api/v1/trees/{treeID}
     */
     public function testApiTreeDelete() {
-
         // delete the tree
         $this->assertTrue(
             json_decode(
@@ -887,17 +843,12 @@ final class APITest extends TreeTestCase
                 )
             )
         );
-
         // check to make sure the endpoints are deleted
         $treeDeleted = json_decode(
             Utility\getEndpoint('trees/'.self::$tree->getID())
         );
-
         // this expects that the tree status will be an error of something like 'Tree does not exist.' since we're trying to find a deleted tree
         $this->assertEquals($treeDeleted->status, 'error');
-
-
-
-
     }
+
 }
