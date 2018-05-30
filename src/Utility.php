@@ -153,7 +153,17 @@ function requestEndpoint($path, $data = [], $method = 'GET') {
     }
 
     if($method !== 'GET') {
+        // add in authentication
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+            'X-API-Access: '.$data['user']['accessToken'],
+            'X-API-Client: '.$data['user']['clientToken']
+        ));
+        // remove user from data
+        if(isset($data['user'])) {
+            unset($data['user']);
+        }
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+
     }
 
     // don't worry about SSL for local

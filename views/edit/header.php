@@ -13,11 +13,24 @@
         body {
             background: #f2f2f2;
         }
-        form {
+        .element {
             border: 1px solid #ddd;
             background: #fff;
             padding: 2rem;
             margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .btn--delete {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            border: none;
+            color: red;
+            background: none;
+        }
+        form {
+
         }
         label {
             display: block;

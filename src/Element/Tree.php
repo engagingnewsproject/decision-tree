@@ -76,9 +76,9 @@ class Tree extends Element {
         return $this->slug;
     }
 
-    public function setSlug($string) {
-        if(Utility\isSlug($string)) {
-            $this->slug = $string;
+    public function setSlug($slug) {
+        if(Utility\isSlug($slug)) {
+            $this->slug = $slug;
         }
 
         return $this->slug;

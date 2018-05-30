@@ -11,7 +11,7 @@
 
     <div v-else class="tree">
         Editing Tree: {{ tree.title }}
-        <form method="PUT" :action="'/trees/' + tree.ID">
+        <form v-on:submit.prevent="saveTree()">
           <label>
             Tree Title
             <input type="text" v-model="tree.title" />
@@ -24,8 +24,8 @@
         </form>
 
         <h2>Questions</h2>
-        <div v-for="question in tree.questions" class="question">
-          <form method="put" :action="'/trees/' + tree.ID + '/questions/' + question.ID" v-on:submit.prevent="saveElement(question.ID, 'question')">
+        <div class="element" v-for="question in tree.questions" class="question">
+          <form v-on:submit.prevent="saveElement(question.ID, 'question')">
             <label>
               Question Title
               <input type="text" v-model="question.title" />
@@ -35,13 +35,18 @@
               <input type="number" v-model="question.order" />
             </label>
             <button>Save</button>
-            <button v-on:click="deleteElement(question.ID, 'question')">Delete</button>
           </form>
+          <button class="btn btn--delete" v-on:click="deleteElement(question.ID, 'question')">Delete</button>
         </div>
 
+        <form v-on:submit.prevent="createElement('question')">
+          <input type="text" name="elementTitle" v-model="newEl.title"/>
+          <button>Add Question</button>
+        </form>
+
         <h2>Ends</h2>
-        <div v-for="end in tree.ends" class="end">
-          <form method="put" :action="'/trees/' + tree.ID + '/ends/' + end.ID" v-on:submit.prevent="saveElement(end.ID, 'end')">
+        <div class="element" v-for="end in tree.ends" class="end">
+          <form v-on:submit.prevent="saveElement(end.ID, 'end')">
             <label>
               End Title
               <input type="text" v-model="end.title" />
@@ -51,8 +56,8 @@
               <input type="number" v-model="end.order" />
             </label>
             <button>Save</button>
-            <button v-on:click="deleteElement(end.ID, 'end')">Delete</button>
           </form>
+          <button class="btn btn--delete" v-on:click="deleteElement(end.ID, 'end')">Delete</button>
         </div>
 
   </section>
@@ -81,7 +86,10 @@
       return {
         tree: null,
         errored: false,
-        loading: true
+        loading: true,
+        newEl: {
+          title: null
+        }
       }
     },
     mounted () {
@@ -110,6 +118,26 @@
             this.errored = true
           })
           .finally(() => this.loading = false)
+      },
+      saveTree: function () {
+        console.log({
+              title: this.tree.title,
+              slug: this.tree.slug
+            });
+        treeServer
+          .put(
+            '/trees/'+tree.ID,
+            {
+              title: this.tree.title,
+              slug: this.tree.slug
+            })
+          .then(response => (
+            console.log(response.data)
+          ))
+          .catch(error => {
+            console.log(error)
+            this.errored = true
+          })
       },
       saveElement: function (ID, elType) {
         els = this.tree[elType+'s']
@@ -164,6 +192,24 @@
             this.errored = true
           })
           .finally(() => this.reMount())
+      },
+      createElement: function(elType) {
+        treeServer
+          .post(
+            '/trees/'+tree.ID+'/'+elType+'s',
+            this.newEl)
+          .then(response => (
+            console.log(response.data)
+          ))
+          .catch(error => {
+            console.log(error)
+            this.errored = true
+          })
+          .finally(
+            () => {
+              this.newEl.title = null
+              this.reMount()
+            })
       },
       buildSave(el) {
         let data = {}

@@ -505,7 +505,7 @@ class DB extends PDO {
             'vals'      => $tree,
             'required'  => [],
             'table'     => $this->tables['tree'],
-            'where'     => ['treeID' => $treeID, 'treeOwner' => $this->user['userID']]
+            'where'     => ['treeID' => $treeID]
         ]);
     }
 
