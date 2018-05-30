@@ -33,12 +33,13 @@ class Authentication {
         $data = $request->getParsedBody();
         $errors = [];
 
-        if(!isset($data['user'])) {
+        if(!$request->hasHeader('X-API-Access') || !$request->hasHeader('X-API-Client')) {
             throw new \Error('No user passed.');
         } else {
-            $user = $data['user'];
+            $clientToken = $request->getHeader('X-API-Client')[0];
+            $accessToken = $request->getHeader('X-API-Access')[0];
             // validate the user
-            $validUser = Utility\validateUserToken($user['clientToken'], $user['accessToken']);
+            $validUser = Utility\validateUserToken($clientToken, $accessToken);
 
             if($validUser !== true) {
                 throw new \Error('Invalid user.');
@@ -51,7 +52,7 @@ class Authentication {
         }
 
         // add in our valid user to the request
-        $request = $request->withAttribute('user', Utility\getUser('clientToken', $data['user']['clientToken']));
+        $request = $request->withAttribute('user', Utility\getUser('clientToken', $clientToken));
         // go ahead and move on to the actual request
         $response = $next($request, $response);
         return $response;
