@@ -68,8 +68,11 @@ class Trees extends Route
         $this->init($request);
 
         $treeSlug = $this->tree->getSlug();
+        $compileStats = true;
         // compile it, passing in the database
-        $compiled = new Database\CompileTree($this->tree, $this->db);
+        $compiled = new Database\CompileTree($this->tree, $this->db, $compileStats);
+        // save it
+        $compiled->save();
 
         // return the file that got written
         // It's already JSON, so don't pass it through the $this->return function
@@ -79,15 +82,23 @@ class Trees extends Route
     }
 
     public function compiled($request, $response) {
-        $treeSlug = $request->getAttribute('treeSlug');
-        $minified = $request->getQueryParam('minified', $default = false);
-        $ext = ($minified === 'true' ? '.min' : '');
+        // init data
+        $this->init($request);
 
-        if(Utility\isID($treeSlug)) {
-            $treeSlug = Utility\getTreeSlugById($treeSlug);
+        $stats = $request->getQueryParam('stats', $default = true);
+        $compileStats = ($stats === 'false' ? false : true);
+
+        if($compileStats === false) {
+            // no stats needed! compile and return (without saving)
+            $compiled = new Database\CompileTree($this->tree, $this->db, $compileStats);
+
+            $response->getBody()->write(json_encode($compiled->getCompiled()));
+        } else {
+            $minified = $request->getQueryParam('minified', $default = false);
+            $ext = ($minified === 'true' ? '.min' : '');
+            // they want the one with stats, get it from the json file
+            $response->getBody()->write(file_get_contents("data/".$this->tree->getSlug().$ext.".json"));
         }
-
-        $response->getBody()->write(file_get_contents("data/".$treeSlug.$ext.".json"));
         return $response;
     }
 

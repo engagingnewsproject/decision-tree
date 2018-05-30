@@ -13,7 +13,7 @@ class CompileTree extends DB {
               $tree,
               $compiled;
 
-    public function __construct($tree, $db = false) {
+    public function __construct($tree, $db = false, $stats = true) {
         // allow a database connection to be passed in
         if($db !== false) {
             $this->db = $db;
@@ -27,15 +27,28 @@ class CompileTree extends DB {
         $this->compiled['questions'] = $this->compileElement('question', $this->tree->getQuestions());
         $this->compiled['ends'] = $this->compileElement('end', $this->tree->getEnds());
 
-        // figure out total paths and longest path
-        $this->compiled['stats'] = $this->computePaths($this->compiled['questions']);
+        if($stats === true) {
+            // figure out total paths and longest path
+            $this->compiled['stats'] = $this->computePaths($this->compiled['questions']);
+        }
+
+        // return compiled php array
+        return $this->compiled;
+    }
+
+    public function getCompiled() {
+        return $this->compiled;
+    }
+
+    // writes to file
+    public function save() {
         // encode to JSON
         $pretty_json = json_encode($this->compiled, JSON_PRETTY_PRINT);
         $minified_json = json_encode($this->compiled);
         // write to file
         $this->writeFile($this->tree->getSlug(), $pretty_json);
         $this->writeFile($this->tree->getSlug().'.min', $minified_json);
-        // return the json, if they need it
+
         return $pretty_json;
     }
 

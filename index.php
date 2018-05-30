@@ -52,6 +52,10 @@ $c['phpErrorHandler'] = function ($c) {
 // An authentication layer for validating users before passing them through to the route
 $app->add(new \Cme\Authentication());
 
+$app->group('/edit', function() {
+    $this->get('/tree/{treeID}', '\Cme\Route\Editor:tree');
+});
+
 $app->group('/api', function() {
     $this->group('/v1', function() {
         // Trees
@@ -61,8 +65,9 @@ $app->group('/api', function() {
         $this->put('/trees/{treeID}', '\Cme\Route\Trees:update');
         $this->delete('/trees/{treeID}', '\Cme\Route\Trees:delete');
         // Tree Actions/Views
-        $this->post('/trees/{treeSlug}/compiled', '\Cme\Route\Trees:compile');
         $this->get('/trees/{treeSlug}/compiled', '\Cme\Route\Trees:compiled');
+        $this->post('/trees/{treeSlug}/compiled', '\Cme\Route\Trees:compile');
+
         $this->get('/trees/{treeSlug}/iframe', '\Cme\Route\Trees:iframe');
         // Starts
         $this->get('/trees/{treeID}/starts', '\Cme\Route\Starts:getAll');
