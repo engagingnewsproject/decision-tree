@@ -1,0 +1,113 @@
+body {
+    padding: 0;
+    margin: 0;
+}
+
+* {
+    box-sizing: border-box;
+}
+.app {
+    background: #f2f2f2;
+    transition: all 2s;
+}
+.app--loading {
+    background: #f2f2f2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.app--error {
+    background: red;
+}
+
+.visually-hidden {
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute !important;
+    left:-10000px;
+    top: 10px;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    z-index: -1;
+
+    &:focus {
+        clip: auto !important;
+        display: block;
+        height: auto;
+        width: auto;
+        left: 10px;
+        top: 10px;
+        z-index: 9999999;
+    }
+}
+
+.element {
+    border: 1px solid #ddd;
+    background: #fff;
+    padding: 2rem;
+    margin: 0 auto 2rem;
+    max-width: 500px;
+    position: relative;
+    animation: fadeIn 0.4s;
+
+    &:hover {
+        cursor: move;
+        cursor: grab;
+        cursor: -webkit-grab;
+    }
+}
+
+body.draggable--is-dragging,
+body.draggable--is-dragging .element:hover,
+body.draggable--is-dragging input:hover {
+    cursor: move!important;
+    cursor: grabbing!important;
+    cursor: -webkit-grabbing!important;
+}
+
+.element__title {
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid #bbb;
+    font-size: 1.6rem;
+    padding: 0.4rem;
+}
+
+.element__save {
+    display: none;
+}
+
+.btn--delete {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    border: none;
+    color: red;
+    background: none;
+}
+
+label {
+    display: block;
+}
+
+.draggable-source--is-dragging {
+    background: #ddd;
+    box-shadow: 0 0 5px #ddd;
+}
+
+.draggable-source--is-dragging > * {
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0.2;
+    },
+    100% {
+        opacity: 1;
+    }
+}

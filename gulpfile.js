@@ -34,7 +34,7 @@ const cssFiles = [
                 ];
 
 // Static Server + watching scss/html files
-gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'TreeLoaderJS', 'handlebars'], function() {
+gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'TreeLoaderJS', 'handlebars', 'editSass', 'editJs'], function() {
 
     browserSync({
         proxy: localhost
@@ -59,6 +59,13 @@ gulp.task('serve', ['sass', 'iframeJS', 'TreeJS', 'TreeLoaderJS', 'handlebars'],
     gulp.watch("dist/js/cme-tree.min.js").on('change', reload);
 
     compressJS("dist/js/handlebars.runtime.js");
+
+
+    // edit files
+    gulp.watch("views/edit/assets/sass/*.scss", ['editSass'])
+    gulp.watch("views/edit/assets/js/*.js", ['editJs'])
+    gulp.watch("views/edit/dist/*/*").on('change', reload);
+    gulp.watch("views/edit/*.php").on('change', reload);
 });
 
 
@@ -169,7 +176,7 @@ function processSASS(filename) {
       .pipe(autoprefixer())
 
       // minify the CSS
-      .pipe(crass())
+      .pipe(crass({pretty:false}))
 
       // rename to add .min
       .pipe(rename({
@@ -196,7 +203,7 @@ function cssImportantify(filename) {
     // add !important tags
     .pipe(cssVip())
     // minify the CSS
-    .pipe(crass())
+    .pipe(crass({pretty:false}))
     // rename to add .min
     .pipe(rename({
       basename: filename+'-important',
@@ -215,7 +222,7 @@ function cssCleanSlate(filename) {
     .pipe(concat(filename+'-clean-slate.css'))
     // minify the CSS
     // @TODO This makes it so you have to save twice, apparently...
-    .pipe(crass())
+    .pipe(crass({pretty:false}))
     // rename to add .min
     .pipe(rename({
       suffix: '.min'
@@ -239,6 +246,42 @@ gulp.task('handlebars', function(){
       .pipe(rename('templates.min.js'))
       .pipe(uglify())
       .pipe(gulp.dest('dist/js/'));
+});
+
+
+gulp.task('editSass', function () {
+  return gulp.src('views/edit/assets/sass/edit.scss')
+      // Converts Sass into CSS with Gulp Sass
+      .pipe(plumber())
+      .pipe(sass({
+        errLogToConsole: true
+      }))
+      // adds prefixes to whatever needs to get done
+      .pipe(autoprefixer())
+
+      // minify the CSS
+      .pipe(crass({pretty:false}))
+
+      // rename to add .min
+      .pipe(rename({
+        suffix: '.min'
+      }))
+      // Outputs CSS files in the css folder
+      .pipe(gulp.dest('views/edit/dist/css/'));
+});
+
+gulp.task('editJs', function () {
+  var jsFiles = 'views/edit/assets/js/*.js',
+    jsDest = 'views/edit/dist/js';
+
+    return gulp.src(jsFiles)
+        .pipe(plumber())
+        .pipe(babel())
+        .pipe(concat('edit.js'))
+        .pipe(gulp.dest(jsDest))
+        .pipe(rename('edit.min.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest(jsDest));
 });
 
 // Creating a default task
