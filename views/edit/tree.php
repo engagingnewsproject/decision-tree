@@ -30,11 +30,11 @@
 
         <h2>Questions</h2>
         <div class="questions">
-          <div v-bind:id="'question--'+question.id" class="element question" v-for="question in currentTree.questions">
+          <div v-bind:id="'question--'+question.ID" class="element question" v-for="question in currentTree.questions">
             <form v-on:submit.prevent="saveElement(question.ID, 'question')">
               <label>
                 <span class="visually-hidden">Question Title</span>
-                <textarea rows="1" v-bind:id="'question-title--'+question.id" class="element__title" v-on:blur="saveElement(question.ID, 'question')" v-on:keyup="setTextareaHeight" v-model="question.title"></textarea>
+                <textarea rows="1" v-bind:id="'question-title--'+question.ID" class="element__title" v-on:blur="saveElement(question.ID, 'question')" v-on:keyup="setTextareaHeight" v-model="question.title"></textarea>
               </label>
               <input type="hidden" v-model="question.order" />
               <button class="element__save">Save</button>
@@ -44,21 +44,21 @@
         </div>
 
         <form v-on:submit.prevent="createElement('question')">
-          <input type="text" name="elementTitle" v-model="newEl.title"/>
+          <input type="text" name="elementTitle" v-model="newEl.question.title"/>
           <button>Add Question</button>
         </form>
 
         <h2>Ends</h2>
         <div class="ends">
-          <div v-bind:id="'end--'+end.id" class="element end" v-for="end in currentTree.ends">
+          <div v-bind:id="'end--'+end.ID" class="element end" v-for="end in currentTree.ends">
             <form v-on:submit.prevent="saveElement(end.ID, 'end')">
               <label>
                 <span class="visually-hidden">End Title</span>
-                <textarea rows="1" v-bind:id="'end-title--'+end.id" class="element__title" v-on:blur="saveElement(end.ID, 'end')" v-on:keyup="setTextareaHeight" v-model="end.title"></textarea>
+                <textarea rows="1" v-bind:id="'end-title--'+end.ID" class="element__title" v-on:blur="saveElement(end.ID, 'end')" v-on:keyup="setTextareaHeight" v-model="end.title"></textarea>
               </label>
               <label>
-                Order
-                <input type="number" v-model="end.order" />
+                <span class="visually-hidden">End Content</span>
+                <textarea rows="1" v-bind:id="'end-content--'+end.ID" class="element__content" v-on:blur="saveElement(end.ID, 'end')" v-on:keyup="setTextareaHeight" v-model="end.content"></textarea>
               </label>
               <button class="element__save">Save</button>
             </form>
@@ -67,7 +67,14 @@
         </div>
 
         <form v-on:submit.prevent="createElement('end')">
-          <input type="text" name="elementTitle" v-model="newEl.title"/>
+          <label>
+            Title
+            <input type="text" name="elementTitle" v-model="newEl.end.title"/>
+          </label>
+          <label>
+            Content
+            <input type="text" name="elementContent" v-model="newEl.end.content"/>
+          </label>
           <button>Add End</button>
         </form>
 

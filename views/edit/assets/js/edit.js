@@ -17,7 +17,13 @@ var app = new Vue({
       loading: true,
       elTypes: ['question', 'end', 'start', 'group', 'option'],
       newEl: {
-        title: null
+        question: {
+          title: null
+        },
+        end: {
+          title: null,
+          content: null
+        }
       },
       sort: {
         sorting: {
@@ -75,7 +81,7 @@ var app = new Vue({
     saveTree: function () {
       treeServer
         .put(
-          '/trees/'+currentTree.ID,
+          '/trees/'+this.currentTree.ID,
           {
             title: this.currentTree.title,
             slug: this.currentTree.slug
@@ -148,7 +154,7 @@ var app = new Vue({
       treeServer
         .post(
           '/trees/'+tree.ID+'/'+elType+'s',
-          this.newEl)
+          this.newEl[elType])
         .then(response => (
           console.log(response.data)
         ))
@@ -158,7 +164,8 @@ var app = new Vue({
         })
         .finally(
           () => {
-            this.newEl.title = null
+            this.newEl[elType].title = null
+            this.newEl[elType].content = null
             this.reMount()
           })
     },
@@ -248,14 +255,6 @@ var app = new Vue({
 
     },
 
-    getElementIndex: function(node) {
-      var index = 0;
-      while ( (node = node.previousElementSibling) ) {
-          index++;
-      }
-      return index;
-    },
-
     orderSave: function(elType, el, to) {
       treeServer
         .put(
@@ -270,8 +269,15 @@ var app = new Vue({
         .finally(() => this.reMount())
     },
     setTextareaHeight: function(e) {
-
       e.target.style.height = (e.target.scrollHeight)+'px'
+    },
+
+    getElementIndex: function(node) {
+      var index = 0;
+      while ( (node = node.previousElementSibling) ) {
+          index++;
+      }
+      return index;
     },
     /**
     * Powers most all of the retrieval of data from the tree

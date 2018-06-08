@@ -19,7 +19,13 @@ var app = new Vue({
       loading: true,
       elTypes: ['question', 'end', 'start', 'group', 'option'],
       newEl: {
-        title: null
+        question: {
+          title: null
+        },
+        end: {
+          title: null,
+          content: null
+        }
       },
       sort: {
         sorting: {
@@ -75,7 +81,7 @@ var app = new Vue({
     saveTree: function saveTree() {
       var _this2 = this;
 
-      treeServer.put('/trees/' + currentTree.ID, {
+      treeServer.put('/trees/' + this.currentTree.ID, {
         title: this.currentTree.title,
         slug: this.currentTree.slug
       }).then(function (response) {
@@ -145,13 +151,14 @@ var app = new Vue({
     createElement: function createElement(elType) {
       var _this5 = this;
 
-      treeServer.post('/trees/' + tree.ID + '/' + elType + 's', this.newEl).then(function (response) {
+      treeServer.post('/trees/' + tree.ID + '/' + elType + 's', this.newEl[elType]).then(function (response) {
         return console.log(response.data);
       }).catch(function (error) {
         console.log(error);
         _this5.errored = true;
       }).finally(function () {
-        _this5.newEl.title = null;
+        _this5.newEl[elType].title = null;
+        _this5.newEl[elType].content = null;
         _this5.reMount();
       });
     },
@@ -236,14 +243,6 @@ var app = new Vue({
       });
     },
 
-    getElementIndex: function getElementIndex(node) {
-      var index = 0;
-      while (node = node.previousElementSibling) {
-        index++;
-      }
-      return index;
-    },
-
     orderSave: function orderSave(elType, el, to) {
       var _this7 = this;
 
@@ -257,8 +256,15 @@ var app = new Vue({
       });
     },
     setTextareaHeight: function setTextareaHeight(e) {
-
       e.target.style.height = e.target.scrollHeight + 'px';
+    },
+
+    getElementIndex: function getElementIndex(node) {
+      var index = 0;
+      while (node = node.previousElementSibling) {
+        index++;
+      }
+      return index;
     },
     /**
     * Powers most all of the retrieval of data from the tree

@@ -65,7 +65,7 @@ body {
     position: relative;
     animation: fadeIn 0.4s;
 
-    &:hover {
+    &.question:hover {
         cursor: move;
         cursor: grab;
         cursor: -webkit-grab;
@@ -81,12 +81,18 @@ body.draggable--is-dragging input:hover,
     cursor: -webkit-grabbing!important;
 }
 
-.element__title {
+.element__title,
+.element__content {
     width: 100%;
     border: none;
     border-bottom: 2px solid #bbb;
     font-size: 1.6rem;
     padding: 0.4rem;
+}
+
+.element__content {
+    font-size: 1rem;
+    border-bottom: none;
 }
 
 .element__save {
