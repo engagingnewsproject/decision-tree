@@ -1,6 +1,8 @@
 body {
     padding: 0;
     margin: 0;
+    font-family: Arial;
+    background: #f2f2f2;
 }
 
 * {
@@ -8,7 +10,8 @@ body {
 }
 .app {
     background: #f2f2f2;
-    transition: all 2s;
+    padding: 3rem 0;
+    transition: all 0.2s;
 }
 .app--loading {
     background: #f2f2f2;
@@ -22,6 +25,15 @@ body {
 
 .app--error {
     background: red;
+}
+
+.app--saving {
+    opacity: 0.2;
+}
+
+.container {
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 .visually-hidden {
@@ -49,8 +61,7 @@ body {
     border: 1px solid #ddd;
     background: #fff;
     padding: 2rem;
-    margin: 0 auto 2rem;
-    max-width: 500px;
+    margin-bottom: 2rem;
     position: relative;
     animation: fadeIn 0.4s;
 
@@ -63,7 +74,8 @@ body {
 
 body.draggable--is-dragging,
 body.draggable--is-dragging .element:hover,
-body.draggable--is-dragging input:hover {
+body.draggable--is-dragging input:hover,
+ body.draggable--is-dragging textarea:hover{
     cursor: move!important;
     cursor: grabbing!important;
     cursor: -webkit-grabbing!important;
@@ -92,6 +104,10 @@ body.draggable--is-dragging input:hover {
 
 label {
     display: block;
+}
+
+textarea {
+    resize: none
 }
 
 .draggable-source--is-dragging {

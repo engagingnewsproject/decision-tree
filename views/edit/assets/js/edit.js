@@ -61,6 +61,14 @@ var app = new Vue({
             this.setupSortable()
             // move to last scroll position so it doesn't jump back to top
             window.scrollTo(0, lastScrollPos);
+            // set height on all text elements
+            var e = {}
+            var textareas = document.querySelectorAll('textarea')
+            for(let i = 0; i < textareas.length; i++) {
+              e.target = textareas[i]
+              this.setTextareaHeight(e)
+            }
+
           })
         })
     },
@@ -260,6 +268,10 @@ var app = new Vue({
           this.errored = true
         })
         .finally(() => this.reMount())
+    },
+    setTextareaHeight: function(e) {
+
+      e.target.style.height = (e.target.scrollHeight)+'px'
     },
     /**
     * Powers most all of the retrieval of data from the tree
