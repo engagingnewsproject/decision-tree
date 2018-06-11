@@ -34,12 +34,12 @@
             <form v-on:submit.prevent="saveElement(question.ID, 'question')">
               <label>
                 <span class="visually-hidden">Question Title</span>
-                <textarea rows="1" v-bind:id="'question-title--'+question.ID" class="element__title" v-on:blur="saveElement(question.ID, 'question')" v-on:keyup="setTextareaHeight" v-model="question.title"></textarea>
+                <textarea rows="1" v-bind:id="'question-title--'+question.ID" class="element__title element__title--question" v-on:blur="saveElement(question.ID, 'question')" v-on:keyup="setTextareaHeight" v-model="question.title"></textarea>
               </label>
               <input type="hidden" v-model="question.order" />
               <button class="element__save">Save</button>
             </form>
-            <div class="option-wrapper" v-for="option in question.options">
+            <div class="options option-wrapper" v-for="option in question.options">
               <form class="element__option" v-on:submit.prevent="saveElement(option.ID, 'option')">
                 <label>
                   <span class="visually-hidden">Option Title</span>
@@ -52,10 +52,17 @@
                   </select>
                 </label>
               </form>
+
+              <button v-if="option.order != 0"v-on:click="orderSave('option', option, option.order-1)" class="option__move option__move--up">↑</button>
+              <button v-if="option.order < question.options.length - 1" v-on:click="orderSave('option', option, option.order+1)" class="option__move option__move--down">↓</button>
+
               <button class="btn btn--delete btn__delete-option" v-on:click="deleteElement(option.ID, 'option')">x</button>
             </div>
-            <form class="option-create" v-on:submit.prevent="createOption(question.ID)">
-              <input type="text" name="optionTitle" v-model="newEl.option.title"/>
+            <form class="element__create element__create--option" v-on:submit.prevent="createOption(question.ID)">
+              <label>
+                <span class="visually-hidden">Option Title</span>
+                <input type="text" name="optionTitle" class="create__title" v-model="newEl.option.title"/>
+              </label>
               <label>
                 <span class="visually-hidden">Destination</span>
                 <select class="element__destination" v-model="newEl.option.destination">
@@ -69,8 +76,12 @@
           </div>
         </div>
 
-        <form v-on:submit.prevent="createElement('question')">
-          <input type="text" name="elementTitle" v-model="newEl.question.title"/>
+        <h3>New Question</h3>
+        <form class="element__create element__create--question" v-on:submit.prevent="createElement('question')">
+          <label>
+            <span class="visually-hidden">Question title</span>
+            <input type="text" name="elementTitle" v-model="newEl.question.title"/>
+          </label>
           <button>Add Question</button>
         </form>
 
@@ -80,7 +91,7 @@
             <form v-on:submit.prevent="saveElement(end.ID, 'end')">
               <label>
                 <span class="visually-hidden">End Title</span>
-                <textarea rows="1" v-bind:id="'end-title--'+end.ID" class="element__title" v-on:blur="saveElement(end.ID, 'end')" v-on:keyup="setTextareaHeight" v-model="end.title"></textarea>
+                <textarea rows="1" v-bind:id="'end-title--'+end.ID" class="element__title element__title--end" v-on:blur="saveElement(end.ID, 'end')" v-on:keyup="setTextareaHeight" v-model="end.title"></textarea>
               </label>
               <label>
                 <span class="visually-hidden">End Content</span>
@@ -92,7 +103,8 @@
           </div>
         </div>
 
-        <form v-on:submit.prevent="createElement('end')">
+        <h3>New End</h3>
+        <form class="element__create element__create--question"  v-on:submit.prevent="createElement('end')">
           <label>
             Title
             <input type="text" name="elementTitle" v-model="newEl.end.title"/>

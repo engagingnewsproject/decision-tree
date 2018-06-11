@@ -1,20 +1,61 @@
+$orange: #bf5700;
+$blue: #daecf3;
+
+@mixin btn--reset {
+    border: none;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+}
+
 body {
     padding: 0;
     margin: 0;
     font-family: Arial;
-    background: #f2f2f2;
+    background: $blue;
 }
 
 * {
     box-sizing: border-box;
 }
+
+label {
+    display: block;
+}
+
+input {
+    width: 100%;
+    padding: 0.4rem;
+    display: block;
+    margin-bottom: 0.6rem;
+}
+
+textarea {
+    resize: none;
+    background: transparent;
+}
+
+select {
+    width: 100%;
+    margin-bottom: 0.6rem;
+}
+
+button {
+    border: none;
+    background: $orange;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 40px;
+    cursor: pointer;
+}
+
 .app {
-    background: #f2f2f2;
+    background: $blue;
     padding: 3rem 0;
     transition: all 0.2s;
 }
 .app--loading {
-    background: #f2f2f2;
+    background: $blue;
     position: absolute;
     top: 0;
     left: 0;
@@ -24,7 +65,7 @@ body {
 }
 
 .app--error {
-    background: red;
+    background: $orange;
 }
 
 .app--saving {
@@ -58,9 +99,7 @@ body {
 }
 
 .element {
-    border: 1px solid #ddd;
-    background: #fff;
-    padding: 2rem;
+    padding: 1rem 0;
     margin-bottom: 2rem;
     position: relative;
     animation: fadeIn 0.4s;
@@ -85,9 +124,18 @@ body.draggable--is-dragging input:hover,
 .element__content {
     width: 100%;
     border: none;
-    border-bottom: 2px solid #bbb;
+    border-bottom: 2px solid #333;
     font-size: 1.375rem;
     padding: 0.4rem;
+}
+
+.element__title--question {
+    font-weight: 600;
+}
+
+.element__title--end {
+    font-size: 2rem;
+    font-weight: 600;
 }
 
 .element__content {
@@ -100,8 +148,7 @@ body.draggable--is-dragging input:hover,
 }
 
 .element__option {
-    border-left: 3px solid #ddd;
-    border-bottom: 1px solid #ddd;
+    background: white;
     padding: 1rem;
     margin-bottom: 0.6rem;
 }
@@ -114,10 +161,15 @@ body.draggable--is-dragging input:hover,
     font-size: 1rem;
 }
 
-.option-create {
-    border: 1px dashed #ddd;
+.element__create {
+    border: 1px dashed #fff;
     padding: 1rem;
 }
+
+.create__title {
+    width: 100%;
+}
+
 
 .btn--delete {
     color: red;
@@ -126,28 +178,33 @@ body.draggable--is-dragging input:hover,
     font-weight: 600;
     position: absolute;
     top: 5px;
-    right: 5px;
+    right: -1rem;
     border: none;
 }
-.btn__delete-question {
 
+.btn__delete-option {
+    right: 0;
 }
 
-label {
-    display: block;
+.option__move {
+    @include btn--reset;
+    position: absolute;
+    left: 0.1rem;
+    color: $orange;
+    font-size: 0.8rem;
 }
 
-textarea {
-    resize: none
+.option__move--up {
+    top: 5px;
 }
 
-select {
-    max-width: 100%;
+.option__move--down {
+    bottom: 5px;
 }
 
 .draggable-source--is-dragging {
-    background: #ddd;
-    box-shadow: 0 0 5px #ddd;
+    background: rgba(0,0,0,.1);
+    box-shadow: 0 0 5px rgba(0,0,0,.1);
 }
 
 .draggable-source--is-dragging > * {

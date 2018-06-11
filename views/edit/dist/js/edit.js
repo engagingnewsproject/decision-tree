@@ -40,7 +40,7 @@ var app = new Vue({
           el: null
         },
         sortables: [],
-        whitelist: ['question', 'group', 'option']
+        whitelist: ['question']
       }
     };
   },
@@ -256,7 +256,13 @@ var app = new Vue({
     orderSave: function orderSave(elType, el, to) {
       var _this7 = this;
 
-      treeServer.put('/trees/' + tree.ID + '/' + elType + 's/' + el.ID + '/move/' + to).then(function (response) {
+      var path = '/trees/' + tree.ID + '/' + elType + 's/' + el.ID + '/move/' + to;
+      if (elType === 'option') {
+        // find the question so we can get the question ID
+        var question = this.getQuestionByOption(el.ID);
+        path = '/trees/' + tree.ID + '/questions/' + question.ID + '/options/' + el.ID + '/move/' + to;
+      }
+      treeServer.put(path).then(function (response) {
         return console.log(response.data);
       }).catch(function (error) {
         console.log(error);

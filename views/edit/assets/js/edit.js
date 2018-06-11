@@ -38,7 +38,7 @@ var app = new Vue({
           el: null
         },
         sortables: [],
-        whitelist: ['question', 'group', 'option'],
+        whitelist: ['question'],
       }
     }
   },
@@ -262,9 +262,14 @@ var app = new Vue({
     },
 
     orderSave: function(elType, el, to) {
+      var path = '/trees/'+tree.ID+'/'+elType+'s/'+el.ID+'/move/'+to;
+      if(elType === 'option') {
+        // find the question so we can get the question ID
+        var question = this.getQuestionByOption(el.ID)
+        path = '/trees/'+tree.ID+'/questions/'+question.ID+'/options/'+el.ID+'/move/'+to;
+      }
       treeServer
-        .put(
-          '/trees/'+tree.ID+'/'+elType+'s/'+el.ID+'/move/'+to)
+        .put(path)
         .then(response => (
           console.log(response.data)
         ))
