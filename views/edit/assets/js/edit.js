@@ -142,10 +142,20 @@ var app = new Vue({
 
     },
     deleteElement: function(ID, elType) {
+      var path, question;
       alert('Are you sure? This will delete the element.');
+
+      path = '/trees/'+tree.ID+'/'+elType+'s/'+ID
+      if(elType === 'option') {
+
+        // find the question so we can get the question ID
+        question = this.getQuestionByOption(ID)
+        // set the path
+        path = '/trees/'+tree.ID+'/questions/'+question.ID+'/options/'+ID
+      }
+
       treeServer
-        .delete(
-          '/trees/'+tree.ID+'/'+elType+'s/'+ID)
+        .delete(path)
         .then(response => (
           console.log(response.data)
           // if successful, then remove this element from the data array
@@ -205,7 +215,7 @@ var app = new Vue({
       let containerSelector = '.'+el+'s';
       let containers = document.querySelectorAll(containerSelector);
       if (containers.length === 0) {
-        console.log('nothing found');
+        console.log('no sortable found for '+el);
         return false;
       }
 
@@ -274,6 +284,33 @@ var app = new Vue({
           index++;
       }
       return index;
+    },
+    getOption(ID) {
+      let questions, option, optionIndex;
+      questions = this.currentTree.questions
+      // loop through questions and find the option if one matches
+      for(let i = 0; i < questions.length; i++) {
+        // try to find the option match in this
+        optionIndex = this.getIndexBy(questions[i].options, 'ID', ID)
+        if(optionIndex !== undefined) {
+          return questions[i].options[optionIndex]
+        }
+      }
+      return undefined;
+    },
+    // find a question ID by an option ID
+    getQuestionByOption(ID) {
+      let questions, option, optionIndex;
+      questions = this.currentTree.questions
+      // loop through questions and find the option if one matches
+      for(let i = 0; i < questions.length; i++) {
+        // try to find the option match in this
+        optionIndex = this.getIndexBy(questions[i].options, 'ID', ID)
+        if(optionIndex !== undefined) {
+          return questions[i]
+        }
+      }
+      return undefined;
     },
     /**
     * Powers most all of the retrieval of data from the tree

@@ -52,6 +52,7 @@
                   </select>
                 </label>
               </form>
+              <button class="btn btn--delete btn__delete-option" v-on:click="deleteElement(option.ID, 'option')">x</button>
             </div>
             <form class="option-create" v-on:submit.prevent="createOption(question.ID)">
               <input type="text" name="optionTitle" v-model="newEl.option.title"/>
@@ -64,7 +65,7 @@
               <button>Add Option</button>
             </form>
 
-            <button class="btn btn--delete" v-on:click="deleteElement(question.ID, 'question')">Delete</button>
+            <button class="btn btn--delete btn__delete-question" v-on:click="deleteElement(question.ID, 'question')">x</button>
           </div>
         </div>
 
@@ -87,7 +88,7 @@
               </label>
               <button class="element__save">Save</button>
             </form>
-            <button class="btn btn--delete" v-on:click="deleteElement(end.ID, 'end')">Delete</button>
+            <button class="btn btn--delete" v-on:click="deleteElement(end.ID, 'end')">x</button>
           </div>
         </div>
 

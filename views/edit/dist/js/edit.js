@@ -142,8 +142,19 @@ var app = new Vue({
     deleteElement: function deleteElement(ID, elType) {
       var _this4 = this;
 
+      var path, question;
       alert('Are you sure? This will delete the element.');
-      treeServer.delete('/trees/' + tree.ID + '/' + elType + 's/' + ID).then(function (response) {
+
+      path = '/trees/' + tree.ID + '/' + elType + 's/' + ID;
+      if (elType === 'option') {
+
+        // find the question so we can get the question ID
+        question = this.getQuestionByOption(ID);
+        // set the path
+        path = '/trees/' + tree.ID + '/questions/' + question.ID + '/options/' + ID;
+      }
+
+      treeServer.delete(path).then(function (response) {
         return console.log(response.data)
         // if successful, then remove this element from the data array
         ;
@@ -200,7 +211,7 @@ var app = new Vue({
       var containerSelector = '.' + el + 's';
       var containers = document.querySelectorAll(containerSelector);
       if (containers.length === 0) {
-        console.log('nothing found');
+        console.log('no sortable found for ' + el);
         return false;
       }
 
@@ -265,6 +276,39 @@ var app = new Vue({
       }
       return index;
     },
+    getOption: function getOption(ID) {
+      var questions = void 0,
+          option = void 0,
+          optionIndex = void 0;
+      questions = this.currentTree.questions;
+      // loop through questions and find the option if one matches
+      for (var i = 0; i < questions.length; i++) {
+        // try to find the option match in this
+        optionIndex = this.getIndexBy(questions[i].options, 'ID', ID);
+        if (optionIndex !== undefined) {
+          return questions[i].options[optionIndex];
+        }
+      }
+      return undefined;
+    },
+
+    // find a question ID by an option ID
+    getQuestionByOption: function getQuestionByOption(ID) {
+      var questions = void 0,
+          option = void 0,
+          optionIndex = void 0;
+      questions = this.currentTree.questions;
+      // loop through questions and find the option if one matches
+      for (var i = 0; i < questions.length; i++) {
+        // try to find the option match in this
+        optionIndex = this.getIndexBy(questions[i].options, 'ID', ID);
+        if (optionIndex !== undefined) {
+          return questions[i];
+        }
+      }
+      return undefined;
+    },
+
     /**
     * Powers most all of the retrieval of data from the tree
     * Searches an array for a key that equals a certain value
