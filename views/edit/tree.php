@@ -39,6 +39,31 @@
               <input type="hidden" v-model="question.order" />
               <button class="element__save">Save</button>
             </form>
+            <div class="option-wrapper" v-for="option in question.options">
+              <form class="element__option" v-on:submit.prevent="saveElement(option.ID, 'option')">
+                <label>
+                  <span class="visually-hidden">Option Title</span>
+                  <textarea rows="1" v-bind:id="'option-title--'+option.ID" class="element__title element__title--option" v-on:blur="saveElement(option.ID, 'option')" v-on:keyup="setTextareaHeight" v-model="option.title"></textarea>
+                </label>
+                <label>
+                  <span class="visually-hidden">Destination</span>
+                  <select v-bind:id="'option-destination--'+option.ID" class="element__destination" v-on:change="saveElement(option.ID, 'option')" v-model="option.destinationID">
+                    <?php include 'destination-select.php'?>
+                  </select>
+                </label>
+              </form>
+            </div>
+            <form class="option-create" v-on:submit.prevent="createOption(question.ID)">
+              <input type="text" name="optionTitle" v-model="newEl.option.title"/>
+              <label>
+                <span class="visually-hidden">Destination</span>
+                <select class="element__destination" v-model="newEl.option.destination">
+                  <?php include 'destination-select.php'?>
+                </select>
+              </label>
+              <button>Add Option</button>
+            </form>
+
             <button class="btn btn--delete" v-on:click="deleteElement(question.ID, 'question')">Delete</button>
           </div>
         </div>

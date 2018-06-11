@@ -16,9 +16,14 @@ var app = new Vue({
       errored: false,
       loading: true,
       elTypes: ['question', 'end', 'start', 'group', 'option'],
-      newEl: {
+      newEl: { // store the data for elements that are getting created
         question: {
           title: null
+        },
+        option: {
+          questionID: null,
+          title: null,
+          destination: ''
         },
         end: {
           title: null,
@@ -32,7 +37,8 @@ var app = new Vue({
           to: null,
           el: null
         },
-        sortables: []
+        sortables: [],
+        whitelist: ['question', 'group', 'option'],
       }
     }
   },
@@ -56,7 +62,7 @@ var app = new Vue({
           this.currentTree = this.trees[this.trees.length - 1]
         })
         .catch(error => {
-          console.log(error)
+          console.error(error)
           this.errored = true
         })
         .finally(() => {
@@ -64,7 +70,10 @@ var app = new Vue({
           this.$nextTick(function () {
             // Code that will run only after the
             // entire view has been rendered
-            this.setupSortable()
+            for(let i = 0; i < this.sort.whitelist.length; i++) {
+              this.setupSortable(this.sort.whitelist[i])
+            }
+
             // move to last scroll position so it doesn't jump back to top
             window.scrollTo(0, lastScrollPos);
             // set height on all text elements
@@ -113,13 +122,10 @@ var app = new Vue({
       elData = this.buildSave(el);
 
       // compare if the old and new match
-      console.log(elData)
-      console.log(oldElData)
       if(this.areObjectsEqual(elData, oldElData)) {
         console.log('no changes');
         return
       }
-      console.log('saving', elData)
       // check that the title has actually changed
       treeServer
         .put(
@@ -151,9 +157,13 @@ var app = new Vue({
         .finally(() => this.reMount())
     },
     createElement: function(elType) {
+      var path = '/trees/'+tree.ID+'/'+elType+'s'
+      if(elType === 'option') {
+        path = '/trees/'+tree.ID+'/questions/'+this.newEl.option.questionID+'/options'
+      }
       treeServer
         .post(
-          '/trees/'+tree.ID+'/'+elType+'s',
+          path,
           this.newEl[elType])
         .then(response => (
           console.log(response.data)
@@ -166,6 +176,8 @@ var app = new Vue({
           () => {
             this.newEl[elType].title = null
             this.newEl[elType].content = null
+            this.newEl[elType].questionID = null
+            this.newEl[elType].destination = null
             this.reMount()
           })
     },
@@ -185,66 +197,50 @@ var app = new Vue({
 
       return data
     },
-    setupSortable: function () {
-
-      /*for(let i = 0; i < this.elTypes.length; i++) {
-        let containerSelector = '.'+this.elTypes[i];
-        let containers = document.querySelectorAll(containerSelector);
-
-        if (containers.length === 0) {
-          return false;
-        }
-
-        var sortable = new Sortable(containers, {
-          draggable: this.elTypes[i],
-          appendTo: containerSelector,
-          mirror: {
-            constrainDimensions: true,
-          },
-        });
-      }*/
-      console.log('setting up draggable');
-      let containerSelector = '.questions';
+    createOption: function(questionID) {
+      this.newEl['option'].questionID = questionID
+      this.createElement('option')
+    },
+    setupSortable: function (el) {
+      let containerSelector = '.'+el+'s';
       let containers = document.querySelectorAll(containerSelector);
-      console.log(containers)
       if (containers.length === 0) {
         console.log('nothing found');
         return false;
       }
 
 
-      this.sort.sortables['question'] = new Sortable.default(
+      this.sort.sortables[el] = new Sortable.default(
         containers,
         {
-          draggable: '.question',
+          draggable: '.'+el,
           appendTo: containerSelector,
           mirror: {
             constrainDimensions: true,
           },
       })
 
-      this.sort.sortables['question'].on('drag:start', (e) => {
+      this.sort.sortables[el].on('drag:start', (e) => {
         if(document.activeElement.nodeName !== 'DIV') {
           // cancel it and assign focus back to this element
           e.cancel()
         }
-        this.sort.sorting.elType = 'question'
+        this.sort.sorting.elType = el
         this.sort.sorting.from = this.getElementIndex(e.data.source)
-        this.sort.sorting.el = this.currentTree.questions[this.sort.sorting.from]
+        this.sort.sorting.el = this.currentTree[el+'s'][this.sort.sorting.from]
       });
 
-      this.sort.sortables['question'].on('drag:stop', (e) => {
+      this.sort.sortables[el].on('drag:stop', (e) => {
         // make element order match the updated data
         this.sort.sorting.to = this.getElementIndex(e.data.source)
         let to = this.sort.sorting.to
         let from = this.sort.sorting.from
-        console.log(to)
         if(to !== from) {
           // save it
           if(to > from) {
             to = to -1 // draggable adds an element, thus making it seem like it's one higher in index than it really is when it's dropped
           }
-          this.orderSave('question', this.sort.sorting.el, to)
+          this.orderSave(el, this.sort.sorting.el, to)
         }
         // clear all values
         this.sort.sorting.elType = null

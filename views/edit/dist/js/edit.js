@@ -18,9 +18,14 @@ var app = new Vue({
       errored: false,
       loading: true,
       elTypes: ['question', 'end', 'start', 'group', 'option'],
-      newEl: {
+      newEl: { // store the data for elements that are getting created
         question: {
           title: null
+        },
+        option: {
+          questionID: null,
+          title: null,
+          destination: ''
         },
         end: {
           title: null,
@@ -34,7 +39,8 @@ var app = new Vue({
           to: null,
           el: null
         },
-        sortables: []
+        sortables: [],
+        whitelist: ['question', 'group', 'option']
       }
     };
   },
@@ -58,21 +64,24 @@ var app = new Vue({
         }
         _this.currentTree = _this.trees[_this.trees.length - 1];
       }).catch(function (error) {
-        console.log(error);
+        console.error(error);
         _this.errored = true;
       }).finally(function () {
         _this.loading = false;
         _this.$nextTick(function () {
           // Code that will run only after the
           // entire view has been rendered
-          this.setupSortable();
+          for (var i = 0; i < this.sort.whitelist.length; i++) {
+            this.setupSortable(this.sort.whitelist[i]);
+          }
+
           // move to last scroll position so it doesn't jump back to top
           window.scrollTo(0, lastScrollPos);
           // set height on all text elements
           var e = {};
           var textareas = document.querySelectorAll('textarea');
-          for (var i = 0; i < textareas.length; i++) {
-            e.target = textareas[i];
+          for (var _i = 0; _i < textareas.length; _i++) {
+            e.target = textareas[_i];
             this.setTextareaHeight(e);
           }
         });
@@ -116,13 +125,10 @@ var app = new Vue({
       elData = this.buildSave(el);
 
       // compare if the old and new match
-      console.log(elData);
-      console.log(oldElData);
       if (this.areObjectsEqual(elData, oldElData)) {
         console.log('no changes');
         return;
       }
-      console.log('saving', elData);
       // check that the title has actually changed
       treeServer.put('/trees/' + tree.ID + '/' + elType + 's/' + ID, elData).then(function (response) {
         return console.log(response.data);
@@ -151,7 +157,11 @@ var app = new Vue({
     createElement: function createElement(elType) {
       var _this5 = this;
 
-      treeServer.post('/trees/' + tree.ID + '/' + elType + 's', this.newEl[elType]).then(function (response) {
+      var path = '/trees/' + tree.ID + '/' + elType + 's';
+      if (elType === 'option') {
+        path = '/trees/' + tree.ID + '/questions/' + this.newEl.option.questionID + '/options';
+      }
+      treeServer.post(path, this.newEl[elType]).then(function (response) {
         return console.log(response.data);
       }).catch(function (error) {
         console.log(error);
@@ -159,6 +169,8 @@ var app = new Vue({
       }).finally(function () {
         _this5.newEl[elType].title = null;
         _this5.newEl[elType].content = null;
+        _this5.newEl[elType].questionID = null;
+        _this5.newEl[elType].destination = null;
         _this5.reMount();
       });
     },
@@ -178,62 +190,49 @@ var app = new Vue({
 
       return data;
     },
-    setupSortable: function setupSortable() {
+    createOption: function createOption(questionID) {
+      this.newEl['option'].questionID = questionID;
+      this.createElement('option');
+    },
+    setupSortable: function setupSortable(el) {
       var _this6 = this;
 
-      /*for(let i = 0; i < this.elTypes.length; i++) {
-        let containerSelector = '.'+this.elTypes[i];
-        let containers = document.querySelectorAll(containerSelector);
-         if (containers.length === 0) {
-          return false;
-        }
-         var sortable = new Sortable(containers, {
-          draggable: this.elTypes[i],
-          appendTo: containerSelector,
-          mirror: {
-            constrainDimensions: true,
-          },
-        });
-      }*/
-      console.log('setting up draggable');
-      var containerSelector = '.questions';
+      var containerSelector = '.' + el + 's';
       var containers = document.querySelectorAll(containerSelector);
-      console.log(containers);
       if (containers.length === 0) {
         console.log('nothing found');
         return false;
       }
 
-      this.sort.sortables['question'] = new Sortable.default(containers, {
-        draggable: '.question',
+      this.sort.sortables[el] = new Sortable.default(containers, {
+        draggable: '.' + el,
         appendTo: containerSelector,
         mirror: {
           constrainDimensions: true
         }
       });
 
-      this.sort.sortables['question'].on('drag:start', function (e) {
+      this.sort.sortables[el].on('drag:start', function (e) {
         if (document.activeElement.nodeName !== 'DIV') {
           // cancel it and assign focus back to this element
           e.cancel();
         }
-        _this6.sort.sorting.elType = 'question';
+        _this6.sort.sorting.elType = el;
         _this6.sort.sorting.from = _this6.getElementIndex(e.data.source);
-        _this6.sort.sorting.el = _this6.currentTree.questions[_this6.sort.sorting.from];
+        _this6.sort.sorting.el = _this6.currentTree[el + 's'][_this6.sort.sorting.from];
       });
 
-      this.sort.sortables['question'].on('drag:stop', function (e) {
+      this.sort.sortables[el].on('drag:stop', function (e) {
         // make element order match the updated data
         _this6.sort.sorting.to = _this6.getElementIndex(e.data.source);
         var to = _this6.sort.sorting.to;
         var from = _this6.sort.sorting.from;
-        console.log(to);
         if (to !== from) {
           // save it
           if (to > from) {
             to = to - 1; // draggable adds an element, thus making it seem like it's one higher in index than it really is when it's dropped
           }
-          _this6.orderSave('question', _this6.sort.sorting.el, to);
+          _this6.orderSave(el, _this6.sort.sorting.el, to);
         }
         // clear all values
         _this6.sort.sorting.elType = null;

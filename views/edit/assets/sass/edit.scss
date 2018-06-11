@@ -99,6 +99,22 @@ body.draggable--is-dragging input:hover,
     display: none;
 }
 
+.element__option {
+    border-left: 3px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 1rem;
+    margin-bottom: 0.6rem;
+}
+
+.element__title--option {
+    font-size: 1rem;
+}
+
+.option-create {
+    border: 1px dashed #ddd;
+    padding: 1rem;
+}
+
 .btn--delete {
     position: absolute;
     top: 5px;
@@ -114,6 +130,10 @@ label {
 
 textarea {
     resize: none
+}
+
+select {
+    max-width: 100%;
 }
 
 .draggable-source--is-dragging {
