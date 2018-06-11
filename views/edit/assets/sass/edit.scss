@@ -151,6 +151,7 @@ body.draggable--is-dragging input:hover,
     background: white;
     padding: 1rem;
     margin-bottom: 0.6rem;
+    border-left: 10px solid #eee;
 }
 
 .option-wrapper {
@@ -189,17 +190,17 @@ body.draggable--is-dragging input:hover,
 .option__move {
     @include btn--reset;
     position: absolute;
-    left: 0.1rem;
+    left: 0;
     color: $orange;
     font-size: 0.8rem;
 }
 
 .option__move--up {
-    top: 5px;
+    top: 28%;
 }
 
 .option__move--down {
-    bottom: 5px;
+    bottom: 28%;
 }
 
 .draggable-source--is-dragging {
