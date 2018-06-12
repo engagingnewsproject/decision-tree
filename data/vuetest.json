@@ -1,0 +1,115 @@
+{
+    "ID": "5",
+    "slug": "vuetest",
+    "title": "Vue Quiz Updates Again",
+    "owner": "1",
+    "starts": [],
+    "groups": [],
+    "questions": [
+        {
+            "ID": "2669",
+            "title": "Question 1",
+            "order": "0",
+            "options": [
+                {
+                    "ID": "2728",
+                    "title": "Go to End 1",
+                    "order": "0",
+                    "destinationID": "2721",
+                    "destinationType": "end"
+                },
+                {
+                    "ID": "2724",
+                    "title": "do you want to go to question 2?",
+                    "order": "1",
+                    "destinationID": "119",
+                    "destinationType": "question"
+                },
+                {
+                    "ID": "2723",
+                    "title": "do you want to go to question 3?",
+                    "order": "2",
+                    "destinationID": "2730",
+                    "destinationType": "question"
+                },
+                {
+                    "ID": "2738",
+                    "title": "Go to end 2",
+                    "order": "3",
+                    "destinationID": "2744",
+                    "destinationType": "end"
+                }
+            ]
+        },
+        {
+            "ID": "119",
+            "title": "Question 2",
+            "order": "1",
+            "options": [
+                {
+                    "ID": "2727",
+                    "title": "Question 3",
+                    "order": "0",
+                    "destinationID": "2730",
+                    "destinationType": "question"
+                },
+                {
+                    "ID": "2726",
+                    "title": "End 1",
+                    "order": "1",
+                    "destinationID": "2721",
+                    "destinationType": "end"
+                }
+            ]
+        },
+        {
+            "ID": "2730",
+            "title": "Question 3",
+            "order": "2",
+            "options": [
+                {
+                    "ID": "2739",
+                    "title": "End 1",
+                    "order": "0",
+                    "destinationID": "2721",
+                    "destinationType": "end"
+                },
+                {
+                    "ID": "2740",
+                    "title": "End 2",
+                    "order": "1",
+                    "destinationID": "2744",
+                    "destinationType": "end"
+                }
+            ]
+        }
+    ],
+    "ends": [
+        {
+            "ID": "2721",
+            "title": "End 1",
+            "content": "Woke scenester church-key aesthetic, lyft cornhole yr yuccie craft beer. Four loko narwhal mlkshk edison bulb af."
+        },
+        {
+            "ID": "2744",
+            "title": "End 2",
+            "content": "Lorem ipsum dolor amet tacos pop-up before they sold out, typewriter hashtag vape trust fund leggings distillery letterpress neutra sartorial vaporware. Bespoke whatever humblebrag copper mug tousled marfa neutra celiac kitsch slow-carb lo-fi."
+        }
+    ],
+    "stats": {
+        "total_paths": 7,
+        "longest_path": 4,
+        "path_ends": {
+            "2721": {
+                "title": "End 1",
+                "count": 4,
+                "percentage": 57.14
+            },
+            "2744": {
+                "title": "End 2",
+                "count": 3,
+                "percentage": 42.86
+            }
+        }
+    }
+}

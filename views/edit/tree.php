@@ -58,7 +58,7 @@
 
               <button class="btn btn--delete btn__delete-option" v-on:click="deleteElement(option.ID, 'option')">x</button>
             </div>
-            <form class="element__create element__create--option" v-on:submit.prevent="createOption(question.ID)">
+            <form v-if="addOption == question.ID" class="element__create element__create--option" v-on:submit.prevent="createOption(question.ID)">
               <label>
                 <span class="visually-hidden">Option Title</span>
                 <input type="text" name="optionTitle" class="create__title" v-model="newEl.option.title"/>
@@ -71,6 +71,7 @@
               </label>
               <button>Add Option</button>
             </form>
+            <button v-if="addOption != question.ID" v-on:click="toggleAddOption(question.ID)">+</button>
 
             <button class="btn btn--delete btn__delete-question" v-on:click="deleteElement(question.ID, 'question')">x</button>
           </div>

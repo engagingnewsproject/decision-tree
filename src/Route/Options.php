@@ -77,7 +77,9 @@ class Options extends Questions
 
         $option = new Option($this->db, $option);
 
-        $keys = ['title', 'destination'];
+        $this->setOptionDestination($this->data, $option);
+
+        $keys = ['title'];
         $option = $this->dynamicSet($this->data, $keys, $option);
 
         $option = $option->save();
@@ -93,8 +95,9 @@ class Options extends Questions
         // init data
         $this->init($request);
 
+        $this->setOptionDestination($this->data, $this->option);
         // allow them to move questions by passing a separate question ID
-        $keys = ['questionID', 'destination', 'title'];
+        $keys = ['questionID', 'title'];
         $this->option = $this->dynamicSet($this->data, $keys, $this->option);
 
         $this->option->save();
@@ -122,5 +125,25 @@ class Options extends Questions
     // TODO
     public function prune() {
         // remove all options that don't have a destination (maybe the destination was deleted)
+    }
+
+    public function setOptionDestination($data, $option) {
+
+        // if no destination or destinationID were passed, return early
+        if(!isset($data['destination']) && !isset($data['destinationID'])) {
+            return $option;
+        }
+
+        // allow for both 'destination' (value is ID), 'destinationID', and both 'destinationID' and 'destinationType'
+        if(isset($data['destination'])) {
+            $data['destinationID'] = $data['destination'];
+        }
+        if(!isset($data['destinationType'])) {
+            $data['destinationType'] = false;
+        }
+        // try to set the destination
+        $option->setDestination($data['destinationID'], $data['destinationType']);
+
+        return $option;
     }
 }

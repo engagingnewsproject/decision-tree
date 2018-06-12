@@ -18,6 +18,7 @@ var app = new Vue({
       errored: false,
       loading: true,
       elTypes: ['question', 'end', 'start', 'group', 'option'],
+      addOption: false, // or ID
       newEl: { // store the data for elements that are getting created
         question: {
           title: null
@@ -107,30 +108,52 @@ var app = new Vue({
           elIndex = void 0,
           el = void 0,
           elData = void 0,
-          oldElData = void 0;
-      // build the old one
-      els = this.trees[this.trees.length - 2][elType + 's'];
-      elIndex = this.getIndexBy(els, 'ID', ID);
-      el = els[elIndex];
+          oldElData = void 0,
+          path = void 0,
+          question = void 0,
+          tree = void 0;
+
+      tree = this.trees[this.trees.length - 2];
+      if (elType !== 'option') {
+        // build the old one
+        els = tree[elType + 's'];
+        elIndex = this.getIndexBy(els, 'ID', ID);
+        el = els[elIndex];
+      } else {
+        el = this.getOption(ID, tree);
+      }
 
       // call the data build dynamically
       oldElData = this.buildSave(el);
-
+      console.log(oldElData);
       // build the new one
-      els = this.currentTree[elType + 's'];
-      elIndex = this.getIndexBy(els, 'ID', ID);
-      el = els[elIndex];
+      tree = this.currentTree;
+
+      if (elType !== 'option') {
+        els = tree[elType + 's'];
+        elIndex = this.getIndexBy(els, 'ID', ID);
+        el = els[elIndex];
+      } else {
+        el = this.getOption(ID, tree);
+      }
 
       // call the data build dynamically
       elData = this.buildSave(el);
-
+      console.log(elData);
       // compare if the old and new match
       if (this.areObjectsEqual(elData, oldElData)) {
         console.log('no changes');
         return;
       }
-      // check that the title has actually changed
-      treeServer.put('/trees/' + tree.ID + '/' + elType + 's/' + ID, elData).then(function (response) {
+      path = '/trees/' + tree.ID + '/' + elType + 's/' + ID;
+      if (elType === 'option') {
+
+        // find the question so we can get the question ID
+        question = this.getQuestionByOption(ID);
+        // set the path
+        path = '/trees/' + tree.ID + '/questions/' + question.ID + '/options/' + ID;
+      }
+      treeServer.put(path, elData).then(function (response) {
         return console.log(response.data);
       }).catch(function (error) {
         console.log(error);
@@ -143,7 +166,7 @@ var app = new Vue({
       var _this4 = this;
 
       var path, question;
-      alert('Are you sure? This will delete the element.');
+      alert('Are you sure? This will delete the ' + elType + '.');
 
       path = '/trees/' + tree.ID + '/' + elType + 's/' + ID;
       if (elType === 'option') {
@@ -188,14 +211,20 @@ var app = new Vue({
     buildSave: function buildSave(el) {
       var data = {};
       // allowed keys
-      var whitelist = ['title', 'content', 'questionID', 'destination', 'questions'];
+      var whitelist = ['title', 'content', 'questionID', 'destination', 'destinationID', 'questions'];
 
       for (var i = 0; i < whitelist.length; i++) {
         // check if the object key exists
         if (whitelist[i] in el) {
-
           data[whitelist[i]] = el[whitelist[i]];
           //data.assign(data, {whitelist[i]: el[whitelist[i]]})
+
+          if (whitelist[i] === 'destinationID' || whitelist[i] === 'destination') {
+            // set the destination type off of this ID
+            data['destinationType'] = this.getDestinationTypeByID(el[whitelist[i]]);
+            console.log('finding destination of ', el[whitelist[i]]);
+            console.log('destinationType', data['destinationType']);
+          }
         }
       }
 
@@ -204,6 +233,7 @@ var app = new Vue({
     createOption: function createOption(questionID) {
       this.newEl['option'].questionID = questionID;
       this.createElement('option');
+      this.toggleAddOption();
     },
     setupSortable: function setupSortable(el) {
       var _this6 = this;
@@ -274,7 +304,10 @@ var app = new Vue({
     setTextareaHeight: function setTextareaHeight(e) {
       e.target.style.height = e.target.scrollHeight + 'px';
     },
-
+    // question ID of the question you're adding options for
+    toggleAddOption: function toggleAddOption(questionID) {
+      this.addOption = questionID;
+    },
     getElementIndex: function getElementIndex(node) {
       var index = 0;
       while (node = node.previousElementSibling) {
@@ -282,11 +315,15 @@ var app = new Vue({
       }
       return index;
     },
-    getOption: function getOption(ID) {
+    getOption: function getOption(ID, tree) {
+      if (tree === undefined) {
+        tree = this.currentTree;
+      }
+
       var questions = void 0,
           option = void 0,
           optionIndex = void 0;
-      questions = this.currentTree.questions;
+      questions = tree.questions;
       // loop through questions and find the option if one matches
       for (var i = 0; i < questions.length; i++) {
         // try to find the option match in this
@@ -312,6 +349,31 @@ var app = new Vue({
           return questions[i];
         }
       }
+      return undefined;
+    },
+    getDestinationTypeByID: function getDestinationTypeByID(ID) {
+      var questions = void 0,
+          ends = void 0;
+      questions = this.currentTree.questions;
+
+      for (var i = 0; i < questions.length; i++) {
+        // try to find the option match in this
+        if (questions[i].ID === ID) {
+          return 'question';
+        }
+      }
+
+      // not a question, make sure it's an end
+      ends = this.currentTree.ends;
+
+      for (var _i2 = 0; _i2 < ends.length; _i2++) {
+        // try to find the option match in this
+        if (ends[_i2].ID === ID) {
+          return 'end';
+        }
+      }
+
+      // couldn't find a match
       return undefined;
     },
 

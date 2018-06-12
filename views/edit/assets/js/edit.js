@@ -16,6 +16,7 @@ var app = new Vue({
       errored: false,
       loading: true,
       elTypes: ['question', 'end', 'start', 'group', 'option'],
+      addOption: false, // or ID
       newEl: { // store the data for elements that are getting created
         question: {
           title: null
@@ -104,32 +105,52 @@ var app = new Vue({
         })
     },
     saveElement: function (ID, elType) {
-      let els, elIndex, el, elData, oldElData;
-      // build the old one
-      els = this.trees[this.trees.length - 2][elType+'s']
-      elIndex = this.getIndexBy(els, 'ID', ID);
-      el = els[elIndex]
+      let els, elIndex, el, elData, oldElData, path, question, tree;
+
+
+      tree = this.trees[this.trees.length - 2]
+      if(elType !== 'option') {
+        // build the old one
+        els = tree[elType+'s']
+        elIndex = this.getIndexBy(els, 'ID', ID);
+        el = els[elIndex]
+      } else {
+        el = this.getOption(ID, tree)
+      }
 
       // call the data build dynamically
       oldElData = this.buildSave(el);
-
+      console.log(oldElData)
       // build the new one
-      els = this.currentTree[elType+'s']
-      elIndex = this.getIndexBy(els, 'ID', ID);
-      el = els[elIndex]
+      tree = this.currentTree
+
+      if(elType !== 'option') {
+        els = tree[elType+'s']
+        elIndex = this.getIndexBy(els, 'ID', ID);
+        el = els[elIndex]
+      } else {
+        el = this.getOption(ID, tree)
+      }
 
       // call the data build dynamically
       elData = this.buildSave(el);
-
+      console.log(elData)
       // compare if the old and new match
       if(this.areObjectsEqual(elData, oldElData)) {
         console.log('no changes');
         return
       }
-      // check that the title has actually changed
+      path = '/trees/'+tree.ID+'/'+elType+'s/'+ID
+      if(elType === 'option') {
+
+        // find the question so we can get the question ID
+        question = this.getQuestionByOption(ID)
+        // set the path
+        path = '/trees/'+tree.ID+'/questions/'+question.ID+'/options/'+ID
+      }
       treeServer
         .put(
-          '/trees/'+tree.ID+'/'+elType+'s/'+ID,
+          path,
           elData)
         .then(response => (
           console.log(response.data)
@@ -143,7 +164,7 @@ var app = new Vue({
     },
     deleteElement: function(ID, elType) {
       var path, question;
-      alert('Are you sure? This will delete the element.');
+      alert('Are you sure? This will delete the '+elType+'.');
 
       path = '/trees/'+tree.ID+'/'+elType+'s/'+ID
       if(elType === 'option') {
@@ -194,14 +215,21 @@ var app = new Vue({
     buildSave: function(el) {
       let data = {}
       // allowed keys
-      let whitelist = ['title','content','questionID','destination','questions'];
+      let whitelist = ['title','content','questionID','destination','destinationID','questions'];
 
       for(let i = 0; i < whitelist.length; i++) {
         // check if the object key exists
         if(whitelist[i] in el) {
-
           data[whitelist[i]] = el[whitelist[i]]
           //data.assign(data, {whitelist[i]: el[whitelist[i]]})
+
+          if(whitelist[i] === 'destinationID' || whitelist[i] === 'destination') {
+            // set the destination type off of this ID
+            data['destinationType'] = this.getDestinationTypeByID(el[whitelist[i]])
+            console.log('finding destination of ', el[whitelist[i]])
+            console.log('destinationType', data['destinationType'])
+          }
+
         }
       }
 
@@ -210,6 +238,7 @@ var app = new Vue({
     createOption: function(questionID) {
       this.newEl['option'].questionID = questionID
       this.createElement('option')
+      this.toggleAddOption()
     },
     setupSortable: function (el) {
       let containerSelector = '.'+el+'s';
@@ -282,7 +311,10 @@ var app = new Vue({
     setTextareaHeight: function(e) {
       e.target.style.height = (e.target.scrollHeight)+'px'
     },
-
+    // question ID of the question you're adding options for
+    toggleAddOption: function(questionID) {
+      this.addOption = questionID
+    },
     getElementIndex: function(node) {
       var index = 0;
       while ( (node = node.previousElementSibling) ) {
@@ -290,9 +322,13 @@ var app = new Vue({
       }
       return index;
     },
-    getOption(ID) {
+    getOption(ID, tree) {
+      if(tree === undefined) {
+        tree = this.currentTree
+      }
+
       let questions, option, optionIndex;
-      questions = this.currentTree.questions
+      questions = tree.questions
       // loop through questions and find the option if one matches
       for(let i = 0; i < questions.length; i++) {
         // try to find the option match in this
@@ -315,6 +351,30 @@ var app = new Vue({
           return questions[i]
         }
       }
+      return undefined;
+    },
+    getDestinationTypeByID(ID) {
+      let questions, ends;
+      questions = this.currentTree.questions
+
+      for(let i = 0; i < questions.length; i++) {
+        // try to find the option match in this
+        if(questions[i].ID === ID) {
+          return 'question'
+        }
+      }
+
+      // not a question, make sure it's an end
+      ends = this.currentTree.ends
+
+      for(let i = 0; i < ends.length; i++) {
+        // try to find the option match in this
+        if(ends[i].ID === ID) {
+          return 'end'
+        }
+      }
+
+      // couldn't find a match
       return undefined;
     },
     /**

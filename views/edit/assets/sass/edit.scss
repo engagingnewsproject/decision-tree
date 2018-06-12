@@ -33,6 +33,7 @@ input {
 textarea {
     resize: none;
     background: transparent;
+    overflow: hidden;
 }
 
 select {
@@ -103,6 +104,7 @@ button {
     margin-bottom: 2rem;
     position: relative;
     animation: fadeIn 0.4s;
+    background: $blue;
 
     &.question:hover {
         cursor: move;
@@ -149,7 +151,7 @@ body.draggable--is-dragging input:hover,
 
 .element__option {
     background: white;
-    padding: 1rem;
+    padding: 0.2rem 1rem;
     margin-bottom: 0.6rem;
     border-left: 10px solid #eee;
 }
@@ -163,7 +165,7 @@ body.draggable--is-dragging input:hover,
 }
 
 .element__create {
-    border: 1px dashed #fff;
+    border: 3px dashed #fff;
     padding: 1rem;
 }
 
@@ -178,9 +180,10 @@ body.draggable--is-dragging input:hover,
     font-size: 1rem;
     font-weight: 600;
     position: absolute;
-    top: 5px;
+    top: 0;
     right: -1rem;
     border: none;
+    padding: 0.2rem;
 }
 
 .btn__delete-option {
