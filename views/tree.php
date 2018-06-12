@@ -25,7 +25,7 @@
             'elNumber' => function($order) {
         return $order + 1;
     },
-            'destination' => function($destinationID, $destinationType, $optionID, $questioniIdex, $options) {
+            'destination' => function($destinationID, $destinationType, $optionID, $questionIndex, $options) {
         return '';
     },
 );
@@ -80,7 +80,7 @@
 ';}).'                </ul>
             </div>
 '.((LR::ifvar($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), false)) ? '                <div class="cme-tree__start-container">
-'.LR::sec($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '                        <p><a id="cme-tree__el--'.LR::encq($cx, (($inary && isset($in['startID'])) ? $in['startID'] : null)).'" class="cme-tree__btn cme-tree__start" href="#cme-tree__el--'.LR::raw($cx, (($inary && isset($in['destinationID'])) ? $in['destinationID'] : null)).'">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</a></p>
+'.LR::sec($cx, (($inary && isset($in['starts'])) ? $in['starts'] : null), null, $in, true, function($cx, $in) {$inary=is_array($in);return '                        <p><a id="cme-tree__el--'.LR::encq($cx, (($inary && isset($in['ID'])) ? $in['ID'] : null)).'" class="cme-tree__btn cme-tree__start" href="#cme-tree__el--'.LR::raw($cx, (($inary && isset($in['destinationID'])) ? $in['destinationID'] : null)).'">'.LR::raw($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</a></p>
 '.((LR::ifvar($cx, (($inary && isset($in['content'])) ? $in['content'] : null), false)) ? '                            <div class="cme-tree__description cme-tree__description--start">
                                 '.LR::encq($cx, (($inary && isset($in['content'])) ? $in['content'] : null)).'
                             </div>
@@ -103,7 +103,7 @@
                                             <span class="cme-tree__option-title">'.LR::encq($cx, (($inary && isset($in['title'])) ? $in['title'] : null)).'</span>
                                             <span class="cme-tree__destination cme-tree__destination--'.LR::raw($cx, (($inary && isset($in['destinationType'])) ? $in['destinationType'] : null)).'">
 '.LR::hbbch($cx, 'destination', array(array((($inary && isset($in['destinationID'])) ? $in['destinationID'] : null),(($inary && isset($in['destinationType'])) ? $in['destinationType'] : null),(($inary && isset($in['ID'])) ? $in['ID'] : null),((isset($cx['sp_vars']['_parent']) && isset($cx['sp_vars']['_parent']['index'])) ? $cx['sp_vars']['_parent']['index'] : null)),array()), $in, false, function($cx, $in) {$inary=is_array($in);return '                                                    <span class="cme-tree__destination-title">'.LR::raw($cx, (($inary && isset($in['destinationTitle'])) ? $in['destinationTitle'] : null)).'</span>
-'.((LR::ifvar($cx, (($inary && isset($in['destinationIcon'])) ? $in['destinationIcon'] : null), false)) ? '                                                        <span class="cme-tree__icon-wrap"><svg id="cme-tree__destination-icon--'.LR::raw($cx, (($inary && isset($in['ID'])) ? $in['ID'] : null)).'" class="cme-tree__icon cme-tree__icon--'.LR::raw($cx, (($inary && isset($in['destinationIcon'])) ? $in['destinationIcon'] : null)).'"><use xlink:href="#icon-'.LR::raw($cx, (($inary && isset($in['destinationIcon'])) ? $in['destinationIcon'] : null)).'"></use></svg></span>
+'.((LR::ifvar($cx, (($inary && isset($in['destinationIcon'])) ? $in['destinationIcon'] : null), false)) ? '                                                        <span class="cme-tree__icon-wrap"><svg id="cme-tree__destination-icon--'.LR::raw($cx, (($inary && isset($in['optionID'])) ? $in['optionID'] : null)).'" class="cme-tree__icon cme-tree__icon--'.LR::raw($cx, (($inary && isset($in['destinationIcon'])) ? $in['destinationIcon'] : null)).'"><use xlink:href="#icon-'.LR::raw($cx, (($inary && isset($in['destinationIcon'])) ? $in['destinationIcon'] : null)).'"></use></svg></span>
 ' : '').'';}).'                                            </span></a></li>
 ';}).'                                </ul>
 ' : '').'                        </section>

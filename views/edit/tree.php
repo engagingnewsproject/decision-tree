@@ -28,6 +28,41 @@
           <button>Save</button>
         </form>
 
+        <h2>Starts</h2>
+        <!-- only allow one start -->
+        <div class="starts">
+          <div v-bind:id="'start--'+start.ID" class="element start" v-for="start in currentTree.starts">
+            <form v-on:submit.prevent="saveElement(start.ID, 'start')">
+              <label>
+                <span class="visually-hidden">Start Title</span>
+                <textarea rows="1" v-bind:id="'start-title--'+start.ID" class="element__title element__title--start" v-on:change="saveElement(start.ID, 'start')" v-on:keyup="setTextareaHeight" v-model="start.title"></textarea>
+              </label>
+              <label>
+                  <span class="visually-hidden">Destination</span>
+                  <select v-bind:id="'start-destination--'+start.ID" class="element__destination" v-on:change="saveElement(start.ID, 'start')" v-model="start.destinationID">
+                    <?php include 'destination-select.php'?>
+                  </select>
+                </label>
+              <button class="element__save">Save</button>
+            </form>
+            <button class="btn btn--delete btn__delete-start" v-on:click="deleteElement(start.ID, 'start')">x</button>
+          </div>
+        </div>
+        <h3>New Start</h3>
+        <form class="element__create element__create--start" v-on:submit.prevent="createElement('start')">
+          <label>
+            <span class="visually-hidden">Start title</span>
+            <input type="text" name="elementTitle" v-model="newEl.start.title"/>
+          </label>
+          <label>
+              <span class="visually-hidden">Destination</span>
+              <select class="element__destination" v-model="newEl.start.destinationID">
+                <?php include 'destination-select.php'?>
+              </select>
+          </label>
+          <button>Add Start</button>
+        </form>
+
         <h2>Questions</h2>
         <div class="questions">
           <div v-bind:id="'question--'+question.ID" class="element question" v-for="question in currentTree.questions">
@@ -65,7 +100,7 @@
               </label>
               <label>
                 <span class="visually-hidden">Destination</span>
-                <select class="element__destination" v-model="newEl.option.destination">
+                <select class="element__destination" v-model="newEl.option.destinationID">
                   <?php include 'destination-select.php'?>
                 </select>
               </label>

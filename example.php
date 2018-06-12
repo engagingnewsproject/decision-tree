@@ -18,9 +18,9 @@
 <body>
 <main>
     <h2>Main content block</h2>
-    <div id="cme-tree__citizen">
+    <div id="cme-tree__vuetest">
         <noscript>
-            <iframe width="100%" height="500px" src="api/v1/trees/citizen/iframe?js=false"></iframe>
+            <iframe width="100%" height="500px" src="api/v1/trees/vuetest/iframe?js=false"></iframe>
         </noscript>
     </div>
 </main>
@@ -37,8 +37,8 @@
 <script>
 
     var treeOptions = {
-            slug: 'citizen',
-            container: document.getElementById('cme-tree__citizen')
+            slug: 'vuetest',
+            container: document.getElementById('cme-tree__vuetest')
     };
 
     // you can access all your trees with var trees

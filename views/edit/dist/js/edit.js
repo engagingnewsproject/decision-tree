@@ -21,13 +21,17 @@ var app = new Vue({
       elTypes: ['question', 'end', 'start', 'group', 'option'],
       addOption: false, // or ID
       newEl: { // store the data for elements that are getting created
+        start: {
+          title: null,
+          destinationID: ''
+        },
         question: {
           title: null
         },
         option: {
           questionID: null,
           title: null,
-          destination: ''
+          destinationID: ''
         },
         end: {
           title: null,
@@ -210,14 +214,14 @@ var app = new Vue({
         _this5.newEl[elType].title = null;
         _this5.newEl[elType].content = null;
         _this5.newEl[elType].questionID = null;
-        _this5.newEl[elType].destination = null;
+        _this5.newEl[elType].destinationID = null;
         _this5.reMount();
       });
     },
     buildSave: function buildSave(el) {
       var data = {};
       // allowed keys
-      var whitelist = ['title', 'content', 'questionID', 'destination', 'destinationID', 'questions'];
+      var whitelist = ['title', 'content', 'questionID', 'destinationID', 'questions'];
 
       for (var i = 0; i < whitelist.length; i++) {
         // check if the object key exists
@@ -225,7 +229,7 @@ var app = new Vue({
           data[whitelist[i]] = el[whitelist[i]];
           //data.assign(data, {whitelist[i]: el[whitelist[i]]})
 
-          if (whitelist[i] === 'destinationID' || whitelist[i] === 'destination') {
+          if (whitelist[i] === 'destinationID') {
             // set the destination type off of this ID
             data['destinationType'] = this.getDestinationTypeByID(el[whitelist[i]]);
             console.log('finding destination of ', el[whitelist[i]]);
