@@ -98,8 +98,8 @@ final class APITest extends TreeTestCase
 
     public static function tearDownAfterClass() {
         // remove the files from the data direcory
-        // unlink(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.json');
-        // unlink(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.min.json');
+        unlink(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.json');
+        unlink(dirname(__FILE__).'/../../data/'.self::$tree->getSlug().'.min.json');
         // delete the static tree
         self::$tree = false;
     }
