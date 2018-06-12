@@ -458,11 +458,11 @@ CREATE  OR REPLACE VIEW `treeOption` (optionID, treeID, questionID, title, conte
         tree.treeElementOrder elOrder ON el.elID = elOrder.elID
             INNER JOIN
         tree.treeElementContainer question ON el.elID = question.elIDChild
-            INNER JOIN
+            LEFT JOIN
         tree.treeElementDestination destination ON el.elID = destination.elID
-            INNER JOIN
+            LEFT JOIN
         tree.treeElement destinationEl ON destinationEl.elID = destination.elIDDestination
-            INNER JOIN
+            LEFT JOIN
         tree.treeElementType destinationType ON destinationType.elTypeID = destinationEl.elTypeID
     WHERE
         elType.elType = 'option';

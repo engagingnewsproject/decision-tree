@@ -95,9 +95,11 @@ class Option extends Element {
           throw new \Error('Option must be a part of a question');
         }
 
+        /*
+        * Removing destination as requirement for creating an option. You can get an option without a valid destination by deleting the destination element, so why make it a requirement when creating?
         if(!$validate->destinationID($this->getDestinationID())) {
           throw new \Error('Option must have a valid destination (Question ID or End ID).');
-        }
+        }*/
 
         $option = [];
         // create it off the object
@@ -125,8 +127,11 @@ class Option extends Element {
         // assign it to the question container
         $this->db->insertContainer($this->getQuestionID(), $optionID);
 
-        // insert the destination row
-        $this->db->insertDestination($optionID, $this->getDestinationID());
+        // insert the destination row if there's a valid destinationID
+        if($validate->destinationID($this->getDestinationID())) {
+            $this->db->insertDestination($optionID, $this->getDestinationID());
+        }
+
 
         // we're good! Build the option again and return it
         return $this->build($optionID);
@@ -174,10 +179,24 @@ class Option extends Element {
           }
         }
 
+
+        // try to get the current one direct from the database
+        // check directly from DB, otherwise we might run into validation errors from the destination setting process
+        $destinationFromDB = $this->db->getDestination($this->getID());
+        $destinationID = $this->getDestinationID();
+        // if the old one doesn't exist and there's a destination ID now, insert it
+        if($destinationFromDB === false && $destinationID) {
+            $this->db->insertDestination($this->getID(), $destinationID);
+        }
+        // delete the destination if destinationID is now null/false
+        else if($destinationFromDB && !$destinationID) {
+            $this->db->deleteDestination($this->getID(), $destinationFromDB['elIDDestination']);
+        }
+
         // if destination ID has changed, then update it
-        if((int) $original->getDestinationID() !== (int) $this->getDestinationID()) {
-            // update the destination
-            $this->db->updateDestination($this->getID(), $this->getDestinationID());
+        else if((int) $destinationFromDB['elIDDestination'] !== (int) $destinationID) {
+            // update the destination since it already exists
+            $this->db->updateDestination($this->getID(), $destinationID);
         }
 
         // rebuild it so we get the fresh copy

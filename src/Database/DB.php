@@ -1041,6 +1041,10 @@ class DB extends PDO {
 
         $el['elCreatedBy'] = $this->user['userID'];
         $el['elUpdatedBy'] = $el['elCreatedBy'];
+        // if no elTitle was passed, set it to an empty string
+        if(!isset($el['elTitle']) || $el['elTitle'] === false) {
+            $el['elTitle'] = '';
+        }
         return $this->insert([
             'vals'      => $el,
             'required'  => ['treeID', 'elTypeID', 'elTitle', 'elCreatedBy', 'elUpdatedBy'],
@@ -1274,6 +1278,42 @@ class DB extends PDO {
             'table'     => $this->tables['treeElementDestination'],
             'where'     => ['elID' => $elID]
         ]);
+    }
+
+    /**
+     * Updates the destination of an element
+     * Elements can only have one destination, but a destination can have multiple ways of arriving at it. We update by the parent (elID) since there can be only one of those.
+     *
+     * @return
+     */
+    public function deleteDestination($elID, $destinationID) {
+        // validate the user
+        Utility\validateUser($this->user);
+
+        // find the element and make sure the owner owns this element
+        $validate = new Validate();
+        $validate->elOwner($elID, $this->user);
+        $validate->elOwner($destinationID, $this->user);
+
+        return $this->delete([
+            'table'     => $this->tables['treeElementDestination'],
+            'where'     => ['elID' => $elID, 'elIDDestination' => $destinationID]
+        ]);
+    }
+
+    /**
+     * Gets the destination of a parent element.
+     *
+     * @param $parentID INT/STRING
+     * @return mixed ARRAY on success, BOOL false on not found
+     */
+    public function getDestination($parentID) {
+        $params = [":elID" => $parentID];
+
+        $sql = "SELECT * FROM ".$this->tables['treeElementDestination']."
+                WHERE elID = :elID";
+        // return the found row
+        return $this->fetchOne($sql, $params);
     }
 
 
