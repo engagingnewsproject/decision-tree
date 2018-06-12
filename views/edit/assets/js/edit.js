@@ -320,6 +320,19 @@ var app = new Vue({
         })
         .finally(() => this.reMount())
     },
+    compile: function() {
+      treeServer
+        .post('/trees/'+tree.ID+'/compiled')
+        .then(response => (
+          console.log(response.data)
+        ))
+        .catch(error => {
+          console.log(error)
+          this.errored = true
+          this.error = error
+        })
+        .finally(() => this.reMount())
+    },
     setTextareaHeight: function(e) {
       e.target.style.height = (e.target.scrollHeight)+'px'
     },

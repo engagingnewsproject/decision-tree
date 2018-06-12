@@ -312,6 +312,19 @@ var app = new Vue({
         return _this7.reMount();
       });
     },
+    compile: function compile() {
+      var _this8 = this;
+
+      treeServer.post('/trees/' + tree.ID + '/compiled').then(function (response) {
+        return console.log(response.data);
+      }).catch(function (error) {
+        console.log(error);
+        _this8.errored = true;
+        _this8.error = error;
+      }).finally(function () {
+        return _this8.reMount();
+      });
+    },
     setTextareaHeight: function setTextareaHeight(e) {
       e.target.style.height = e.target.scrollHeight + 'px';
     },

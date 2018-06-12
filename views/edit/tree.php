@@ -152,7 +152,18 @@
           <button>Add End</button>
         </form>
 
+        <!-- compile -->
+        <div class="compiled">
+          <h2>Compile</h2>
+          <p>After editing, click this button to update the data structure file with all stats so it can be used as an actual decision tree.</p>
+          <button v-on:click="compile">Compile</button>
+        </div>
+
+
+
   </section>
+
+
 
 </div>
 

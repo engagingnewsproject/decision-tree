@@ -9,12 +9,6 @@
             "title": "Begin",
             "destinationID": "2669",
             "destinationType": "question"
-        },
-        {
-            "ID": "2844",
-            "title": "Two starts?",
-            "destinationID": "119",
-            "destinationType": "question"
         }
     ],
     "groups": [],
