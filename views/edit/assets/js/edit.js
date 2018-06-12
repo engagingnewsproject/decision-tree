@@ -34,6 +34,11 @@ var app = new Vue({
         end: {
           title: null,
           content: null
+        },
+        group: {
+          title: null,
+          content: null,
+          questions: []
         }
       },
       sort: {
@@ -45,7 +50,8 @@ var app = new Vue({
         },
         sortables: [],
         whitelist: ['question'],
-      }
+      },
+      compiledResult: ''
     }
   },
   mounted () {
@@ -323,9 +329,10 @@ var app = new Vue({
     compile: function() {
       treeServer
         .post('/trees/'+tree.ID+'/compiled')
-        .then(response => (
+        .then(response => {
           console.log(response.data)
-        ))
+          this.compiledResult = response.data
+        })
         .catch(error => {
           console.log(error)
           this.errored = true

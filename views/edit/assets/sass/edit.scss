@@ -223,3 +223,10 @@ body.draggable--is-dragging input:hover,
         opacity: 1;
     }
 }
+
+.compiled-json {
+    overflow: scroll;
+    max-width: 100%;
+    background: #fff;
+    padding: 1rem;
+}

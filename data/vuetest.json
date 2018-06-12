@@ -11,7 +11,26 @@
             "destinationType": "question"
         }
     ],
-    "groups": [],
+    "groups": [
+        {
+            "ID": "2845",
+            "title": "Editing too?",
+            "content": "Woah.",
+            "order": "0",
+            "questions": [
+                "119"
+            ]
+        },
+        {
+            "ID": "2846",
+            "title": "Another Group",
+            "content": "For realz, this works kinda well.",
+            "order": "1",
+            "questions": [
+                "119"
+            ]
+        }
+    ],
     "questions": [
         {
             "ID": "2669",
@@ -36,8 +55,8 @@
                     "ID": "2723",
                     "title": "do you want to go to question 3?",
                     "order": "2",
-                    "destinationID": "2730",
-                    "destinationType": "question"
+                    "destinationID": null,
+                    "destinationType": null
                 },
                 {
                     "ID": "2738",
@@ -57,8 +76,8 @@
                     "ID": "2727",
                     "title": "Question 3",
                     "order": "0",
-                    "destinationID": "2730",
-                    "destinationType": "question"
+                    "destinationID": null,
+                    "destinationType": null
                 },
                 {
                     "ID": "2726",
@@ -70,28 +89,21 @@
             ]
         },
         {
-            "ID": "2730",
-            "title": "Question 3",
-            "order": "2",
+            "ID": "119",
+            "title": "Question 2",
+            "order": "1",
             "options": [
                 {
-                    "ID": "2739",
-                    "title": "End 1",
+                    "ID": "2727",
+                    "title": "Question 3",
                     "order": "0",
-                    "destinationID": "2721",
-                    "destinationType": "end"
+                    "destinationID": null,
+                    "destinationType": null
                 },
                 {
-                    "ID": "2740",
-                    "title": "End 2",
+                    "ID": "2726",
+                    "title": "End 1",
                     "order": "1",
-                    "destinationID": "2744",
-                    "destinationType": "end"
-                },
-                {
-                    "ID": "2762",
-                    "title": "Another End 1",
-                    "order": "2",
                     "destinationID": "2721",
                     "destinationType": "end"
                 }
@@ -111,18 +123,18 @@
         }
     ],
     "stats": {
-        "total_paths": 9,
-        "longest_path": 4,
+        "total_paths": 5,
+        "longest_path": 3,
         "path_ends": {
             "2721": {
                 "title": "End 1",
-                "count": 6,
-                "percentage": 66.67
+                "count": 2,
+                "percentage": 40
             },
             "2744": {
                 "title": "End 2",
-                "count": 3,
-                "percentage": 33.33
+                "count": 1,
+                "percentage": 20
             }
         }
     }

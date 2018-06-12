@@ -36,6 +36,11 @@ var app = new Vue({
         end: {
           title: null,
           content: null
+        },
+        group: {
+          title: null,
+          content: null,
+          questions: []
         }
       },
       sort: {
@@ -47,7 +52,8 @@ var app = new Vue({
         },
         sortables: [],
         whitelist: ['question']
-      }
+      },
+      compiledResult: ''
     };
   },
   mounted: function mounted() {
@@ -316,7 +322,8 @@ var app = new Vue({
       var _this8 = this;
 
       treeServer.post('/trees/' + tree.ID + '/compiled').then(function (response) {
-        return console.log(response.data);
+        console.log(response.data);
+        _this8.compiledResult = response.data;
       }).catch(function (error) {
         console.log(error);
         _this8.errored = true;
