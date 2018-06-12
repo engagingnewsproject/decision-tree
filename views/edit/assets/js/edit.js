@@ -14,6 +14,7 @@ var app = new Vue({
       trees: [], // keeps a history of all trees
       currentTree: undefined, // sets the most current version of the tree
       errored: false,
+      error: false,
       loading: true,
       elTypes: ['question', 'end', 'start', 'group', 'option'],
       addOption: false, // or ID
@@ -65,6 +66,7 @@ var app = new Vue({
         .catch(error => {
           console.error(error)
           this.errored = true
+          this.error = error
         })
         .finally(() => {
           this.loading = false
@@ -102,13 +104,14 @@ var app = new Vue({
         .catch(error => {
           console.log(error)
           this.errored = true
+          this.error = error
         })
     },
     saveElement: function (ID, elType) {
       let els, elIndex, el, elData, oldElData, path, question, tree;
 
 
-      tree = this.trees[this.trees.length - 2]
+      /*tree = this.trees[this.trees.length - 2]
       if(elType !== 'option') {
         // build the old one
         els = tree[elType+'s']
@@ -116,11 +119,12 @@ var app = new Vue({
         el = els[elIndex]
       } else {
         el = this.getOption(ID, tree)
+        console.log('option el', el)
       }
 
       // call the data build dynamically
       oldElData = this.buildSave(el);
-      console.log(oldElData)
+      console.log(oldElData)*/
       // build the new one
       tree = this.currentTree
 
@@ -136,10 +140,10 @@ var app = new Vue({
       elData = this.buildSave(el);
       console.log(elData)
       // compare if the old and new match
-      if(this.areObjectsEqual(elData, oldElData)) {
+      /*if(this.areObjectsEqual(elData, oldElData)) {
         console.log('no changes');
         return
-      }
+      }*/
       path = '/trees/'+tree.ID+'/'+elType+'s/'+ID
       if(elType === 'option') {
 
@@ -158,6 +162,7 @@ var app = new Vue({
         .catch(error => {
           console.log(error)
           this.errored = true
+          this.error = error
         })
         .finally(() => this.reMount())
 
@@ -184,6 +189,7 @@ var app = new Vue({
         .catch(error => {
           console.log(error)
           this.errored = true
+          this.error = error
         })
         .finally(() => this.reMount())
     },
@@ -202,6 +208,7 @@ var app = new Vue({
         .catch(error => {
           console.log(error)
           this.errored = true
+          this.error = error
         })
         .finally(
           () => {
@@ -305,6 +312,7 @@ var app = new Vue({
         .catch(error => {
           console.log(error)
           this.errored = true
+          this.error = error
         })
         .finally(() => this.reMount())
     },

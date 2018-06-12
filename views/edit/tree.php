@@ -8,7 +8,7 @@
     }">
 
   <section v-if="errored">
-    <p>We're sorry, we're not able to retrieve this information at the moment, please try back later</p>
+    <p>{{error.message}}</p>
   </section>
 
   <section v-else>
@@ -34,7 +34,7 @@
             <form v-on:submit.prevent="saveElement(question.ID, 'question')">
               <label>
                 <span class="visually-hidden">Question Title</span>
-                <textarea rows="1" v-bind:id="'question-title--'+question.ID" class="element__title element__title--question" v-on:blur="saveElement(question.ID, 'question')" v-on:keyup="setTextareaHeight" v-model="question.title"></textarea>
+                <textarea rows="1" v-bind:id="'question-title--'+question.ID" class="element__title element__title--question" v-on:change="saveElement(question.ID, 'question')" v-on:keyup="setTextareaHeight" v-model="question.title"></textarea>
               </label>
               <input type="hidden" v-model="question.order" />
               <button class="element__save">Save</button>
@@ -43,7 +43,7 @@
               <form class="element__option" v-on:submit.prevent="saveElement(option.ID, 'option')">
                 <label>
                   <span class="visually-hidden">Option Title</span>
-                  <textarea rows="1" v-bind:id="'option-title--'+option.ID" class="element__title element__title--option" v-on:blur="saveElement(option.ID, 'option')" v-on:keyup="setTextareaHeight" v-model="option.title"></textarea>
+                  <textarea rows="1" v-bind:id="'option-title--'+option.ID" class="element__title element__title--option" v-on:change="saveElement(option.ID, 'option')" v-on:keyup="setTextareaHeight" v-model="option.title"></textarea>
                 </label>
                 <label>
                   <span class="visually-hidden">Destination</span>
@@ -92,11 +92,11 @@
             <form v-on:submit.prevent="saveElement(end.ID, 'end')">
               <label>
                 <span class="visually-hidden">End Title</span>
-                <textarea rows="1" v-bind:id="'end-title--'+end.ID" class="element__title element__title--end" v-on:blur="saveElement(end.ID, 'end')" v-on:keyup="setTextareaHeight" v-model="end.title"></textarea>
+                <textarea rows="1" v-bind:id="'end-title--'+end.ID" class="element__title element__title--end" v-on:change="saveElement(end.ID, 'end')" v-on:keyup="setTextareaHeight" v-model="end.title"></textarea>
               </label>
               <label>
                 <span class="visually-hidden">End Content</span>
-                <textarea rows="1" v-bind:id="'end-content--'+end.ID" class="element__content" v-on:blur="saveElement(end.ID, 'end')" v-on:keyup="setTextareaHeight" v-model="end.content"></textarea>
+                <textarea rows="1" v-bind:id="'end-content--'+end.ID" class="element__content" v-on:change="saveElement(end.ID, 'end')" v-on:keyup="setTextareaHeight" v-model="end.content"></textarea>
               </label>
               <button class="element__save">Save</button>
             </form>

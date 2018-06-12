@@ -16,6 +16,7 @@ var app = new Vue({
       trees: [], // keeps a history of all trees
       currentTree: undefined, // sets the most current version of the tree
       errored: false,
+      error: false,
       loading: true,
       elTypes: ['question', 'end', 'start', 'group', 'option'],
       addOption: false, // or ID
@@ -67,6 +68,7 @@ var app = new Vue({
       }).catch(function (error) {
         console.error(error);
         _this.errored = true;
+        _this.error = error;
       }).finally(function () {
         _this.loading = false;
         _this.$nextTick(function () {
@@ -99,6 +101,7 @@ var app = new Vue({
       }).catch(function (error) {
         console.log(error);
         _this2.errored = true;
+        _this2.error = error;
       });
     },
     saveElement: function saveElement(ID, elType) {
@@ -113,19 +116,19 @@ var app = new Vue({
           question = void 0,
           tree = void 0;
 
-      tree = this.trees[this.trees.length - 2];
-      if (elType !== 'option') {
+      /*tree = this.trees[this.trees.length - 2]
+      if(elType !== 'option') {
         // build the old one
-        els = tree[elType + 's'];
+        els = tree[elType+'s']
         elIndex = this.getIndexBy(els, 'ID', ID);
-        el = els[elIndex];
+        el = els[elIndex]
       } else {
-        el = this.getOption(ID, tree);
+        el = this.getOption(ID, tree)
+        console.log('option el', el)
       }
-
-      // call the data build dynamically
+       // call the data build dynamically
       oldElData = this.buildSave(el);
-      console.log(oldElData);
+      console.log(oldElData)*/
       // build the new one
       tree = this.currentTree;
 
@@ -141,10 +144,10 @@ var app = new Vue({
       elData = this.buildSave(el);
       console.log(elData);
       // compare if the old and new match
-      if (this.areObjectsEqual(elData, oldElData)) {
+      /*if(this.areObjectsEqual(elData, oldElData)) {
         console.log('no changes');
-        return;
-      }
+        return
+      }*/
       path = '/trees/' + tree.ID + '/' + elType + 's/' + ID;
       if (elType === 'option') {
 
@@ -158,6 +161,7 @@ var app = new Vue({
       }).catch(function (error) {
         console.log(error);
         _this3.errored = true;
+        _this3.error = error;
       }).finally(function () {
         return _this3.reMount();
       });
@@ -184,6 +188,7 @@ var app = new Vue({
       }).catch(function (error) {
         console.log(error);
         _this4.errored = true;
+        _this4.error = error;
       }).finally(function () {
         return _this4.reMount();
       });
@@ -200,6 +205,7 @@ var app = new Vue({
       }).catch(function (error) {
         console.log(error);
         _this5.errored = true;
+        _this5.error = error;
       }).finally(function () {
         _this5.newEl[elType].title = null;
         _this5.newEl[elType].content = null;
@@ -297,6 +303,7 @@ var app = new Vue({
       }).catch(function (error) {
         console.log(error);
         _this7.errored = true;
+        _this7.error = error;
       }).finally(function () {
         return _this7.reMount();
       });
