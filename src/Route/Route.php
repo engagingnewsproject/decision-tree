@@ -75,6 +75,14 @@ class Route
 
         foreach($data as $key => $val) {
             if(in_array($key, $keys)) {
+
+                // handle destination differently
+                if($key === 'destinationID') {
+                    $obj->setDestination($val);
+                    // go to next cycle
+                    continue;
+                }
+
                 $function = 'set'.ucfirst($key);
 
                 // if we need to explode the value and it's not already an array
@@ -88,6 +96,8 @@ class Route
 
         return $obj;
     }
+
+
 
 
     /**

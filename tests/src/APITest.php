@@ -46,12 +46,12 @@ final class APITest extends TreeTestCase
         self::$ends['two'] = self::createEnd(self::$tree->getID(), ['title' => 'End Two Title', 'content' => 'End Two Content']);
 
         // create starts via the API
-        self::$starts['one'] = self::createStart(self::$tree->getID(), ['title' => 'Start One Title', 'destination' => self::$questions['one']->getID()]);
+        self::$starts['one'] = self::createStart(self::$tree->getID(), ['title' => 'Start One Title', 'destinationID' => self::$questions['one']->getID()]);
 
         // create options
-        self::$options['one'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option One Title','destination'=>self::$questions['three']->getID()]);
-        self::$options['two'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option Two Title','destination'=>self::$questions['two']->getID()]);
-        self::$options['three'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option Three Title','destination'=>self::$questions['three']->getID()]);
+        self::$options['one'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option One Title','destinationID'=>self::$questions['three']->getID()]);
+        self::$options['two'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option Two Title','destinationID'=>self::$questions['two']->getID()]);
+        self::$options['three'] = self::createOption(self::$tree->getID(), self::$questions['one']->getID(), ['title'=>'Option Three Title','destinationID'=>self::$questions['three']->getID()]);
 
         $groupQuestions = [
                     self::$questions['one']->getID(),
@@ -411,7 +411,7 @@ final class APITest extends TreeTestCase
     public function testApiOptionChangeDestination() {
         $option = self::$options['one'];
         $newDestinationID = self::$ends['one']->getID();
-        $this->data['destination'] = $newDestinationID;
+        $this->data['destinationID'] = $newDestinationID;
 
         $optionOneUpdated = Utility\putEndpoint('trees/'.self::$tree->getID().'/questions/'.$option->getQuestionID().'/options/'.$option->getID(), $this->data);
         $optionOneUpdated = json_decode($optionOneUpdated);
@@ -463,7 +463,7 @@ final class APITest extends TreeTestCase
     public function testApiStartDestinationChange() {
         $newDestinationID = self::$questions['two']->getID();
         // update start destination
-        $this->data['destination'] = $newDestinationID;
+        $this->data['destinationID'] = $newDestinationID;
         $startOneUpdated = json_decode(
             Utility\putEndpoint('trees/'.self::$tree->getID().'/starts/'.self::$starts['one']->getID(), $this->data)
         );

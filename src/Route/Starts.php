@@ -63,7 +63,7 @@ class Starts extends Trees
         $start['treeID'] = $this->treeID;
         $start = new Start($this->db, $start);
 
-        $keys = ['title', 'destination'];
+        $keys = ['title', 'destinationID'];
         $start = $this->dynamicSet($this->data, $keys, $start);
 
         $start = $start->save();
@@ -79,7 +79,7 @@ class Starts extends Trees
         // init data
         $this->init($request);
 
-        $keys = ['title','destination'];
+        $keys = ['title','destinationID'];
         $this->start = $this->dynamicSet($this->data, $keys, $this->start);
 
         $this->start->save();

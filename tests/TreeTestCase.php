@@ -138,7 +138,7 @@ class TreeTestCase extends TestCase
         // add in the user to the request
         $data = [
             'title'       => $data['title'],
-            'destination' => $data['destination'],
+            'destinationID' => $data['destinationID'],
             'user'        => self::getAdminUser()
         ];
 
@@ -174,7 +174,7 @@ class TreeTestCase extends TestCase
         return new Tree(new Database\DB(), $tree->ID);
     }
 
-     // $options should have 'title' and 'destination'
+     // $options should have 'title' and 'destinationID'
     public static function createStart($treeID, $options = []) {
         // add in the user to the request
         $data = [
