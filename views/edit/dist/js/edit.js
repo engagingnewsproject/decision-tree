@@ -21,6 +21,7 @@ var app = new Vue({
       elTypes: ['question', 'end', 'start', 'group', 'option'],
       addOption: false, // or ID
       newestEl: null,
+      lastFocused: null,
       newEl: { // store the data for elements that are getting created
         start: {
           title: null,
@@ -104,9 +105,20 @@ var app = new Vue({
             document.getElementById(this.newestEl.type + '-title--' + this.newestEl.ID).focus();
             this.newestEl = null;
           }
+
+          console.log(this.lastFocused);
+          if (this.lastFocused) {
+            document.getElementById(this.lastFocused.id).focus();
+            this.lastFocused = null;
+          }
         });
       });
     },
+    setLastFocus: function setLastFocus() {
+      this.lastFocused = document.activeElement;
+      console.log(this.lastFocused);
+    },
+
     saveTree: function saveTree() {
       var _this2 = this;
 
@@ -135,19 +147,6 @@ var app = new Vue({
           question = void 0,
           tree = void 0;
 
-      /*tree = this.trees[this.trees.length - 2]
-      if(elType !== 'option') {
-        // build the old one
-        els = tree[elType+'s']
-        elIndex = this.getIndexBy(els, 'ID', ID);
-        el = els[elIndex]
-      } else {
-        el = this.getOption(ID, tree)
-        console.log('option el', el)
-      }
-       // call the data build dynamically
-      oldElData = this.buildSave(el);
-      console.log(oldElData)*/
       // build the new one
       tree = this.currentTree;
 
@@ -162,11 +161,7 @@ var app = new Vue({
       // call the data build dynamically
       elData = this.buildSave(el);
       console.log(elData);
-      // compare if the old and new match
-      /*if(this.areObjectsEqual(elData, oldElData)) {
-        console.log('no changes');
-        return
-      }*/
+
       path = '/trees/' + tree.ID + '/' + elType + 's/' + ID;
       if (elType === 'option') {
 
@@ -439,31 +434,6 @@ var app = new Vue({
         }
       }
       return undefined;
-    },
-    areObjectsEqual: function areObjectsEqual(a, b) {
-      // Create arrays of property names
-      var aProps = Object.getOwnPropertyNames(a);
-      var bProps = Object.getOwnPropertyNames(b);
-
-      // If number of properties is different,
-      // objects are not equivalent
-      if (aProps.length != bProps.length) {
-        return false;
-      }
-
-      for (var i = 0; i < aProps.length; i++) {
-        var propName = aProps[i];
-
-        // If values of same property are not equal,
-        // objects are not equivalent
-        if (a[propName] !== b[propName]) {
-          return false;
-        }
-      }
-
-      // If we made it this far, objects
-      // are considered equivalent
-      return true;
     }
   }
 });

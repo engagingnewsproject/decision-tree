@@ -23,11 +23,19 @@
       <form class="element">
         <label>
           Tree Title
-          <input v-on:change="saveTree" type="text" v-model="currentTree.title" />
+          <input
+            v-on:focus="setLastFocus"
+            v-on:change="saveTree"
+            type="text"
+            v-model="currentTree.title"
+            id="treeTitle"
+            name="treeTitle" />
         </label>
         <label>
           Tree Slug
-          <input v-on:change="saveTree" type="text" v-model="currentTree.slug" />
+          <input v-on:focus="setLastFocus" v-on:change="saveTree" type="text" v-model="currentTree.slug"
+          id="treeSlug"
+          name="treeSlug" />
         </label>
         <button class="element__save">Save</button>
       </form>
@@ -42,7 +50,8 @@
         <form v-on:submit.prevent="saveElement(start.ID, 'start')">
           <label>
             <span class="element__label">Start Title</span>
-            <textarea rows="1"
+            <textarea
+              v-on:focus="setLastFocus" rows="1"
             v-bind:id="'start-title--'+start.ID"
             class="element__title element__title--start"
             v-on:change="saveElement(start.ID, 'start')"
@@ -72,17 +81,19 @@
         <form v-on:submit.prevent="saveElement(question.ID, 'question')">
           <label>
             <span class="element__label">Question Title</span>
-            <textarea rows="1" v-bind:id="'question-title--'+question.ID" class="element__title element__title--question" v-on:change="saveElement(question.ID, 'question')" v-on:keyup="setTextareaHeight" v-model="question.title"
+            <textarea
+              v-on:focus="setLastFocus" rows="1" v-bind:id="'question-title--'+question.ID" class="element__title element__title--question" v-on:change="saveElement(question.ID, 'question')" v-on:keyup="setTextareaHeight" v-model="question.title"
             v-bind:placeholder="'Question Title '+(index+1)"></textarea>
           </label>
-          <input type="hidden" v-model="question.order" />
+          <input v-on:focus="setLastFocus" type="hidden" v-model="question.order" />
           <button class="element__save">Save</button>
         </form>
         <div class="options option-wrapper" v-for="(option, index) in question.options">
           <form class="element__option" v-on:submit.prevent="saveElement(option.ID, 'option')">
             <label>
               <span class="visually-hidden">Option Title</span>
-              <textarea rows="1" v-bind:id="'option-title--'+option.ID" class="element__title element__title--option" v-on:change="saveElement(option.ID, 'option')" v-on:keyup="setTextareaHeight" v-model="option.title"
+              <textarea
+                v-on:focus="setLastFocus" rows="1" v-bind:id="'option-title--'+option.ID" class="element__title element__title--option" v-on:change="saveElement(option.ID, 'option')" v-on:keyup="setTextareaHeight" v-model="option.title"
               v-bind:placeholder="'Option '+(index+1)">></textarea>
             </label>
             <label>
@@ -117,6 +128,7 @@
           <label>
             <span class="element__label">End Title</span>
             <textarea
+              v-on:focus="setLastFocus"
               rows="1"
               v-bind:id="'end-title--'+end.ID"
               class="element__title element__title--end" v-on:change="saveElement(end.ID, 'end')"
@@ -127,6 +139,7 @@
           <label>
             <span class="element__label">End Content</span>
             <textarea
+              v-on:focus="setLastFocus"
               rows="1"
               v-bind:id="'end-content--'+end.ID"
               class="element__content"
@@ -152,6 +165,7 @@
           <label>
             <span class="element__label">Group Title</span>
             <textarea
+              v-on:focus="setLastFocus"
               rows="1"
               v-bind:id="'group-title--'+group.ID"
               class="element__title element__title--group"
@@ -163,6 +177,7 @@
           <label>
             <span class="element__label">Group Content</span>
             <textarea
+              v-on:focus="setLastFocus"
               rows="1"
               v-bind:id="'group-content--'+group.ID"
               class="element__content"
@@ -171,8 +186,8 @@
               v-model="group.content"
               v-bind:placeholder="'Group Content '+(index+1)"></textarea>
           </label>
-          <input type="hidden" v-model="group.order" />
-          <select v-bind:id="'group-destination--'+group.ID" class="element__multiselect" v-on:blur="saveElement(group.ID, 'group')" v-model="group.questions" multiple>
+          <input v-on:focus="setLastFocus" type="hidden" v-model="group.order" />
+          <select v-on:focus="setLastFocus" v-bind:id="'group-destination--'+group.ID" class="element__multiselect" v-on:blur="saveElement(group.ID, 'group')" v-model="group.questions" multiple>
             <option v-for="question in currentTree.questions" v-bind:value="question.ID">{{ question.title }}</option>
           </select>
           <button class="element__save">Save</button>
