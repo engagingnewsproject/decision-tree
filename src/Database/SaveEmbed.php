@@ -152,7 +152,7 @@ class SaveEmbed extends DB {
                     ':embedIsIframe'      => $embed['isIframe']
                   ];
         // write our SQL statement
-        $sql = 'INSERT INTO '.$this->db->tables['tree_embed'].' (
+        $sql = 'INSERT INTO '.$this->db->tables['treeEmbed'].' (
                                             siteID,
                                             treeID,
                                             embedPath,
@@ -164,6 +164,7 @@ class SaveEmbed extends DB {
                                             :embedPath,
                                             :embedIsIframe
                                         )';
+
         // insert the mc_option into the database
         $stmt = $this->db->query($sql, $params);
 

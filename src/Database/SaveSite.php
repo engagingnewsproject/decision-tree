@@ -112,7 +112,7 @@ class SaveSite extends DB {
                     ':siteName'              => $site['name']
                   ];
         // write our SQL statement
-        $sql = 'INSERT INTO '.$this->db->tables['tree_site'].' (
+        $sql = 'INSERT INTO '.$this->db->tables['treeSite'].' (
                                             siteHost,
                                             siteName
                                         )
