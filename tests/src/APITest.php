@@ -524,7 +524,11 @@ final class APITest extends TreeTestCase
     public function testApiGroupUpdateQuestions() {
 
 
-        $this->data['questionsArray'] = [self::$questions['three']->getID(), self::$questions['four']->getID()];
+        $this->data['questionsArray'] = [
+            self::$questions['three']->getID(),
+            self::$questions['four']->getID()
+        ];
+
         $this->data['questions'] = implode(',', $this->data['questionsArray']);
 
         $groupTwoUpdated = Utility\putEndpoint('trees/'.self::$tree->getID().'/groups/'.self::$groups['two']->getID(), $this->data);
@@ -533,11 +537,9 @@ final class APITest extends TreeTestCase
 
         $this->assertEquals($groupTwoUpdated->questions, $this->data['questionsArray']);
 
-
         $this->data['questions'] = self::$questions['two']->getID();
 
-
-        $groupOneUpdated = Utility\putEndpoint('trees/'.self::$tree->getID().'/groups/'.self::$groups['two']->getID(), $this->data);
+        $groupOneUpdated = Utility\putEndpoint('trees/'.self::$tree->getID().'/groups/'.self::$groups['one']->getID(), $this->data);
 
         $groupOneUpdated = json_decode($groupOneUpdated);
 
