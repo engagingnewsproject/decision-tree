@@ -123,6 +123,7 @@ var app = new Vue({
           this.errored = true
           this.error = error
         })
+        .finally(() => this.reMount())
     },
     saveElement: function (ID, elType) {
       let els, elIndex, el, elData, oldElData, path, question, tree;

@@ -119,6 +119,8 @@ var app = new Vue({
         console.log(error);
         _this2.errored = true;
         _this2.error = error;
+      }).finally(function () {
+        return _this2.reMount();
       });
     },
     saveElement: function saveElement(ID, elType) {

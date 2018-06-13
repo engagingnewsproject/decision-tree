@@ -20,16 +20,16 @@
     <section>
     <h2>Editing Tree: {{ currentTree.title }}</h2>
     <div class="container">
-      <form v-on:submit.prevent="saveTree()" class="element">
+      <form class="element">
         <label>
           Tree Title
-          <input type="text" v-model="currentTree.title" />
+          <input v-on:change="saveTree" type="text" v-model="currentTree.title" />
         </label>
         <label>
           Tree Slug
-          <input type="text" v-model="currentTree.slug" />
+          <input v-on:change="saveTree" type="text" v-model="currentTree.slug" />
         </label>
-        <button>Save</button>
+        <button class="element__save">Save</button>
       </form>
     </div>
     </section>

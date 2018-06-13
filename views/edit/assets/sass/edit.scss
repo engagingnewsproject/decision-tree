@@ -2,6 +2,7 @@ $orange: #bf5700;
 $red: #af3131;
 $blue: #daecf3;
 $blueGray: #646769;
+$lightGray: #f7f6f5;
 
 @mixin btn--reset {
     border: none;
@@ -94,6 +95,7 @@ button {
 .container {
     max-width: 500px;
     margin: 0 auto;
+    padding: 15px;
 }
 
 section {
@@ -105,9 +107,15 @@ h2 {
     color: rgba(0,0,0,.7);
     font-size: 1rem;
     border-bottom: 1px solid rgba(0,0,0,.2);
-    width: 80%;
-    min-width: 500px;
+    padding: 0 15px;
+    max-width: 700px;
+
+    @media (min-width: 780px) {
+        width: 80%;
+    }
 }
+
+
 
 h3 {
     margin: 0 auto 0.6rem;
@@ -196,9 +204,9 @@ body.draggable--is-dragging input:hover,
 
 .element__option {
     background: white;
-    padding: 0.2rem 1rem;
+    padding: 0.2rem 1.4rem 0.2rem 1.4rem;
     margin-bottom: 0.6rem;
-    border-left: 10px solid #ddd;
+    box-shadow: inset 11px 0 0 $lightGray, inset 12px 0 0 #ddd;
 }
 
 .option-wrapper {
@@ -249,16 +257,22 @@ body.draggable--is-dragging input:hover,
     background: none;
     position: absolute;
     top: 0;
-    right: -1rem;
+    right: -0.5rem;
     border: none;
     padding: 0.2rem;
     border-radius: 50%;
+
+
+    @media (min-width: 500px) {
+        right: -1rem;
+    }
 
     &:hover,
     &:focus {
         fill: $red;
     }
 }
+
 
 .btn__delete-option {
     right: 0;
@@ -273,11 +287,11 @@ body.draggable--is-dragging input:hover,
 }
 
 .option__move--up {
-    top: 28%;
+    top: 2px;
 }
 
 .option__move--down {
-    bottom: 28%;
+    bottom: 2px;
 }
 
 .draggable-source--is-dragging {
