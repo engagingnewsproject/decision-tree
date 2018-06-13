@@ -1,11 +1,38 @@
 $orange: #bf5700;
+$red: #af3131;
 $blue: #daecf3;
+$blueGray: #646769;
 
 @mixin btn--reset {
     border: none;
     background: none;
     padding: 0;
     border-radius: 0;
+}
+
+@mixin visually-hidden {
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute !important;
+    left:-10000px;
+    top: 10px;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    z-index: -1;
+
+    &:focus {
+        clip: auto !important;
+        display: block;
+        height: auto;
+        width: auto;
+        left: 10px;
+        top: 10px;
+        z-index: 9999999;
+    }
+}
+
+.visually-hidden {
+    @include visually-hidden;
 }
 
 body {
@@ -41,6 +68,20 @@ select {
     margin-bottom: 0.6rem;
 }
 
+svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+.element__multiselect {
+    border: 1px solid #ddd;
+
+    option {
+        padding: 0.2rem;
+        font-size: 0.85rem;
+    }
+}
+
 button {
     border: none;
     background: $orange;
@@ -48,6 +89,30 @@ button {
     padding: 0.6rem 1rem;
     border-radius: 40px;
     cursor: pointer;
+}
+
+.container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+section {
+    margin-bottom: 4rem;
+}
+
+h2 {
+    margin: 1rem auto;
+    color: rgba(0,0,0,.7);
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(0,0,0,.2);
+    width: 80%;
+    min-width: 500px;
+}
+
+h3 {
+    margin: 0 auto 0.6rem;
+    font-size: 1rem;
+    max-width: 500px;
 }
 
 .app {
@@ -73,31 +138,7 @@ button {
     opacity: 0.2;
 }
 
-.container {
-    max-width: 500px;
-    margin: 0 auto;
-}
 
-.visually-hidden {
-    clip: rect(1px, 1px, 1px, 1px);
-    position: absolute !important;
-    left:-10000px;
-    top: 10px;
-    width:1px;
-    height:1px;
-    overflow:hidden;
-    z-index: -1;
-
-    &:focus {
-        clip: auto !important;
-        display: block;
-        height: auto;
-        width: auto;
-        left: 10px;
-        top: 10px;
-        z-index: 9999999;
-    }
-}
 
 .element {
     padding: 1rem 0;
@@ -129,6 +170,10 @@ body.draggable--is-dragging input:hover,
     border-bottom: 2px solid #333;
     font-size: 1.375rem;
     padding: 0.4rem;
+
+    &:focus {
+        background: #fff;
+    }
 }
 
 .element__title--question {
@@ -153,7 +198,7 @@ body.draggable--is-dragging input:hover,
     background: white;
     padding: 0.2rem 1rem;
     margin-bottom: 0.6rem;
-    border-left: 10px solid #eee;
+    border-left: 10px solid #ddd;
 }
 
 .option-wrapper {
@@ -169,21 +214,50 @@ body.draggable--is-dragging input:hover,
     padding: 1rem;
 }
 
+.element__label {
+    @include visually-hidden;
+}
+
 .create__title {
     width: 100%;
 }
 
+.btn--icon {
+    font-size: 1rem;
+    padding: 0.4rem 0.6rem;
+    line-height: 1;
+}
+
+.btn--add {
+    display: block;
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: $blue;
+    color: #333;
+    border: 2px dashed darken($blue, 15%);
+    font-size: 0.9rem;
+    transition: all .15s;
+
+    &:focus,
+    &:hover {
+        background: darken($blue, 3%);
+    }
+}
 
 .btn--delete {
-    color: red;
+    fill: $blueGray;
     background: none;
-    font-size: 1rem;
-    font-weight: 600;
     position: absolute;
     top: 0;
     right: -1rem;
     border: none;
     padding: 0.2rem;
+    border-radius: 50%;
+
+    &:hover,
+    &:focus {
+        fill: $red;
+    }
 }
 
 .btn__delete-option {

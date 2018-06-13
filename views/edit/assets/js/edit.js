@@ -18,6 +18,7 @@ var app = new Vue({
       loading: true,
       elTypes: ['question', 'end', 'start', 'group', 'option'],
       addOption: false, // or ID
+      newestEl: null,
       newEl: { // store the data for elements that are getting created
         start: {
           title: null,
@@ -97,6 +98,12 @@ var app = new Vue({
               this.setTextareaHeight(e)
             }
 
+            if(this.newestEl) {
+              // focus element if one needs to be focused
+              document.getElementById(this.newestEl.type+'-title--'+this.newestEl.ID).focus()
+              this.newestEl = null
+            }
+
           })
         })
     },
@@ -166,9 +173,9 @@ var app = new Vue({
         .put(
           path,
           elData)
-        .then(response => (
+        .then(response => {
           console.log(response.data)
-        ))
+        })
         .catch(error => {
           console.log(error)
           this.errored = true
@@ -178,8 +185,12 @@ var app = new Vue({
 
     },
     deleteElement: function(ID, elType) {
-      var path, question;
-      alert('Are you sure? This will delete the '+elType+'.');
+      var path, question, sure;
+      sure = confirm('Are you sure? This will delete the '+elType+'.');
+
+      if(!sure) {
+        return;
+      }
 
       path = '/trees/'+tree.ID+'/'+elType+'s/'+ID
       if(elType === 'option') {
@@ -208,13 +219,15 @@ var app = new Vue({
       if(elType === 'option') {
         path = '/trees/'+tree.ID+'/questions/'+this.newEl.option.questionID+'/options'
       }
-      treeServer
+      return treeServer
         .post(
           path,
           this.newEl[elType])
-        .then(response => (
+        .then(response => {
           console.log(response.data)
-        ))
+          this.newestEl = response.data
+          this.newestEl.type = elType
+        })
         .catch(error => {
           console.log(error)
           this.errored = true
@@ -226,7 +239,7 @@ var app = new Vue({
             this.newEl[elType].content = null
             this.newEl[elType].questionID = null
             this.newEl[elType].destinationID = null
-            this.reMount()
+            return this.reMount()
           })
     },
     buildSave: function(el) {

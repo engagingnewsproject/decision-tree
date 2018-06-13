@@ -20,6 +20,7 @@ var app = new Vue({
       loading: true,
       elTypes: ['question', 'end', 'start', 'group', 'option'],
       addOption: false, // or ID
+      newestEl: null,
       newEl: { // store the data for elements that are getting created
         start: {
           title: null,
@@ -97,6 +98,12 @@ var app = new Vue({
             e.target = textareas[_i];
             this.setTextareaHeight(e);
           }
+
+          if (this.newestEl) {
+            // focus element if one needs to be focused
+            document.getElementById(this.newestEl.type + '-title--' + this.newestEl.ID).focus();
+            this.newestEl = null;
+          }
         });
       });
     },
@@ -167,7 +174,7 @@ var app = new Vue({
         path = '/trees/' + tree.ID + '/questions/' + question.ID + '/options/' + ID;
       }
       treeServer.put(path, elData).then(function (response) {
-        return console.log(response.data);
+        console.log(response.data);
       }).catch(function (error) {
         console.log(error);
         _this3.errored = true;
@@ -179,8 +186,12 @@ var app = new Vue({
     deleteElement: function deleteElement(ID, elType) {
       var _this4 = this;
 
-      var path, question;
-      alert('Are you sure? This will delete the ' + elType + '.');
+      var path, question, sure;
+      sure = confirm('Are you sure? This will delete the ' + elType + '.');
+
+      if (!sure) {
+        return;
+      }
 
       path = '/trees/' + tree.ID + '/' + elType + 's/' + ID;
       if (elType === 'option') {
@@ -210,8 +221,10 @@ var app = new Vue({
       if (elType === 'option') {
         path = '/trees/' + tree.ID + '/questions/' + this.newEl.option.questionID + '/options';
       }
-      treeServer.post(path, this.newEl[elType]).then(function (response) {
-        return console.log(response.data);
+      return treeServer.post(path, this.newEl[elType]).then(function (response) {
+        console.log(response.data);
+        _this5.newestEl = response.data;
+        _this5.newestEl.type = elType;
       }).catch(function (error) {
         console.log(error);
         _this5.errored = true;
@@ -221,7 +234,7 @@ var app = new Vue({
         _this5.newEl[elType].content = null;
         _this5.newEl[elType].questionID = null;
         _this5.newEl[elType].destinationID = null;
-        _this5.reMount();
+        return _this5.reMount();
       });
     },
     buildSave: function buildSave(el) {

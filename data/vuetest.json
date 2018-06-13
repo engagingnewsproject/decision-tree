@@ -13,21 +13,13 @@
     ],
     "groups": [
         {
-            "ID": "2845",
-            "title": "Editing too?",
-            "content": "Woah.",
+            "ID": "2921",
+            "title": "My Group Title",
+            "content": "The Group Content",
             "order": "0",
             "questions": [
-                "119"
-            ]
-        },
-        {
-            "ID": "2846",
-            "title": "Another Group",
-            "content": "For realz, this works kinda well.",
-            "order": "1",
-            "questions": [
-                "119"
+                "119",
+                "2852"
             ]
         }
     ],
@@ -52,17 +44,10 @@
                     "destinationType": "question"
                 },
                 {
-                    "ID": "2723",
-                    "title": "do you want to go to question 3?",
-                    "order": "2",
-                    "destinationID": null,
-                    "destinationType": null
-                },
-                {
                     "ID": "2738",
                     "title": "Go to end 2",
-                    "order": "3",
-                    "destinationID": "2744",
+                    "order": "2",
+                    "destinationID": "2940",
                     "destinationType": "end"
                 }
             ]
@@ -73,37 +58,30 @@
             "order": "1",
             "options": [
                 {
-                    "ID": "2727",
-                    "title": "Question 3",
-                    "order": "0",
-                    "destinationID": null,
-                    "destinationType": null
-                },
-                {
                     "ID": "2726",
                     "title": "End 1",
-                    "order": "1",
+                    "order": "0",
                     "destinationID": "2721",
                     "destinationType": "end"
+                },
+                {
+                    "ID": "2885",
+                    "title": "Go to question 3",
+                    "order": "1",
+                    "destinationID": "2852",
+                    "destinationType": "question"
                 }
             ]
         },
         {
-            "ID": "119",
-            "title": "Question 2",
-            "order": "1",
+            "ID": "2852",
+            "title": "Question 3",
+            "order": "2",
             "options": [
                 {
-                    "ID": "2727",
-                    "title": "Question 3",
+                    "ID": "2855",
+                    "title": "",
                     "order": "0",
-                    "destinationID": null,
-                    "destinationType": null
-                },
-                {
-                    "ID": "2726",
-                    "title": "End 1",
-                    "order": "1",
                     "destinationID": "2721",
                     "destinationType": "end"
                 }
@@ -117,24 +95,24 @@
             "content": "Woke scenester church-key aesthetic, lyft cornhole yr yuccie craft beer. Four loko narwhal mlkshk edison bulb af."
         },
         {
-            "ID": "2744",
+            "ID": "2940",
             "title": "End 2",
-            "content": "Lorem ipsum dolor amet tacos pop-up before they sold out, typewriter hashtag vape trust fund leggings distillery letterpress neutra sartorial vaporware. Bespoke whatever humblebrag copper mug tousled marfa neutra celiac kitsch slow-carb lo-fi."
+            "content": "Four loko narwhal mlkshk edison bulb af. Woke scenester church-key aesthetic, lyft cornhole yr yuccie craft beer."
         }
     ],
     "stats": {
-        "total_paths": 5,
-        "longest_path": 3,
+        "total_paths": 4,
+        "longest_path": 4,
         "path_ends": {
             "2721": {
                 "title": "End 1",
-                "count": 2,
-                "percentage": 40
+                "count": 3,
+                "percentage": 75
             },
-            "2744": {
+            "2940": {
                 "title": "End 2",
                 "count": 1,
-                "percentage": 20
+                "percentage": 25
             }
         }
     }
