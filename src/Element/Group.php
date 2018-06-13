@@ -181,10 +181,18 @@ class Group extends Element {
 
     public function addQuestion($question) {
         $questionID = (is_object($question) ? $question->getID() : $question);
-        // validate option
+        // validate question
         $validate = new Validate();
         if(!in_array($questionID, $this->getQuestions()) && $validate->questionID($questionID)) {
-            $this->questions[] = $questionID;
+
+            // check to make sure this isn't already in a group
+            $qView = $this->db->getQuestion($questionID);
+
+            // if it's not in another group, or it's in THIS group, add it
+            if(!$qView['groupID'] || (int) $qView['groupID'] === (int) $this->getID()) {
+                $this->questions[] = $questionID;
+            }
+
         }
         return $this->questions;
     }
@@ -212,6 +220,10 @@ class Group extends Element {
     public function delete() {
         $treeID = $this->getTreeID();
 
+        // delete all the questions in this container
+        $this->questions = [];
+        $this->saveQuestions();
+
         // delete the group
         $delete = $this->db->deleteElement(
             ['elID'=>$this->getID(), 'treeID' => $treeID]
@@ -224,6 +236,8 @@ class Group extends Element {
         $tree = new Tree($this->db, $this->getTreeID());
         // save it so the order updates
         $tree->updateOrder($tree->getGroups());
+
+        // delete the container
 
         return true;
     }

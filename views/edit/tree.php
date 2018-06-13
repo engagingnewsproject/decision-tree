@@ -166,7 +166,7 @@
             <textarea rows="1" v-bind:id="'group-content--'+group.ID" class="element__content" v-on:change="saveElement(group.ID, 'group')" v-on:keyup="setTextareaHeight" v-model="group.content"></textarea>
           </label>
           <input type="hidden" v-model="group.order" />
-          <select v-bind:id="'group-destination--'+group.ID" class="element__destination" v-on:change="saveElement(group.ID, 'group')" v-model="group.questions" multiple>
+          <select v-bind:id="'group-destination--'+group.ID" class="element__destination" v-on:blur="saveElement(group.ID, 'group')" v-model="group.questions" multiple>
             <option v-for="question in currentTree.questions" v-bind:value="question.ID">{{ question.title }}</option>
           </select>
           <button class="element__save">Save</button>
