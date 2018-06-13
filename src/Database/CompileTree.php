@@ -26,7 +26,6 @@ class CompileTree extends DB {
         $this->compiled['groups'] = $this->compileElement('group', $this->tree->getGroups());
         $this->compiled['questions'] = $this->compileElement('question', $this->tree->getQuestions());
         $this->compiled['ends'] = $this->compileElement('end', $this->tree->getEnds());
-        $this->compiled['tQs'] = $this->tree->getQuestions();
         if($stats === true) {
             // figure out total paths and longest path
             $this->compiled['stats'] = $this->computePaths($this->compiled['questions']);
