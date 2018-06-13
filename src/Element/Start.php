@@ -36,6 +36,7 @@ class Start extends Element {
         $validate = new Validate();
         //print_r($startID);
         if($validate->startID($startID) !== true) {
+            throw new \Error('Invalid startID:' .$startID);
             return false;
         }
 
@@ -71,11 +72,11 @@ class Start extends Element {
     }
 
     protected function create() {
-        $validate = new Validate();
-
+        /*
+        // removing need for start to have valid destination when created
         if(!$validate->destinationID($this->getDestinationID())) {
             throw new \Error('Start must have a valid destination (Question ID or End ID). Likely a Question ID...');
-        }
+        }*/
 
         // create it off the object
         // map the start object to the start parameters in the DB
@@ -91,8 +92,8 @@ class Start extends Element {
         if(Utility\isID($result)) {
             $startID = $result;
 
-            // insert the destination row
-            $this->db->insertDestination($startID, $this->getDestinationID());
+            // validation happens within this function
+            $this->insertDestination($startID);
 
             // we're good! Build the start again and return it
             return $this->build($startID);
@@ -119,11 +120,8 @@ class Start extends Element {
             $result = $this->db->updateElement($start);
         }
 
-        // if destination ID has changed, then update it
-        if((int) $original->getDestinationID() !== (int) $this->getDestinationID()) {
-            // update the destination
-            $this->db->updateDestination($this->getID(), $this->getDestinationID());
-        }
+        // this could insert, update, or delete the destination depending on new value
+        $this->updateDestination();
 
         // rebuild it so we get the fresh copy
         $this->rebuild();

@@ -247,4 +247,34 @@ class Element {
         // rebuild the el
         return $this->build($this->getID());
     }
+
+    protected function insertDestination($ID) {
+        $validate = new Validate();
+        // insert the destination row if there's a valid destinationID
+        if($validate->destinationID($this->getDestinationID())) {
+            $this->db->insertDestination($ID, $this->getDestinationID());
+        }
+    }
+
+    protected function updateDestination() {
+        $validate = new Validate();
+        // try to get the current one direct from the database
+        // check directly from DB, otherwise we might run into validation errors from the destination setting process
+        $destinationFromDB = $this->db->getDestination($this->getID());
+        $destinationID = $this->getDestinationID();
+        // if the old one doesn't exist and there's a destination ID now, insert it
+        if($destinationFromDB === false && $validate->destinationID($destinationID)) {
+            $this->db->insertDestination($this->getID(), $destinationID);
+        }
+        // delete the destination if destinationID is now null/false
+        else if($destinationFromDB && !$destinationID) {
+            $this->db->deleteDestination($this->getID(), $destinationFromDB['elIDDestination']);
+        }
+
+        // if destination ID has changed, then update it
+        else if((int) $destinationFromDB['elIDDestination'] !== (int) $destinationID && $validate->destinationID($destinationID)) {
+            // update the destination since it already exists
+            $this->db->updateDestination($this->getID(), $destinationID);
+        }
+    }
 }

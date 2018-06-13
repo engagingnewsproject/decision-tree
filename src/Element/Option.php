@@ -127,10 +127,9 @@ class Option extends Element {
         // assign it to the question container
         $this->db->insertContainer($this->getQuestionID(), $optionID);
 
-        // insert the destination row if there's a valid destinationID
-        if($validate->destinationID($this->getDestinationID())) {
-            $this->db->insertDestination($optionID, $this->getDestinationID());
-        }
+
+        // validation happens within this function
+        $this->insertDestination($optionID);
 
 
         // we're good! Build the option again and return it
@@ -179,25 +178,8 @@ class Option extends Element {
           }
         }
 
-
-        // try to get the current one direct from the database
-        // check directly from DB, otherwise we might run into validation errors from the destination setting process
-        $destinationFromDB = $this->db->getDestination($this->getID());
-        $destinationID = $this->getDestinationID();
-        // if the old one doesn't exist and there's a destination ID now, insert it
-        if($destinationFromDB === false && $destinationID) {
-            $this->db->insertDestination($this->getID(), $destinationID);
-        }
-        // delete the destination if destinationID is now null/false
-        else if($destinationFromDB && !$destinationID) {
-            $this->db->deleteDestination($this->getID(), $destinationFromDB['elIDDestination']);
-        }
-
-        // if destination ID has changed, then update it
-        else if((int) $destinationFromDB['elIDDestination'] !== (int) $destinationID) {
-            // update the destination since it already exists
-            $this->db->updateDestination($this->getID(), $destinationID);
-        }
+        // this could insert, update, or delete the destination depending on new value
+        $this->updateDestination();
 
         // rebuild it so we get the fresh copy
         $this->rebuild();

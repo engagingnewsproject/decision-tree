@@ -496,7 +496,7 @@ CREATE  OR REPLACE VIEW `treeStart` (startID, treeID, title, content, destinatio
         tree.treeElement el
     INNER JOIN
         tree.treeElementType elType ON el.elTypeID = elType.elTypeID
-    INNER JOIN
+    LEFT JOIN
         tree.treeElementDestination destination ON el.elID = destination.elID
     WHERE
         elType.elType = 'start';

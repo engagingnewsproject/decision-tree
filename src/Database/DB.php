@@ -1045,6 +1045,9 @@ class DB extends PDO {
         if(!isset($el['elTitle']) || $el['elTitle'] === false) {
             $el['elTitle'] = '';
         }
+        if(!isset($el['elContent']) || $el['elContent'] === false) {
+            $el['elContent'] = '';
+        }
         return $this->insert([
             'vals'      => $el,
             'required'  => ['treeID', 'elTypeID', 'elTitle', 'elCreatedBy', 'elUpdatedBy'],
