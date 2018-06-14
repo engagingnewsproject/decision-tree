@@ -59,6 +59,12 @@ var app = new Vue({
     };
   },
   mounted: function mounted() {
+    if (!localStorage.getItem('accessToken') || !localStorage.getItem('clientToken')) {
+      this.errored = true;
+      this.error = {
+        message: 'Please set your accessToken and clientToken in localStorage'
+      };
+    }
     this.reMount();
   },
 
@@ -106,17 +112,17 @@ var app = new Vue({
             this.newestEl = null;
           }
 
-          console.log(this.lastFocused);
           if (this.lastFocused) {
-            document.getElementById(this.lastFocused.id).focus();
-            this.lastFocused = null;
+
+            if (document.getElementById(this.lastFocused.id)) {
+              document.getElementById(this.lastFocused.id).focus();
+            }
           }
         });
       });
     },
     setLastFocus: function setLastFocus() {
       this.lastFocused = document.activeElement;
-      console.log(this.lastFocused);
     },
 
     saveTree: function saveTree() {
@@ -128,7 +134,7 @@ var app = new Vue({
       }).then(function (response) {
         return console.log(response.data);
       }).catch(function (error) {
-        console.log(error);
+        console.error(error);
         _this2.errored = true;
         _this2.error = error;
       }).finally(function () {
@@ -160,7 +166,6 @@ var app = new Vue({
 
       // call the data build dynamically
       elData = this.buildSave(el);
-      console.log(elData);
 
       path = '/trees/' + tree.ID + '/' + elType + 's/' + ID;
       if (elType === 'option') {
@@ -173,7 +178,7 @@ var app = new Vue({
       treeServer.put(path, elData).then(function (response) {
         console.log(response.data);
       }).catch(function (error) {
-        console.log(error);
+        console.error(error);
         _this3.errored = true;
         _this3.error = error;
       }).finally(function () {
@@ -204,7 +209,7 @@ var app = new Vue({
         // if successful, then remove this element from the data array
         ;
       }).catch(function (error) {
-        console.log(error);
+        console.error(error);
         _this4.errored = true;
         _this4.error = error;
       }).finally(function () {
@@ -223,7 +228,7 @@ var app = new Vue({
         _this5.newestEl = response.data;
         _this5.newestEl.type = elType;
       }).catch(function (error) {
-        console.log(error);
+        console.error(error);
         _this5.errored = true;
         _this5.error = error;
       }).finally(function () {
@@ -248,8 +253,6 @@ var app = new Vue({
           if (whitelist[i] === 'destinationID') {
             // set the destination type off of this ID
             data['destinationType'] = this.getDestinationTypeByID(el[whitelist[i]]);
-            console.log('finding destination of ', el[whitelist[i]]);
-            console.log('destinationType', data['destinationType']);
           }
         }
       }
@@ -321,7 +324,7 @@ var app = new Vue({
       treeServer.put(path).then(function (response) {
         return console.log(response.data);
       }).catch(function (error) {
-        console.log(error);
+        console.error(error);
         _this7.errored = true;
         _this7.error = error;
       }).finally(function () {
@@ -335,7 +338,7 @@ var app = new Vue({
         console.log(response.data);
         _this8.compiledResult = response.data;
       }).catch(function (error) {
-        console.log(error);
+        console.error(error);
         _this8.errored = true;
         _this8.error = error;
       }).finally(function () {

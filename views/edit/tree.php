@@ -51,17 +51,23 @@
           <label>
             <span class="element__label">Start Title</span>
             <textarea
-              v-on:focus="setLastFocus" rows="1"
-            v-bind:id="'start-title--'+start.ID"
-            class="element__title element__title--start"
-            v-on:change="saveElement(start.ID, 'start')"
-            v-on:keyup="setTextareaHeight"
-            v-model="start.title"
-            v-bind:placeholder="'Start Title '+(index+1)"></textarea>
+              v-on:focus="setLastFocus"
+              rows="1"
+              v-bind:id="'start-title--'+start.ID"
+              class="element__title element__title--start"
+              v-on:change="saveElement(start.ID, 'start')"
+              v-on:keyup="setTextareaHeight"
+              v-model="start.title"
+              v-bind:placeholder="'Start Title '+(index+1)"></textarea>
           </label>
           <label>
               <span class="visually-hidden">Destination</span>
-              <select v-bind:id="'start-destination--'+start.ID" class="element__destination" v-on:change="saveElement(start.ID, 'start')" v-model="start.destinationID">
+              <select
+                v-on:focus="setLastFocus"
+                v-bind:id="'start-destination--'+start.ID"
+                class="element__destination"
+                v-on:change="saveElement(start.ID, 'start')"
+                v-model="start.destinationID">
                 <?php include 'destination-select.php'?>
               </select>
             </label>
@@ -82,10 +88,19 @@
           <label>
             <span class="element__label">Question Title</span>
             <textarea
-              v-on:focus="setLastFocus" rows="1" v-bind:id="'question-title--'+question.ID" class="element__title element__title--question" v-on:change="saveElement(question.ID, 'question')" v-on:keyup="setTextareaHeight" v-model="question.title"
-            v-bind:placeholder="'Question Title '+(index+1)"></textarea>
+              v-on:focus="setLastFocus"
+              rows="1"
+              v-bind:id="'question-title--'+question.ID"
+              class="element__title element__title--question"
+              v-on:change="saveElement(question.ID, 'question')"
+              v-on:keyup="setTextareaHeight"
+              v-model="question.title"
+              v-bind:placeholder="'Question Title '+(index+1)"></textarea>
           </label>
-          <input v-on:focus="setLastFocus" type="hidden" v-model="question.order" />
+          <input
+            v-on:focus="setLastFocus"
+            type="hidden"
+            v-model="question.order" />
           <button class="element__save">Save</button>
         </form>
         <div class="options option-wrapper" v-for="(option, index) in question.options">
@@ -93,18 +108,30 @@
             <label>
               <span class="visually-hidden">Option Title</span>
               <textarea
-                v-on:focus="setLastFocus" rows="1" v-bind:id="'option-title--'+option.ID" class="element__title element__title--option" v-on:change="saveElement(option.ID, 'option')" v-on:keyup="setTextareaHeight" v-model="option.title"
-              v-bind:placeholder="'Option '+(index+1)">></textarea>
+                v-on:focus="setLastFocus"
+                rows="1"
+                v-bind:id="'option-title--'+option.ID"
+                class="element__title element__title--option"
+                v-on:change="saveElement(option.ID, 'option')"
+                v-on:keyup="setTextareaHeight"
+                v-model="option.title"
+                v-bind:placeholder="'Option '+(index+1)"></textarea>
             </label>
             <label>
               <span class="visually-hidden">Destination</span>
-              <select v-bind:id="'option-destination--'+option.ID" class="element__destination" v-on:change="saveElement(option.ID, 'option')" v-model="option.destinationID">
+              <select
+                v-on:focus="setLastFocus"
+                v-bind:id="'option-destination--'+option.ID"
+                class="element__destination"
+                v-on:change="saveElement(option.ID, 'option')"
+                v-model="option.destinationID">
                 <?php include 'destination-select.php'?>
               </select>
             </label>
           </form>
 
           <button v-if="option.order != 0"v-on:click="orderSave('option', option, option.order-1)" class="option__move option__move--up">↑</button>
+
           <button v-if="option.order < question.options.length - 1" v-on:click="orderSave('option', option, option.order+1)" class="option__move option__move--down">↓</button>
 
           <button class="btn btn--delete btn__delete-option" v-on:click="deleteElement(option.ID, 'option')"><svg class="icon icon--close"><use xlink:href="#close" /></svg></button>
@@ -131,7 +158,8 @@
               v-on:focus="setLastFocus"
               rows="1"
               v-bind:id="'end-title--'+end.ID"
-              class="element__title element__title--end" v-on:change="saveElement(end.ID, 'end')"
+              class="element__title element__title--end"
+              v-on:change="saveElement(end.ID, 'end')"
               v-on:keyup="setTextareaHeight"
               v-model="end.title"
               v-bind:placeholder="'End Title '+(index+1)"></textarea>
@@ -186,8 +214,17 @@
               v-model="group.content"
               v-bind:placeholder="'Group Content '+(index+1)"></textarea>
           </label>
-          <input v-on:focus="setLastFocus" type="hidden" v-model="group.order" />
-          <select v-on:focus="setLastFocus" v-bind:id="'group-destination--'+group.ID" class="element__multiselect" v-on:blur="saveElement(group.ID, 'group')" v-model="group.questions" multiple>
+          <input
+            v-on:focus="setLastFocus"
+            type="hidden"
+            v-model="group.order" />
+          <select
+            v-on:focus="setLastFocus"
+            v-bind:id="'group-destination--'+group.ID"
+            class="element__multiselect"
+            v-on:blur="saveElement(group.ID, 'group')"
+            v-model="group.questions"
+            multiple>
             <option v-for="question in currentTree.questions" v-bind:value="question.ID">{{ question.title }}</option>
           </select>
           <button class="element__save">Save</button>

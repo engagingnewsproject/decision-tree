@@ -57,6 +57,12 @@ var app = new Vue({
     }
   },
   mounted () {
+    if(!localStorage.getItem('accessToken') || !localStorage.getItem('clientToken')) {
+      this.errored = true
+      this.error = {
+        message: 'Please set your accessToken and clientToken in localStorage'
+      }
+    }
     this.reMount();
   },
   methods: {
@@ -105,10 +111,11 @@ var app = new Vue({
               this.newestEl = null
             }
 
-            console.log(this.lastFocused)
             if(this.lastFocused) {
-              document.getElementById(this.lastFocused.id).focus()
-              this.lastFocused = null
+
+              if(document.getElementById(this.lastFocused.id)) {
+                document.getElementById(this.lastFocused.id).focus()
+              }
             }
 
           })
@@ -116,7 +123,6 @@ var app = new Vue({
     },
     setLastFocus() {
       this.lastFocused = document.activeElement
-      console.log(this.lastFocused)
     },
     saveTree: function () {
       treeServer
@@ -130,7 +136,7 @@ var app = new Vue({
           console.log(response.data)
         ))
         .catch(error => {
-          console.log(error)
+          console.error(error)
           this.errored = true
           this.error = error
         })
@@ -153,7 +159,6 @@ var app = new Vue({
 
       // call the data build dynamically
       elData = this.buildSave(el);
-      console.log(elData)
 
       path = '/trees/'+tree.ID+'/'+elType+'s/'+ID
       if(elType === 'option') {
@@ -171,7 +176,7 @@ var app = new Vue({
           console.log(response.data)
         })
         .catch(error => {
-          console.log(error)
+          console.error(error)
           this.errored = true
           this.error = error
         })
@@ -202,7 +207,7 @@ var app = new Vue({
           // if successful, then remove this element from the data array
         ))
         .catch(error => {
-          console.log(error)
+          console.error(error)
           this.errored = true
           this.error = error
         })
@@ -223,7 +228,7 @@ var app = new Vue({
           this.newestEl.type = elType
         })
         .catch(error => {
-          console.log(error)
+          console.error(error)
           this.errored = true
           this.error = error
         })
@@ -250,8 +255,6 @@ var app = new Vue({
           if(whitelist[i] === 'destinationID') {
             // set the destination type off of this ID
             data['destinationType'] = this.getDestinationTypeByID(el[whitelist[i]])
-            console.log('finding destination of ', el[whitelist[i]])
-            console.log('destinationType', data['destinationType'])
           }
 
         }
@@ -327,7 +330,7 @@ var app = new Vue({
           console.log(response.data)
         ))
         .catch(error => {
-          console.log(error)
+          console.error(error)
           this.errored = true
           this.error = error
         })
@@ -341,7 +344,7 @@ var app = new Vue({
           this.compiledResult = response.data
         })
         .catch(error => {
-          console.log(error)
+          console.error(error)
           this.errored = true
           this.error = error
         })

@@ -242,13 +242,13 @@ body.draggable--is-dragging input:hover,
     padding: 0.8rem 1rem;
     background: $blue;
     color: #333;
-    border: 2px dashed darken($blue, 15%);
+    border: 2px dashed darken($blue, 20%);
     font-size: 0.9rem;
     transition: all .15s;
 
     &:focus,
     &:hover {
-        background: darken($blue, 3%);
+        background: darken($blue, 5%);
     }
 }
 

@@ -1,31 +1,31 @@
 {
     "ID": "5",
     "slug": "vuetest",
-    "title": "Vue Quiz Updates Again This time",
+    "title": "Vue Quiz Editing Title",
     "owner": "1",
     "starts": [
         {
             "ID": "2843",
-            "title": "Begin",
-            "destinationID": "2669",
+            "title": "Begin Start",
+            "destinationID": "119",
             "destinationType": "question"
         }
     ],
     "groups": [
         {
-            "ID": "2921",
-            "title": "My Group Title",
-            "content": "The Group Content",
+            "ID": "2949",
+            "title": "Test group",
+            "content": "",
             "order": "0",
             "questions": [
-                "119"
+                "2852"
             ]
         }
     ],
     "questions": [
         {
             "ID": "2669",
-            "title": "Question 1 is the first one did you know that",
+            "title": "Question 1 is the first one",
             "order": "0",
             "options": [
                 {
@@ -86,7 +86,7 @@
                 },
                 {
                     "ID": "2945",
-                    "title": "Go to end 2",
+                    "title": "Go to end 2 now",
                     "order": "1",
                     "destinationID": "2940",
                     "destinationType": "end"
