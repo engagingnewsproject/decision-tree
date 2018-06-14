@@ -12,9 +12,11 @@ use \Cme\Utility as Utility;
 use PDO;
 
 class Validate extends DB {
-    public function __construct() {
+    protected $user;
+
+    public function __construct($user = false) {
         // create a DB instance
-        parent::__construct();
+        parent::__construct($user);
     }
 
     public function tree($tree) {
@@ -96,7 +98,7 @@ class Validate extends DB {
 
         $el = $this->getElement($elID);
         // check owner
-        if($el['elCreatedBy'] === $user['userID'] || $this->user['userRole'] === 'admin') {
+        if($el['elCreatedBy'] === $user['userID'] || $user['userRole'] === 'admin') {
             return true;
         }
 

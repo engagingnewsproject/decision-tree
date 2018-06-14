@@ -318,4 +318,34 @@ final class ValidateTest extends TreeTestCase
 
         return $provider;
     }
+
+    /**
+     * @covers Cme\Database\Validate\elOwner()
+     * @dataProvider validateElOwnerProvider
+     */
+    public function testValidatElOwner($elID, $user, $expected) {
+        if($expected == Error::class) {
+            $this->expectException(\Error::class);
+            $this->validate->elOwner($elID, $user);
+        } else {
+            $this->evaluateAssert($this->validate->elOwner($elID, $user), $expected);
+        }
+
+    }
+
+    public function validateElOwnerProvider() {
+        $el = $this->getOneDynamic('question', 1);
+        $elID = $el['questionID'];
+        $owner = Utility\getUser('userID', 1);
+        $admin = Utility\getUser('userID', 17);
+        $notOwner = Utility\getUser('userID', 2);
+
+        return [
+                'owner'=>[$elID, $owner, true],
+                'not_owner'=>[$elID, $notOwner, Error::class],
+                'admin'=>[$elID, $adminUser, true],
+                'el_not_exist' => [999999999999999999999999999999, $owner, Error::class],
+                'invalid_boolean' => [true, true, Error::class]
+        ];
+    }
 }

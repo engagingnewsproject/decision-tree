@@ -497,6 +497,13 @@
                     "destinationType": "end"
                 },
                 {
+                    "ID": "53",
+                    "title": "True",
+                    "order": "1",
+                    "destinationID": null,
+                    "destinationType": null
+                },
+                {
                     "ID": "87",
                     "title": "True",
                     "order": "1",
@@ -590,30 +597,9 @@
             ]
         },
         {
-            "ID": "91",
-            "title": "I am a male who was in the United States between the ages of 18 and 26 as a lawful nonimmigrant.",
-            "order": "24",
-            "options": [
-                {
-                    "ID": "100",
-                    "title": "False",
-                    "order": "0",
-                    "destinationID": "6",
-                    "destinationType": "end"
-                },
-                {
-                    "ID": "101",
-                    "title": "True",
-                    "order": "1",
-                    "destinationID": "68",
-                    "destinationType": "question"
-                }
-            ]
-        },
-        {
             "ID": "68",
             "title": "I have never deserted from the U.S. Armed Forces.",
-            "order": "25",
+            "order": "24",
             "options": [
                 {
                     "ID": "102",
@@ -634,7 +620,7 @@
         {
             "ID": "69",
             "title": "I have never received an exemption or discharge from the U.S. Armed Forces on the grounds that I am an alien. ",
-            "order": "26",
+            "order": "25",
             "options": [
                 {
                     "ID": "104",
@@ -655,7 +641,7 @@
         {
             "ID": "70",
             "title": "I am willing to perform either military or civilian service for the United States if required by law. (NOTE: If your religious teachings OR beliefs prohibit you from performing military service, you must be willing to perform non-military service.)",
-            "order": "27",
+            "order": "26",
             "options": [
                 {
                     "ID": "106",
@@ -676,7 +662,7 @@
         {
             "ID": "71",
             "title": "I will support the Constitution of the United States.",
-            "order": "28",
+            "order": "27",
             "options": [
                 {
                     "ID": "108",
@@ -697,7 +683,7 @@
         {
             "ID": "72",
             "title": "I understand and am willing to take an oath of allegiance to the United States.",
-            "order": "29",
+            "order": "28",
             "options": [
                 {
                     "ID": "110",
@@ -729,18 +715,18 @@
         }
     ],
     "stats": {
-        "total_paths": 3442,
+        "total_paths": 3570,
         "longest_path": 30,
         "path_ends": {
             "5": {
                 "title": "Eligible",
                 "count": 512,
-                "percentage": 14.88
+                "percentage": 14.34
             },
             "6": {
                 "title": "May Not Be Eligible",
                 "count": 2930,
-                "percentage": 85.12
+                "percentage": 82.07
             }
         }
     }
