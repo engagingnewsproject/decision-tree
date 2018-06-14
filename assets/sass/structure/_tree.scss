@@ -37,8 +37,8 @@ html {
 }
 
 .cme-tree__title {
-    margin-top: 0;
-    margin-bottom: $spacing__base;
+    margin: 0 0 $spacing__base; // reasonable reset
+    padding: 0; // reasonable reset
     transition: all .4s $easing;
 }
 
