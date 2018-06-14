@@ -1,6 +1,6 @@
 const treeServer = axios.create({
   baseURL: window.location.origin+'/api/v1',
-  timeout: 1000,
+  timeout: 5000,
   headers: {
     'X-API-Access': localStorage.getItem('accessToken'),
     'X-API-Client': localStorage.getItem('clientToken'),
