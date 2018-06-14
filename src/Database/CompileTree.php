@@ -22,10 +22,15 @@ class CompileTree extends DB {
         }
         $this->tree = $tree;
         $this->compiled = $this->tree->array();
+        $this->compiled['errors'] = []; // add in errors like question missing options, or option not having a destination
         $this->compiled['starts'] = $this->compileElement('start', $this->tree->getStarts());
         $this->compiled['groups'] = $this->compileElement('group', $this->tree->getGroups());
         $this->compiled['questions'] = $this->compileElement('question', $this->tree->getQuestions());
         $this->compiled['ends'] = $this->compileElement('end', $this->tree->getEnds());
+
+        if(empty($this->compiled['errors'])) {
+            unset($this->compiled['errors']);
+        }
         if($stats === true) {
             // figure out total paths and longest path
             $this->compiled['stats'] = $this->computePaths($this->compiled['questions']);
@@ -64,8 +69,20 @@ class CompileTree extends DB {
 
             // if we're on a question, run this again for the options
             if($elType === 'question') {
+                if(empty($el->getOptions())) {
+                    $this->compiled['errors']['questions'][$el->getID()] = 'No options';
+                }
+                // still add in the array tho
                 $compiledEl['options'] = $this->compileElement('option', $el->getOptions());
             }
+
+            // if we're on a start or option, check the destination
+            if($elType === 'start' || $elType === 'option') {
+                if(empty($el->getDestinationID())) {
+                    $this->compiled['errors'][$elType][$el->getID()] = 'No destination';
+                }
+            }
+
             $compiled[] = $compiledEl;
         }
         return $compiled;
