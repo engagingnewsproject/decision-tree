@@ -40,7 +40,9 @@ $c['phpErrorHandler'] = function ($c) {
     return function ($request, $response, $error) use ($c) {
         $return = [
             'status'  => 'error',
-            'message' => $error->getMessage()
+            'message' => $error->getMessage(),
+            'file'  => $error->getFile(),
+            'line'  => $error->getLine()
         ];
         return $c['response']
             ->withStatus(500)
@@ -53,7 +55,11 @@ $c['phpErrorHandler'] = function ($c) {
 $app->add(new \Cme\Authentication());
 
 $app->group('/edit', function() {
-    $this->get('/tree/{treeID}', '\Cme\Route\Editor:tree');
+    $this->get('/tree/{treeIdentifier}', '\Cme\Route\Editor:tree');
+});
+
+$app->group('/preview', function() {
+    $this->get('/tree/{treeIdentifier}', '\Cme\Route\Preview:tree');
 });
 
 $app->group('/api', function() {
