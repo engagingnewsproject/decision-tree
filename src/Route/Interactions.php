@@ -27,7 +27,7 @@ class Interactions extends Route
             $this->data['site']['siteID'] = $siteResponse['siteID'];
             $this->data['site']['treeID'] = $this->data['treeID'];
         } else {
-            $this->addError($siteResponse);
+            $this->addError(print_r($siteRresponse, true));
         }
         // no errors? get the embed
         if(empty($this->errors)) {
@@ -39,7 +39,7 @@ class Interactions extends Route
             if(isset($embed['status']) && $embed['status'] === 'success') {
                 $this->data['site']['embedID'] = $embed['embedID'];
             } else {
-                $this->addError($embed);
+                $this->addError(print_r($embed, true));
             }
         }
 

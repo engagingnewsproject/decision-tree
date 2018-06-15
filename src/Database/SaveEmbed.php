@@ -92,8 +92,8 @@ class SaveEmbed extends DB {
         }
 
         // check that isIframe is boolean
-        if(is_bool( $embed['isIframe'] ) === false) {
-            $this->errors[] = 'isIframe must be boolean.';
+        if($embed['isIframe'] !== 0 && $embed['isIframe'] !== 1) {
+            $this->errors[] = 'isIframe must be 0 or 1.';
         }
 
         // if we have don't have any errors, it's valid!
@@ -108,6 +108,15 @@ class SaveEmbed extends DB {
     protected function sanitize($embed) {
         if(isset($embed['path'])) {
             $embed['path'] = filter_var($embed['path'], FILTER_SANITIZE_URL);
+        }
+
+        if(isset($embed['isIframe'])) {
+            // convert to tinyint to match database
+            if($embed['isIframe'] === true) {
+                $embed['isIframe'] = 1;
+            } else if ($embed['isIframe'] === false) {
+                $embed['isIframe'] = 0;
+            }
         }
 
         return $embed;
