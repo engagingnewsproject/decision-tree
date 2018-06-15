@@ -298,7 +298,7 @@ CREATE TRIGGER treeInsertTrigger
 BEFORE INSERT ON `tree`.`tree`
 FOR EACH ROW
 BEGIN
-IF NEW.treeCreatedAt = '1970-01-01 06:00:00' THEN
+IF NEW.treeCreatedAt = '1970-01-01 %' THEN
 SET NEW.treeCreatedAt = NOW();
 END IF;
 END;//
@@ -313,7 +313,7 @@ CREATE TRIGGER treeElementInsertTrigger
 BEFORE INSERT ON `tree`.`treeElement`
 FOR EACH ROW
 BEGIN
-IF NEW.elCreatedAt = '1970-01-01 06:00:00' THEN
+IF NEW.elCreatedAt = '1970-01-01 %' THEN
 SET NEW.elCreatedAt = NOW();
 END IF;
 END;//
@@ -328,7 +328,7 @@ CREATE TRIGGER treeInteractionTrigger
 BEFORE INSERT ON `tree`.`treeInteraction`
 FOR EACH ROW
 BEGIN
-IF NEW.interactionCreatedAt = '1970-01-01 06:00:00' THEN
+IF NEW.interactionCreatedAt = '1970-01-01 %' THEN
 SET NEW.interactionCreatedAt = NOW();
 END IF;
 END;//
@@ -343,7 +343,7 @@ CREATE TRIGGER treeSiteTrigger
 BEFORE INSERT ON `tree`.`treeSite`
 FOR EACH ROW
 BEGIN
-IF NEW.siteCreatedAt = '1970-01-01 06:00:00' THEN
+IF NEW.siteCreatedAt = '1970-01-01 %' THEN
 SET NEW.siteCreatedAt = NOW();
 END IF;
 END;//
@@ -358,7 +358,7 @@ CREATE TRIGGER treeEmbedTrigger
 BEFORE INSERT ON `tree`.`treeEmbed`
 FOR EACH ROW
 BEGIN
-IF NEW.embedCreatedAt = '1970-01-01 06:00:00' THEN
+IF NEW.embedCreatedAt = '1970-01-01 %' THEN
 SET NEW.embedCreatedAt = NOW();
 END IF;
 END;//
