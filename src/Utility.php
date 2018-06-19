@@ -167,7 +167,7 @@ function requestEndpoint($path, $data = [], $method = 'GET') {
     }
 
     // don't worry about SSL for local
-    if(TREE_URL === 'https://decision-tree.dev') {
+    if(TREE_URL === 'https://decision-tree.test') {
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
     }
 

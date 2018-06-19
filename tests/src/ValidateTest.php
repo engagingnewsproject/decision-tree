@@ -275,7 +275,7 @@ final class ValidateTest extends TreeTestCase
     }
 
     public function validateSiteProvider() {
-        $sites = ['localhost:3000', 'decision-tree.dev', 1];
+        $sites = ['localhost:3000', 'decision-tree.test', 1];
 
         $provider = [
             'invalid_empty'   => ['', false],

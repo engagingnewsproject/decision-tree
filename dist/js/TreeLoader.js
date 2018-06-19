@@ -10,7 +10,7 @@
         */
         var _setRootURL = function _setRootURL(url) {
             // regex it to see if it's one of our DEV urls
-            var regex = /https?:\/\/(?:(?:localhost:3000|decision-tree.dev)|(?:enptree|cmetree)\.(?:staging\.)?wpengine\.com)\b/;
+            var regex = /https?:\/\/(?:(?:localhost:3000|decision-tree.test)|(?:enptree|cmetree)\.(?:staging\.)?wpengine\.com)\b/;
             _rootURL = regex.exec(url);
 
             if (_rootURL === null) {

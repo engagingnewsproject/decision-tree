@@ -436,8 +436,8 @@ function getTreeData(slug) {
 
     return new Promise(function(resolve, reject) {
         let baseUrl;
-        if(/https?:\/\/(?:localhost:3000|decision-tree.dev)\//.test(window.location.href)) {
-            baseUrl = 'https://decision-tree.dev'
+        if(/https?:\/\/(?:localhost:3000|decision-tree.test)\//.test(window.location.href)) {
+            baseUrl = 'https://decision-tree.test'
         } else {
             baseUrl = 'https://tree.mediaengagement.org'
         }
@@ -469,7 +469,7 @@ function getTreeData(slug) {
 function buildTree(request) {
 
     // check our response URL to make sure it's from a trusted source
-    if(!/https?:\/\/(?:decision-tree\.dev|tree\.mediaengagement\.org|(?:enptree|cmetree)(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
+    if(!/https?:\/\/(?:decision-tree\.test|tree\.mediaengagement\.org|(?:enptree|cmetree)(\.staging)?\.wpengine\.com)\/api\//.test(request.responseURL)) {
         console.error('responseURL from an invalidated source.')
         return false;
     }

@@ -25,7 +25,7 @@ function TreeInteraction(options) {
         currentScript = scripts[ scripts.length - 1 ].src
 
         // regex it to see if it's one of our DEV urls
-        regex = /https?:\/\/(?:(?:localhost:3000|decision-tree.dev)|(?:enptree|cmetree)\.(?:staging\.)?wpengine\.com)\b/
+        regex = /https?:\/\/(?:(?:localhost:3000|decision-tree.test)|(?:enptree|cmetree)\.(?:staging\.)?wpengine\.com)\b/
         _rootURL = regex.exec(currentScript)
 
         if(_rootURL === null) {
