@@ -1467,6 +1467,13 @@ return /******/ (function(modules) { // webpackBootstrap
 });
 ;
 
+var decodeHTML = function (html) {
+    var txt = document.createElement('textarea');
+    txt.innerHTML = html;
+    //console.log(txt.value);
+    return txt.value;
+};
+
 this["TreeTemplates"] = this["TreeTemplates"] || {};
 this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function";
@@ -1514,7 +1521,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
     + "\" class=\"cme-tree__question\" tabindex=\"-1\">\n                            <span class=\"cme-tree__el-number\">"
     + alias4((helpers.elNumber || (depth0 && depth0.elNumber) || alias2).call(alias1,(depth0 != null ? depth0.order : depth0),{"name":"elNumber","hash":{},"data":data}))
     + "</span>\n                            <h4 class=\"cme-tree__title cme-tree__title--question\">"
-    + alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper)))
+    + decodeHTML(alias4(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2), (typeof helper === alias3 ? helper.call(alias1, { "name": "title", "hash": {}, "data": data }) : helper))))
     + "</h4>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.content : depth0),{"name":"if","hash":{},"fn":container.program(11, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.options : depth0),{"name":"if","hash":{},"fn":container.program(13, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
@@ -1587,7 +1594,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
   return "\n                        <section id=\"cme-tree__el--"
     + ((stack1 = ((helper = (helper = helpers.ID || (depth0 != null ? depth0.ID : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"ID","hash":{},"data":data}) : helper))) != null ? stack1 : "")
     + "\" class=\"cme-tree__end\" tabindex=\"-1\">\n                            <h3 class=\"cme-tree__title cme-tree__title--end\">"
-    + ((stack1 = ((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"title","hash":{},"data":data}) : helper))) != null ? stack1 : "")
+      + decodeHTML(((stack1 = ((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : alias2), (typeof helper === alias3 ? helper.call(alias1, { "name": "title", "hash": {}, "data": data }) : helper))) != null ? stack1 : ""))
     + "</h3>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.content : depth0),{"name":"if","hash":{},"fn":container.program(22, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n                            <ul class=\"cme-tree__end-options\">\n                                <li class=\"cme-tree__end-option\">\n                                    <a id=\"cme-tree__restart--"
@@ -1603,7 +1610,7 @@ this["TreeTemplates"]["tree"] = Handlebars.template({"1":function(container,dept
     var helper;
 
   return "                                <div class=\"cme-tree__description cme-tree__description--end\">"
-    + container.escapeExpression(((helper = (helper = helpers.content || (depth0 != null ? depth0.content : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}),{"name":"content","hash":{},"data":data}) : helper)))
+      + decodeHTML(container.escapeExpression(((helper = (helper = helpers.content || (depth0 != null ? depth0.content : depth0)) != null ? helper : helpers.helperMissing), (typeof helper === "function" ? helper.call(depth0 != null ? depth0 : (container.nullContext || {}), { "name": "content", "hash": {}, "data": data }) : helper))))
     + "</div>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, helper, alias1=depth0 != null ? depth0 : (container.nullContext || {}), alias2=helpers.helperMissing, alias3="function", alias4=container.lambda;
@@ -3715,7 +3722,9 @@ function TreeView(options) {
         var el = void 0,
             elId = void 0;
 
-        if (state.type === 'overview') {
+        console.log(state);
+
+        if (state.type === 'overview' || state.type === 'intro') {
             elId = 'cme-tree--' + state.id;
         } else {
             elId = 'cme-tree__el--' + state.id;
@@ -3727,6 +3736,9 @@ function TreeView(options) {
         }
         // they're trying to set a new state, so let's see if we can
         el = document.getElementById(elId);
+
+        console.log(elId, el);
+
         if ((typeof el === 'undefined' ? 'undefined' : _typeof(el)) !== 'object') {
             console.error('Could not set active element for state type ' + state.type + ' with state id ' + state.id);
             return false;
@@ -3950,7 +3962,7 @@ TreeView.prototype = {
         activeEl = this.setActiveEl(state);
 
         // if set active fails... what to do?
-        if (activeEl === false) {
+        if (activeEl === false || activeEl === null) {
             return false;
         }
         // validated, so set the new class!
@@ -4085,7 +4097,8 @@ TreeView.prototype = {
                 // kicks off the process for calculating necesary group data if necessary
                 this.checkForGroupsCalc();
                 // get the groups height
-                groupsHeight = this.getGroupsHeight();
+                groupsHeight = "0";
+                // groupsHeight = this.getGroupsHeight();
 
                 this.displayArrowDirection();
                 // make sure the height of the groups isn't taller than the cWindowHeight

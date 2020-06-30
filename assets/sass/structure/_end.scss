@@ -42,12 +42,14 @@
 
 .cme-tree__state--overview {
     .cme-tree__ends {
-        display: flex; // we don't have anything to connect them to right now, so don't worry about displaying them
+        // display: flex; // we don't have anything to connect them to right now, so don't worry about displaying them
+        display: none;
     }
 
     .cme-tree__end {
         margin-right: $spacing__base;
         margin-bottom: $spacing__base;
+        flex-direction: column;
     }
 
     .cme-tree__end-options {

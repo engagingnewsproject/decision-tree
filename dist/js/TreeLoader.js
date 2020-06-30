@@ -93,8 +93,10 @@
         // create our tree container
         _treeContainer = this.createTreeContainer(this.getTreeSlug(), this.getLoaderScript());
 
+        var uniqueNum = new Date().getTime();
+
         var resources = [{
-            src: this.getRootURL() + '/dist/js/cme-tree.min.js',
+            src: this.getRootURL() + '/dist/js/cme-tree-min.js?ver=' + uniqueNum,
             type: 'js'
         }, {
             src: this.getRootURL() + '/dist/css/' + this.getTreeStyle() + '.min.css',
