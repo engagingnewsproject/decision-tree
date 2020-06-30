@@ -1,0 +1,49 @@
+{
+    "ID": "15",
+    "slug": "vote",
+    "title": "Vote",
+    "owner": "172",
+    "starts": [
+        {
+            "ID": "332",
+            "title": "Start",
+            "destinationID": "333",
+            "destinationType": "question"
+        }
+    ],
+    "groups": [],
+    "questions": [
+        {
+            "ID": "333",
+            "title": "Question 1",
+            "order": "0",
+            "options": [
+                {
+                    "ID": "334",
+                    "title": "Test option",
+                    "order": "0",
+                    "destinationID": "335",
+                    "destinationType": "end"
+                }
+            ]
+        }
+    ],
+    "ends": [
+        {
+            "ID": "335",
+            "title": "End",
+            "content": "test"
+        }
+    ],
+    "stats": {
+        "total_paths": 1,
+        "longest_path": 2,
+        "path_ends": {
+            "335": {
+                "title": "End",
+                "count": 1,
+                "percentage": 100
+            }
+        }
+    }
+}

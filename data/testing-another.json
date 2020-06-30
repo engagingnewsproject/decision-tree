@@ -1,0 +1,101 @@
+{
+    "ID": "6",
+    "slug": "testing-another",
+    "title": "Testing Another",
+    "owner": "17",
+    "starts": [
+        {
+            "ID": "125",
+            "title": "Start Test",
+            "destinationID": "126",
+            "destinationType": "question"
+        }
+    ],
+    "groups": [
+        {
+            "ID": "131",
+            "title": "New Group",
+            "content": "This is the group content",
+            "order": "0",
+            "questions": [
+                "132"
+            ]
+        }
+    ],
+    "questions": [
+        {
+            "ID": "126",
+            "title": "Test Question 1",
+            "order": "0",
+            "options": [
+                {
+                    "ID": "127",
+                    "title": "Go to Question 2",
+                    "order": "0",
+                    "destinationID": "128",
+                    "destinationType": "question"
+                },
+                {
+                    "ID": "129",
+                    "title": "Go to End",
+                    "order": "1",
+                    "destinationID": "124",
+                    "destinationType": "end"
+                }
+            ]
+        },
+        {
+            "ID": "128",
+            "title": "Testing Question 2",
+            "order": "1",
+            "options": [
+                {
+                    "ID": "130",
+                    "title": "Go to End",
+                    "order": "0",
+                    "destinationID": "124",
+                    "destinationType": "end"
+                },
+                {
+                    "ID": "135",
+                    "title": "Question 3",
+                    "order": "1",
+                    "destinationID": "132",
+                    "destinationType": "question"
+                }
+            ]
+        },
+        {
+            "ID": "132",
+            "title": "Question 3 is in the Group",
+            "order": "2",
+            "options": [
+                {
+                    "ID": "133",
+                    "title": "Go to end",
+                    "order": "0",
+                    "destinationID": "124",
+                    "destinationType": "end"
+                }
+            ]
+        }
+    ],
+    "ends": [
+        {
+            "ID": "124",
+            "title": "End Test",
+            "content": "This is the end."
+        }
+    ],
+    "stats": {
+        "total_paths": 3,
+        "longest_path": 4,
+        "path_ends": {
+            "124": {
+                "title": "End Test",
+                "count": 3,
+                "percentage": 100
+            }
+        }
+    }
+}

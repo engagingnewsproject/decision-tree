@@ -1,0 +1,94 @@
+{
+    "ID": "11",
+    "slug": "test-four",
+    "title": "test four",
+    "owner": "172",
+    "starts": [
+        {
+            "ID": "241",
+            "title": "start",
+            "destinationID": "236",
+            "destinationType": "question"
+        }
+    ],
+    "groups": [
+        {
+            "ID": "242",
+            "title": "group title",
+            "content": "content",
+            "order": "0",
+            "questions": [
+                "329"
+            ]
+        }
+    ],
+    "questions": [
+        {
+            "ID": "236",
+            "title": "Are you registered?",
+            "order": "0",
+            "options": [
+                {
+                    "ID": "237",
+                    "title": "Yes",
+                    "order": "0",
+                    "destinationID": "240",
+                    "destinationType": "end"
+                },
+                {
+                    "ID": "238",
+                    "title": "No",
+                    "order": "1",
+                    "destinationID": "240",
+                    "destinationType": "end"
+                },
+                {
+                    "ID": "239",
+                    "title": "I dont know.",
+                    "order": "2",
+                    "destinationID": "240",
+                    "destinationType": "end"
+                }
+            ]
+        },
+        {
+            "ID": "329",
+            "title": "Test Question",
+            "order": "1",
+            "options": [
+                {
+                    "ID": "330",
+                    "title": "option 1",
+                    "order": "0",
+                    "destinationID": "236",
+                    "destinationType": "question"
+                },
+                {
+                    "ID": "331",
+                    "title": "optino 2",
+                    "order": "1",
+                    "destinationID": "240",
+                    "destinationType": "end"
+                }
+            ]
+        }
+    ],
+    "ends": [
+        {
+            "ID": "240",
+            "title": "End title",
+            "content": "end content"
+        }
+    ],
+    "stats": {
+        "total_paths": 3,
+        "longest_path": 2,
+        "path_ends": {
+            "240": {
+                "title": "End title",
+                "count": 3,
+                "percentage": 100
+            }
+        }
+    }
+}
