@@ -1,0 +1,76 @@
+{
+    "ID": "1",
+    "slug": "citizen",
+    "title": "Are You Eligible to be a US Citizen?",
+    "owner": "172",
+    "starts": [
+        {
+            "ID": "36",
+            "title": "Start",
+            "destinationID": "2",
+            "destinationType": "question"
+        }
+    ],
+    "groups": [
+        {
+            "ID": "1",
+            "title": "Attachment A",
+            "content": "I have been a Permanent Resident for three to five years",
+            "order": "0",
+            "questions": [
+                "2"
+            ]
+        }
+    ],
+    "questions": [
+        {
+            "ID": "2",
+            "title": "I am at least 18 years old.",
+            "order": "0",
+            "options": [
+                {
+                    "ID": "4",
+                    "title": "False",
+                    "order": "0",
+                    "destinationID": "5",
+                    "destinationType": "end"
+                },
+                {
+                    "ID": "3",
+                    "title": "True",
+                    "order": "1",
+                    "destinationID": "6",
+                    "destinationType": "end"
+                }
+            ]
+        }
+    ],
+    "ends": [
+        {
+            "ID": "5",
+            "title": "Eligible",
+            "content": "You can apply for US Citizenship if you want to."
+        },
+        {
+            "ID": "6",
+            "title": "May Not Be Eligible",
+            "content": "You will get rejected from US Citizenship if you apply right now."
+        }
+    ],
+    "stats": {
+        "total_paths": 3442,
+        "longest_path": 30,
+        "path_ends": {
+            "5": {
+                "title": "Eligible",
+                "count": 512,
+                "percentage": 14.88
+            },
+            "6": {
+                "title": "May Not Be Eligible",
+                "count": 2930,
+                "percentage": 85.12
+            }
+        }
+    }
+}

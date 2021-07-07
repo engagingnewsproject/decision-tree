@@ -169,7 +169,7 @@
 
 .cme-tree__history-list-link {
     -webkit-tap-highlight-color: rgba(0,0,0,.15);
-    @include historyLink
+    @include historyLink;
 
     &.is-active {
         @include historyLinkActive

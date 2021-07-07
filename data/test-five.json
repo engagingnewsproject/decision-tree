@@ -1,0 +1,71 @@
+{
+    "ID": "12",
+    "slug": "test-five",
+    "title": "test five",
+    "owner": "172",
+    "starts": [
+        {
+            "ID": "248",
+            "title": "start",
+            "destinationID": "243",
+            "destinationType": "question"
+        }
+    ],
+    "groups": [
+        {
+            "ID": "249",
+            "title": "group",
+            "content": "title",
+            "order": "0",
+            "questions": []
+        }
+    ],
+    "questions": [
+        {
+            "ID": "243",
+            "title": "Registered?",
+            "order": "0",
+            "options": [
+                {
+                    "ID": "244",
+                    "title": "Yes",
+                    "order": "0",
+                    "destinationID": "247",
+                    "destinationType": "end"
+                },
+                {
+                    "ID": "245",
+                    "title": "No",
+                    "order": "1",
+                    "destinationID": "247",
+                    "destinationType": "end"
+                },
+                {
+                    "ID": "246",
+                    "title": "Dont know",
+                    "order": "2",
+                    "destinationID": "247",
+                    "destinationType": "end"
+                }
+            ]
+        }
+    ],
+    "ends": [
+        {
+            "ID": "247",
+            "title": "End 01",
+            "content": "01 content"
+        }
+    ],
+    "stats": {
+        "total_paths": 3,
+        "longest_path": 2,
+        "path_ends": {
+            "247": {
+                "title": "End 01",
+                "count": 3,
+                "percentage": 100
+            }
+        }
+    }
+}

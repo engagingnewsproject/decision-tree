@@ -11,3 +11,4 @@ vendor/*
 !vendor/composer
 tree-config.php
 tree-db.php
+config.codekit3
